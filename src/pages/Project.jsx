@@ -103,7 +103,7 @@ const Project = () => {
   };
 
   // GET ALL PROJECTS
-
+  const [selectProject, setSelectProject] = useState({});
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [activeTab, setActiveTab] = useState("All");
   useEffect(() => {
@@ -373,30 +373,6 @@ const Project = () => {
     };
   });
 
-  // Status
-  const [selectProject, setSelectProject] = useState([]);
-  const [projectStatuses, setProjectStatuses] = useState([]);
-  const [projectId, setProjectId] = useState("");
-  useEffect(() => {
-    const fetchProjectStatuses = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL}api/project-status/${projectId}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch project statuses");
-        }
-        const data = await response.json();
-        // console.log(data);
-        setProjectStatuses(data);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-    if (projectId) {
-      fetchProjectStatuses();
-    }
-  }, [projectId]);
 
   //GET TASK
   const [tasks, setTasks] = useState([]);
@@ -426,6 +402,48 @@ const Project = () => {
       setRole(user.role);
     }
   }, []);
+
+
+  const [messages, setMessages] = useState([]);
+  const [content, setContent] = useState('');
+
+  const fetchProjectMessages = async (projectId) => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/messages/${projectId}`);
+      console.log(response.data);
+
+      setMessages(response.data);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
+  const messageSubmit = async (e) => {
+    e.preventDefault();
+    const userDetails = JSON.parse(localStorage.getItem('user'));
+    const senderId = userDetails.username; // Assuming user ID is stored in local storage
+
+    try {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, {
+        content,
+        senderId,
+        projectId: selectProject._id,
+      });
+      setContent('');
+      fetchProjectMessages(selectProject._id); // Refresh messages
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectProject._id) {
+      fetchProjectMessages(selectProject._id);
+    }
+  }, [selectProject]);
+
+
+
 
 
   return (
@@ -564,7 +582,7 @@ const Project = () => {
                                 <th>Progress</th>
                                 <th>Edit</th>
                                 <th>Delete</th>
-                                <th>Status</th>
+                                <th>Message</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -671,12 +689,13 @@ const Project = () => {
                                     </td>
                                     <td>
                                       <button
-                                        className="d-flex justify-content-center bi bi-stopwatch btn outline-secondary text-primary"
+                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
                                         data-bs-toggle="modal"
                                         data-bs-target="#addUser"
+                                        type="button"
                                         onClick={() => {
-                                          setProjectId(project._id);
                                           setSelectProject(project);
+                                          fetchProjectMessages(project._id); // Fetch messages for the selected project
                                         }}
                                       ></button>
                                     </td>
@@ -1137,178 +1156,94 @@ const Project = () => {
               </div>
             </div>
 
-            {/* Status Modal */}
-            <div
-              className="modal fade"
-              id="addUser"
-              tabIndex={-1}
-              aria-labelledby="addUserLabel"
-              aria-hidden="true"
-            >
+            {/* Message Modal */}
+            <div className="modal fade" id="addUser" tabIndex={-1} aria-labelledby="addUserLabel" aria-hidden="true">
               <div className="modal-dialog modal-dialog-centered modal-lg">
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h5 className="modal-title  fw-bold" id="addUserLabel">
+                    <h5 className="modal-title" id="addUserLabel">
                       {selectProject.projectName}
                     </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    />
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div className="modal-body">
-                    {/* <div className="inviteby_email">
-                      <div className="input-group mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder=""
-                          id=""
-                          aria-describedby="exampleInputEmail1"
-                        />
-                        <button
-                          className="btn btn-dark"
-                          type="button"
-                          id="button-addon2"
-                        >
-                          Search
-                        </button>
-                      </div>
-                    </div> */}
-                    <div className="members_list">
-                      <ul
-                        className="list-unstyled list-group list-group-custom list-group-flush mb-0"
-                        style={{ maxHeight: "350px", overflowY: "auto" }}
-                      >
-                        <li className="list-group-item py-3 text-center text-md-start">
-                          {projectStatuses.map((status) => {
-                            const getFormattedDate = (date) => {
-                              const newDate = new Date(date);
-                              const day = newDate.getDate();
-                              const month = newDate.getMonth() + 1;
-                              const year = newDate.getFullYear();
-                              let hours = newDate.getHours();
-                              const minutes = newDate.getMinutes();
-
-                              const meridiem = hours >= 12 ? "PM" : "AM";
-                              hours = hours % 12 || 12;
-
-                              return `${day}/${month}/${year} ${hours}:${minutes} ${meridiem}`;
-                            };
-                            // console.log(status);
-                            return (
-                              <div
-                                key={status._id}
-                                className="d-flex align-items-center flex-column flex-sm-column flex-md-column flex-lg-row"
-                              >
-                                <div className="no-thumbnail mb-2 mb-md-0">
-                                  <img
-                                    className="avatar md rounded-circle"
-                                    src={
-                                      `${import.meta.env.VITE_BASE_URL}` +
-                                      status.user_id.employeeImage
-                                    }
-                                    alt=""
-                                  />
-                                  <p
-                                    className="text-muted text-uppercase"
-                                    style={{ width: "6rem" }}
-                                  >
-                                    {status.user_id.employeeName}
-                                  </p>
-                                </div>
-                                <div className="flex-fill ms-3 text-truncate">
-                                  <p className="mb-0  fw-bold">
-                                    {status.currentStatus}
-                                  </p>
-                                  <span className="text-muted">
-                                    {getFormattedDate(status.createdAt)}
-                                  </span>
-                                </div>
-                                <div className="members-action">
-                                  <div className="btn-group">
-                                    <div className="btn-group"></div>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
+                    <ul className="list-group">
+                      {messages.map((message) => (
+                        <li key={message._id}>
+                          <div className="d-flex border-bottom py-1">
+                          <h6 className="fw-bold px-3">{message.senderId}</h6> - <span className="px-3 text-break">{message.content}</span>
+                          </div>
+                          
                         </li>
-                      </ul>
-                    </div>
+                      ))}
+                    </ul>
+
+                    {/* Message Submission Form */}
+                    <form onSubmit={messageSubmit}>
+                      <div className="mb-3">
+                        <label htmlFor="currentMessage" className="form-label">Add Message</label>
+                        <textarea
+                          className="form-control"
+                          id="currentMessage"
+                          name="message"
+                          rows="3"
+                          value={content}
+                          onChange={(e) => setContent(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <button type="submit" className="btn btn-dark">Submit</button>
+                    </form>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* vitew task Modal */}
-            {/* <div
-              className="modal fade"
-              id="viewtask"
-              tabIndex={-1}
-              aria-hidden="true"
-            >
-              <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5
-                      className="modal-title  fw-bold"
-                      id="createprojectlLabel"
-                    >
-                      {currProj.projectName} - View Task
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    />
-                  </div>
-                  <div className="modal-body">
-                    <table className="table table-bordered">
-                      <thead>
-                        <tr>
-                          <th scope="col">Task name</th>
-                          <th scope="col">Assignee</th>
-                          <th scope="col">Due Date</th>
-                          <th scope="col">Priority</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><input className="w-100" type="text"
-                            value={currProj?.description} 
-                            style={{ outline: "none", border: "none", textWrap: "wrap" }} />fffffffffff   </td>
-                          <td>{currProj.taskAssignPerson?.employeeName}, Admin</td>
-                            <td>{currProj.taskAssignPerson?.employeeName}</td>
-                          <td>ddd</td>
-                          <td> www </td>
-                          <td> ss </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                    // onClick={()=>{}}
-                    >
-                      Update
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div> */}
 
           </>
         </div>
         <ToastContainer />
-      </div>
+      </div >
     </>
   );
 };
 
 export default Project;
+
+
+
+
+{/* <form onSubmit={async (e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.target);
+                      const newMessage = formData.get("message");
+
+                      try {
+                        await axios.post(
+                          `${import.meta.env.VITE_BASE_URL}api/projects/${selectProject._id}/messages`,
+                          { message: newMessage },
+                          {
+                            headers: {
+                              Authorization: `Bearer ${localStorage.getItem("token")}` // Include JWT token if needed
+                            }
+                          }
+                        );
+                        // Refresh messages after submission
+                        fetchProjectMessages(selectProject._id);
+                        e.target.reset();
+                      } catch (error) {
+                        console.error("Error sending message:", error);
+                      }
+                    }}>
+                      <div className="mb-3">
+                        <label htmlFor="currentMessage" className="form-label">Add Message</label>
+                        <textarea
+                          className="form-control"
+                          id="currentMessage"
+                          name="message"
+                          rows="3"
+                          required
+                        />
+                      </div>
+                      <button type="submit" className="btn btn-dark">Submit</button>
+                    </form> */}

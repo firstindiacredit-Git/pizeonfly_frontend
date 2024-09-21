@@ -12,11 +12,13 @@ const Tasks = () => {
   const [taskStatuses, setTaskStatuses] = useState({});
   const [showFullDescription, setShowFullDescription] = useState("");
   const [taskMessages, setTaskMessages] = useState([]);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [taskMessage, setTaskMessage] = useState("");
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
+  const [messages, setMessages] = useState([]);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [taskMessage, setTaskMessage] = useState("");
+
 
 
   useEffect(() => {
@@ -83,52 +85,12 @@ const Tasks = () => {
     }
   };
 
-  const fetchTaskMessages = async (task_id) => {
-    try {
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/task-messages/${task_id}`);
-      setTaskMessages(response.data);
-    } catch (error) {
-      console.error('Failed to fetch task messages:', error);
-    }
-  };
 
   useEffect(() => {
     if (selectedTask) {
       fetchTaskMessages(selectedTask);
     }
   }, [selectedTask]);
-
-  const handleTaskMessageSubmit = async () => {
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_BASE_URL}api/task-message`,
-        {
-          currentMessage: taskMessage,
-          user_id: JSON.parse(localStorage.getItem("emp_user"))._id,
-          task_id: selectedTask,
-        }
-      );
-      setTaskMessage("");
-      setSelectedTask(null);
-      fetchTaskMessages(selectedTask);
-
-      const modal = document.getElementById('taskMessage');
-      const modalInstance = bootstrap.Modal.getInstance(modal);
-      modalInstance.hide();
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  const deleteTaskMessage = async (id) => {
-    try {
-      await axios.delete(`${import.meta.env.VITE_BASE_URL}api/task-message/${id}`);
-      setTaskMessages(taskMessages.filter(msg => msg._id !== id));
-    } catch (error) {
-      console.error('Failed to delete task message:', error);
-    }
-  };
-
   // Modify filtering logic based on filterStatus and searchQuery
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch = task.projectName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -137,6 +99,44 @@ const Tasks = () => {
     return matchesSearch && matchesFilter;
   });
 
+
+  const userData = JSON.parse(localStorage.getItem('emp_user')); // Assuming 'user' is the key where user info is stored
+  const userId = userData._id; // User ID
+  const userName = userData.employeeName;
+
+  // Function to fetch task messages
+  const fetchTaskMessages = async (taskId) => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/taskMessages/${taskId}`);
+      setMessages(response.data);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
+  // Function to handle task message submission
+  const handleSubmitMessage = async (e) => {
+    e.preventDefault();
+    const messageContent = e.target.elements.message.value;
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/taskMessage`, {
+        content: messageContent,
+        senderId: userId, // Sender ID from localStorage
+        taskId: selectedTask, // Selected Task ID
+      });
+      setMessages([...messages, response.data]); // Add new message to the list
+      e.target.reset(); // Reset the form
+    } catch (error) {
+      console.error("Error submitting message:", error);
+    }
+  };
+
+  // Function to handle view messages modal
+  const handleViewMessages = (taskId) => {
+    setSelectedTask(taskId);
+    fetchTaskMessages(taskId);
+  };
 
 
   return (
@@ -292,7 +292,7 @@ const Tasks = () => {
                                         className="d-flex justify-content-center bi bi-stopwatch btn outline-secondary text-primary"
                                         data-bs-toggle="modal"
                                         data-bs-target="#taskMessage"
-                                        onClick={() => setSelectedTask(task._id)}
+                                        onClick={() => handleViewMessages(task._id)}
                                       ></button>
                                     </div>
                                   </li>
@@ -338,7 +338,7 @@ const Tasks = () => {
               </div>
             </div>
 
-            {/* Task Message Modal */}
+            {/* Message Modal */}
             <div
               className="modal fade"
               id="taskMessage"
@@ -349,70 +349,34 @@ const Tasks = () => {
               <div className="modal-dialog modal-dialog-centered modal-lg">
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h5 className="modal-title fs-4 fw-bold" id="taskMessageLabel">
-                      Task Message
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    />
-                  </div>
-                  <div className="mt-3">
-                    {taskMessages.map((msg) => (
-                      <div key={msg._id} className="d-flex justify-content-between container mt-2 border-bottom">
-                        <div className="d-flex gap-5">
-                          <div>
-                            <img
-                              className="avatar md rounded-circle"
-                              src={
-                                `${import.meta.env.VITE_BASE_URL}` +
-                                msg.user_id.employeeImage
-                              }
-                              alt="employeeImage"
-                            />
-                            <p className="fw-bold">{msg.user_id.employeeName}</p>
-                          </div>
-                          <div>
-                            <p className="fw-bold">{msg.currentMessage}</p>
-                            <small className="text-muted">{new Date(msg.createdAt).toLocaleString()}</small>
-                          </div>
-                        </div>
-                        <div className=" mt-3">
-                          <button
-                            onClick={() => deleteTaskMessage(msg._id)}
-                            className="bi bi-trash bg-danger text-white border-0 rounded p-2"
-                          >
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                    <h5 className="modal-title" id="addUserLabel">Task Messages</h5>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div className="modal-body">
-                    <form>
+                    <ul className="list-group">
+                      {messages.map(message => (
+                        <li key={message._id} className="list-group-item">
+                          <div className="d-flex border-bottom py-1">
+                            {/* <h6 className="fw-bold px-3">{userName}</h6> */}
+                            <span className="px-3 text-break">{message.content}</span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Message Submission Form */}
+                    <form onSubmit={handleSubmitMessage}>
                       <div className="mb-3">
-                        <label htmlFor="taskMessage" className="form-label">
-                          Add Message
-                        </label>
+                        <label htmlFor="currentMessage" className="form-label">Add Message</label>
                         <textarea
-                          id="taskMessage"
-                          rows="4"
                           className="form-control"
-                          value={taskMessage}
-                          onChange={(e) => setTaskMessage(e.target.value)}
+                          id="currentMessage"
+                          name="message"
+                          rows="3"
+                          required
                         />
-                        {error && <div className="text-danger mt-2">{error}</div>}
                       </div>
-                      <div className="d-flex justify-content-end">
-                        <button
-                          type="button"
-                          className="btn btn-dark"
-                          onClick={handleTaskMessageSubmit}
-                        >
-                          Submit
-                        </button>
-                      </div>
+                      <button type="submit" className="btn btn-dark">Submit</button>
                     </form>
                   </div>
                 </div>

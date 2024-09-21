@@ -125,8 +125,9 @@ const Tasks = () => {
   const [filterDate, setFilterDate] = useState(''); // Date for date filter
   const [currentPage, setCurrentPage] = useState(1); // State for current page
   const tasksPerPage = 10; // Number of tasks per page
-  const [taskMessages, setTaskMessages] = useState([]);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -153,18 +154,6 @@ const Tasks = () => {
 
     fetchTasks();
   }, []);
-
-  const fetchTaskMessages = async (taskId) => {
-    try {
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/task-messages/${taskId}`);
-      console.log("gg", response.data);
-      setTaskMessages(response.data);
-    } catch (error) {
-      console.error("Error fetching task messages:", error);
-      setTaskMessages([]);
-    }
-  };
-
   const handleViewMessages = (taskId) => {
     setSelectedTaskId(taskId);
     fetchTaskMessages(taskId);
@@ -300,33 +289,6 @@ const Tasks = () => {
       console.error("Error:", error);
     }
   };
-  // // GET SINGLE TASK
-  // const [searchQuery, setSearchQuery] = useState("");
-  // const handleSearch = async (searchQuery) => {
-  //   if (searchQuery !== "") {
-  //     try {
-  //       const response = await axios.get(
-  //         `${import.meta.env.VITE_BASE_URL}api/pros/search?id=${searchQuery}`
-  //       );
-  //       setTasks(response.data);
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //       setTasks(null);
-  //     }
-  //   } else {
-  //     const fetchData = async () => {
-  //       try {
-  //         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/tasks`);
-  //         setTasks(response.data);
-  //       } catch (error) {
-  //         console.error("Error:", error);
-  //       }
-  //     };
-
-  //     fetchData();
-  //   }
-  // };
-
   const [employees, setEmployees] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
@@ -370,6 +332,39 @@ const Tasks = () => {
       };
     }) || [];
   // console.log(assignEmployee, 23423);
+
+  const userData = JSON.parse(localStorage.getItem('user')); // Assuming 'user' is the key where user info is stored
+  const userId = userData._id; // User ID
+  const userName = userData.username;
+
+  const fetchTaskMessages = async (taskId) => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/taskMessages/${taskId}`);
+      setMessages(response.data);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
+  const handleSubmitMessage = async (e) => {
+    e.preventDefault();
+    const messageContent = e.target.elements.message.value;
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/taskMessage`, {
+        content: messageContent,
+        senderId: userId, // Sender ID from localStorage
+        taskId: selectedTaskId,
+      });
+      setMessages([...messages, response.data]); // Update messages
+      e.target.reset(); // Reset form
+    } catch (error) {
+      console.error("Error submitting message:", error);
+    }
+  };
+
+
+
 
 
 
@@ -598,7 +593,7 @@ const Tasks = () => {
                                 )}
 
                                 <button
-                                  className="d-flex justify-content-center bi bi-stopwatch btn outline-secondary text-primary"
+                                  className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
                                   data-bs-toggle="modal"
                                   data-bs-target="#taskMessage"
                                   onClick={() => handleViewMessages(task._id)}
@@ -635,6 +630,88 @@ const Tasks = () => {
                     </ul>
                   </nav>
                 </div>
+
+
+                <div className="col-md-4 mb-4" >
+                        <div className="card" style={{ width: "18rem" }}>
+                          <div className="card-body dd-handle">
+                            <div className="d-flex justify-content-between">
+                              <h5 className="fw-bold">ProjectName</h5>
+
+                            </div>
+                            <div className="task-info d-flex align-items-center justify-content-between">
+                              <h6 className="py-1 px-2 rounded-1 d-inline-block fw-bold small-14 mb-0">
+                                {/* <span className={`badge ${taskStatuses[task._id] === "Not Started" ? "bg-warning text-dark" : taskStatuses[task._id] === "In Progress" ? "bg-info text-dark" : "bg-success"}`}>
+                                  {taskStatuses[task._id]}
+                                </span> */}
+                                statuses
+                              </h6>
+                              <div className="task-priority d-flex flex-column align-items-center justify-content-center">
+                                <div>employeeName</div>
+                                <span className="badge bg-danger text-end mt-2">
+                                  setpriority
+                                </span>
+                              </div>
+                            </div>
+                            <p
+                              className="py-2 mb-0 task-description"
+                              
+                            >
+                              Description
+
+                            </p>
+                            <div className="tikit-info row g-3 align-items-center">
+                              <div className="col-sm">
+                                <ul className="d-flex list-unstyled align-items-center justify-content-between">
+                                  <li className="me-2">
+                                    <div className="d-flex gap-5">
+                                      <div className="d-flex align-items-center fw-bold">
+                                        Due Date:
+                                        <span className="ms-1">
+                                          enddate
+                                        </span>
+                                      </div>
+                                      <button
+                                        className="d-flex justify-content-center bi bi-stopwatch btn outline-secondary text-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#taskMessage"
+                                      ></button>
+                                    </div>
+                                  </li>
+                                </ul>
+                                <div className="fw-bold">assigned By - assignerName</div>
+                              </div>
+
+                              <div className="d-flex justify-content-between align-items-center">
+
+                                <select
+                                  className="form-select"
+                                  aria-label="Default select Status"
+                                  name="taskStatus"
+                                >
+                                  <option value="Not Started">Not Started</option>
+                                  <option value="In Progress">In Progress</option>
+                                  <option value="Completed">Completed</option>
+                                </select>
+
+                                <div className="btn-group" role="group" aria-label="Basic outlined example">
+                                  <Link
+                                    to="/images"
+                                    className="btn btn-outline-secondary"
+                                    // state={{
+                                    //   images: task.taskImages,
+                                    //   projectName: task.projectName,
+                                    // }}
+                                  >
+                                    <i className="bi-paperclip fs-6" />
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                
 
               </div>
             </div>
@@ -1102,63 +1179,44 @@ const Tasks = () => {
                 </div>
               </div>
 
-
-              {/* Task Message Modal */}
-              <div
-                className="modal fade"
-                id="taskMessage"
-                tabIndex={-1}
-                aria-labelledby="taskMessageLabel"
-                aria-hidden="true"
-              >
+              {/* Message Modal */}
+              <div className="modal fade" id="taskMessage" tabIndex={-1} aria-labelledby="taskMessageLabel" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered modal-lg">
                   <div className="modal-content">
                     <div className="modal-header">
-                      <h5 className="modal-title fs-4 fw-bold" id="taskMessageLabel">
-                        Task Message
-                      </h5>
-                      <button
-                        type="button"
-                        className="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                      />
+                      <h5 className="modal-title" id="addUserLabel">Task Messages</h5>
+                      <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-
-                    <div className="mt-3">
-                      {taskMessages.length === 0 ? (
-                        <p className="p-2">No messages found for this task.</p>
-                      ) : (
-                        taskMessages?.map((message) => (
-                          <div key={message._id} className="d-flex justify-content-between container mt-2 border-bottom">
-                            <div className="d-flex gap-5">
-                              <div>
-                                <div className="d-flex justify-content-center">
-                                  <img
-                                    className="avatar md rounded-circle"
-                                    src={
-                                      `${import.meta.env.VITE_BASE_URL}` +
-                                      message.user_id.employeeImage
-                                    }
-                                    alt="employeeImage"
-                                  />
-                                </div>
-                                <p className="fw-bold">{message.user_id.employeeName}</p>
-                              </div>
-                              <div>
-                                <p className="fw-bold">{message.currentMessage}</p>
-                                <small className="text-muted">{new Date(message.createdAt).toLocaleString()}</small>
-                              </div>
+                    <div className="modal-body">
+                      <ul className="list-group">
+                        {messages.map(message => (
+                          <li key={message._id} className="list-group-item">
+                            <div className="d-flex border-bottom py-1">
+                              {/* <h6 className="fw-bold px-3">{userName}</h6> -  */}
+                              <span className="px-3 text-break">{message.content}</span>
                             </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
+                          </li>
+                        ))}
+                      </ul>
 
+                      {/* Message Submission Form */}
+                      <form onSubmit={handleSubmitMessage}>
+                        <div className="mb-3">
+                          <label htmlFor="currentMessage" className="form-label">Add Message</label>
+                          <textarea
+                            className="form-control"
+                            id="currentMessage"
+                            name="message"
+                            rows="3"
+                            required
+                          />
+                        </div>
+                        <button type="submit" className="btn btn-dark">Submit</button>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </div>
-
             </>
           </>
         </div>

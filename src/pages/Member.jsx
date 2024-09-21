@@ -1272,7 +1272,7 @@ const Member = () => {
                                 UI/UX Design
                               </option>
                               <option value={"Website Design"}>
-                                Website Design
+                                Web Design
                               </option>
                               <option value={"App Development"}>
                                 App Development
@@ -1280,17 +1280,14 @@ const Member = () => {
                               <option value={"Quality Assurance"}>
                                 Quality Assurance
                               </option>
-                              <option value={"Development"}>Development</option>
+                              <option value={"Fontend Development"}>Frontend Development</option>
                               <option value={"Backend Development"}>
                                 Backend Development
                               </option>
                               <option value={"Software Testing"}>
                                 Software Testing
                               </option>
-                              <option value={"Website Design"}>
-                                Website Design
-                              </option>
-                              <option value={"Marketing"}>Marketing</option>
+                              <option value={"Digital Marketing"}>Digital Marketing</option>
                               <option value={"SEO"}>SEO</option>
                               <option value={"Project Manager"}>
                                 Project Manager

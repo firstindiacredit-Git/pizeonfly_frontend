@@ -51,8 +51,8 @@ const Project = () => {
   }, []);
 
   // GET A PROJECT BY TOKEN
+  const [selectProject, setSelectProject] = useState({});
   const [projects, setProjects] = useState([]);
-  const [selectProject, setSelectProject] = useState([]);
   const [loginUserId, setLoginUserId] = useState([]);
   // console.log(selectProject);
   useEffect(() => {
@@ -78,96 +78,6 @@ const Project = () => {
     fetchData();
   }, []);
 
-  // Status
-  const [currentStatus, setCurrentStatus] = useState("");
-  const [user_id, setUser_id] = useState("");
-  const [project_id, setProject_id] = useState("");
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/project-status`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          currentStatus,
-          user_id: loginUserId,
-          project_id: selectProject._id,
-        }),
-      });
-      // console.log(response.json);
-
-      if (!response.ok) {
-        throw new Error("Failed to add project status");
-      }
-
-      // console.log(response.data);
-
-      // const newStatus = await response.json(); // Assuming the response contains the new status
-
-      // // Update the state of the project to include the new status
-      // setProjects(prevProjects => prevProjects.map(project => 
-      //   project._id === selectProject._id 
-      //     ? { newStatus, ...prevProjects }
-      //     : project
-      // ));
-      // setProjects((prevProjects) => [newStatus, ...prevProjects]);
-
-
-      setCurrentStatus("");
-      setUser_id("");
-      setProject_id("");
-
-      // Close the modal programmatically
-      const modalElement = document.getElementById("addUser");
-      const modal = window.bootstrap.Modal.getInstance(modalElement);
-      modal.hide();
-
-
-
-      toast.success('Status Added Successfully!', {
-        style: {
-          backgroundColor: '#4c3575',
-          color: 'white',
-        },
-      });
-
-      window.location.reload()
-
-
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
-
-  const [projectStatuses, setProjectStatuses] = useState([]);
-  const [projectId, setProjectId] = useState("");
-
-  useEffect(() => {
-    const fetchProjectStatuses = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL}api/project-status/${projectId}`
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch project statuses");
-        }
-
-        const data = await response.json();
-        setProjectStatuses(data);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-
-    if (projectId) {
-      fetchProjectStatuses();
-    }
-  }, [projectId]);
-
 
   // Delete Status
   const handleDelete = async () => {
@@ -190,6 +100,46 @@ const Project = () => {
       console.error("Error deleting project status:", error.message);
     }
   };
+
+
+  const [messages, setMessages] = useState([]);
+  const [content, setContent] = useState('');
+
+  const fetchProjectMessages = async (projectId) => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/messages/${projectId}`);
+      setMessages(response.data);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
+  const messageSubmit = async (e) => {
+    e.preventDefault();
+    const userDetails = JSON.parse(localStorage.getItem('emp_user'));
+    const senderId = userDetails.employeeName;
+
+    try {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, {
+        content,
+        senderId,
+        projectId: selectProject._id,
+      });
+      setContent('');
+      fetchProjectMessages(selectProject._id); // Refresh messages
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectProject._id) {
+      fetchProjectMessages(selectProject._id);
+    }
+  }, [selectProject]);
+
+
+
 
 
   return (
@@ -273,7 +223,7 @@ const Project = () => {
                               <th>End Date</th>
                               <th>Members</th>
                               <th>Progress</th>
-                              <th>Add Status</th>
+                              <th>Add Message</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -327,13 +277,12 @@ const Project = () => {
                                   </td>
                                   <td>
                                     <button
-                                      className="d-flex justify-content-center bi bi-stopwatch btn outline-secondary text-primary"
+                                      className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
                                       data-bs-toggle="modal"
                                       data-bs-target="#addUser"
                                       onClick={() => {
-                                        // console.log("abc: " + project._id);
-                                        setProjectId(project._id);
                                         setSelectProject(project);
+                                        fetchProjectMessages(project._id); // Fetch messages for the selected project
                                       }}
                                     ></button>
                                   </td>
@@ -349,168 +298,42 @@ const Project = () => {
               </div>
             </div>
 
-            {/* Status Modal */}
-            <div
-              className="modal fade"
-              id="addUser"
-              tabIndex={-1}
-              aria-labelledby="addUserLabel"
-              aria-hidden="true"
-            >
+            {/* Message Modal */}
+            <div className="modal fade" id="addUser" tabIndex={-1} aria-labelledby="addUserLabel" aria-hidden="true">
               <div className="modal-dialog modal-dialog-centered modal-lg">
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h5 className="modal-title fs-4 fw-bold" id="addUserLabel">
+                    <h5 className="modal-title" id="addUserLabel">
                       {selectProject.projectName}
                     </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    />
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div className="modal-body">
-                    {/* <div className="inviteby_email">
-                      <div className="input-group mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder=""
-                          id=""
-                          aria-describedby="exampleInputEmail1"
-                        />
-                        <button
-                          className="btn btn-dark"
-                          type="button"
-                          id="button-addon2"
-                        >
-                          Search
-                        </button>
-                      </div>
-                    </div> */}
-                    <div className="members_list" >
-
-                      <ul className="list-unstyled list-group list-group-custom list-group-flush mb-0">
-                        <li className="list-group-item py-3 text-center text-md-start" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                          {projectStatuses.map((status) => {
-                            const getFormattedDate = (date) => {
-                              const newDate = new Date(date);
-                              const day = newDate.getDate();
-                              const month = newDate.getMonth() + 1;
-                              const year = newDate.getFullYear();
-                              let hours = newDate.getHours();
-                              const minutes = newDate.getMinutes();
-
-                              const meridiem = hours >= 12 ? "PM" : "AM";
-                              hours = hours % 12 || 12;
-
-                              return `${day}/${month}/${year} ${hours}:${minutes} ${meridiem}`;
-                            };
-
-                            return (
-                              <div
-                                key={status._id}
-                                className="d-flex align-items-center flex-column flex-sm-column flex-md-column flex-lg-row"
-                              >
-                                <div className="no-thumbnail mb-2 mb-md-0">
-                                  <img
-                                    className="avatar md rounded-circle"
-                                    src={
-                                      `${import.meta.env.VITE_BASE_URL}` +
-                                      status.user_id.employeeImage
-                                    }
-                                    alt=""
-                                  />
-                                  <p
-                                    className="fw-bold text-uppercase"
-                                    style={{ width: "6rem" }}
-                                  >
-                                    {status.user_id.employeeName}
-                                  </p>
-                                </div>
-                                <div className="flex-fill ms-3 text-truncate">
-                                  <p className="mb-0  fw-bold">
-                                    {status.currentStatus}
-                                  </p>
-                                  <span className="text-muted">
-                                    {getFormattedDate(status.createdAt)}
-                                  </span>
-                                </div>
-                                <div className="members-action">
-                                  {/* <div className="btn-group">
-                                    <div className="btn-group">
-                                      <button
-                                        type=""
-                                        className="btn outline-secondary icofont-ui-delete text-danger "
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteproject"
-                                        onClick={() => {
-                                          setProjectId(status._id);
-                                        }}
-                                      ></button>
-                                    </div>
-                                  </div> */}
-                                </div>
-                              </div>
-                            );
-                          })}
+                    <ul className="list-group">
+                      {messages.map((message) => (
+                        <li key={message._id}>
+                          <div className="d-flex border-bottom py-1">
+                            <h6 className="fw-bold px-3">{message.senderId}</h6> - <span className="px-3 text-break">{message.content}</span>
+                          </div>
                         </li>
-                      </ul>
+                      ))}                    </ul>
 
-                      <form onSubmit={handleSubmit}>
-                        <div className="row g-3 mb-3">
-                          <div className="col">
-                            <label className="form-label" hidden>
-                              Employee Name
-                            </label>
-                            <select
-                              className="form-select"
-                              aria-label="Default select Project Category"
-                              id="user_id"
-                              value={user_id}
-                              onChange={(e) => setUser_id(e.target.value)}
-                              hidden
-                            >
-                              {selectProject.taskAssignPerson?.map((item) => {
-                                return (
-                                  <option key={item}>
-                                    {item.employeeName}
-                                  </option>
-                                );
-                              })}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="container">
-                          <div className="row">
-                            <div className="col-12">
-                              <label htmlFor="currentStatus" className="fw-bold fs-5">
-                                Add Status
-                              </label>
-                              <textarea
-                                rows=""
-                                cols="50"
-                                type="text"
-                                id="currentStatus"
-                                value={currentStatus}
-                                onChange={(e) =>
-                                  setCurrentStatus(e.target.value)
-                                }
-                                className="form-control"
-                              />
-                            </div>
-                          </div>
-                          <div className="row mt-3">
-                            <div className="col-12 d-flex justify-content-end">
-                              <button type="submit" className="btn btn-dark">
-                                Submit
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
+                    {/* Message Submission Form */}
+                    <form onSubmit={messageSubmit}>
+                      <div className="mb-3">
+                        <label htmlFor="currentMessage" className="form-label">Add Message</label>
+                        <textarea
+                          className="form-control"
+                          id="currentMessage"
+                          name="message"
+                          rows="3"
+                          value={content}
+                          onChange={(e) => setContent(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <button type="submit" className="btn btn-dark">Submit</button>
+                    </form>
                   </div>
                 </div>
               </div>
