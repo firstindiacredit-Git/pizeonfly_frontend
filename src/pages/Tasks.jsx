@@ -10,6 +10,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "./Loading.css";
 
 const Tasks = () => {
+  const [viewMode, setViewMode] = useState('list'); // Default is list view
+
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -448,6 +450,15 @@ const Tasks = () => {
                   </div>
                 </div>{" "}
                 <div className="d-flex justify-content-between">
+
+                  <div>
+                    <h6>Change View</h6>
+                    <div className="d-flex justify-content-around">
+                      <button className="bi bi-list-task bg-primary text-white border-0 rounded" onClick={() => setViewMode('list')}></button>
+                      <button className="bi bi-grid-3x3-gap-fill bg-primary text-white border-0 rounded" onClick={() => setViewMode('row')}></button>
+                    </div>
+                  </div>
+
                   <div className="order-0">
                     <div className="input-group">
                       <input
@@ -456,7 +467,7 @@ const Tasks = () => {
                         placeholder="Search by Project Name or Assignee"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{ width: "19rem" }}
+                        style={{ width: "19rem", height:"3rem"}}
                       />
                       <button
                         type="button"
@@ -467,8 +478,11 @@ const Tasks = () => {
                     </div>
 
                   </div>
-                  <div className="d-flex text-end mb-3" >
-                    <p className="mt-3 fw-bold">Filter by Date:</p>
+
+
+
+                  <div className=" text-end mb-3" >
+                    <p className="fw-bold">Filter by Date:</p>
 
                     <input
                       className="form-control"
@@ -480,238 +494,183 @@ const Tasks = () => {
                 </div>
 
                 {/* Row end  */}
+                {viewMode === 'list' ? (
+                  <div className="modal-body">
+                    <table className="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th scope="col" style={{ width: '7.5rem' }}>Project name</th>
+                          <th scope="col">Task name</th>
+                          <th scope="col" style={{ width: '9rem' }}>Assignee</th>
+                          <th scope="col" style={{ width: '' }}>Due Date</th>
+                          <th scope="col" style={{ width: '9rem' }}>Priority</th>
+                          <th scope="col" style={{ width: '' }}>U/D</th>
+                          <th scope="col" style={{ width: '' }}>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {loading ? (
+                          <div className="custom-loader"></div>
+                        ) : (
+                          currentTasks.map((task) => {
+                            const currentDate = new Date();
+                            const taskEndDate = new Date(task.taskEndDate);
+                            const taskStartDate = new Date(task.taskDate);
+                            const isOverdue = taskEndDate < currentDate && task.taskStatus !== 'Completed';
+                            const isCompletedAfterDue = task.taskStatus === 'Completed' && taskEndDate < currentDate && taskEndDate.getTime() !== taskStartDate.getTime();
 
-                <div className="modal-body">
-                  <table className="table table-bordered">
-                    <thead>
-                      <tr>
-                        <th scope="col" style={{ width: '7.5rem' }}>Project name</th>
-                        <th scope="col">Task name</th>
-                        <th scope="col" style={{ width: '9rem' }}>Assignee</th>
-                        <th scope="col" style={{ width: '' }}>Due Date</th>
-                        <th scope="col" style={{ width: '9rem' }}>Priority</th>
-                        <th scope="col" style={{ width: '' }}>U/D</th>
-                        <th scope="col" style={{ width: '' }}>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {loading ? (
-                        <div className="custom-loader"></div>
-                      ) : (
-                        currentTasks.map((task) => {
-                          const currentDate = new Date();
-                          const taskEndDate = new Date(task.taskEndDate);
-                          const taskStartDate = new Date(task.taskDate);
-                          const isOverdue = taskEndDate < currentDate && task.taskStatus !== 'Completed';
-                          const isCompletedAfterDue = task.taskStatus === 'Completed' && taskEndDate < currentDate && taskEndDate.getTime() !== taskStartDate.getTime();
+                            let backgroundColor = '';
+                            if (isOverdue) {
+                              backgroundColor = '#f6c8b7';
+                            } else if (isCompletedAfterDue) {
+                              backgroundColor = '#c6f2c1';
+                            }
 
-                          let backgroundColor = '';
-                          if (isOverdue) {
-                            backgroundColor = '#ebbcc0';
-                          } else if (isCompletedAfterDue) {
-                            backgroundColor = '#c6f2c1';
-                          }
-
-                          return (
-                            <tr
-                              key={task._id}
-                              style={{ backgroundColor }}
-                            >
-                              <td style={{ backgroundColor }}>
-                                {task.projectName}
-                                <p>{task.taskDate}</p>
-                                <Link
-                                  to="/images"
-                                  state={{
-                                    images: task.taskImages,
-                                    projectName: task.projectName,
-                                  }}
-                                  style={{ marginLeft: "33px" }}
-                                >
-                                  <i className="bi-paperclip fs-6" />
-                                </Link>
-                              </td>
-                              <td className="" style={{ backgroundColor }}>
-                                <textarea
-                                  className="w-100 form-control"
-                                  type="text"
-                                  placeholder="Explain The Task What To Do & How To Do"
-                                  name="description"
-                                  value={task.description}
-                                  onChange={(e) => taskHandleChange(e, task._id)}
-                                  style={{ outline: 'none', border: 'none', textWrap: 'wrap' }}
-                                />
-                              </td>
-                              <td style={{ backgroundColor }}>
-                                {task.taskAssignPerson.employeeName}
-                                <p className="text-muted">By:-{task.assignedBy}</p>
-                              </td>
-                              <td style={{ backgroundColor }}>
-                                <input
-                                  type="date"
-                                  className="form-control"
-                                  name="taskEndDate"
-                                  value={task.taskEndDate}
-                                  onChange={(e) => taskHandleChange(e, task._id)}
-                                />
-                              </td>
-                              <td style={{ backgroundColor }}>
-                                <select
-                                  className="form-select"
-                                  aria-label="Default select Priority"
-                                  name="taskPriority"
-                                  value={task.taskPriority}
-                                  onChange={(e) => taskHandleChange(e, task._id)}
-                                >
-                                  <option value="">Set Priority</option>
-                                  <option value="Highest">Highest</option>
-                                  <option value="Medium">Medium</option>
-                                  <option value="Lowest">Lowest</option>
-                                </select>
-                              </td>
-                              <td style={{ display: 'flex', justifyContent: 'center', gap: '2vh', marginTop: '1.1rem', backgroundColor }}>
-                                <button
-                                  onClick={() => taskHandleSubmit(task._id)}
-                                  className="bi bi-check2 bg-primary text-white border-0 rounded"
-                                />
-                                <button
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#dremovetask"
-                                  onClick={() => setDeletableId(task._id)}
-                                  className="bi bi-trash bg-danger text-white border-0 rounded"
-                                />
-                              </td>
-                              <td style={{ backgroundColor }} className="">
-                                {task.taskStatus === 'Not Started' && (
-                                  <span className="badge bg-warning text-dark">Not Started</span>
-                                )}
-                                {task.taskStatus === 'In Progress' && (
-                                  <span className="badge bg-info text-dark">In Progress</span>
-                                )}
-                                {task.taskStatus === 'Completed' && (
-                                  <span className="badge bg-success">Completed</span>
-                                )}
-
-                                <button
-                                  className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#taskMessage"
-                                  onClick={() => handleViewMessages(task._id)}
-                                ></button>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-
-
-
-                  </table>
-                  <nav className="d-flex justify-content-center">
-                    <ul className="pagination">
-                      <li className="page-item">
-                        <button onClick={prevPage} className="page-link" disabled={currentPage === 1}>
-                          &laquo;
-                        </button>
-                      </li>
-                      {Array.from({ length: Math.ceil(filteredTasks.length / tasksPerPage) }, (_, i) => (
-                        <li key={i + 1} className="page-item">
-                          <button onClick={() => paginate(i + 1)} className="page-link">
-                            {i + 1}
-                          </button>
-                        </li>
-                      ))}
-                      <li className="page-item">
-                        <button onClick={nextPage} className="page-link" disabled={currentPage === Math.ceil(filteredTasks.length / tasksPerPage)}>
-                          &raquo;
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-
-
-                <div className="col-md-4 mb-4" >
-                        <div className="card" style={{ width: "18rem" }}>
-                          <div className="card-body dd-handle">
-                            <div className="d-flex justify-content-between">
-                              <h5 className="fw-bold">ProjectName</h5>
-
-                            </div>
-                            <div className="task-info d-flex align-items-center justify-content-between">
-                              <h6 className="py-1 px-2 rounded-1 d-inline-block fw-bold small-14 mb-0">
-                                {/* <span className={`badge ${taskStatuses[task._id] === "Not Started" ? "bg-warning text-dark" : taskStatuses[task._id] === "In Progress" ? "bg-info text-dark" : "bg-success"}`}>
-                                  {taskStatuses[task._id]}
-                                </span> */}
-                                statuses
-                              </h6>
-                              <div className="task-priority d-flex flex-column align-items-center justify-content-center">
-                                <div>employeeName</div>
-                                <span className="badge bg-danger text-end mt-2">
-                                  setpriority
-                                </span>
-                              </div>
-                            </div>
-                            <p
-                              className="py-2 mb-0 task-description"
-                              
-                            >
-                              Description
-
-                            </p>
-                            <div className="tikit-info row g-3 align-items-center">
-                              <div className="col-sm">
-                                <ul className="d-flex list-unstyled align-items-center justify-content-between">
-                                  <li className="me-2">
-                                    <div className="d-flex gap-5">
-                                      <div className="d-flex align-items-center fw-bold">
-                                        Due Date:
-                                        <span className="ms-1">
-                                          enddate
-                                        </span>
-                                      </div>
-                                      <button
-                                        className="d-flex justify-content-center bi bi-stopwatch btn outline-secondary text-primary"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#taskMessage"
-                                      ></button>
-                                    </div>
-                                  </li>
-                                </ul>
-                                <div className="fw-bold">assigned By - assignerName</div>
-                              </div>
-
-                              <div className="d-flex justify-content-between align-items-center">
-
-                                <select
-                                  className="form-select"
-                                  aria-label="Default select Status"
-                                  name="taskStatus"
-                                >
-                                  <option value="Not Started">Not Started</option>
-                                  <option value="In Progress">In Progress</option>
-                                  <option value="Completed">Completed</option>
-                                </select>
-
-                                <div className="btn-group" role="group" aria-label="Basic outlined example">
+                            return (
+                              <tr
+                                key={task._id}
+                                style={{ backgroundColor }}
+                              >
+                                <td style={{ backgroundColor }}>
+                                  {task.projectName}
+                                  <p>{task.taskDate}</p>
                                   <Link
                                     to="/images"
-                                    className="btn btn-outline-secondary"
-                                    // state={{
-                                    //   images: task.taskImages,
-                                    //   projectName: task.projectName,
-                                    // }}
+                                    state={{
+                                      images: task.taskImages,
+                                      projectName: task.projectName,
+                                    }}
+                                    style={{ marginLeft: "33px" }}
                                   >
                                     <i className="bi-paperclip fs-6" />
                                   </Link>
-                                </div>
-                              </div>
-                            </div>
+                                </td>
+                                <td className="" style={{ backgroundColor }}>
+                                  <textarea
+                                    className="w-100 form-control"
+                                    type="text"
+                                    placeholder="Explain The Task What To Do & How To Do"
+                                    name="description"
+                                    value={task.description}
+                                    onChange={(e) => taskHandleChange(e, task._id)}
+                                    style={{ outline: 'none', border: 'none', textWrap: 'wrap' }}
+                                  />
+                                </td>
+                                <td style={{ backgroundColor }}>
+                                  {task.taskAssignPerson.employeeName}
+                                  <p className="text-muted">By:-{task.assignedBy}</p>
+                                </td>
+                                <td style={{ backgroundColor }}>
+                                  <input
+                                    type="date"
+                                    className="form-control"
+                                    name="taskEndDate"
+                                    value={task.taskEndDate}
+                                    onChange={(e) => taskHandleChange(e, task._id)}
+                                  />
+                                </td>
+                                <td style={{ backgroundColor }}>
+                                  <select
+                                    className="form-select"
+                                    aria-label="Default select Priority"
+                                    name="taskPriority"
+                                    value={task.taskPriority}
+                                    onChange={(e) => taskHandleChange(e, task._id)}
+                                  >
+                                    <option value="">Set Priority</option>
+                                    <option value="Highest">Highest</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Lowest">Lowest</option>
+                                  </select>
+                                </td>
+                                <td style={{ display: 'flex', justifyContent: 'center', gap: '2vh', marginTop: '1.1rem', backgroundColor }}>
+                                  <button
+                                    onClick={() => taskHandleSubmit(task._id)}
+                                    className="bi bi-check2 bg-primary text-white border-0 rounded"
+                                  />
+                                  <button
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#dremovetask"
+                                    onClick={() => setDeletableId(task._id)}
+                                    className="bi bi-trash bg-danger text-white border-0 rounded"
+                                  />
+                                </td>
+                                <td style={{ backgroundColor }} className="">
+                                  {task.taskStatus === 'Not Started' && (
+                                    <span className="badge bg-warning text-dark">Not Started</span>
+                                  )}
+                                  {task.taskStatus === 'In Progress' && (
+                                    <span className="badge bg-info text-dark">In Progress</span>
+                                  )}
+                                  {task.taskStatus === 'Completed' && (
+                                    <span className="badge bg-success">Completed</span>
+                                  )}
+
+                                  <button
+                                    className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#taskMessage"
+                                    onClick={() => handleViewMessages(task._id)}
+                                  ></button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+
+
+
+                    </table>
+                  </div>
+                ) : (
+                  <div className="row">
+                    {currentTasks.map((task) => (
+                      <div key={task._id} className="col-md-4 mb-4">
+                        <div className="card task-card" style={{ width: "18rem" }}>
+                          <div className="card-body">
+                            <h5 className="fw-bold">{task.projectName}</h5>
+                            <p>{task.description}</p>
+                            <p>Due Date: {task.taskEndDate}</p>
+                            <p>Assigned to: {task.taskAssignPerson.employeeName}</p>
+                            <div className="task-priority">{task.taskPriority}</div>
+                            <div className="task-status">{task.taskStatus}</div>
+                            <button
+                              className="bi bi-stopwatch btn outline-secondary text-primary"
+                              data-bs-toggle="modal"
+                              data-bs-target="#taskMessage"
+                              onClick={() => handleViewMessages(task._id)}
+                            />
                           </div>
                         </div>
                       </div>
-                
+                    ))}
+                  </div>
+                )}
+
+
+                <nav className="d-flex justify-content-center">
+                  <ul className="pagination">
+                    <li className="page-item">
+                      <button onClick={prevPage} className="page-link" disabled={currentPage === 1}>
+                        &laquo;
+                      </button>
+                    </li>
+                    {Array.from({ length: Math.ceil(filteredTasks.length / tasksPerPage) }, (_, i) => (
+                      <li key={i + 1} className="page-item">
+                        <button onClick={() => paginate(i + 1)} className="page-link">
+                          {i + 1}
+                        </button>
+                      </li>
+                    ))}
+                    <li className="page-item">
+                      <button onClick={nextPage} className="page-link" disabled={currentPage === Math.ceil(filteredTasks.length / tasksPerPage)}>
+                        &raquo;
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+
 
               </div>
             </div>
