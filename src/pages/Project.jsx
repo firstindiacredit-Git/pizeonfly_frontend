@@ -776,6 +776,7 @@ const Project = () => {
                                           projectName: project.projectName,
                                         }}
                                         style={{ marginLeft: "33px" }}
+                                        // 
                                       >
                                         <i className="bi-paperclip fs-6" />
                                       </Link>
