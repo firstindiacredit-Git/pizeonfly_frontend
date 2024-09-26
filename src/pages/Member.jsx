@@ -95,10 +95,10 @@ const Member = () => {
           color: "white",
         },
       });
-        // Reload the page after 5 seconds
-        setTimeout(() => {
-          window.location.reload();
-        }, 5000);
+      // Reload the page after 5 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
       // Handle successful response
 
     } catch (error) {
@@ -124,13 +124,13 @@ const Member = () => {
           }
         });
 
-        const newId = `TN00${lastOldId + 1}`;
+        const newId = `PF00${lastOldId + 1}`;
         setFormData((prevFormData) => ({
           ...prevFormData,
           employeeId: newId,
         }));
-        console.log(response.data, "lll");
-        
+        // console.log(response.data, "lll");
+
         setEmployees(response.data);
       } catch (error) {
         console.error("Error:", error);
@@ -166,10 +166,10 @@ const Member = () => {
           color: "white",
         },
       });
-        // Reload the page after 5 seconds
-        setTimeout(() => {
-          window.location.reload();
-        }, 5000);
+      // Reload the page after 5 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -297,11 +297,11 @@ const Member = () => {
           color: "white",
         },
       });
-        // Reload the page after 5 seconds
-        setTimeout(() => {
-          window.location.reload();
-        }, 5000);
-      
+      // Reload the page after 5 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
+
     } catch (error) {
       console.error("Error:", error);
     }
@@ -1240,22 +1240,24 @@ const Member = () => {
                         <div className="row g-3 mb-3">
                           <div className="col">
                             <label className="form-label">Department</label>
-                            <select
-                              className="form-select"
-                              aria-label="Default select Project Category"
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Enter department or select"
                               name="department"
                               value={formData.department}
                               onChange={handleChange}
+                            />
+                            <select
+                              className="form-select mt-2"
+                              aria-label="Department options"
+                              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                             >
-                              <option value={""}>Select Department</option>
-                              <option value={"Web Development"}>
-                                Web Development
-                              </option>
-                              <option value={"It Management"}>
-                                It Management
-                              </option>
-                              <option value={"Marketing"}>Marketing</option>
-                              <option value={"Manager"}>Manager</option>
+                              <option value="">Select Department</option>
+                              <option value="Web Development">Web Development</option>
+                              <option value="IT Management">IT Management</option>
+                              <option value="Marketing">Marketing</option>
+                              <option value="Manager">Manager</option>
                             </select>
                           </div>
                           <div className="col">
