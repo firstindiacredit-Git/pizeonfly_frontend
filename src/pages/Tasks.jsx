@@ -467,7 +467,7 @@ const Tasks = () => {
                         placeholder="Search by Project Name or Assignee"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{ width: "19rem", height:"3rem"}}
+                        style={{ width: "19rem", height: "3rem" }}
                       />
                       <button
                         type="button"
@@ -512,7 +512,7 @@ const Tasks = () => {
                         {loading ? (
                           <div className="custom-loader"></div>
                         ) : (
-                          currentTasks.map((task) => {
+                          currentTasks.map((task, index) => {
                             const currentDate = new Date();
                             const taskEndDate = new Date(task.taskEndDate);
                             const taskStartDate = new Date(task.taskDate);
@@ -532,6 +532,7 @@ const Tasks = () => {
                                 style={{ backgroundColor }}
                               >
                                 <td style={{ backgroundColor }}>
+                                  <span className="fw-bold fs-6">{index + 1}. </span>
                                   {task.projectName}
                                   <p>{task.taskDate}</p>
                                   <Link
@@ -710,7 +711,7 @@ const Tasks = () => {
                           value={formData.projectName}
                           onChange={handleChange}
                         >
-                          <option>Chosse Project</option>
+                          <option>Select Project</option>
                           {projects.map((project) => (
                             <option
                               key={project.id}
@@ -965,7 +966,7 @@ const Tasks = () => {
                           value={taskFormData.projectName}
                           onChange={taskHandleChange}
                         >
-                          <option>Chosse Project</option>
+                          <option>Select Project</option>
                           {projects.map((project) => (
                             <option
                               key={project.id}

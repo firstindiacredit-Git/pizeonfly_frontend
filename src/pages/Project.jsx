@@ -600,7 +600,7 @@ const Project = () => {
                                 </tr>
                               </thead>
                               <tbody>
-                                {filteredProjects.map((project) => {
+                                {filteredProjects.map((project, index) => {
                                   const getFormattedDate = (date) => {
                                     const newDate = new Date(date);
                                     let day = newDate.getDate();
@@ -643,21 +643,24 @@ const Project = () => {
                                     // onClick={() => setCurrProj(project)}
                                     >
                                       <td>
-                                        <div className="">
-                                          <Link to="/tasks">
-                                            {project.projectName}
-                                          </Link>
+                                        <div className="d-flex gap-2">
+                                          <span className="fw-bold fs-6">{index + 1}.</span>
+                                          <div className="">
+                                            <Link to="/tasks">
+                                              {project.projectName}
+                                            </Link>
 
-                                          <Link
-                                            to="/images"
-                                            state={{
-                                              images: project.projectImage,
-                                              projectName: project.projectName,
-                                            }}
-                                            style={{ marginLeft: "33px" }}
-                                          >
-                                            <i className="bi-paperclip fs-6" />
-                                          </Link>
+                                            <Link
+                                              to="/images"
+                                              state={{
+                                                images: project.projectImage,
+                                                projectName: project.projectName,
+                                              }}
+                                              style={{ marginLeft: "33px" }}
+                                            >
+                                              <i className="bi-paperclip fs-6" />
+                                            </Link>
+                                          </div>
                                         </div>
                                         <div className="text-muted">
                                           -{getFormattedDate(project.projectDate)}
@@ -722,7 +725,7 @@ const Project = () => {
                         </div>
                       ) : (
                         <div className="row">
-                          {filteredProjects.map((project) => {
+                          {filteredProjects.map((project, index) => {
                             const getFormattedDate = (date) => {
                               const newDate = new Date(date);
                               let day = newDate.getDate();
@@ -763,7 +766,9 @@ const Project = () => {
                                 <div className="card mt-4 task-card">
                                   <div className="card-body">
                                     <div className="d-flex justify-content-between">
-                                      <h5 className="card-title">{project.projectName}</h5>
+                                      <h5 className="card-title">
+                                        <span className="fw-bold">{index + 1}. </span>
+                                        {project.projectName}</h5>
                                       <Link
                                         to="/images"
                                         state={{
