@@ -9,6 +9,8 @@ const Signin = () => {
   });
   const [error, setError] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // New state for loading
+  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -19,8 +21,13 @@ const Signin = () => {
     });
   };
 
+  const toggleShowPassword = () => {
+    setShowPassword((prevState) => !prevState);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Start loading when API is hit
 
     try {
       const response = await axios.post(
@@ -37,15 +44,16 @@ const Signin = () => {
       if (token) {
         localStorage.setItem("emp_token", token);
         localStorage.setItem("emp_user", JSON.stringify(user));
-        console.log(JSON.stringify(response.data));
-        alert("Login successful!");
         setIsAuthenticated(true);
         navigate("/employee-dashboard");
+      } else {
+        setError("Incorrect email or password");
       }
-      setError("Incorrect email or password");
+
       setTimeout(() => {
         window.location.reload();
       }, 3000);
+
     } catch (error) {
       if (error.response && error.response.status === 401) {
         setError("Incorrect email or password");
@@ -53,6 +61,8 @@ const Signin = () => {
         setError("An error occurred. Please try again.");
       }
       console.log(error);
+    } finally {
+      setIsLoading(false); // End loading after the API call
     }
   };
 
@@ -138,23 +148,29 @@ const Signin = () => {
                             </a>
                           </span>
                         </div>
-                        <input
-                          type="password"
-                          name="password"
-                          onChange={handleChange}
-                          value={formData.password}
-                          className="form-control form-control-lg"
-                          placeholder="***************"
-                        />
+                        <div className="input-group">
+                          <input
+                            type={showPassword ? "text" : "password"} // Toggle input type
+                            name="password"
+                            onChange={handleChange}
+                            value={formData.password}
+                            className="form-control form-control-lg"
+                            placeholder="***************"
+                          />
+                          <div className="d-flex" style={{position: "absolute", color: "black", marginLeft:"20rem"}}>
+                            <i onClick={toggleShowPassword} className={`bi mt-2 form-control ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div className="col-12 text-center mt-4">
                       <button
                         type="submit"
                         className="btn btn-lg btn-block btn-light lift text-uppercase"
-                        atl="signin"
+                        disabled={isLoading} // Disable button while loading
+                        alt="signin"
                       >
-                        SIGN IN
+                        {isLoading ? "Signing in..." : "SIGN IN"} {/* Show loading text */}
                       </button>
                     </div>
                     {error && <p className="text-danger mt-3 text-center">{error}</p>}

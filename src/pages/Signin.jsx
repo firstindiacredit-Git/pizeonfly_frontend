@@ -13,6 +13,8 @@ const Signin = () => {
   });
   const [error, setError] = useState("");
   const [roles, setRoles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State for show password
 
   const handleChange = (e) => {
     setForm({
@@ -40,13 +42,18 @@ const Signin = () => {
     }
   }, [navigate]);
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!form.email || !form.password || !form.role) {
       setError("Please fill out all fields");
       return;
     }
+
+    setLoading(true);
 
     try {
       const response = await axios.post(
@@ -64,6 +71,8 @@ const Signin = () => {
         setError("An error occurred. Please try again later.");
         console.error(error);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -128,11 +137,6 @@ const Signin = () => {
                           <option value="">Select Role</option>
                           <option value="superadmin">Super Admin</option>
                           <option value="admin">Admin</option>
-                          {/* {roles.map((role) => (
-                            <option key={role} value={role}>
-                              {role.role}
-                            </option>
-                          ))} */}
                         </select>
                       </div>
                     </div>
@@ -150,34 +154,45 @@ const Signin = () => {
                       </div>
                     </div>
                     <div className="col-12">
-                      <div className="mb-2">
+                      <div className="mb-2 position-relative">
                         <div className="form-label">
                           <span className="d-flex justify-content-between align-items-center">
                             Password
-                            {/* <a
-                              className="text-secondary"
-                              href="auth-password-reset.html"
-                            >
-                              Forgot Password?
-                            </a> */}
                           </span>
                         </div>
                         <input
-                          type="password"
+                          type={showPassword ? "text" : "password"} // Toggle input type
                           name="password"
                           onChange={handleChange}
                           value={form.password}
                           className="form-control form-control-lg"
                           placeholder="***************"
                         />
+                        <div
+                          className="d-flex"
+                          style={{
+                            position: "absolute",
+                            right: "15px",
+                            top: "67%",
+                            transform: "translateY(-50%)",
+                            color: "black",
+                            cursor: "pointer",
+                          }}
+                          onClick={toggleShowPassword}
+                        >
+                          <i
+                            className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
+                          ></i>
+                        </div>
                       </div>
                     </div>
                     <div className="col-12 text-center mt-4">
                       <button
                         type="submit"
                         className="btn btn-lg btn-block btn-light lift text-uppercase"
+                        disabled={loading}
                       >
-                        SIGN IN
+                        {loading ? "Signing In..." : "SIGN IN"}
                       </button>
                     </div>
                     {error && <p className="text-danger">{error}</p>}
