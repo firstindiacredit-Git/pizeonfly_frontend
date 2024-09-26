@@ -12,6 +12,7 @@ const Project = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currProj, setCurrProj] = useState({});
+  const [viewMode, setViewMode] = useState("list");
 
 
   // CREATE PROJECT
@@ -521,7 +522,19 @@ const Project = () => {
 
                     </div>
                     <div className="d-flex justify-content-between mb-4">
-                      <div></div>
+                      <div>
+                        <h6>Change View</h6>
+                        <div className="d-flex justify-content-around">
+                          <button
+                            className="bi bi-list-task bg-primary text-white border-0 rounded"
+                            onClick={() => setViewMode("list")} // Set to list view
+                          ></button>
+                          <button
+                            className="bi bi-grid-3x3-gap-fill bg-primary text-white border-0 rounded"
+                            onClick={() => setViewMode("grid")} // Set to grid view
+                          ></button>
+                        </div>
+                      </div>
 
                       <div className="order-0 ms-1">
                         <div className="input-group">
@@ -566,146 +579,248 @@ const Project = () => {
                 ) : (
                   <div className="row g-3 mb-3 row-deck">
                     <div className="col-md-12">
-                      <div className="card mb-3">
-                        <div className="card-body">
-                          <table
-                            className="table table-hover align-middle mb-0"
-                            style={{ width: "100%" }}
-                          >
-                            <thead>
-                              <tr>
-                                <th>Project Name</th>
-                                {/* <th>Project Category</th> */}
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Members</th>
-                                <th>Progress</th>
-                                <th>Edit</th>
-                                <th>Delete</th>
-                                <th>Message</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {filteredProjects.map((project) => {
-                                const getFormattedDate = (date) => {
-                                  const newDate = new Date(date);
-                                  let day = newDate.getDate();
-                                  let month = newDate.getMonth() + 1;
-                                  const year = newDate.getFullYear();
-                                  let hour = newDate.getHours();
-                                  let min = newDate.getMinutes();
-                                  let period = "AM";
+                      {viewMode === "list" ? (
+                        <div className="card mb-3">
+                          <div className="card-body">
+                            <table
+                              className="table table-hover align-middle mb-0"
+                              style={{ width: "100%" }}
+                            >
+                              <thead>
+                                <tr>
+                                  <th>Project Name</th>
+                                  {/* <th>Project Category</th> */}
+                                  <th>Start Date</th>
+                                  <th>End Date</th>
+                                  <th>Members</th>
+                                  <th>Progress</th>
+                                  <th>Edit</th>
+                                  <th>Delete</th>
+                                  <th>Message</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {filteredProjects.map((project) => {
+                                  const getFormattedDate = (date) => {
+                                    const newDate = new Date(date);
+                                    let day = newDate.getDate();
+                                    let month = newDate.getMonth() + 1;
+                                    const year = newDate.getFullYear();
+                                    let hour = newDate.getHours();
+                                    let min = newDate.getMinutes();
+                                    let period = "AM";
 
-                                  // Convert hours to 12-hour format
-                                  if (hour === 0) {
-                                    hour = 12;
-                                  } else if (hour >= 12) {
-                                    period = "PM";
-                                    if (hour > 12) {
-                                      hour -= 12;
+                                    // Convert hours to 12-hour format
+                                    if (hour === 0) {
+                                      hour = 12;
+                                    } else if (hour >= 12) {
+                                      period = "PM";
+                                      if (hour > 12) {
+                                        hour -= 12;
+                                      }
                                     }
-                                  }
 
-                                  // Adding leading zero to minutes if necessary
-                                  if (min < 10) {
-                                    min = "0" + min;
-                                  }
+                                    // Adding leading zero to minutes if necessary
+                                    if (min < 10) {
+                                      min = "0" + min;
+                                    }
 
-                                  // Adding leading zero to day and month if necessary
-                                  if (day < 10) {
-                                    day = "0" + day;
-                                  }
-                                  if (month < 10) {
-                                    month = "0" + month;
-                                  }
+                                    // Adding leading zero to day and month if necessary
+                                    if (day < 10) {
+                                      day = "0" + day;
+                                    }
+                                    if (month < 10) {
+                                      month = "0" + month;
+                                    }
 
-                                  return `${day}/${month}/${year} --${hour}:${min} ${period}`;
-                                };
+                                    return `${day}/${month}/${year} --${hour}:${min} ${period}`;
+                                  };
 
-                                return (
-                                  <tr key={project.id}
-                                  // data-bs-toggle="modal"
-                                  // data-bs-target="#viewtask"
-                                  // onClick={() => setCurrProj(project)}
-                                  >
-                                    <td>
-                                      <div className="">
-                                        <Link to="/tasks">
-                                          {project.projectName}
-                                        </Link>
+                                  return (
+                                    <tr key={project.id}
+                                    // data-bs-toggle="modal"
+                                    // data-bs-target="#viewtask"
+                                    // onClick={() => setCurrProj(project)}
+                                    >
+                                      <td>
+                                        <div className="">
+                                          <Link to="/tasks">
+                                            {project.projectName}
+                                          </Link>
 
-                                        <Link
-                                          to="/images"
-                                          state={{
-                                            images: project.projectImage,
-                                            projectName: project.projectName,
+                                          <Link
+                                            to="/images"
+                                            state={{
+                                              images: project.projectImage,
+                                              projectName: project.projectName,
+                                            }}
+                                            style={{ marginLeft: "33px" }}
+                                          >
+                                            <i className="bi-paperclip fs-6" />
+                                          </Link>
+                                        </div>
+                                        <div className="text-muted">
+                                          -{getFormattedDate(project.projectDate)}
+                                        </div>
+                                      </td>
+                                      <td>
+                                        {getFormattedDate(
+                                          project.projectStartDate
+                                        )}
+                                      </td>
+                                      <td>
+                                        {getFormattedDate(project.projectEndDate)}{" "}
+                                      </td>
+                                      <td>
+                                        {project.taskAssignPerson.map(
+                                          (name) => name.employeeName + ", "
+                                        )}
+                                      </td>
+                                      <td>
+                                        <div className="d-flex justify-content-center">
+                                          {project.progress}%
+                                        </div>
+                                      </td>
+                                      <td>
+                                        <button
+                                          type=""
+                                          onClick={() => setToEdit(project._id)}
+                                          className="btn icofont-edit text-success"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#editproject"
+                                        ></button>
+                                      </td>
+                                      <td>
+                                        <button
+                                          type=""
+                                          className="btn outline-secondary icofont-ui-delete text-danger "
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#deleteproject"
+                                          onClick={() => {
+                                            setDeletableId(project._id);
                                           }}
-                                          style={{ marginLeft: "33px" }}
-                                        >
-                                          <i className="bi-paperclip fs-6" />
-                                        </Link>
-                                      </div>
-                                      <div className="text-muted">
-                                        -{getFormattedDate(project.projectDate)}
-                                      </div>
-                                    </td>
-                                    <td>
-                                      {getFormattedDate(
-                                        project.projectStartDate
-                                      )}
-                                    </td>
-                                    <td>
-                                      {getFormattedDate(project.projectEndDate)}{" "}
-                                    </td>
-                                    <td>
+                                        ></button>
+                                      </td>
+                                      <td>
+                                        <button
+                                          className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#addUser"
+                                          type="button"
+                                          onClick={() => {
+                                            setSelectProject(project);
+                                            fetchProjectMessages(project._id); // Fetch messages for the selected project
+                                          }}
+                                        ></button>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="row">
+                          {filteredProjects.map((project) => {
+                            const getFormattedDate = (date) => {
+                              const newDate = new Date(date);
+                              let day = newDate.getDate();
+                              let month = newDate.getMonth() + 1;
+                              const year = newDate.getFullYear();
+                              let hour = newDate.getHours();
+                              let min = newDate.getMinutes();
+                              let period = "AM";
+
+                              // Convert hours to 12-hour format
+                              if (hour === 0) {
+                                hour = 12;
+                              } else if (hour >= 12) {
+                                period = "PM";
+                                if (hour > 12) {
+                                  hour -= 12;
+                                }
+                              }
+
+                              // Adding leading zero to minutes if necessary
+                              if (min < 10) {
+                                min = "0" + min;
+                              }
+
+                              // Adding leading zero to day and month if necessary
+                              if (day < 10) {
+                                day = "0" + day;
+                              }
+                              if (month < 10) {
+                                month = "0" + month;
+                              }
+
+                              return `${day}/${month}/${year} --${hour}:${min} ${period}`;
+                            };
+                            return (
+
+                              <div className="col-md-4" key={project.id}>
+                                <div className="card mt-4 task-card">
+                                  <div className="card-body">
+                                    <div className="d-flex justify-content-between">
+                                      <h5 className="card-title">{project.projectName}</h5>
+                                      <Link
+                                        to="/images"
+                                        state={{
+                                          images: project.projectImage,
+                                          projectName: project.projectName,
+                                        }}
+                                        style={{ marginLeft: "33px" }}
+                                      >
+                                        <i className="bi-paperclip fs-6" />
+                                      </Link>
+                                    </div>
+                                    <p className="card-text">
+                                      Start Date: {getFormattedDate(project.projectStartDate)}
+                                      <br />
+                                      End Date: {getFormattedDate(project.projectEndDate)}
+                                      <br />
+                                      Members:{" "}
                                       {project.taskAssignPerson.map(
                                         (name) => name.employeeName + ", "
                                       )}
-                                    </td>
-                                    <td>
-                                      <div className="d-flex justify-content-center">
-                                        {project.progress}%
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <button
-                                        type=""
-                                        onClick={() => setToEdit(project._id)}
-                                        className="btn icofont-edit text-success"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editproject"
-                                      ></button>
-                                    </td>
-                                    <td>
-                                      <button
-                                        type=""
-                                        className="btn outline-secondary icofont-ui-delete text-danger "
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteproject"
-                                        onClick={() => {
-                                          setDeletableId(project._id);
-                                        }}
-                                      ></button>
-                                    </td>
-                                    <td>
-                                      <button
-                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#addUser"
-                                        type="button"
-                                        onClick={() => {
-                                          setSelectProject(project);
-                                          fetchProjectMessages(project._id); // Fetch messages for the selected project
-                                        }}
-                                      ></button>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
+                                      <br />
+                                      Progress: {project.progress}%
+                                    </p>
+                                    <button
+                                      onClick={() => setToEdit(project._id)}
+                                      className="btn icofont-edit text-success"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#editproject"
+                                    >
+                                      Edit
+                                    </button>
+                                    <button
+                                      className="btn icofont-ui-delete text-danger"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#deleteproject"
+                                      onClick={() => setDeletableId(project._id)}
+                                    >
+                                      Delete
+                                    </button>
+                                    <button
+                                      className="btn bi bi-chat-left-dots text-primary"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#addUser"
+                                      onClick={() => {
+                                        setSelectProject(project);
+                                        fetchProjectMessages(project._id);
+                                      }}
+                                    >
+                                      Message
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1171,9 +1286,9 @@ const Project = () => {
                       {messages.map((message) => (
                         <li key={message._id}>
                           <div className="d-flex border-bottom py-1">
-                          <h6 className="fw-bold px-3">{message.senderId}</h6> - <span className="px-3 text-break">{message.content}</span>
+                            <h6 className="fw-bold px-3">{message.senderId}</h6> - <span className="px-3 text-break">{message.content}</span>
                           </div>
-                          
+
                         </li>
                       ))}
                     </ul>
