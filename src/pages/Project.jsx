@@ -588,6 +588,7 @@ const Project = () => {
                             >
                               <thead>
                                 <tr>
+                                  <th>Sr.No.</th>
                                   <th>Project Name</th>
                                   {/* <th>Project Category</th> */}
                                   <th>Start Date</th>
@@ -642,9 +643,9 @@ const Project = () => {
                                     // data-bs-target="#viewtask"
                                     // onClick={() => setCurrProj(project)}
                                     >
+                                      <td><span className="fw-bold fs-6">{index + 1}.</span></td>
                                       <td>
                                         <div className="d-flex gap-2">
-                                          <span className="fw-bold fs-6">{index + 1}.</span>
                                           <div className="">
                                             <Link to="/tasks">
                                               {project.projectName}
@@ -766,8 +767,8 @@ const Project = () => {
                                 <div className="card mt-4 task-card">
                                   <div className="card-body">
                                     <div className="d-flex justify-content-between">
+                                    <span className="fw-bold fs-5" >{index + 1}. </span>
                                       <h5 className="card-title">
-                                        <span className="fw-bold">{index + 1}. </span>
                                         {project.projectName}</h5>
                                       <Link
                                         to="/images"

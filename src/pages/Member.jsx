@@ -1258,6 +1258,7 @@ const Member = () => {
                               <option value="IT Management">IT Management</option>
                               <option value="Marketing">Marketing</option>
                               <option value="Manager">Manager</option>
+                              <button>Add Department</button>
                             </select>
                           </div>
                           <div className="col">

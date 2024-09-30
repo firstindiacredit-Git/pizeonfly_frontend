@@ -256,6 +256,13 @@ const Tasks = () => {
   // Previous page
   const prevPage = () => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
 
+  // Logic for page number chunking (5 page limit)
+  const pageLimit = 5;
+  const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
+  const startPage = Math.floor((currentPage - 1) / pageLimit) * pageLimit + 1;
+  const endPage = Math.min(startPage + pageLimit - 1, totalPages);
+
+
 
   //DELETE TASK
   const [deletableId, setDeletableId] = useState("");
@@ -482,7 +489,7 @@ const Tasks = () => {
 
 
                   <div className=" text-end mb-3" >
-                    <p className="fw-bold">Filter by Date:</p>
+                    <p className="fw-bold">Filter by Date</p>
 
                     <input
                       className="form-control"
@@ -499,9 +506,10 @@ const Tasks = () => {
                     <table className="table table-bordered">
                       <thead>
                         <tr>
-                          <th scope="col" style={{ width: '7.5rem' }}>Project name</th>
+                          <th scope="col" >SrNo.</th>
+                          <th scope="col" style={{ width: '6rem' }}>Project name</th>
                           <th scope="col">Task name</th>
-                          <th scope="col" style={{ width: '9rem' }}>Assignee</th>
+                          <th scope="col" style={{ width: '7rem' }}>Assignee</th>
                           <th scope="col" style={{ width: '' }}>Due Date</th>
                           <th scope="col" style={{ width: '9rem' }}>Priority</th>
                           <th scope="col" style={{ width: '' }}>U/D</th>
@@ -531,8 +539,9 @@ const Tasks = () => {
                                 key={task._id}
                                 style={{ backgroundColor }}
                               >
+                                <td><span className="fw-bold fs-6">{index + 1}. </span></td>
                                 <td style={{ backgroundColor }}>
-                                  <span className="fw-bold fs-6">{index + 1}. </span>
+
                                   {task.projectName}
                                   <p>{task.taskDate}</p>
                                   <Link
@@ -626,11 +635,24 @@ const Tasks = () => {
                   </div>
                 ) : (
                   <div className="row">
-                    {currentTasks.map((task) => (
+                    {currentTasks.map((task, index) => (
                       <div key={task._id} className="col-md-4 mb-4">
                         <div className="card task-card" style={{ width: "18rem" }}>
                           <div className="card-body">
-                            <h5 className="fw-bold">{task.projectName}</h5>
+                            <div className="d-flex justify-content-between">
+                              <span className="fw-bold fs-6">{index + 1}. </span>
+                              <h5 className="fw-bold ">{task.projectName}</h5>
+                              <Link
+                                to="/images"
+                                state={{
+                                  images: task.taskImages,
+                                  projectName: task.projectName,
+                                }}
+                                style={{ marginLeft: "33px" }}
+                              >
+                                <i className="bi-paperclip fs-6" />
+                              </Link>
+                            </div>
                             <p>{task.description}</p>
                             <p>Due Date: {task.taskEndDate}</p>
                             <p>Assigned to: {task.taskAssignPerson.employeeName}</p>
@@ -657,20 +679,27 @@ const Tasks = () => {
                         &laquo;
                       </button>
                     </li>
-                    {Array.from({ length: Math.ceil(filteredTasks.length / tasksPerPage) }, (_, i) => (
-                      <li key={i + 1} className="page-item">
-                        <button onClick={() => paginate(i + 1)} className="page-link">
-                          {i + 1}
+
+                    {/* Only show pages between startPage and endPage */}
+                    {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
+                      <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                        <button onClick={() => paginate(page)} className="page-link bg-white  ">
+                          {page}
                         </button>
                       </li>
                     ))}
-                    <li className="page-item">
-                      <button onClick={nextPage} className="page-link" disabled={currentPage === Math.ceil(filteredTasks.length / tasksPerPage)}>
-                        &raquo;
-                      </button>
-                    </li>
+
+                    {/* Next 5 pages button */}
+                    {endPage < totalPages && (
+                      <li className="page-item">
+                        <button onClick={() => paginate(endPage + 1)} className="page-link">
+                          &raquo;
+                        </button>
+                      </li>
+                    )}
                   </ul>
                 </nav>
+
 
 
               </div>
