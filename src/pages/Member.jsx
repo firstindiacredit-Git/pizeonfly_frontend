@@ -418,7 +418,7 @@ const Member = () => {
                             <div className="card-body d-flex">
                               <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w220">
                                 <img
-                                  src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
+                                  src={employee.employeeImage}
                                   alt=""
                                   className="avatar xl rounded-circle img-thumbnail shadow-sm"
                                 />
@@ -488,15 +488,6 @@ const Member = () => {
                                   <p>{employee.description}</p>
                                 </div>
                                 <div className="d-flex justify-content-center">
-                                  {/* <Link
-                    className="ms-link d-flex justify-content-center"
-                    to="/tasks"
-                  >
-                    <div className="btn btn-dark btn-sm mt-1 ">
-                      <i className="icofont-plus-circle me-2 fs-6" />
-                      Add Task
-                    </div>
-                  </Link> */}
                                 </div>
                               </div>
                             </div>
