@@ -5,8 +5,11 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "./Loading.css";
 
 const Project = () => {
+  const [viewMode, setViewMode] = useState("list");
+
   // GET SINGLE PROJECT
   const [searchQuery, setSearchQuery] = useState("");
   const [employees, setEmployees] = useState([]);
@@ -160,141 +163,146 @@ const Project = () => {
                     <div className="card-header py-3 px-0 d-sm-flex align-items-center  justify-content-between border-bottom">
                       <h3 className="fw-bold py-3 mb-0">Projects</h3>
                       <div className="d-flex me-2">
-                        {/* <button
-                          type="button"
-                          className="btn btn-dark me-1 w-sm-100"
-                          data-bs-toggle="modal"
-                          data-bs-target="#createproject"
-                        >
-                          <i className="icofont-plus-circle me-2 fs-6" />
-                          Create Project
-                        </button> */}
-                        {/* <div className="order-0 ">
-                          <div className="input-group">
-                            <input
-                              type="search"
-                              className="form-control"
-                              aria-label="search"
-                              aria-describedby="addon-wrapping"
-                              value={searchQuery}
-                              onChange={(e) => {
-                                setSearchQuery(e.target.value);
-                                handleSearch(e.target.value);
-                              }}
-                              placeholder="Enter Project Name"
-                            />
+                        <div>
+                          <h6>Change View</h6>
+                          <div className="d-flex justify-content-around">
                             <button
-                              type="button"
-                              className="input-group-text add-member-top"
-                              id="addon-wrappingone"
-                              data-bs-toggle="modal"
-                              data-bs-target="#addUser"
-                            >
-                              <i className="fa fa-plus" />
-                            </button>
+                              className="bi bi-list-task bg-primary text-white border-0 rounded"
+                              onClick={() => setViewMode("list")} // Set to list view
+                            ></button>
                             <button
-                              type="button"
-                              className="input-group-text"
-                              id="addon-wrapping"
-                              onClick={handleSearch}
-                            >
-                              <i className="fa fa-search" />
-                            </button>
+                              className="bi bi-grid-3x3-gap-fill bg-primary text-white border-0 rounded"
+                              onClick={() => setViewMode("grid")} // Set to grid view
+                            ></button>
                           </div>
-                        </div> */}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>{" "}
                 {/* Row end  */}
-                <div className="row g-3 mb-3 row-deck">
-                  <div className="col-md-12">
-                    <div className="card mb-3">
-                      <div className="card-body">
-                        <table
-                          className="table table-hover align-middle mb-0"
-                          style={{ width: "100%" }}
-                        >
-                          <thead>
-                            <tr>
-                              <th>Project Name</th>
-                              {/* <th>Project Category</th> */}
-                              <th>Start Date</th>
-                              <th>End Date</th>
-                              <th>Members</th>
-                              <th>Progress</th>
-                              <th>Add Message</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {projects.map((project) => {
-                              const getFormattedDate = (date) => {
-                                const newDate = new Date(date);
-                                const day = newDate.getDate();
-                                const month = newDate.getMonth() + 1;
-                                const year = newDate.getFullYear();
+                {viewMode === "list" && (
+                  <div className="row g-3 mb-3 row-deck">
+                    <div className="col-md-12">
+                      <div className="card mb-3">
+                        <div className="card-body">
+                          <table
+                            className="table table-hover align-middle mb-0"
+                            style={{ width: "100%" }}
+                          >
+                            <thead>
+                              <tr>
+                                <th>Project Name</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Members</th>
+                                <th>Progress</th>
+                                <th>Add Message</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {projects.map((project) => {
+                                const getFormattedDate = (date) => {
+                                  const newDate = new Date(date);
+                                  const day = newDate.getDate();
+                                  const month = newDate.getMonth() + 1;
+                                  const year = newDate.getFullYear();
+                                  return `${day}/${month}/${year}`;
+                                };
 
-                                return `${day}/${month}/${year}`;
-                              };
-
-                              return (
-                                <tr key={project.id}>
-                                  <td>
-                                    <Link to="/employee-tasks">
-                                      {project.projectName}
-                                    </Link>
-                                    <Link
-                                      to="/images"
-                                      className="btn btn-outline-secondary"
-                                      state={{
-                                        images: project.projectImage,
-                                        projectName: project.projectName,
-                                      }}
-                                    >
-                                      <i className="bi-paperclip fs-6" />
-                                    </Link>
-                                    <p />
-                                    <figcaption class="blockquote-footer">
-                                      {project.projectCategory}
-                                    </figcaption>
-                                  </td>
-                                  {/* <td>{project.projectCategory}</td> */}
-                                  <td>
-                                    {getFormattedDate(project.projectStartDate)}
-                                  </td>
-                                  <td>
-                                    {getFormattedDate(project.projectEndDate)}{" "}
-                                  </td>
-                                  <td>
-                                    {project.taskAssignPerson.map(
-                                      (name) => name.employeeName + ", "
-                                    )}
-                                  </td>
-                                  <td>
-                                    <div className="d-flex justify-content-center">
-                                      0%
-                                    </div>
-                                  </td>
-                                  <td>
-                                    <button
-                                      className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#addUser"
-                                      onClick={() => {
-                                        setSelectProject(project);
-                                        fetchProjectMessages(project._id); // Fetch messages for the selected project
-                                      }}
-                                    ></button>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
+                                return (
+                                  <tr key={project.id}>
+                                    <td>
+                                      <Link to="/employee-tasks">{project.projectName}</Link>
+                                      <Link
+                                        to="/images"
+                                        className="btn btn-outline-secondary"
+                                        state={{
+                                          images: project.projectImage,
+                                          projectName: project.projectName,
+                                        }}
+                                      >
+                                        <i className="bi-paperclip fs-6" />
+                                      </Link>
+                                      <p />
+                                      <figcaption className="blockquote-footer">
+                                        {project.projectCategory}
+                                      </figcaption>
+                                    </td>
+                                    <td>{getFormattedDate(project.projectStartDate)}</td>
+                                    <td>{getFormattedDate(project.projectEndDate)} </td>
+                                    <td>
+                                      {project.taskAssignPerson.map(
+                                        (name) => name.employeeName + ", "
+                                      )}
+                                    </td>
+                                    <td>
+                                      <div className="d-flex justify-content-center">0%</div>
+                                    </td>
+                                    <td>
+                                      <button
+                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#addUser"
+                                        onClick={() => {
+                                          setSelectProject(project);
+                                          fetchProjectMessages(project._id);
+                                        }}
+                                      ></button>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {viewMode === "grid" && (
+                  <div className="row g-3 mb-3 row-deck">
+                    {projects.map((project) => {
+                      const getFormattedDate = (date) => {
+                        const newDate = new Date(date);
+                        const day = newDate.getDate();
+                        const month = newDate.getMonth() + 1;
+                        const year = newDate.getFullYear();
+                        return `${day}/${month}/${year}`;
+                      };
+
+                      return (
+                        <div className="col-md-4" key={project.id}>
+                          <div className="card task-card">
+                            <div className="card-body">
+                              <h5 className="card-title">{project.projectName}</h5>
+                              <figcaption className="blockquote-footer mt-2">
+                                {project.projectCategory}
+                              </figcaption>
+                              <p>Start Date: {getFormattedDate(project.projectStartDate)}</p>
+                              <p>End Date: {getFormattedDate(project.projectEndDate)}</p>
+                              <p>Members: {project.taskAssignPerson.map((name) => name.employeeName + ", ")}</p>
+                              <button
+                                className="bi bi-chat-left-dots btn outline-secondary text-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addUser"
+                                onClick={() => {
+                                  setSelectProject(project);
+                                  fetchProjectMessages(project._id);
+                                }}
+                              >
+                                Add Message
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+
               </div>
             </div>
 

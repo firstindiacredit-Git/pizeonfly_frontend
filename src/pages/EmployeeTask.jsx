@@ -4,8 +4,10 @@ import Sidebar from "../employeeCompt/EmployeeSidebar";
 import Header from "../employeeCompt/EmployeeHeader";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import "./Loading.css";
 
 const Tasks = () => {
+  const [viewMode, setViewMode] = useState("grid");
   const [employees, setEmployees] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [selectedEmployees, setSelectedEmployees] = useState([]);
@@ -153,10 +155,24 @@ const Tasks = () => {
               <div className="container-xxl">
                 <div className="row align-items-center">
                   <div className="border-0 mb-4">
-                    <div className="card-header py-3 no-bg bg-transparent d-flex align-items-center px-0 justify-content-between border-bottom flex-wrap">
+                    <div className="card-header py-3 no-bg bg-transparent d-flex align-items-center px-0 justify-content-between border-bottom flex-wrap mb-3">
                       <h3 className="fw-bold mb-0">Task Management</h3>
                     </div>
-                    <div className="col-auto d-flex justify-content-between w-sm-100">
+                    <div className="col-auto d-flex justify-content-between">
+                      <div>
+                        <h6>Change View</h6>
+                        <div className="d-flex justify-content-around">
+                          <button
+                            className="bi bi-list-task bg-primary text-white border-0 rounded"
+                            onClick={() => setViewMode("list")} // Set to list view
+                          ></button>
+                          <button
+                            className="bi bi-grid-3x3-gap-fill bg-primary text-white border-0 rounded"
+                            onClick={() => setViewMode("grid")} // Set to grid view
+                          ></button>
+                        </div>
+                      </div>
+
                       <div className="order-0">
                         <div className="input-group">
                           <input
@@ -186,7 +202,7 @@ const Tasks = () => {
                           </button>
                         </div>
                       </div>
-                      <ul className="nav nav-tabs tab-body-header rounded ms-1 prtab-set w-sm-100" style={{ cursor: 'pointer' }} role="tablist">
+                      <ul className="nav nav-tabs tab-body-header rounded prtab-set" style={{ cursor: 'pointer' }} role="tablist">
                         <li className="nav-item">
                           <a
                             className={`nav-link ${filterStatus === "All" ? "active" : ""}`}
@@ -229,111 +245,169 @@ const Tasks = () => {
                 </div>{" "}
                 {/* Row end  */}
                 <div className="row">
-                  {filteredTasks.map((task) => {
-                    const getFormattedDate = (date) => {
-                      const newDate = new Date(date);
-                      const day = newDate.getDate();
-                      const month = newDate.getMonth() + 1;
-                      const year = newDate.getFullYear();
-
-                      return `${day}/${month}/${year}`;
-                    };
-
-                    return (
-                      <div className="col-md-4 mb-4" key={task._id}>
-                        <div className="card" style={{ width: "18rem" }}>
-                          <div className="card-body dd-handle">
-                            <div className="d-flex justify-content-between">
-                              <h5 className="fw-bold">{task.projectName}</h5>
-
-                            </div>
-                            <div className="task-info d-flex align-items-center justify-content-between">
-                              <h6 className="py-1 px-2 rounded-1 d-inline-block fw-bold small-14 mb-0">
-                                <span className={`badge ${taskStatuses[task._id] === "Not Started" ? "bg-warning text-dark" : taskStatuses[task._id] === "In Progress" ? "bg-info text-dark" : "bg-success"}`}>
+                  {viewMode === "list" ? (
+                    // List View Rendering
+                    <table className="table table-hover align-middle mb-0" style={{ width: "100%" }}>
+                      <thead>
+                        <tr>
+                          <th>Sr.No</th>
+                          <th>Project Name</th>
+                          <th>Status</th>
+                          <th>Due Date</th>
+                          <th>Assigned To</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredTasks.map((task, index) => {
+                          const getFormattedDate = (date) => {
+                            const newDate = new Date(date);
+                            return `${newDate.getDate()}/${newDate.getMonth() + 1}/${newDate.getFullYear()}`;
+                          };
+                          return (
+                            <tr key={task._id}>
+                              <td><span className="fw-bold fs-6">{index + 1}.</span></td>
+                              <td>{task.projectName}</td>
+                              <td>
+                                <span
+                                  className={`badge ${taskStatuses[task._id] === "Not Started"
+                                    ? "bg-warning text-dark"
+                                    : taskStatuses[task._id] === "In Progress"
+                                      ? "bg-info text-dark"
+                                      : "bg-success"
+                                    }`}
+                                >
                                   {taskStatuses[task._id]}
                                 </span>
-                              </h6>
-                              <div className="task-priority d-flex flex-column align-items-center justify-content-center">
-                                <div className="avatar-list avatar-list-stacked m-0">
-                                  <img
-                                    className="avatar rounded-circle small-avt"
-                                    src={`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage}`}
-                                    alt=""
-                                  />
-                                </div>
-                                <div>{task.taskAssignPerson.employeeName}</div>
-                                <span className="badge bg-danger text-end mt-2">
-                                  {task.taskPriority}
-                                </span>
-                              </div>
-                            </div>
-                            <p
-                              className="py-2 mb-0 task-description"
-                              style={{
-                                maxHeight: showFullDescription ? "none" : "11em",
-                                overflowY: "auto",
-                              }}
-                            >
-                              {task.description}
-
-                            </p>
-                            <div className="tikit-info row g-3 align-items-center">
-                              <div className="col-sm">
-                                <ul className="d-flex list-unstyled align-items-center justify-content-between">
-                                  <li className="me-2">
-                                    <div className="d-flex gap-5">
-                                      <div className="d-flex align-items-center fw-bold">
-                                        Due Date:
-                                        <span className="ms-1">
-                                          {getFormattedDate(task.taskEndDate)}
-                                        </span>
-                                      </div>
-                                      <button
-                                        className="d-flex justify-content-center bi bi-stopwatch btn outline-secondary text-primary"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#taskMessage"
-                                        onClick={() => handleViewMessages(task._id)}
-                                      ></button>
-                                    </div>
-                                  </li>
-                                </ul>
-                                <div className="fw-bold">Task Given By - {task.assignedBy}</div>
-                              </div>
-
-                              <div className="d-flex justify-content-between align-items-center">
-
-                                <select
-                                  className="form-select"
-                                  aria-label="Default select Status"
-                                  name="taskStatus"
-                                  onChange={(e) => handleTaskUpdate(e, task._id)}
-                                  value={taskStatuses[task._id]}
+                              </td>
+                              <td>{getFormattedDate(task.taskEndDate)}</td>
+                              <td>{task.taskAssignPerson.employeeName}</td>
+                              <td>
+                                <button
+                                  className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#taskMessage"
+                                  onClick={() => handleViewMessages(task._id)}
                                 >
-                                  <option value="Not Started">Not Started</option>
-                                  <option value="In Progress">In Progress</option>
-                                  <option value="Completed">Completed</option>
-                                </select>
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  ) : (
+                    // Grid View Rendering
+                    <div className="row">
+                      {filteredTasks.map((task, index) => {
+                        const getFormattedDate = (date) => {
+                          const newDate = new Date(date);
+                          const day = newDate.getDate();
+                          const month = newDate.getMonth() + 1;
+                          const year = newDate.getFullYear();
 
-                                <div className="btn-group" role="group" aria-label="Basic outlined example">
-                                  <Link
-                                    to="/images"
-                                    className="btn btn-outline-secondary"
-                                    state={{
-                                      images: task.taskImages,
-                                      projectName: task.projectName,
-                                    }}
-                                  >
-                                    <i className="bi-paperclip fs-6" />
-                                  </Link>
+                          return `${day}/${month}/${year}`;
+                        };
+
+                        return (
+                          <div className="col-md-4 mb-4" key={task._id}>
+                            <div className="card" style={{ width: "18rem" }}>
+                              <div className="card-body dd-handle">
+                                <div className="d-flex justify-content-between">
+                                
+                                  <h5 className="fw-bold">{index + 1}. {task.projectName}</h5>
+
+                                </div>
+                                <div className="task-info d-flex align-items-center justify-content-between">
+                                  <h6 className="py-1 px-2 rounded-1 d-inline-block fw-bold small-14 mb-0">
+                                    <span className={`badge ${taskStatuses[task._id] === "Not Started" ? "bg-warning text-dark" : taskStatuses[task._id] === "In Progress" ? "bg-info text-dark" : "bg-success"}`}>
+                                      {taskStatuses[task._id]}
+                                    </span>
+                                  </h6>
+                                  <div className="task-priority d-flex flex-column align-items-center justify-content-center">
+                                    <div className="avatar-list avatar-list-stacked m-0">
+                                      <img
+                                        className="avatar rounded-circle small-avt"
+                                        src={`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage}`}
+                                        alt=""
+                                      />
+                                    </div>
+                                    <div>{task.taskAssignPerson.employeeName}</div>
+                                    <span className="badge bg-danger text-end mt-2">
+                                      {task.taskPriority}
+                                    </span>
+                                  </div>
+                                </div>
+                                <p
+                                  className="py-2 mb-0 task-description"
+                                  style={{
+                                    maxHeight: showFullDescription ? "none" : "11em",
+                                    overflowY: "auto",
+                                  }}
+                                >
+                                  {task.description}
+
+                                </p>
+                                <div className="tikit-info row g-3 align-items-center">
+                                  <div className="col-sm">
+                                    <ul className="d-flex list-unstyled align-items-center justify-content-between">
+                                      <li className="me-2">
+                                        <div className="d-flex gap-5">
+                                          <div className="d-flex align-items-center fw-bold">
+                                            Due Date:
+                                            <span className="ms-1">
+                                              {getFormattedDate(task.taskEndDate)}
+                                            </span>
+                                          </div>
+                                          <button
+                                            className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#taskMessage"
+                                            onClick={() => handleViewMessages(task._id)}
+                                          ></button>
+                                        </div>
+                                      </li>
+                                    </ul>
+                                    <div className="fw-bold">Task Given By - {task.assignedBy}</div>
+                                  </div>
+
+                                  <div className="d-flex justify-content-between align-items-center">
+
+                                    <select
+                                      className="form-select"
+                                      aria-label="Default select Status"
+                                      name="taskStatus"
+                                      onChange={(e) => handleTaskUpdate(e, task._id)}
+                                      value={taskStatuses[task._id]}
+                                    >
+                                      <option value="Not Started">Not Started</option>
+                                      <option value="In Progress">In Progress</option>
+                                      <option value="Completed">Completed</option>
+                                    </select>
+
+                                    <div className="btn-group" role="group" aria-label="Basic outlined example">
+                                      <Link
+                                        to="/images"
+                                        className="btn btn-outline-secondary"
+                                        state={{
+                                          images: task.taskImages,
+                                          projectName: task.projectName,
+                                        }}
+                                      >
+                                        <i className="bi-paperclip fs-6" />
+                                      </Link>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
+
 
               </div>
             </div>
