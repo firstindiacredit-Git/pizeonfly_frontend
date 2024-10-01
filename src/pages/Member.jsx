@@ -1037,7 +1037,7 @@ const Member = () => {
                       className="btn btn-primary"
                       onClick={updateSubmit}
                     >
-                      Create
+                      Update
                     </button>
                   </div>
                 </div>
