@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client';
 import { MultiSelect } from "react-multi-select-component";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -406,15 +406,13 @@ const Project = () => {
   }, []);
 
 
-  const socket = io(import.meta.env.VITE_BASE_URL); // Connect to Socket.IO server
-
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState('');
-  const [newMessages, setNewMessages] = useState({});
 
   const fetchProjectMessages = async (projectId) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/messages/${projectId}`);
+      console.log(response.data);
       setMessages(response.data);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -424,49 +422,27 @@ const Project = () => {
   const messageSubmit = async (e) => {
     e.preventDefault();
     const userDetails = JSON.parse(localStorage.getItem('user'));
-    const senderId = userDetails.username;
-
-    const messageData = {
-      content,
-      senderId,
-      projectId: selectProject._id,
-    };
+    const senderId = userDetails.username; // Assuming user ID is stored in local storage
 
     try {
-      // Send message to the server
-      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, messageData);
-
-      // Emit the message via Socket.IO
-      socket.emit('sendMessage', messageData);
-
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, {
+        content,
+        senderId,
+        projectId: selectProject._id,
+      });
       setContent('');
-      fetchProjectMessages(selectProject._id);
+      fetchProjectMessages(selectProject._id); // Refresh messages
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
   useEffect(() => {
-    // Fetch messages initially
-    if (selectProject) {
+    if (selectProject._id) {
       fetchProjectMessages(selectProject._id);
     }
-
-    // Listen for new messages
-    socket.on('receiveMessage', (newMessage) => {
-      if (newMessage.projectId === selectProject._id) {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-        setNewMessages((prev) => ({
-          ...prev,
-          [newMessage.projectId]: true, // Notify of new messages
-        }));
-      }
-    });
-
-    return () => {
-      socket.off('receiveMessage');
-    };
   }, [selectProject]);
+
 
 
 
@@ -737,7 +713,10 @@ const Project = () => {
                                           data-bs-toggle="modal"
                                           data-bs-target="#addUser"
                                           type="button"
-                                          onClick={() => setSelectProject(project)}
+                                          onClick={() => {
+                                            setSelectProject(project);
+                                            fetchProjectMessages(project._id); // Fetch messages for the selected project
+                                          }}
                                         ></button>
                                       </td>
                                     </tr>
@@ -1307,25 +1286,21 @@ const Project = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="addUserLabel">
-                      {selectProject && selectProject.projectName}
+                      {selectProject.projectName}
                     </h5>
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div className="modal-body">
                     {/* Message List */}
                     <ul className="list-group">
-                      {messages.length > 0 ? (
-                        messages.map((message) => (
-                          <li key={message._id} className="list-group-item">
-                            <div className="d-flex border-bottom py-1">
-                              <h6 className="fw-bold px-3">{message.senderId}</h6>
-                              - <span className="px-3 text-break">{message.content}</span>
-                            </div>
-                          </li>
-                        ))
-                      ) : (
-                        <li className="list-group-item">No messages yet</li>
-                      )}
+                      {messages.map((message) => (
+                        <li key={message._id}>
+                          <div className="d-flex border-bottom py-1">
+                            <h6 className="fw-bold px-3">{message.senderId}</h6> - <span className="px-3 text-break">{message.content}</span>
+                            <p className="text-muted">{message.createdAt}</p>
+                          </div>
+                        </li>
+                      ))}
                     </ul>
 
                     {/* Message Submission Form */}

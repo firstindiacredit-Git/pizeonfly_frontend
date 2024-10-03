@@ -3,6 +3,7 @@ import Sidebar from "../employeeCompt/EmployeeSidebar";
 import Header from "../employeeCompt/EmployeeHeader";
 import { Link } from "react-router-dom";
 import axios from "axios";
+// import { io } from 'socket.io-client';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./Loading.css";
@@ -105,28 +106,18 @@ const Project = () => {
   };
 
 
+
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState('');
-  const [newMessages, setNewMessages] = useState({});
-
 
   const fetchProjectMessages = async (projectId) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/messages/${projectId}`);
-      const latestMessages = response.data;
-
-      setMessages(latestMessages);
-
-      // Agar naye messages aaye hain to is project ke liye newMessages ko true set karein
-      setNewMessages((prev) => ({
-        ...prev,
-        [projectId]: true, // Mark project as having new messages
-      }));
+      setMessages(response.data);
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
   };
-
 
   const messageSubmit = async (e) => {
     e.preventDefault();
@@ -146,18 +137,11 @@ const Project = () => {
     }
   };
 
-  const openMessageModal = (project) => {
-    setSelectProject(project);
-    fetchProjectMessages(project._id);
-
-    // Mark project as read by setting newMessages to false
-    setNewMessages((prev) => ({
-      ...prev,
-      [project._id]: false, // No new messages for this project now
-    }));
-  };
-
-
+  useEffect(() => {
+    if (selectProject._id) {
+      fetchProjectMessages(selectProject._id);
+    }
+  }, [selectProject]);
 
 
 
@@ -257,21 +241,15 @@ const Project = () => {
                                     </td>
                                     <td>
                                       <button
-                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary position-relative"
+                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
                                         data-bs-toggle="modal"
                                         data-bs-target="#addUser"
                                         type="button"
-                                        onClick={() => openMessageModal(project)}
-                                      >
-                                        {/* Green dot for new messages */}
-                                        {newMessages[project._id] && (
-                                          <span
-                                            className="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle"
-                                            style={{ width: '10px', height: '10px' }}
-                                          ></span>
-                                        )}
-                                      </button>
-
+                                        onClick={() => {
+                                          setSelectProject(project);
+                                          fetchProjectMessages(project._id);
+                                        }}
+                                      ></button>
                                     </td>
                                   </tr>
                                 );
@@ -345,6 +323,7 @@ const Project = () => {
                         <li key={message._id}>
                           <div className="d-flex border-bottom py-1">
                             <h6 className="fw-bold px-3">{message.senderId}</h6> - <span className="px-3 text-break">{message.content}</span>
+                            <p className="text-muted">{message.createdAt}</p>
                           </div>
                         </li>
                       ))}                    </ul>
@@ -370,6 +349,7 @@ const Project = () => {
               </div>
             </div>
           </>
+
           {/* Modal  Delete Folder/ File*/}
           <div
             className="modal fade"
