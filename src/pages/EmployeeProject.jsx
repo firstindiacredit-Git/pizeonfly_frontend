@@ -107,15 +107,26 @@ const Project = () => {
 
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState('');
+  const [newMessages, setNewMessages] = useState({});
+
 
   const fetchProjectMessages = async (projectId) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/messages/${projectId}`);
-      setMessages(response.data);
+      const latestMessages = response.data;
+
+      setMessages(latestMessages);
+
+      // Agar naye messages aaye hain to is project ke liye newMessages ko true set karein
+      setNewMessages((prev) => ({
+        ...prev,
+        [projectId]: true, // Mark project as having new messages
+      }));
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
   };
+
 
   const messageSubmit = async (e) => {
     e.preventDefault();
@@ -135,11 +146,16 @@ const Project = () => {
     }
   };
 
-  useEffect(() => {
-    if (selectProject._id) {
-      fetchProjectMessages(selectProject._id);
-    }
-  }, [selectProject]);
+  const openMessageModal = (project) => {
+    setSelectProject(project);
+    fetchProjectMessages(project._id);
+
+    // Mark project as read by setting newMessages to false
+    setNewMessages((prev) => ({
+      ...prev,
+      [project._id]: false, // No new messages for this project now
+    }));
+  };
 
 
 
@@ -241,14 +257,21 @@ const Project = () => {
                                     </td>
                                     <td>
                                       <button
-                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary position-relative"
                                         data-bs-toggle="modal"
                                         data-bs-target="#addUser"
-                                        onClick={() => {
-                                          setSelectProject(project);
-                                          fetchProjectMessages(project._id);
-                                        }}
-                                      ></button>
+                                        type="button"
+                                        onClick={() => openMessageModal(project)}
+                                      >
+                                        {/* Green dot for new messages */}
+                                        {newMessages[project._id] && (
+                                          <span
+                                            className="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle"
+                                            style={{ width: '10px', height: '10px' }}
+                                          ></span>
+                                        )}
+                                      </button>
+
                                     </td>
                                   </tr>
                                 );

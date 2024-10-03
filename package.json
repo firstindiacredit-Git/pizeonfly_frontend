@@ -25,7 +25,8 @@
     "react-multi-select-component": "^4.3.4",
     "react-pdf": "^9.1.1",
     "react-router-dom": "^6.23.0",
-    "react-toastify": "^10.0.5"
+    "react-toastify": "^10.0.5",
+    "socket.io-client": "^4.8.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

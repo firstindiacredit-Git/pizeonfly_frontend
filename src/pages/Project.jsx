@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { io } from 'socket.io-client';
 import { MultiSelect } from "react-multi-select-component";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -405,14 +406,15 @@ const Project = () => {
   }, []);
 
 
+  const socket = io(import.meta.env.VITE_BASE_URL); // Connect to Socket.IO server
+
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState('');
+  const [newMessages, setNewMessages] = useState({});
 
   const fetchProjectMessages = async (projectId) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/messages/${projectId}`);
-      console.log(response.data);
-
       setMessages(response.data);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -422,26 +424,50 @@ const Project = () => {
   const messageSubmit = async (e) => {
     e.preventDefault();
     const userDetails = JSON.parse(localStorage.getItem('user'));
-    const senderId = userDetails.username; // Assuming user ID is stored in local storage
+    const senderId = userDetails.username;
+
+    const messageData = {
+      content,
+      senderId,
+      projectId: selectProject._id,
+    };
 
     try {
-      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, {
-        content,
-        senderId,
-        projectId: selectProject._id,
-      });
+      // Send message to the server
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, messageData);
+
+      // Emit the message via Socket.IO
+      socket.emit('sendMessage', messageData);
+
       setContent('');
-      fetchProjectMessages(selectProject._id); // Refresh messages
+      fetchProjectMessages(selectProject._id);
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
   useEffect(() => {
-    if (selectProject._id) {
+    // Fetch messages initially
+    if (selectProject) {
       fetchProjectMessages(selectProject._id);
     }
+
+    // Listen for new messages
+    socket.on('receiveMessage', (newMessage) => {
+      if (newMessage.projectId === selectProject._id) {
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        setNewMessages((prev) => ({
+          ...prev,
+          [newMessage.projectId]: true, // Notify of new messages
+        }));
+      }
+    });
+
+    return () => {
+      socket.off('receiveMessage');
+    };
   }, [selectProject]);
+
 
 
 
@@ -711,10 +737,7 @@ const Project = () => {
                                           data-bs-toggle="modal"
                                           data-bs-target="#addUser"
                                           type="button"
-                                          onClick={() => {
-                                            setSelectProject(project);
-                                            fetchProjectMessages(project._id); // Fetch messages for the selected project
-                                          }}
+                                          onClick={() => setSelectProject(project)}
                                         ></button>
                                       </td>
                                     </tr>
@@ -767,7 +790,7 @@ const Project = () => {
                                 <div className="card mt-4 task-card">
                                   <div className="card-body">
                                     <div className="d-flex justify-content-between">
-                                    <span className="fw-bold fs-5" >{index + 1}. </span>
+                                      <span className="fw-bold fs-5" >{index + 1}. </span>
                                       <h5 className="card-title">
                                         {project.projectName}</h5>
                                       <Link
@@ -777,7 +800,7 @@ const Project = () => {
                                           projectName: project.projectName,
                                         }}
                                         style={{ marginLeft: "33px" }}
-                                        // 
+                                      // 
                                       >
                                         <i className="bi-paperclip fs-6" />
                                       </Link>
@@ -1284,20 +1307,25 @@ const Project = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="addUserLabel">
-                      {selectProject.projectName}
+                      {selectProject && selectProject.projectName}
                     </h5>
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div className="modal-body">
+                    {/* Message List */}
                     <ul className="list-group">
-                      {messages.map((message) => (
-                        <li key={message._id}>
-                          <div className="d-flex border-bottom py-1">
-                            <h6 className="fw-bold px-3">{message.senderId}</h6> - <span className="px-3 text-break">{message.content}</span>
-                          </div>
-
-                        </li>
-                      ))}
+                      {messages.length > 0 ? (
+                        messages.map((message) => (
+                          <li key={message._id} className="list-group-item">
+                            <div className="d-flex border-bottom py-1">
+                              <h6 className="fw-bold px-3">{message.senderId}</h6>
+                              - <span className="px-3 text-break">{message.content}</span>
+                            </div>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="list-group-item">No messages yet</li>
+                      )}
                     </ul>
 
                     {/* Message Submission Form */}
@@ -1320,7 +1348,6 @@ const Project = () => {
                 </div>
               </div>
             </div>
-
 
           </>
         </div>
