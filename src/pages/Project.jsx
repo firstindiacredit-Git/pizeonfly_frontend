@@ -1337,6 +1337,7 @@ const Project = () => {
                           id="currentMessage"
                           name="message"
                           rows="3"
+
                           value={content}
                           onChange={(e) => setContent(e.target.value)}
                           required
