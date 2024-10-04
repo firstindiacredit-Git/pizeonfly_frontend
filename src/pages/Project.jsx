@@ -117,8 +117,6 @@ const Project = () => {
         );
 
         console.log(response.data, 'projects');
-        // setProjects(response.data);
-        // setFilteredProjects(response.data); // Initialize with all projects
         const sortedProjects = response?.data?.sort(
           (a, b) => new Date(b.projectDate) - new Date(a.projectDate)
         );
@@ -408,11 +406,12 @@ const Project = () => {
 
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState('');
+  const [files, setFiles] = useState([]); // State for multiple file uploads
 
   const fetchProjectMessages = async (projectId) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/messages/${projectId}`);
-      console.log(response.data);
+      // console.log(response.data);
       setMessages(response.data);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -424,24 +423,47 @@ const Project = () => {
     const userDetails = JSON.parse(localStorage.getItem('user'));
     const senderId = userDetails.username; // Assuming user ID is stored in local storage
 
+    const formData = new FormData();
+    formData.append('content', content);
+    formData.append('senderId', senderId);
+    formData.append('projectId', selectProject._id);
+
+    // Append the files if any are selected
+    for (let file of files) {
+      formData.append('files', file);
+    }
+
     try {
-      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, {
-        content,
-        senderId,
-        projectId: selectProject._id,
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
       setContent('');
+      setFiles([]); // Reset the files input
       fetchProjectMessages(selectProject._id); // Refresh messages
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
+  // Handle file selection
+  const messageFileChange = (e) => {
+    setFiles(Array.from(e.target.files)); // Set selected files
+  };
+
+
   useEffect(() => {
     if (selectProject._id) {
-      fetchProjectMessages(selectProject._id);
+      // fetchProjectMessages(selectProject._id);
+      const interval = setInterval(() => {
+        fetchProjectMessages(selectProject._id); // Polling every 5 seconds
+      }, 1000);
+
+      return () => clearInterval(interval); // Clean up interval on component unmount
     }
   }, [selectProject]);
+
 
 
 
@@ -1295,10 +1317,43 @@ const Project = () => {
                     <ul className="list-group">
                       {messages.map((message) => (
                         <li key={message._id}>
-                          <div className="d-flex border-bottom py-1">
-                            <h6 className="fw-bold px-3">{message.senderId}</h6> - <span className="px-3 text-break">{message.content}</span>
-                            <p className="text-muted">{message.createdAt}</p>
+                          <div className="border-bottom">
+                            <div className="d-flex py-1">
+                              <h6 className="fw-bold px-3">{message.senderId}</h6> -
+                              <span className="px-3 text-break">{message.content}</span>
+                              {message.fileUrls && message.fileUrls.map((fileUrl, index) => {
+                                const fileExtension = fileUrl.split('.').pop().toLowerCase();
+
+                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                  // Display image if the file is an image
+                                  return (
+                                    <div key={index} className="px-3">
+                                      <a href={fileUrl} target="_blank" rel="noopener noreferrer">
+                                        <img src={fileUrl} alt={`Attachment ${index + 1}`} style={{ maxWidth: '5rem', cursor: 'pointer' }} />
+                                      </a>
+                                    </div>
+                                  );
+                                } else if (fileExtension === 'pdf') {
+                                  // Provide a download link for PDF
+                                  return (
+                                    <div key={index} className="px-3">
+                                      <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="">PDF File</a>
+                                    </div>
+                                  );
+                                } else {
+                                  // Default for other file types (e.g., DOC, XLS)
+                                  return (
+                                    <div key={index} className="px-3">
+                                      <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="">Download File</a>
+                                    </div>
+                                  );
+                                }
+                              })}
+                            </div>
+                            <p className="text-muted" style={{marginTop:"-2rem"}}>{new Date(message.createdAt).toLocaleString()}</p>
+
                           </div>
+
                         </li>
                       ))}
                     </ul>
@@ -1315,6 +1370,16 @@ const Project = () => {
                           value={content}
                           onChange={(e) => setContent(e.target.value)}
                           required
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="fileUpload" className="form-label">Upload Files</label>
+                        <input
+                          type="file"
+                          className="form-control"
+                          id="fileUpload"
+                          onChange={messageFileChange}
+                          multiple // Allow multiple files
                         />
                       </div>
                       <button type="submit" className="btn btn-dark">Submit</button>
