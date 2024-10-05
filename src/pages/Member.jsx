@@ -129,7 +129,7 @@ const Member = () => {
           ...prevFormData,
           employeeId: newId,
         }));
-        // console.log(response.data, "lll");
+        console.log(response.data, "lll");
 
         setEmployees(response.data);
       } catch (error) {
@@ -418,7 +418,8 @@ const Member = () => {
                             <div className="card-body d-flex">
                               <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w220">
                                 <img
-                                  src={employee.employeeImage}
+                                  // src={employee.employeeImage}
+                                  src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
                                   alt=""
                                   className="avatar xl rounded-circle img-thumbnail shadow-sm"
                                 />

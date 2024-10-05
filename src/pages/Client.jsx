@@ -91,7 +91,7 @@ const Client = () => {
             setLoading(true);
             try {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/clients`);
-                // console.log(response.data);
+                console.log(response.data);
                 setClients(response.data);
             } catch (error) {
                 console.error('Error fetching clients:', error);
