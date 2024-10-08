@@ -131,7 +131,14 @@ const Member = () => {
         }));
         console.log(response.data, "lll");
 
-        setEmployees(response.data);
+        // Save the fetched employees
+        const modifiedEmployees = response.data.map(employee => ({
+          ...employee,
+          employeeImage: employee.employeeImage.replace('uploads/', '') // Remove 'uploads/' from the image path
+        }));
+
+        setEmployees(modifiedEmployees); // Set the modified employees
+
       } catch (error) {
         console.error("Error:", error);
       } finally {
@@ -141,6 +148,7 @@ const Member = () => {
 
     fetchData();
   }, []);
+
 
   //DELETE EMPLOYEE
   const [deletableId, setDeletableId] = useState("");

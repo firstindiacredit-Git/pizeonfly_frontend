@@ -678,7 +678,7 @@ const Project = () => {
                                             <Link
                                               to="/images"
                                               state={{
-                                                images: project.projectImage,
+                                                images: project.projectImage.map(image => `${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`), // Add base URL
                                                 projectName: project.projectName,
                                               }}
                                               style={{ marginLeft: "33px" }}
@@ -1350,7 +1350,7 @@ const Project = () => {
                                 }
                               })}
                             </div>
-                            <p className="text-muted" style={{marginTop:"-2rem"}}>{new Date(message.createdAt).toLocaleString()}</p>
+                            <p className="text-muted" style={{ marginTop: "-2rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
 
                           </div>
 

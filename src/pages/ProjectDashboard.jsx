@@ -68,11 +68,22 @@ const ProjectDashboard = () => {
           <div className="body d-flex py-lg-3 py-md-2">
             <div className="container-xxl ">
               <div className="text-center">
-                <img
-                  src="../assets/images/no-data.svg"
-                  className="img-fluid mx-size"
+                {/* <img
+                  src="Images/picon.png"
+                  className="img-fluid "
                   alt="No Data"
-                />
+                  style={{height:"rem"}}
+                /> */}
+                <div style={{height:"13rem"}}>
+
+                  <img
+                    src="Images/icon.png"
+                    className="img-fluid"
+                    alt="No Data"
+                    style={{height:"7rem"}}
+                  />
+                  <p className="fs-4 mt-4" style={{color:"#4989fd"}}>An agency like no other. <span style={{color:"#0c117b"}}>Results to match.</span></p>
+                </div>
 
                 <div className="row justify-content-center mt-3">
                   <div className="col-12 col-md-4 mb-4">

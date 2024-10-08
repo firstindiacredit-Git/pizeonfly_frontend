@@ -10,6 +10,9 @@ const FilePage = () => {
     return <p>No files to display.</p>; // Handle case where no images are available
   }
 
+  // Log the images to check the URLs
+  console.log(images, 'Image URLs');
+
   const getFileType = (url) => {
     const extension = url.split('.').pop().toLowerCase(); // Get the file extension
     if (['jpeg', 'jpg', 'png', 'gif'].includes(extension)) {
@@ -41,20 +44,29 @@ const FilePage = () => {
           return (
             <div key={index} style={{ marginBottom: '20px' }}>
               {fileType === 'image' && (
-                <img src={file} alt={`Image ${index}`} style={{ maxWidth: '100%', height: 'auto' }} />
+                <div className='d-flex'>
+                  <img src={file} alt={`Image ${index}`} style={{ maxWidth: '100%', height: 'auto' }} />
+                  <div style={{ marginTop: '10px' }}>
+                    <Link onClick={() => handleDownload(file)} style={{ color: "blue", textDecoration: 'underline' }}>
+                      Download Image
+                    </Link>
+                  </div>
+                </div>
               )}
 
               {fileType === 'pdf' && (
-                <div>
-                  <span style={{ marginRight: '10px' }}>PDF File: {file.split('/').pop()}</span>
-                  <Link onClick={() => handleDownload(file)} style={{ marginLeft: '10px', color: "blue", textDecoration: 'underline' }}>
-                    Download PDF
-                  </Link>
+                <div className='d-flex'>
+                  <iframe src={file} title={`PDF ${index}`} style={{ width: '61%', height: '500px' }} />
+                  <div style={{ marginTop: '10px' }}>
+                    <Link onClick={() => handleDownload(file)} style={{ color: "blue", textDecoration: 'underline' }}>
+                      Download PDF
+                    </Link>
+                  </div>
                 </div>
               )}
 
               {fileType === 'document' && (
-                <div>
+                <div className='d-flex'>
                   <span style={{ marginRight: '10px' }}>Document {index + 1}: {file.split('/').pop()}</span>
                   <Link onClick={() => handleDownload(file)} style={{ marginLeft: '10px', color: "blue", textDecoration: 'underline' }}>
                     Download Document
