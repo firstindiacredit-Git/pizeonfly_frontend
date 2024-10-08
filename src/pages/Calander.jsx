@@ -64,7 +64,7 @@ const Calander = () => {
         if (confirmation) {
             // Notify employees about the holiday
             const holidayDetails = selectedHoliday;
-            await axios.post(`${import.meta.env.VITE_BASE_URL}api/notify-holiday`, {
+            await axios.post(`${import.meta.env.VITE_BASE_URL}api/notifyHoliday`, {
                 holidayName: holidayDetails.name,
                 holidayDate: holidayDetails.date.iso,
                 isConfirmed: confirmation
