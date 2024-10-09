@@ -26,10 +26,15 @@ const Calander = () => {
             }
         };
         fetchHolidays();
-        // Check for existing decision in local storage
-        const existingDecision = localStorage.getItem("decisionMade");
-        if (existingDecision) {
-            setDecisionMade(true); // Set decision made to true if exists
+
+        // Check if there was a decision made for the current date
+        const existingDecisionDate = localStorage.getItem("decisionDate");
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in ISO format
+
+        if (existingDecisionDate === today) {
+            setDecisionMade(true); // Set decision made to true if exists for today
+        } else {
+            setDecisionMade(false); // Reset decision for a new day
         }
     }, []);
 
@@ -51,13 +56,16 @@ const Calander = () => {
 
         const holiday = holidays.find(h => h.date.iso === isoDate);
         setSelectedHoliday(holiday ? holiday : null); // Set holiday details if exists
+        setDecisionMade(false); // Reset the decision when changing the date
     };
 
     // Handle confirmation of holiday
     const handleConfirm = async (confirmation) => {
         setIsConfirmed(confirmation);
         setDecisionMade(true); // Set decision made to true
-        localStorage.setItem("decisionMade", true); // Save decision to local storage
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in ISO format
+        localStorage.setItem("decisionDate", today); // Save decision to local storage
+
         const adjustedDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
         const isoDate = adjustedDate.toISOString().split('T')[0];
 
@@ -71,13 +79,12 @@ const Calander = () => {
             });
             toast.success(`Tomorrow is a holiday of ${holidayDetails.name} on ${holidayDetails.date.iso}. Enjoy your day off!`);
         } else {
-            await axios.post(`${import.meta.env.VITE_BASE_URL}api/notify-holiday`, {
+            await axios.post(`${import.meta.env.VITE_BASE_URL}api/notifyHoliday`, {
                 isConfirmed: confirmation
             });
             toast.info("There is no holiday tomorrow. Please come on time, all employees.");
         }
     };
-
 
     return (
         <>
@@ -107,12 +114,14 @@ const Calander = () => {
                                             <button
                                                 className="btn btn-success me-5"
                                                 onClick={() => handleConfirm(true)} // Confirm holiday
+                                                disabled={decisionMade} // Disable if decision already made
                                             >
                                                 Yes
                                             </button>
                                             <button
                                                 className="btn btn-danger"
                                                 onClick={() => handleConfirm(false)} // Decline holiday
+                                                disabled={decisionMade} // Disable if decision already made
                                             >
                                                 No
                                             </button>
