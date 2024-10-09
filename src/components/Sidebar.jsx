@@ -177,17 +177,6 @@ const Sidebar = () => {
           </span>
         </button>
       </div>
-      {/* CSS for red dot */}
-      <style jsx>{`
-        .holiday-dot {
-          display: inline-block;
-          width: 8px;
-          height: 8px;
-          background-color: red;
-          border-radius: 50%;
-          margin-left: 5px;
-        }
-      `}</style>
     </div>
   );
 };

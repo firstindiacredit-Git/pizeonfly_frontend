@@ -95,7 +95,7 @@ const Header = () => {
                 >
                   <img
                     className="avatar lg rounded-circle img-thumbnail"
-                    src="assets/images/profile_av.png"
+                    src="Images/superadminimg.jpg"
                     alt="profile"
                   />
                 </a>
@@ -105,7 +105,7 @@ const Header = () => {
                       <div className="d-flex py-1">
                         <img
                           className="avatar rounded-circle"
-                          src="assets/images/profile_av.png"
+                          src="Images/superadminimg.jpg"
                           alt="profile"
                         />
                         <div className="flex-fill ms-3">
