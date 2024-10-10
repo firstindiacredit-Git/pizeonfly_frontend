@@ -245,12 +245,21 @@ const Member = () => {
   }, [toEdit]);
   const updateChange = (e) => {
     const { name, value, files } = e.target;
-    // console.log(value);
     setEmployeeData((prevState) => ({
       ...prevState,
       [name]: files ? files[0] : value,
     }));
   };
+
+  const handleImageChanges = (e) => {
+    const file = e.target.files[0];
+    setEmployeeData((prevState) => ({
+      ...prevState,
+      employeeImage: file,
+    }));
+  };
+
+
   const updateSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -837,7 +846,7 @@ const Member = () => {
                         type="file"
                         id="formFileMultipleoneone"
                         name="employeeImage"
-                        onChange={handleImageChange}
+                        onChange={handleImageChanges}
                       />
                     </div>
                     <div className="deadline-form">
