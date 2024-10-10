@@ -49,6 +49,9 @@ const Client = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
+
+            // console.log('Phone Number:', formData.clientPhone);
+
             const newClient = response.data;
             setClients((prevClient) => [newClient, ...prevClient]);
             setFormData({
@@ -170,9 +173,14 @@ const Client = () => {
         e.preventDefault();
         try {
             const updateDataToSend = new FormData();
-            for (const key in clientData) {
-                updateDataToSend.append(key, clientData[key]);
-            }
+            Object.keys(clientData).forEach(key => {
+                // Check if clientImage is a file and append correctly
+                if (key === "clientImage" && clientData[key] instanceof File) {
+                    updateDataToSend.append(key, clientData[key]);
+                } else {
+                    updateDataToSend.append(key, clientData[key]);
+                }
+            });
 
             const response = await axios.put(
                 `${import.meta.env.VITE_BASE_URL}api/clients/${toEdit}`,
@@ -186,12 +194,30 @@ const Client = () => {
 
             if (response.status === 200) {
                 console.log('Client updated successfully');
-                // Optionally, trigger some state update or callback to indicate success
             }
+
+            //  Close the modal programmatically
+            const modalElement = document.getElementById("editproject");
+            const modal = window.bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+
+            toast.success("Client Updated", {
+                style: {
+                    backgroundColor: "#4c3575",
+                    color: "white",
+                },
+            });
+            // Reload the page after 5 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 5000);
+
+
         } catch (error) {
             console.error('Error updating client:', error);
         }
     };
+
 
 
     //Delete a Client
@@ -326,7 +352,6 @@ const Client = () => {
                                                                         onClick={() => {
                                                                             setDeletableId(client._id);
                                                                         }}
-                                                                    // onClick={() => handleDelete(client._id)}
                                                                     >
                                                                         <i className="icofont-ui-delete text-danger" />
                                                                     </button>
@@ -452,20 +477,6 @@ const Client = () => {
                                                     </div>
                                                 </div>
                                                 <div className="row g-3 mb-3">
-                                                    {/* <div className="col">
-                                                        <label
-                                                            htmlFor="exampleFormControlInput177"
-                                                            className="form-label"
-                                                        >
-                                                            User Name
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            id="exampleFormControlInput177"
-                                                            placeholder="User Name"
-                                                        />
-                                                    </div> */}
                                                     <div className="col">
                                                         <label
                                                             htmlFor="exampleFormControlInput477"
@@ -534,7 +545,7 @@ const Client = () => {
                             </div>
                         </div>
 
-                        {/* Edit Client*/}
+                        {/* Update Client*/}
                         <div
                             className="modal fade"
                             id="editproject"

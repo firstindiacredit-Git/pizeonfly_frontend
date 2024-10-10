@@ -25,6 +25,7 @@ const Project = () => {
     projectEndDate: "",
     taskAssignPerson: "",
     description: "",
+    clientAssignPerson: "",
   });
   const [error, setError] = useState("");
   const handleChange = (e) => {
@@ -51,6 +52,10 @@ const Project = () => {
       }
       for (let obj of selectedEmployees) {
         formDataToSend.append("taskAssignPerson", obj.value);
+      }
+      // Add clients assignees
+      for (let obj of selectedClients) {
+        formDataToSend.append("clientAssignPerson", obj.value);
       }
 
       const response = await axios.post(
@@ -79,6 +84,7 @@ const Project = () => {
         projectEndDate: "",
         taskAssignPerson: "",
         description: "",
+        clientAssignPerson: "",
       });
 
       // Close the modal programmatically
@@ -348,6 +354,10 @@ const Project = () => {
       fetchData();
     }
   };
+
+  //get employee
+  const [employees, setEmployees] = useState([]);
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -363,8 +373,6 @@ const Project = () => {
 
     fetchData();
   }, []);
-  const [employees, setEmployees] = useState([]);
-  const [selectedEmployees, setSelectedEmployees] = useState([]);
   // console.log(selectedEmployees);
   const assignEmployee = employees?.map((emp) => {
     return {
@@ -372,6 +380,31 @@ const Project = () => {
       value: emp._id,
     };
   });
+
+  //get client
+  const [clients, setClients] = useState([]); // To store list of clients
+  const [selectedClients, setSelectedClients] = useState([]); // For selected clients
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/clients`);
+        console.log(response.data);
+        
+        setClients(response.data);
+      } catch (error) {
+        console.error("Error fetching clients:", error);
+      }
+    };
+
+    fetchClients();
+  }, []);
+  const assignClient = clients?.map((client) => {
+    return {
+      label: client.clientName,
+      value: client._id,
+    };
+  });
+
 
 
   //GET TASK
@@ -614,7 +647,7 @@ const Project = () => {
                                 <tr>
                                   <th>Sr.No.</th>
                                   <th>Project Name</th>
-                                  {/* <th>Project Category</th> */}
+                                  <th style={{width:"6rem"}}>Clients</th>
                                   <th>Start Date</th>
                                   <th>End Date</th>
                                   <th>Members</th>
@@ -663,9 +696,6 @@ const Project = () => {
 
                                   return (
                                     <tr key={project.id}
-                                    // data-bs-toggle="modal"
-                                    // data-bs-target="#viewtask"
-                                    // onClick={() => setCurrProj(project)}
                                     >
                                       <td><span className="fw-bold fs-6">{index + 1}.</span></td>
                                       <td>
@@ -690,6 +720,9 @@ const Project = () => {
                                         <div className="text-muted">
                                           -{getFormattedDate(project.projectDate)}
                                         </div>
+                                      </td>
+                                      <td>
+                                        {project.clientAssignPerson?.map(client => client.clientName + ", ")}
                                       </td>
                                       <td>
                                         {getFormattedDate(
@@ -993,6 +1026,22 @@ const Project = () => {
                             </div>
                           </div>
                         </div>
+                        <div className="row g-3 mb-3">
+                          <div className="col-sm-12">
+                            <label className="form-label">
+                              Project Assign Client
+                            </label>
+                            <div>
+                              <MultiSelect
+                                options={assignClient}
+                                value={selectedClients}
+                                onChange={setSelectedClients}
+                                labelledBy="Select Clients"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
                       </form>
                     </div>
                     <div className="mb-3">

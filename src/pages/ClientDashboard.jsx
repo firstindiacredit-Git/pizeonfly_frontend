@@ -1,12 +1,9 @@
 import React from 'react'
-import Sidebar from '../employeeCompt/EmployeeSidebar'
-import Header from '../employeeCompt/EmployeeHeader'
-
-import axios from 'axios'
 import { Link } from 'react-router-dom'
+import Sidebar from '../clientCompt/ClientSidebar'
+import Header from '../clientCompt/ClientHeader'
 
-const EmployeeDashboard = () => {
-
+const ClientDashboard = () => {
   return (
     <>
       <div id="mytask-layout">
@@ -48,4 +45,4 @@ const EmployeeDashboard = () => {
   )
 }
 
-export default EmployeeDashboard
+export default ClientDashboard

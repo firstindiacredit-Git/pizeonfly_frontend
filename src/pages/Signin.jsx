@@ -114,15 +114,26 @@ const Signin = () => {
                       <span>Admin Panel</span>
                     </div>
                     <div className="col-12 text-center mb-4">
-                      <Link
-                        className="btn btn-lg btn-outline-secondary btn-block"
-                        to="/employeesignin"
-                      >
-                        <span className="d-flex justify-content-center align-items-center gap-2">
-                          <i className="bi bi-person-plus-fill"></i>
-                          Sign in as an Employee
-                        </span>
-                      </Link>
+                      <div className="d-flex gap-5">
+                        <Link
+                          className="btn btn-lg btn-outline-secondary btn-block"
+                          to="/employeesignin"
+                        >
+                          <span className="d-flex justify-content-center align-items-center gap-2">
+                            <i className="bi bi-person-plus-fill"></i>
+                            Employee Sign In
+                          </span>
+                        </Link>
+                        <Link
+                          className="btn btn-lg btn-outline-secondary btn-block"
+                          to="/clientsignin"
+                        >
+                          <span className="d-flex justify-content-center align-items-center gap-2">
+                            <i className="bi bi-person-plus-fill"></i>
+                            Client Sign In
+                          </span>
+                        </Link>
+                      </div>
                       <span className="dividers text-muted mt-4">OR</span>
                     </div>
                     <div className="col-12">

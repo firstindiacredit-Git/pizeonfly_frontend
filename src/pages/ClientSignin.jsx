@@ -4,15 +4,16 @@ import axios from "axios";
 
 const Signin = () => {
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    clientEmail: "",
+    clientPassword: "",
   });
   const [error, setError] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // New state for loading
-  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
+  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [showPassword, setShowPassword] = useState(false); // Password visibility state
   const navigate = useNavigate();
 
+  // Handle form data change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -21,17 +22,19 @@ const Signin = () => {
     });
   };
 
+  // Toggle password visibility
   const toggleShowPassword = () => {
     setShowPassword((prevState) => !prevState);
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Start loading when API is hit
+    setIsLoading(true); // Start loading
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}api/employeelogin`,
+        `${import.meta.env.VITE_BASE_URL}api/clientlogin`,
         formData,
         {
           headers: {
@@ -42,14 +45,15 @@ const Signin = () => {
       const { token, user } = response.data;
 
       if (token) {
-        localStorage.setItem("emp_token", token);
-        localStorage.setItem("emp_user", JSON.stringify(user));
+        localStorage.setItem("client_token", token);
+        localStorage.setItem("client_user", JSON.stringify(user));
         setIsAuthenticated(true);
-        navigate("/employee-tasks");
+        navigate("/client-dashboard");
       } else {
         setError("Incorrect email or password");
       }
 
+      // Optional reload after successful login
       setTimeout(() => {
         window.location.reload();
       }, 3000);
@@ -60,22 +64,20 @@ const Signin = () => {
       } else {
         setError("An error occurred. Please try again.");
       }
-      console.log(error);
+      console.error(error);
     } finally {
-      setIsLoading(false); // End loading after the API call
+      setIsLoading(false); // Stop loading
     }
   };
 
-  // Check authentication status and redirect if already authenticated
+  // Redirect if authenticated
   if (isAuthenticated) {
-    return <Navigate to="/employee-dashboard" />;
+    return <Navigate to="/client-dashboard" />;
   }
 
   return (
     <div id="mytask-layout">
-      {/* main body area */}
-      <div className="main p-2 py-3 p-xl-5 ">
-        {/* Body: Body */}
+      <div className="main p-2 py-3 p-xl-5">
         <div className="body d-flex p-0 p-xl-5">
           <div className="container-xxl">
             <div className="row g-0">
@@ -86,35 +88,27 @@ const Signin = () => {
                     className="mb-4"
                     style={{ width: "-webkit-fill-available" }}
                   />
-                  <div className="d-flex justify-content-center ">
+                  <div className="d-flex justify-content-center">
                     <img
                       src="../Images/crm.jpeg"
                       className="text-center"
                       style={{ height: "30px" }}
                     />
                   </div>
-                  {/* Image block */}
                   <div>
                     <img src="../assets/images/login-img.svg" alt="login-img" />
                   </div>
                 </div>
               </div>
               <div className="col-lg-6 d-flex justify-content-center align-items-center border-0 rounded-lg auth-h100">
-                <div
-                  className="w-100 p-3 p-md-5 card border-0 bg-dark text-light"
-                  style={{ maxWidth: "32rem" }}
-                >
-                  {/* Form */}
+                <div className="w-100 p-3 p-md-5 card border-0 bg-dark text-light" style={{ maxWidth: "32rem" }}>
                   <form onSubmit={handleSubmit} className="row g-1 p-3 p-md-4">
                     <div className="col-12 text-center mb-1 mb-lg-5">
-                      <h1>Employee Sign in</h1>
-                      <span>Employee Panel</span>
+                      <h1>Client Sign in</h1>
+                      <span>Client Panel</span>
                     </div>
                     <div className="col-12 text-center mb-4">
-                      <Link
-                        className="btn btn-lg btn-outline-secondary btn-block"
-                        to="/"
-                      >
+                      <Link className="btn btn-lg btn-outline-secondary btn-block" to="/">
                         <span className="d-flex justify-content-center align-items-center gap-2">
                           <i className="bi bi-person-plus-fill"></i>
                           Sign in as an Admin
@@ -127,9 +121,9 @@ const Signin = () => {
                         <label className="form-label">Email address</label>
                         <input
                           type="email"
-                          name="email"
+                          name="clientEmail" // Correct name for email
                           onChange={handleChange}
-                          value={formData.email}
+                          value={formData.clientEmail}
                           className="form-control form-control-lg"
                           placeholder="name@example.com"
                         />
@@ -140,10 +134,7 @@ const Signin = () => {
                         <div className="form-label">
                           <span className="d-flex justify-content-between align-items-center">
                             Password
-                            <a
-                              className="text-secondary"
-                              href="auth-password-reset.html"
-                            >
+                            <a className="text-secondary" href="auth-password-reset.html">
                               Forgot Password?
                             </a>
                           </span>
@@ -151,14 +142,17 @@ const Signin = () => {
                         <div className="input-group">
                           <input
                             type={showPassword ? "text" : "password"} // Toggle input type
-                            name="password"
+                            name="clientPassword" // Correct name for password
                             onChange={handleChange}
-                            value={formData.password}
+                            value={formData.clientPassword}
                             className="form-control form-control-lg"
                             placeholder="***************"
                           />
-                          <div className="d-flex" style={{position: "absolute", color: "black", marginLeft:"20rem"}}>
-                            <i onClick={toggleShowPassword} className={`bi mt-2 form-control ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                          <div className="d-flex" style={{ position: "absolute", color: "black", marginLeft: "20rem" }}>
+                            <i
+                              onClick={toggleShowPassword}
+                              className={`bi mt-2 form-control ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
+                            ></i>
                           </div>
                         </div>
                       </div>
@@ -168,21 +162,12 @@ const Signin = () => {
                         type="submit"
                         className="btn btn-lg btn-block btn-light lift text-uppercase"
                         disabled={isLoading} // Disable button while loading
-                        alt="signin"
                       >
                         {isLoading ? "Signing in..." : "SIGN IN"} {/* Show loading text */}
                       </button>
                     </div>
                     {error && <p className="text-danger mt-3 text-center">{error}</p>}
                   </form>
-                  {/* <div className="col-12 text-center mt-4">
-                    <span className="text-muted">
-                      Don't have an account yet?{" "}
-                      <Link to="/employeesignup" className="text-secondary">
-                        Sign up here
-                      </Link>
-                    </span>
-                  </div> */}
                 </div>
               </div>
             </div>
