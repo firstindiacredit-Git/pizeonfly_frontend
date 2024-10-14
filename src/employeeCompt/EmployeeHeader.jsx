@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Header = () => {
   const [employeeName, setEmployeeName] = useState("");
@@ -22,6 +24,8 @@ const Header = () => {
     designation: "",
     description: "",
   });
+  const [selectedFile, setSelectedFile] = useState(null);
+
   useEffect(() => {
     const token = localStorage.getItem("emp_token");
 
@@ -33,8 +37,17 @@ const Header = () => {
       setEmployeeData({
         ...employeeData,
         employeeName: user.employeeName,
-        emailid: user.emailid,
-        password: user.password,
+        employeeCompany: user.employeeCompany || "", // Add more fields as needed
+        employeeId: user.employeeId || "", // Ensure employeeId is set
+        joiningDate: user.joiningDate ? user.joiningDate.split('T')[0] : "", // Format date if necessary
+        username: user.username || "",
+        password: user.password || "",
+        emailid: user.emailid || "",
+        phone: user.phone || "",
+        department: user.department || "",
+        designation: user.designation || "",
+        description: user.description || "",
+        employeeImage: user.employeeImage ? user.employeeImage.replace('uploads/', '') : null,
       });
       setEmployeeName(user.employeeName);
       setEmail(user.emailid);
@@ -65,110 +78,83 @@ const Header = () => {
     fetchData();
   }, []);
 
-  // UPDATE EMPLOYEE
-  const [formData, setFormData] = useState({
-    employeeName: "",
-    employeeCompany: "",
-    employeeImage: null,
-    employeeId: "",
-    joiningDate: "",
-    username: "",
-    password: "",
-    emailid: "",
-    phone: "",
-    department: "",
-    designation: "",
-    description: "",
-  });
-
-  const handleImageChange = (e) => {
-    setFormData({
-      ...formData,
-      employeeImage: e.target.files[0],
-    });
-  };
-
-  const [toEdit, setToEdit] = useState("");
-  // console.log(projectFormData);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/employees/${toEdit}`
-        );
-        const { data } = response;
-        let formattedDate = "";
-        const fDate = (data) => {
-          const sd = new Date(data);
-          const sy = sd.getFullYear();
-          const sm =
-            sd.getMonth() + 1 < 10
-              ? "0" + (Number(sd.getMonth()) + 1)
-              : sd.getMonth();
-          const sdd = sd.getDate() < 10 ? "0" + sd.getDate() : sd.getDate();
-          formattedDate = `${sy}-${sm}-${sdd}`;
-          return formattedDate;
-        };
-        const fStartDate = fDate(data.joiningDate);
-        // console.log(fStartDate);
-        setEmployeeData({
-          employeeName: data.employeeName,
-          employeeCompany: data.employeeCompany,
-          employeeImage: data.employeeImage,
-          employeeId: data.employeeId,
-          joiningDate: fStartDate,
-          username: data.username,
-          password: data.password,
-          emailid: data.emailid,
-          phone: data.phone,
-          department: data.department,
-          designation: data.designation,
-          description: data.description,
-        });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    if (toEdit) {
-      fetchData();
-    }
-  }, [toEdit]);
-  const updateChange = (e) => {
-    const { name, value, files } = e.target;
-    // console.log(value);
-    setEmployeeData((prevState) => ({
-      ...prevState,
-      [name]: files ? files[0] : value,
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEmployeeData((prevData) => ({
+      ...prevData,
+      [name]: value,
     }));
   };
-  const updateSubmit = async (e) => {
-    e.preventDefault();
+
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  const updateSubmit = async () => {
+    const formData = new FormData();
+    formData.append("employeeName", employeeData.employeeName);
+    formData.append("joiningDate", employeeData.joiningDate);
+    formData.append("emailid", employeeData.emailid);
+    formData.append("password", employeeData.password);
+    formData.append("phone", employeeData.phone);
+    formData.append("description", employeeData.description);
+
+    if (selectedFile) {
+      formData.append("employeeImage", selectedFile);
+    }
+
     try {
-      const formDataToSend = new FormData();
-      delete employeeData?.taskAssignPerson;
-      for (const key in employeeData) {
-        // console.log(key);
-        formDataToSend.append(key, employeeData[key]);
-      }
+      const token = localStorage.getItem("emp_token");
+      const employeeId = JSON.parse(localStorage.getItem("emp_user"))._id;
+
       const response = await axios.put(
-        `${import.meta.env.VITE_BASE_URL}api/employees/${toEdit}`,
-        formDataToSend,
+        `${import.meta.env.VITE_BASE_URL}api/employees/${employeeId}`,
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: token,
           },
         }
       );
-      const { token, user } = response.data;
-      localStorage.setItem("emp_token", token);
-      localStorage.setItem("emp_user", JSON.stringify(user));
-      console.log(JSON.stringify(response.data));
-      // console.log(response.data);
-      window.location.reload();
-    } catch (error) {
-      console.error("Error:", error);
+
+      if (response.status === 200) {
+        // Update localStorage with new user data
+        const updatedUser = response.data;
+        localStorage.setItem("emp_user", JSON.stringify(updatedUser));
+
+        // Update local state to reflect new data
+        setEmployeeName(updatedUser.employeeName);
+        const updatedImage = updatedUser.employeeImage.replace('uploads/', '');
+        setImage(updatedImage);
+
+        // Close the modal
+        const modalElement = document.getElementById("editemp");
+        const modal = window.bootstrap.Modal.getInstance(modalElement);
+        modal.hide();
+
+        // Show toast notification
+        toast.success("Your Profile Updated Successfully!", {
+          style: {
+            backgroundColor: "#4c3575",
+            color: "white",
+          },
+        });
+
+        // Reload the page after 5 seconds
+        setTimeout(() => {
+          window.location.reload();
+        }, 5000);
+      }
+    } catch (err) {
+      console.log(err);
+      alert("Error updating profile.");
     }
   };
+
+
+
+
 
   return (
     <>
@@ -225,7 +211,7 @@ const Header = () => {
                         className="list-group-item list-group-item-action border-0"
                         data-bs-toggle="modal"
                         data-bs-target="#editemp"
-                        onClick={() => setToEdit(employees._id)}
+                      // onClick={() => setToEdit(employees._id)}
                       >
                         <i className="icofont-ui-user-group fs-6 me-3" /> Edit
                         Profile
@@ -280,7 +266,7 @@ const Header = () => {
                       id="createprojectlLabel"
                     >
                       {" "}
-                      Edit Profile
+                      Edit Employee
                     </h5>
                     <button
                       type="button"
@@ -301,27 +287,10 @@ const Header = () => {
                         type="text"
                         className="form-control"
                         id="exampleFormControlInput877"
-                        placeholder="Enter your name"
+                        placeholder="Explain what the Project Name"
                         name="employeeName"
                         value={employeeData.employeeName}
-                        onChange={updateChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label
-                        htmlFor="exampleFormControlInput977"
-                        className="form-label"
-                      >
-                        Employee Company
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleFormControlInput977"
-                        placeholder="Explain what the Project Name"
-                        name="employeeCompany"
-                        value={employeeData.employeeCompany}
-                        onChange={updateChange}
+                        onChange={handleChange}
                       />
                     </div>
                     <div className="mb-3">
@@ -336,7 +305,7 @@ const Header = () => {
                         type="file"
                         id="formFileMultipleoneone"
                         name="employeeImage"
-                        onChange={handleImageChange}
+                        onChange={handleFileChange}
                       />
                     </div>
                     <div className="deadline-form">
@@ -356,8 +325,6 @@ const Header = () => {
                               placeholder="User Name"
                               name="employeeId"
                               value={employeeData.employeeId}
-                              onChange={updateChange}
-                              disabled
                             />
                           </div>
                           <div className="col-sm-6">
@@ -373,44 +340,6 @@ const Header = () => {
                               id="exampleFormControlInput2778"
                               name="joiningDate"
                               value={employeeData.joiningDate}
-                              onChange={updateChange}
-                              disabled
-                            />
-                          </div>
-                        </div>
-                        <div className="row g-3 mb-3">
-                          <div className="col">
-                            <label
-                              htmlFor="exampleFormControlInput177"
-                              className="form-label"
-                            >
-                              User Name
-                            </label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="exampleFormControlInput177"
-                              placeholder="User Name"
-                              name="username"
-                              value={employeeData.username}
-                              onChange={updateChange}
-                            />
-                          </div>
-                          <div className="col">
-                            <label
-                              htmlFor="exampleFormControlInput277"
-                              className="form-label"
-                            >
-                              Password
-                            </label>
-                            <input
-                              type="Password"
-                              className="form-control"
-                              id="exampleFormControlInput277"
-                              placeholder="Password"
-                              name="password"
-                              value={employeeData.password}
-                              onChange={updateChange}
                             />
                           </div>
                         </div>
@@ -429,9 +358,27 @@ const Header = () => {
                               placeholder="User Name"
                               name="emailid"
                               value={employeeData.emailid}
-                              onChange={updateChange}
+                              onChange={handleChange}
                             />
                           </div>
+                          <div className="col">
+                            <label
+                              htmlFor="exampleFormControlInput277"
+                              className="form-label"
+                            >
+                              Password
+                            </label>
+                            <input
+                              type="Password"
+                              className="form-control"
+                              id="exampleFormControlInput277"
+                              placeholder="Password"
+                              name="password"
+                              value={employeeData.password}
+                              onChange={handleChange} />
+                          </div>
+                        </div>
+                        <div className="row g-3 mb-3">
                           <div className="col">
                             <label
                               htmlFor="exampleFormControlInput777"
@@ -443,75 +390,38 @@ const Header = () => {
                               type="text"
                               className="form-control"
                               id="exampleFormControlInput777"
-                              placeholder="User Name"
+                              placeholder="phone"
+                              maxLength={14}
                               name="phone"
                               value={employeeData.phone}
-                              onChange={updateChange}
+                              onChange={handleChange}
                             />
                           </div>
                         </div>
                         <div className="row g-3 mb-3">
                           <div className="col">
                             <label className="form-label">Department</label>
-                            <select
-                              className="form-select"
-                              aria-label="Default select Project Category"
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="exampleFormControlInput777"
+                              placeholder="Department"
+                              maxLength={14}
                               name="department"
                               value={employeeData.department}
-                              onChange={updateChange}
-                              disabled
-                            >
-                              <option value={""}></option>
-                              <option value={"Web Development"}>
-                                Web Development
-                              </option>
-                              <option value={"It Management"}>
-                                It Management
-                              </option>
-                              <option value={"Marketing"}>Marketing</option>
-                              <option value={"Manager"}>Manager</option>
-                            </select>
+                            />
                           </div>
                           <div className="col">
                             <label className="form-label">Designation</label>
-                            <select
-                              className="form-select"
-                              aria-label="Default select Project Category"
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="exampleFormControlInput777"
+                              placeholder="Designation"
+                              maxLength={14}
                               name="designation"
                               value={employeeData.designation}
-                              onChange={updateChange}
-                              disabled
-                            >
-                              <option value={""}></option>
-                              <option value={"UI/UX Design"}>
-                                UI/UX Design
-                              </option>
-                              <option value={"Website Design"}>
-                                Website Design
-                              </option>
-                              <option value={"App Development"}>
-                                App Development
-                              </option>
-                              <option value={"Quality Assurance"}>
-                                Quality Assurance
-                              </option>
-                              <option value={"Development"}>Development</option>
-                              <option value={"Backend Development"}>
-                                Backend Development
-                              </option>
-                              <option value={"Software Testing"}>
-                                Software Testing
-                              </option>
-                              <option value={"Website Design"}>
-                                Website Design
-                              </option>
-                              <option value={"Marketing"}>Marketing</option>
-                              <option value={"SEO"}>SEO</option>
-                              <option value={"Project Manager"}>
-                                Project Manager
-                              </option>
-                              <option value={"Other"}>Other</option>
-                            </select>
+                            />
                           </div>
                         </div>
                       </form>
@@ -531,7 +441,7 @@ const Header = () => {
                         defaultValue={""}
                         name="description"
                         value={employeeData.description}
-                        onChange={updateChange}
+                        onChange={handleChange}
                       />
                     </div>
                   </div>
@@ -546,15 +456,13 @@ const Header = () => {
                     <button
                       type="button"
                       className="btn btn-primary"
-                      onClick={updateSubmit}
-                    >
-                      Create
+                      onClick={updateSubmit}                    >
+                      Update
                     </button>
                   </div>
                 </div>
               </div>
             </div>
-
 
             {/* Message Modal */}
             <div
@@ -602,8 +510,9 @@ const Header = () => {
 
 
           </div>
-        </nav>
-      </div>
+        </nav >
+        <ToastContainer />
+      </div >
     </>
   );
 };

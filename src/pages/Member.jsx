@@ -817,23 +817,6 @@ const Member = () => {
                         onChange={updateChange}
                       />
                     </div>
-                    {/* <div className="mb-3">
-                      <label
-                        htmlFor="exampleFormControlInput977"
-                        className="form-label"
-                      >
-                        Employee Company
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleFormControlInput977"
-                        placeholder="Explain what the Project Name"
-                        name="employeeCompany"
-                        value={employeeData.employeeCompany}
-                        onChange={updateChange}
-                      />
-                    </div> */}
                     <div className="mb-3">
                       <label
                         htmlFor="formFileMultipleoneone"
@@ -887,23 +870,6 @@ const Member = () => {
                           </div>
                         </div>
                         <div className="row g-3 mb-3">
-                          {/* <div className="col">
-                            <label
-                              htmlFor="exampleFormControlInput177"
-                              className="form-label"
-                            >
-                              User Name
-                            </label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="exampleFormControlInput177"
-                              placeholder="User Name"
-                              name="username"
-                              value={employeeData.username}
-                              onChange={updateChange}
-                            />
-                          </div> */}
                           <div className="col">
                             <label
                               htmlFor="exampleFormControlInput477"
