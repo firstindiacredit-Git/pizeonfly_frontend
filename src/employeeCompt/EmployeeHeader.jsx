@@ -38,7 +38,9 @@ const Header = () => {
       });
       setEmployeeName(user.employeeName);
       setEmail(user.emailid);
-      setImage(user.employeeImage);
+      // Remove 'uploads/' from the employeeImage path
+      const modifiedImage = user.employeeImage.replace('uploads/', '');
+      setImage(modifiedImage);
     }
   }, [navigation]);
 
