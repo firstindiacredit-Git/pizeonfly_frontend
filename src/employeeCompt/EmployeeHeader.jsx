@@ -147,8 +147,12 @@ const Header = () => {
         }, 5000);
       }
     } catch (err) {
-      console.log(err);
-      alert("Error updating profile.");
+      if (err.response && err.response.status === 413) {
+        toast.error("Uploaded file is too large. Please select a smaller file.");
+      } else {
+        console.log(err);
+        alert("Error updating profile.");
+      }
     }
   };
 

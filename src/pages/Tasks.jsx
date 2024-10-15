@@ -132,21 +132,26 @@ const Tasks = () => {
   const [newMessage, setNewMessage] = useState('');
 
   useEffect(() => {
-    const fetchTasks = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/tasks`);
-        const formattedTasks = response.data.map(task => ({
+        const [tasksResponse, projectsResponse, employeesResponse] = await Promise.all([
+          axios.get(`${import.meta.env.VITE_BASE_URL}api/tasks`),
+          axios.get(`${import.meta.env.VITE_BASE_URL}api/projects`),
+          axios.get(`${import.meta.env.VITE_BASE_URL}api/employees`)
+        ]);
+
+        const formattedTasks = tasksResponse.data.map(task => ({
           ...task,
           taskEndDate: formatDate(task.taskEndDate),
           taskDate: formatDate(task.taskDate),
         }));
 
-        // Sort tasks by taskDate in descending order
         formattedTasks.sort((a, b) => new Date(b.taskDate) - new Date(a.taskDate));
 
         setTasks(formattedTasks);
-        console.log(response.data);
+        setProjects(projectsResponse.data);
+        setEmployees(employeesResponse.data);
       } catch (error) {
         console.error("Error:", error);
       } finally {
@@ -154,8 +159,9 @@ const Tasks = () => {
       }
     };
 
-    fetchTasks();
+    fetchData();
   }, []);
+
   const handleViewMessages = (taskId) => {
     setSelectedTaskId(taskId);
     fetchTaskMessages(taskId);
@@ -230,7 +236,11 @@ const Tasks = () => {
 
     const matchesSearch =
       task.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (task.taskAssignPerson && task.taskAssignPerson.employeeName.toLowerCase().includes(searchTerm.toLowerCase()));
+      (task.taskAssignPerson && task.taskAssignPerson.employeeName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      task.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.taskPriority.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.taskStatus.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.assignedBy.toLowerCase().includes(searchTerm.toLowerCase());
 
     if (activeTab === 'All') {
       return isSameDate && matchesSearch;
@@ -372,6 +382,22 @@ const Tasks = () => {
     }
   };
 
+  const globalSearch = () => {
+    const searchResults = {
+      tasks: filteredTasks,
+      projects: projects.filter(project => 
+        project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+      employees: employees.filter(employee => 
+        employee.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.email.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    };
+
+    return searchResults;
+  };
+
 
 
 
@@ -471,7 +497,7 @@ const Tasks = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Search by Project Name or Assignee"
+                        placeholder="Global Search"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         style={{ width: "19rem", height: "3rem" }}
@@ -483,7 +509,6 @@ const Tasks = () => {
                         <i className="fa fa-search" />
                       </button>
                     </div>
-
                   </div>
 
 
@@ -1183,6 +1208,7 @@ const Tasks = () => {
                             <div className="d-flex border-bottom py-1">
                               <strong>{message.senderId}: </strong> -
                               <span className="px-3 text-break">{message.content}</span>
+                              <span className="px-3 text-muted">{new Date(message.createdAt).toLocaleString()}</span>
                             </div>
                           </li>
                         ))}

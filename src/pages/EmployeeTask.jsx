@@ -93,7 +93,7 @@ const Tasks = () => {
   };
   const userData = JSON.parse(localStorage.getItem('emp_user')); // Assuming 'user' is the key where user info is stored
   const userName = userData.employeeName
-  ;
+    ;
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedTask) return;
@@ -423,6 +423,7 @@ const Tasks = () => {
                   <div key={index} className="mb-2">
                     <strong>{message.senderId}: </strong>
                     {message.content}
+                    <span className="px-3 text-muted">{new Date(message.createdAt).toLocaleString()}</span>
                   </div>
                 ))}
               </div>

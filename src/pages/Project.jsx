@@ -14,7 +14,7 @@ const Project = () => {
   const [loading, setLoading] = useState(true);
   const [currProj, setCurrProj] = useState({});
   const [viewMode, setViewMode] = useState("list");
-
+  const [searchTerm, setSearchTerm] = useState("");
 
   // CREATE PROJECT
   const [formData, setFormData] = useState({
@@ -139,19 +139,36 @@ const Project = () => {
   }, []);
   useEffect(() => {
     filterProjects();
-  }, [activeTab, projects]);
+  }, [activeTab, projects, searchTerm]);
   const filterProjects = () => {
-    if (activeTab === "All") {
-      setFilteredProjects(projects);
-    } else if (activeTab === "Completed") {
-      setFilteredProjects(
-        projects.filter((project) => project.status === "Completed")
-      );
+    let filtered = projects;
+
+    // Filter by active tab
+    if (activeTab === "Completed") {
+      filtered = filtered.filter((project) => project.status === "Completed");
     } else if (activeTab === "In Progress") {
-      setFilteredProjects(
-        projects.filter((project) => project.status === "In Progress")
+      filtered = filtered.filter((project) => project.status === "In Progress");
+    }
+
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter((project) =>
+        (project.projectName?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+        (project.clientAssignPerson?.some(client => client?.clientName?.toLowerCase().includes(searchTerm.toLowerCase())) || false) ||
+        (project.projectDate?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+        (project.projectStartDate?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+        (project.projectEndDate?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+        (project.taskAssignPerson?.some(member => member?.employeeName?.toLowerCase().includes(searchTerm.toLowerCase())) || false) ||
+        (project.progress?.toString().includes(searchTerm) || false)
       );
     }
+
+    setFilteredProjects(filtered);
+  };
+
+  // Add this function to handle search
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   //DELETE PROJECT
@@ -325,35 +342,7 @@ const Project = () => {
     }
   };
 
-  // GET SINGLE PROJECT
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const handleSearch = async (searchQuery) => {
-    if (searchQuery !== "") {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/pro/search?id=${searchQuery}`
-        );
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-        setProjects(null);
-      }
-    } else {
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_BASE_URL}api/projects`
-          );
-          setProjects(response.data);
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      };
-
-      fetchData();
-    }
-  };
 
   //get employee
   const [employees, setEmployees] = useState([]);
@@ -600,27 +589,14 @@ const Project = () => {
                             className="form-control"
                             aria-label="search"
                             aria-describedby="addon-wrapping"
-                            value={searchQuery}
-                            onChange={(e) => {
-                              setSearchQuery(e.target.value);
-                              handleSearch(e.target.value);
-                            }}
-                            placeholder="Enter Project Name"
+                            placeholder="Search projects..."
+                            value={searchTerm}
+                            onChange={handleSearch}
                           />
-                          <button
-                            type="button"
-                            className="input-group-text add-member-top"
-                            id="addon-wrappingone"
-                            data-bs-toggle="modal"
-                            data-bs-target="#addUser"
-                          >
-                            <i className="fa fa-plus" />
-                          </button>
                           <button
                             type="button"
                             className="input-group-text"
                             id="addon-wrapping"
-                            onClick={handleSearch}
                           >
                             <i className="fa fa-search" />
                           </button>
@@ -1447,4 +1423,3 @@ const Project = () => {
 };
 
 export default Project;
-
