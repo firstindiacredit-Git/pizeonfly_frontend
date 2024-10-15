@@ -316,7 +316,7 @@ const Tasks = () => {
                                     <div className="avatar-list avatar-list-stacked m-0">
                                       <img
                                         className="avatar rounded-circle small-avt"
-                                        src={`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage}`}
+                                        src={`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage.replace('uploads/', '')}`}
                                         alt=""
                                       />
                                     </div>
