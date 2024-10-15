@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Sidebar from "../employeeCompt/EmployeeSidebar";
 import Header from "../employeeCompt/EmployeeHeader";
 import axios from "axios";
@@ -10,18 +9,15 @@ const Tasks = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [employees, setEmployees] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [taskStatuses, setTaskStatuses] = useState({});
   const [showFullDescription, setShowFullDescription] = useState("");
-  const [taskMessages, setTaskMessages] = useState([]);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
-  const [messages, setMessages] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [taskMessage, setTaskMessage] = useState("");
-
-
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const messageContainerRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,27 +83,7 @@ const Tasks = () => {
     }
   };
 
-
-  useEffect(() => {
-    if (selectedTask) {
-      fetchTaskMessages(selectedTask);
-    }
-  }, [selectedTask]);
-  // Modify filtering logic based on filterStatus and searchQuery
-  const filteredTasks = tasks.filter((task) => {
-    const matchesSearch = task.projectName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterStatus === "All" || task.taskStatus === filterStatus;
-
-    return matchesSearch && matchesFilter;
-  });
-
-
-  const userData = JSON.parse(localStorage.getItem('emp_user')); // Assuming 'user' is the key where user info is stored
-  const userId = userData._id; // User ID
-  const userName = userData.employeeName;
-
-  // Function to fetch task messages
-  const fetchTaskMessages = async (taskId) => {
+  const fetchMessages = async (taskId) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/taskMessages/${taskId}`);
       setMessages(response.data);
@@ -115,30 +91,39 @@ const Tasks = () => {
       console.error("Error fetching messages:", error);
     }
   };
+  const userData = JSON.parse(localStorage.getItem('emp_user')); // Assuming 'user' is the key where user info is stored
+  const userName = userData.employeeName
+  ;
 
-  // Function to handle task message submission
-  const handleSubmitMessage = async (e) => {
-    e.preventDefault();
-    const messageContent = e.target.elements.message.value;
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !selectedTask) return;
 
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/taskMessage`, {
-        content: messageContent,
-        senderId: userId, // Sender ID from localStorage
-        taskId: selectedTask, // Selected Task ID
+        content: newMessage,
+        senderId: userName, // Assuming you store the employee ID in localStorage
+        taskId: selectedTask._id
       });
-      setMessages([...messages, response.data]); // Add new message to the list
-      e.target.reset(); // Reset the form
+      setMessages([...messages, response.data]);
+      setNewMessage("");
     } catch (error) {
-      console.error("Error submitting message:", error);
+      console.error("Error sending message:", error);
     }
   };
 
-  // Function to handle view messages modal
-  const handleViewMessages = (taskId) => {
-    setSelectedTask(taskId);
-    fetchTaskMessages(taskId);
-  };
+  useEffect(() => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Modify filtering logic based on filterStatus and searchQuery
+  const filteredTasks = tasks.filter((task) => {
+    const matchesSearch = task.projectName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = filterStatus === "All" || task.taskStatus === filterStatus;
+
+    return matchesSearch && matchesFilter;
+  });
 
 
   return (
@@ -286,8 +271,11 @@ const Tasks = () => {
                                 <button
                                   className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
                                   data-bs-toggle="modal"
-                                  data-bs-target="#taskMessage"
-                                  onClick={() => handleViewMessages(task._id)}
+                                  data-bs-target="#taskMessages"
+                                  onClick={() => {
+                                    setSelectedTask(task);
+                                    fetchMessages(task._id);
+                                  }}
                                 >
                                 </button>
                               </td>
@@ -314,7 +302,7 @@ const Tasks = () => {
                             <div className="card" style={{ width: "18rem" }}>
                               <div className="card-body dd-handle">
                                 <div className="d-flex justify-content-between">
-                                
+
                                   <h5 className="fw-bold">{index + 1}. {task.projectName}</h5>
 
                                 </div>
@@ -362,8 +350,11 @@ const Tasks = () => {
                                           <button
                                             className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#taskMessage"
-                                            onClick={() => handleViewMessages(task._id)}
+                                            data-bs-target="#taskMessages"
+                                            onClick={() => {
+                                              setSelectedTask(task);
+                                              fetchMessages(task._id);
+                                            }}
                                           ></button>
                                         </div>
                                       </li>
@@ -412,52 +403,41 @@ const Tasks = () => {
               </div>
             </div>
 
-            {/* Message Modal */}
-            <div
-              className="modal fade"
-              id="taskMessage"
-              tabIndex={-1}
-              aria-labelledby="taskMessageLabel"
-              aria-hidden="true"
-            >
-              <div className="modal-dialog modal-dialog-centered modal-lg">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title" id="addUserLabel">Task Messages</h5>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div className="modal-body">
-                    <ul className="list-group">
-                      {messages.map(message => (
-                        <li key={message._id} className="list-group-item">
-                          <div className="d-flex border-bottom py-1">
-                            {/* <h6 className="fw-bold px-3">{userName}</h6> */}
-                            <span className="px-3 text-break">{message.content}</span>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
 
-                    {/* Message Submission Form */}
-                    <form onSubmit={handleSubmitMessage}>
-                      <div className="mb-3">
-                        <label htmlFor="currentMessage" className="form-label">Add Message</label>
-                        <textarea
-                          className="form-control"
-                          id="currentMessage"
-                          name="message"
-                          rows="3"
-                          required
-                        />
-                      </div>
-                      <button type="submit" className="btn btn-dark">Submit</button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
 
           </>
+        </div>
+      </div>
+
+      {/* Message Modal */}
+      <div className="modal fade" id="taskMessages" tabIndex="-1" aria-labelledby="taskMessagesLabel" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="taskMessagesLabel">Task Messages</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <div ref={messageContainerRef} style={{ height: '300px', overflowY: 'auto' }}>
+                {messages.map((message, index) => (
+                  <div key={index} className="mb-2">
+                    <strong>{message.senderId}: </strong>
+                    {message.content}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <input
+                type="text"
+                className="form-control"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type your message..."
+              />
+              <button type="button" className="btn btn-primary" onClick={handleSendMessage}>Send</button>
+            </div>
+          </div>
         </div>
       </div>
     </>

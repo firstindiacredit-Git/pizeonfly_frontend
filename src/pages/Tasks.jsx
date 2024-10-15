@@ -362,7 +362,7 @@ const Tasks = () => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/taskMessage`, {
         content: messageContent,
-        senderId: userId, // Sender ID from localStorage
+        senderId: userName, // Sender ID from localStorage
         taskId: selectedTaskId,
       });
       setMessages([...messages, response.data]); // Update messages
@@ -1181,7 +1181,7 @@ const Tasks = () => {
                         {messages.map(message => (
                           <li key={message._id} className="list-group-item">
                             <div className="d-flex border-bottom py-1">
-                              {/* <h6 className="fw-bold px-3">{userName}</h6> -  */}
+                              <strong>{message.senderId}: </strong> -
                               <span className="px-3 text-break">{message.content}</span>
                             </div>
                           </li>
