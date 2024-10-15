@@ -12,9 +12,9 @@ const EmployeeSidebar = () => {
                             <img src='../Images/picon.png' style={{ height: "4rem" }} alt="Pizeonfly Logo" />
                         </span>
                         <div className=''>
-                            <span className="logo-text fs-4" style={{ color: "#00f8ffdb" }}>pizeon</span>
-                            <span className="logo-text fs-4" style={{ marginLeft: "-0.9rem", color: "#004eff" }}>fly</span>
-                            {/* <span className="logo-text" style={{ fontSize: "10px" }}>TECHNOLOGY NINJAS</span> */}
+                            <span className="logo-text fs-3" style={{ color: "#4989fd" }}>pizeon</span>
+                            <span className="logo-text fs-3" style={{ marginLeft: "-0.9rem", color: "#0c117b" }}>fly</span>
+
                         </div>
                     </div>
                     {/* Menu: main ul */}

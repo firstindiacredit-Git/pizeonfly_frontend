@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import { Link } from "react-router-dom";
 import axios from "axios";
-// import { io } from 'socket.io-client';
+import io from 'socket.io-client';
 import { MultiSelect } from "react-multi-select-component";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,6 +15,7 @@ const Project = () => {
   const [currProj, setCurrProj] = useState({});
   const [viewMode, setViewMode] = useState("list");
   const [searchTerm, setSearchTerm] = useState("");
+  const [notifications, setNotifications] = useState({});
 
   // CREATE PROJECT
   const [formData, setFormData] = useState({
@@ -433,37 +434,100 @@ const Project = () => {
   const fetchProjectMessages = async (projectId) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/messages/${projectId}`);
-      // console.log(response.data);
       setMessages(response.data);
+      // Clear notifications for this project
+      setNotifications(prev => ({ ...prev, [projectId]: 0 }));
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
   };
 
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const newSocket = io(`${import.meta.env.VITE_BASE_URL}`);
+    setSocket(newSocket);
+
+    newSocket.on('connect', () => {
+      console.log('Socket connected');
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+
+    return () => newSocket.close();
+  }, []);
+
+  useEffect(() => {
+    if (socket == null) return;
+
+    const handleNewMessage = (message) => {
+      console.log('New message received:', message);
+      setMessages((prevMessages) => [...prevMessages, message]);
+      setNotifications(prev => ({
+        ...prev,
+        [message.projectId]: (prev[message.projectId] || 0) + 1
+      }));
+    };
+
+    const handleNewNotification = (notification) => {
+      console.log('New notification received:', notification);
+      setNotifications(prev => ({
+        ...prev,
+        [notification.projectId]: (prev[notification.projectId] || 0) + 1
+      }));
+    };
+
+    socket.on('new message', handleNewMessage);
+    socket.on('new notification', handleNewNotification);
+
+    return () => {
+      socket.off('new message', handleNewMessage);
+      socket.off('new notification', handleNewNotification);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket == null || projects.length === 0) return;
+
+    projects.forEach(project => {
+      console.log(`Joining room for project: ${project._id}`);
+      socket.emit('join project', project._id);
+    });
+
+    return () => {
+      projects.forEach(project => {
+        console.log(`Leaving room for project: ${project._id}`);
+        socket.emit('leave project', project._id);
+      });
+    };
+  }, [socket, projects]);
+
   const messageSubmit = async (e) => {
     e.preventDefault();
     const userDetails = JSON.parse(localStorage.getItem('user'));
-    const senderId = userDetails.username; // Assuming user ID is stored in local storage
+    const senderId = userDetails.username;
 
     const formData = new FormData();
     formData.append('content', content);
     formData.append('senderId', senderId);
     formData.append('projectId', selectProject._id);
 
-    // Append the files if any are selected
     for (let file of files) {
       formData.append('files', file);
     }
 
     try {
-      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+      
+      // The server will emit the socket event, so we don't need to update messages here
       setContent('');
-      setFiles([]); // Reset the files input
-      fetchProjectMessages(selectProject._id); // Refresh messages
+      setFiles([]);
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -740,15 +804,21 @@ const Project = () => {
                                       </td>
                                       <td>
                                         <button
-                                          className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                          className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary position-relative"
                                           data-bs-toggle="modal"
                                           data-bs-target="#addUser"
                                           type="button"
                                           onClick={() => {
                                             setSelectProject(project);
-                                            fetchProjectMessages(project._id); // Fetch messages for the selected project
+                                            fetchProjectMessages(project._id);
                                           }}
-                                        ></button>
+                                        >
+                                          {notifications[project._id] > 0 && (
+                                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                              {notifications[project._id]}
+                                            </span>
+                                          )}
+                                        </button>
                                       </td>
                                     </tr>
                                   );
@@ -844,7 +914,7 @@ const Project = () => {
                                       Delete
                                     </button>
                                     <button
-                                      className="btn bi bi-chat-left-dots text-primary"
+                                      className="btn bi bi-chat-left-dots text-primary position-relative"
                                       data-bs-toggle="modal"
                                       data-bs-target="#addUser"
                                       onClick={() => {
@@ -853,6 +923,11 @@ const Project = () => {
                                       }}
                                     >
                                       Message
+                                      {notifications[project._id] > 0 && (
+                                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                          {notifications[project._id]}
+                                        </span>
+                                      )}
                                     </button>
                                   </div>
                                 </div>
@@ -1375,7 +1450,7 @@ const Project = () => {
                                 }
                               })}
                             </div>
-                            <p className="text-muted" style={{ marginTop: "-2rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
+                            <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft:"1rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
 
                           </div>
 

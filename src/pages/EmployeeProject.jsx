@@ -3,7 +3,7 @@ import Sidebar from "../employeeCompt/EmployeeSidebar";
 import Header from "../employeeCompt/EmployeeHeader";
 import { Link } from "react-router-dom";
 import axios from "axios";
-// import { io } from 'socket.io-client';
+import io from 'socket.io-client';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./Loading.css";
@@ -109,12 +109,54 @@ const Project = () => {
 
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState('');
-  const [files, setFiles] = useState([]); // State for multiple file uploads
+  const [files, setFiles] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const [notifications, setNotifications] = useState({});
+
+  useEffect(() => {
+    const newSocket = io(`${import.meta.env.VITE_BASE_URL}`);
+    setSocket(newSocket);
+
+    return () => newSocket.close();
+  }, []);
+
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on('new message', (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    socket.on('new notification', (notification) => {
+      setNotifications(prev => ({
+        ...prev,
+        [notification.projectId]: (prev[notification.projectId] || 0) + 1
+      }));
+    });
+
+    return () => {
+      socket.off('new message');
+      socket.off('new notification');
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket == null) return;
+
+    projects.forEach(project => {
+      socket.emit('join project', project._id);
+    });
+
+    return () => {
+      projects.forEach(project => {
+        socket.emit('leave project', project._id);
+      });
+    };
+  }, [socket, projects]);
 
   const fetchProjectMessages = async (projectId) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/messages/${projectId}`);
-      // console.log(response.data);
       setMessages(response.data);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -124,14 +166,13 @@ const Project = () => {
   const messageSubmit = async (e) => {
     e.preventDefault();
     const userDetails = JSON.parse(localStorage.getItem('emp_user'));
-    const senderId = userDetails.employeeName; // Assuming user ID is stored in local storage
+    const senderId = userDetails.employeeName;
 
     const formData = new FormData();
     formData.append('content', content);
     formData.append('senderId', senderId);
     formData.append('projectId', selectProject._id);
 
-    // Append the files if any are selected
     for (let file of files) {
       formData.append('files', file);
     }
@@ -143,8 +184,8 @@ const Project = () => {
         },
       });
       setContent('');
-      setFiles([]); // Reset the files input
-      fetchProjectMessages(selectProject._id); // Refresh messages
+      setFiles([]);
+      // No need to manually fetch messages here, as the socket will handle real-time updates
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -167,7 +208,12 @@ const Project = () => {
     }
   }, [selectProject]);
 
-
+  const handleOpenMessages = (project) => {
+    setSelectProject(project);
+    fetchProjectMessages(project._id);
+    // Clear notifications for this project
+    setNotifications(prev => ({...prev, [project._id]: 0}));
+  };
 
   return (
     <>
@@ -265,15 +311,18 @@ const Project = () => {
                                     </td>
                                     <td>
                                       <button
-                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary position-relative"
                                         data-bs-toggle="modal"
                                         data-bs-target="#addUser"
                                         type="button"
-                                        onClick={() => {
-                                          setSelectProject(project);
-                                          fetchProjectMessages(project._id);
-                                        }}
-                                      ></button>
+                                        onClick={() => handleOpenMessages(project)}
+                                      >
+                                        {notifications[project._id] > 0 && (
+                                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            {notifications[project._id]}
+                                          </span>
+                                        )}
+                                      </button>
                                     </td>
                                   </tr>
                                 );
@@ -309,15 +358,17 @@ const Project = () => {
                               <p>End Date: {getFormattedDate(project.projectEndDate)}</p>
                               <p>Members: {project.taskAssignPerson.map((name) => name.employeeName + ", ")}</p>
                               <button
-                                className="bi bi-chat-left-dots btn outline-secondary text-primary"
+                                className="bi bi-chat-left-dots btn outline-secondary text-primary position-relative"
                                 data-bs-toggle="modal"
                                 data-bs-target="#addUser"
-                                onClick={() => {
-                                  setSelectProject(project);
-                                  fetchProjectMessages(project._id);
-                                }}
+                                onClick={() => handleOpenMessages(project)}
                               >
                                 Add Message
+                                {notifications[project._id] > 0 && (
+                                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {notifications[project._id]}
+                                  </span>
+                                )}
                               </button>
                             </div>
                           </div>
@@ -379,7 +430,7 @@ const Project = () => {
                                 }
                               })}
                             </div>
-                            <p className="text-muted" style={{ marginTop: "-2rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
+                            <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
 
                           </div>
 
