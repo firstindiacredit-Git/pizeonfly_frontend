@@ -35,19 +35,23 @@ const Tasks = () => {
   }, []);
 
   useEffect(() => {
-    const Token = localStorage.getItem("emp_token");
-    async function fetchTasks() {
+    const fetchTasks = async () => {
       try {
+        const token = localStorage.getItem('emp_token');
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/author`, {
-          headers: {
-            Authorization: Token,
-          },
+          headers: { Authorization: token }
         });
-        setTasks(response.data);
+        
+        // Check the structure of the response
+        console.log('API response:', response.data);
+        
+        // Ensure tasks is an array
+        const tasksData = Array.isArray(response.data.tasks) ? response.data.tasks : [];
+        setTasks(tasksData);
       } catch (error) {
-        console.error("Error fetching tasks:", error);
+        console.error('Error fetching tasks:', error);
       }
-    }
+    };
 
     fetchTasks();
   }, []);
@@ -120,7 +124,7 @@ const Tasks = () => {
   }, [messages]);
 
   // Modify filtering logic based on filterStatus and searchQuery
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = Array.isArray(tasks) ? tasks.filter((task) => {
     const searchTerms = searchQuery.toLowerCase().split(' ');
     const taskData = [
       task.projectName.toLowerCase(),
@@ -136,7 +140,7 @@ const Tasks = () => {
     const matchesFilter = filterStatus === "All" || task.taskStatus === filterStatus;
 
     return matchesSearch && matchesFilter;
-  });
+  }) : [];
 
   const handleImageClick = useCallback((imageUrl) => {
     window.open(imageUrl, '_blank');

@@ -11,35 +11,8 @@ import "./Loading.css";
 const Project = () => {
   const [viewMode, setViewMode] = useState("list");
 
-  // GET SINGLE PROJECT
-  const [searchQuery, setSearchQuery] = useState("");
   const [employees, setEmployees] = useState([]);
-  const handleSearch = async (searchQuery) => {
-    if (searchQuery !== "") {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/pro/search?id=${searchQuery}`
-        );
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Error:", error);
-        setProjects(null);
-      }
-    } else {
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_BASE_URL}api/projects`
-          );
-          setProjects(response.data);
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      };
-
-      fetchData();
-    }
-  };
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -67,7 +40,7 @@ const Project = () => {
 
     async function fetchData() {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/auth`, {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/employee-projects`, {
           headers: {
             authorization: Token,
           },
@@ -81,29 +54,6 @@ const Project = () => {
 
     fetchData();
   }, []);
-
-
-  // Delete Status
-  const handleDelete = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}api/project-status/${projectId}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (!response.ok) {
-        const errorMessage = await response.json();
-        throw new Error(errorMessage.message);
-      }
-
-      console.log("Project status deleted successfully");
-      window.location.reload();
-    } catch (error) {
-      console.error("Error deleting project status:", error.message);
-    }
-  };
 
 
 
@@ -471,52 +421,6 @@ const Project = () => {
 
           </>
 
-          {/* Modal  Delete Folder/ File*/}
-          <div
-            className="modal fade"
-            id="deleteproject"
-            tabIndex={-1}
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-dialog-centered modal-md modal-dialog-scrollable">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title  fw-bold" id="deleteprojectLabel">
-                    {" "}
-                    Delete item Permanently?
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  />
-                </div>
-                <div className="modal-body justify-content-center flex-column d-flex">
-                  <i className="icofont-ui-delete text-danger display-2 text-center mt-2" />
-                  <p className="mt-4 fs-5 text-center">
-                    You can only delete this item Permanently
-                  </p>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger color-fff"
-                    onClick={handleDelete}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
         <ToastContainer />
       </div>
