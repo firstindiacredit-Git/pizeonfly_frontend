@@ -3,13 +3,16 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import { MultiSelect } from "react-multi-select-component";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Loading.css";
 
 const Tasks = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [filteredProjectName, setFilteredProjectName] = useState(null);
+
   const [viewMode, setViewMode] = useState('list'); // Default is list view
 
   const [tasks, setTasks] = useState([]);
@@ -117,8 +120,18 @@ const Tasks = () => {
     description: "",
   });
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString, includeTime = false) => {
     const date = new Date(dateString);
+    if (includeTime) {
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
     return date.toISOString().split('T')[0]; // Formats date to 'YYYY-MM-DD'
   };
 
@@ -126,41 +139,67 @@ const Tasks = () => {
   const [activeTab, setActiveTab] = useState('All'); // State for active tab filter
   const [filterDate, setFilterDate] = useState(''); // Date for date filter
   const [currentPage, setCurrentPage] = useState(1); // State for current page
-  const tasksPerPage = 10; // Number of tasks per page
+  const [tasksPerPage, setTasksPerPage] = useState(10); // Default to 10 tasks per page
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
 
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [tasksResponse, projectsResponse, employeesResponse] = await Promise.all([
+        axios.get(`${import.meta.env.VITE_BASE_URL}api/tasks`),
+        axios.get(`${import.meta.env.VITE_BASE_URL}api/projects`),
+        axios.get(`${import.meta.env.VITE_BASE_URL}api/employees`)
+      ]);
+
+      const formattedTasks = tasksResponse.data.map(task => ({
+        ...task,
+        taskEndDate: formatDate(task.taskEndDate),
+        taskDate: formatDate(task.taskDate, true),
+      }));
+
+      formattedTasks.sort((a, b) => new Date(b.taskDate) - new Date(a.taskDate));
+
+      // Filter tasks if there's a filtered project name
+      const filteredTasks = filteredProjectName
+        ? formattedTasks.filter(task => task.projectName === filteredProjectName)
+        : formattedTasks;
+
+      setTasks(filteredTasks);
+      setProjects(projectsResponse.data);
+      setEmployees(employeesResponse.data);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [tasksResponse, projectsResponse, employeesResponse] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_BASE_URL}api/tasks`),
-          axios.get(`${import.meta.env.VITE_BASE_URL}api/projects`),
-          axios.get(`${import.meta.env.VITE_BASE_URL}api/employees`)
-        ]);
+    const projectNameFromState = location.state?.projectName;
+    const projectNameFromStorage = localStorage.getItem('filteredProjectName');
 
-        const formattedTasks = tasksResponse.data.map(task => ({
-          ...task,
-          taskEndDate: formatDate(task.taskEndDate),
-          taskDate: formatDate(task.taskDate),
-        }));
-
-        formattedTasks.sort((a, b) => new Date(b.taskDate) - new Date(a.taskDate));
-
-        setTasks(formattedTasks);
-        setProjects(projectsResponse.data);
-        setEmployees(employeesResponse.data);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (projectNameFromState) {
+      setFilteredProjectName(projectNameFromState);
+      localStorage.setItem('filteredProjectName', projectNameFromState);
+    } else if (projectNameFromStorage) {
+      setFilteredProjectName(projectNameFromStorage);
+    }
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [filteredProjectName]);
+
+  // Update the clearFilter function
+  const clearFilter = () => {
+    setFilteredProjectName(null);
+    localStorage.removeItem('filteredProjectName');
+    navigate('/tasks', { replace: true }); // This will clear the location state
+  };
 
   const handleViewMessages = (taskId) => {
     setSelectedTaskId(taskId);
@@ -385,17 +424,24 @@ const Tasks = () => {
   const globalSearch = () => {
     const searchResults = {
       tasks: filteredTasks,
-      projects: projects.filter(project => 
+      projects: projects.filter(project =>
         project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         project.description.toLowerCase().includes(searchTerm.toLowerCase())
       ),
-      employees: employees.filter(employee => 
+      employees: employees.filter(employee =>
         employee.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         employee.email.toLowerCase().includes(searchTerm.toLowerCase())
       )
     };
 
     return searchResults;
+  };
+
+  // Add this function to handle the change in tasks per page
+  const handleTasksPerPageChange = (e) => {
+    const value = e.target.value;
+    setTasksPerPage(value === 'all' ? filteredTasks.length : parseInt(value, 10));
+    setCurrentPage(1); // Reset to first page when changing the number of tasks per page
   };
 
 
@@ -509,6 +555,12 @@ const Tasks = () => {
                         <i className="fa fa-search" />
                       </button>
                     </div>
+                    {filteredProjectName && (
+                      <div className="d-flex justify-content-evenly mt-2">
+                        <strong>{filteredProjectName}</strong> -
+                        <button type="button" className="btn btn-dark btn-set-task w-sm-100 me-2" onClick={clearFilter}>Clear Filter</button>
+                      </div>
+                    )}
                   </div>
 
 
@@ -535,15 +587,15 @@ const Tasks = () => {
                           <th scope="col" style={{ width: '6rem' }}>Project name</th>
                           <th scope="col">Task name</th>
                           <th scope="col" style={{ width: '7rem' }}>Assignee</th>
-                          <th scope="col" style={{ width: '' }}>Due Date</th>
-                          <th scope="col" style={{ width: '9rem' }}>Priority</th>
+                          <th scope="col" style={{ width: '6rem' }}>Due Date</th>
+                          <th scope="col" style={{ width: '6rem' }}>Priority</th>
                           <th scope="col" style={{ width: '' }}>U/D</th>
                           <th scope="col" style={{ width: '' }}>Status</th>
                         </tr>
                       </thead>
                       <tbody>
                         {loading ? (
-                          <div className="custom-loader"></div>
+                          <div className="custom-loader" style={{ marginTop: "20vh", marginLeft: "-8rem" }}></div>
                         ) : (
                           currentTasks.map((task, index) => {
                             const currentDate = new Date();
@@ -602,6 +654,7 @@ const Tasks = () => {
                                     name="taskEndDate"
                                     value={task.taskEndDate}
                                     onChange={(e) => taskHandleChange(e, task._id)}
+                                    style={{ width: '120px', fontSize: '0.8rem' }} // Adjusted width and font size
                                   />
                                 </td>
                                 <td style={{ backgroundColor }}>
@@ -611,6 +664,7 @@ const Tasks = () => {
                                     name="taskPriority"
                                     value={task.taskPriority}
                                     onChange={(e) => taskHandleChange(e, task._id)}
+                                    style={{ width: '120px', fontSize: '0.8rem' }}
                                   >
                                     <option value="">Set Priority</option>
                                     <option value="Highest">Highest</option>
@@ -660,71 +714,154 @@ const Tasks = () => {
                   </div>
                 ) : (
                   <div className="row">
-                    {currentTasks.map((task, index) => (
-                      <div key={task._id} className="col-md-4 mb-4">
-                        <div className="card task-card" style={{ width: "18rem" }}>
-                          <div className="card-body">
-                            <div className="d-flex justify-content-between">
-                              <span className="fw-bold fs-6">{index + 1}. </span>
-                              <h5 className="fw-bold ">{task.projectName}</h5>
-                              <Link
-                                to="/images"
-                                state={{
-                                  images: task.taskImages,
-                                  projectName: task.projectName,
-                                }}
-                                style={{ marginLeft: "33px" }}
+                    {currentTasks.map((task, index) => {
+                      const currentDate = new Date();
+                      const taskEndDate = new Date(task.taskEndDate);
+                      const taskStartDate = new Date(task.taskDate);
+                      const isOverdue = taskEndDate < currentDate && task.taskStatus !== 'Completed';
+                      const isCompletedAfterDue = task.taskStatus === 'Completed' && taskEndDate < currentDate && taskEndDate.getTime() !== taskStartDate.getTime();
+
+                      let backgroundColor = '';
+                      if (isOverdue) {
+                        backgroundColor = '#f6c8b7';
+                      } else if (isCompletedAfterDue) {
+                        backgroundColor = '#c6f2c1';
+                      }
+
+                      return (
+                        <div key={task._id} className="col-md-4 mb-4">
+                          <div className="card task-card" style={{ width: "18rem", backgroundColor }}>
+                            <div className="card-body">
+                              <div className="d-flex justify-content-between align-items-center mb-2">
+                                <span className="fw-bold fs-6">{index + 1}. </span>
+                                <h5 className="fw-bold mb-0">{task.projectName}</h5>
+                                <Link
+                                  to="/images"
+                                  state={{
+                                    images: task.taskImages,
+                                    projectName: task.projectName,
+                                  }}
+                                >
+                                  <i className="bi-paperclip fs-6" />
+                                </Link>
+                              </div>
+                              <textarea
+                                className="form-control mb-2"
+                                rows="3"
+                                name="description"
+                                value={task.description}
+                                onChange={(e) => taskHandleChange(e, task._id)}
+                                style={{ resize: 'none' }}
+                              />
+                              <p className="mb-1">Assigned to: {task.taskAssignPerson.employeeName}</p>
+                              <p className="mb-1">By: {task.assignedBy}</p>
+                              <input
+                                type="date"
+                                className="form-control mb-2"
+                                name="taskEndDate"
+                                value={task.taskEndDate}
+                                onChange={(e) => taskHandleChange(e, task._id)}
+                              />
+                              <select
+                                className="form-select mb-2"
+                                name="taskPriority"
+                                value={task.taskPriority}
+                                onChange={(e) => taskHandleChange(e, task._id)}
                               >
-                                <i className="bi-paperclip fs-6" />
-                              </Link>
+                                <option value="">Set Priority</option>
+                                <option value="Highest">Highest</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Lowest">Lowest</option>
+                              </select>
+                              <div className="d-flex justify-content-between align-items-center mb-2">
+                                <button
+                                  onClick={() => taskHandleSubmit(task._id)}
+                                  className="btn btn-sm btn-primary"
+                                >
+                                  <i className="bi bi-check2"></i> Update
+                                </button>
+                                <button
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#dremovetask"
+                                  onClick={() => setDeletableId(task._id)}
+                                  className="btn btn-sm btn-danger"
+                                >
+                                  <i className="bi bi-trash"></i> Delete
+                                </button>
+                              </div>
+                              <div className="d-flex justify-content-between align-items-center">
+                                {task.taskStatus === 'Not Started' && (
+                                  <span className="badge bg-warning text-dark">Not Started</span>
+                                )}
+                                {task.taskStatus === 'In Progress' && (
+                                  <span className="badge bg-info text-dark">In Progress</span>
+                                )}
+                                {task.taskStatus === 'Completed' && (
+                                  <span className="badge bg-success">Completed</span>
+                                )}
+                                <button
+                                  className="btn btn-sm btn-outline-secondary"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#taskMessage"
+                                  onClick={() => handleViewMessages(task._id)}
+                                >
+                                  <i className="bi bi-chat-left-dots"></i> Messages
+                                </button>
+                              </div>
                             </div>
-                            <p>{task.description}</p>
-                            <p>Due Date: {task.taskEndDate}</p>
-                            <p>Assigned to: {task.taskAssignPerson.employeeName}</p>
-                            <div className="task-priority">{task.taskPriority}</div>
-                            <div className="task-status">{task.taskStatus}</div>
-                            <button
-                              className="bi bi-stopwatch btn outline-secondary text-primary"
-                              data-bs-toggle="modal"
-                              data-bs-target="#taskMessage"
-                              onClick={() => handleViewMessages(task._id)}
-                            />
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
 
 
-                <nav className="d-flex justify-content-center">
-                  <ul className="pagination">
-                    <li className="page-item">
-                      <button onClick={prevPage} className="page-link" disabled={currentPage === 1}>
-                        &laquo;
-                      </button>
-                    </li>
-
-                    {/* Only show pages between startPage and endPage */}
-                    {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
-                      <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                        <button onClick={() => paginate(page)} className="page-link bg-white  ">
-                          {page}
-                        </button>
-                      </li>
-                    ))}
-
-                    {/* Next 5 pages button */}
-                    {endPage < totalPages && (
+                <div className="d-flex justify-content-around">
+                  {/* Add this dropdown menu */}
+                  <div className="mb-3">
+                    <label htmlFor="tasksPerPage" className="form-label">Tasks per page:</label>
+                    <select
+                      id="tasksPerPage"
+                      className="form-select"
+                      value={tasksPerPage}
+                      onChange={handleTasksPerPageChange}
+                    >
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                      <option value="all">Show All</option>
+                    </select>
+                  </div>
+                  <nav className="d-flex justify-content-center mt-5">
+                    <ul className="pagination">
                       <li className="page-item">
-                        <button onClick={() => paginate(endPage + 1)} className="page-link">
-                          &raquo;
+                        <button onClick={prevPage} className="page-link" disabled={currentPage === 1}>
+                          &laquo;
                         </button>
                       </li>
-                    )}
-                  </ul>
-                </nav>
 
+                      {/* Only show pages between startPage and endPage */}
+                      {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
+                        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                          <button onClick={() => paginate(page)} className="page-link bg-white  ">
+                            {page}
+                          </button>
+                        </li>
+                      ))}
+
+                      {/* Next 5 pages button */}
+                      {endPage < totalPages && (
+                        <li className="page-item">
+                          <button onClick={() => paginate(endPage + 1)} className="page-link">
+                            &raquo;
+                          </button>
+                        </li>
+                      )}
+                    </ul>
+                  </nav>
+                </div>
 
 
               </div>

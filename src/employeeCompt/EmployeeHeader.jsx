@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -25,6 +25,7 @@ const Header = () => {
     description: "",
   });
   const [selectedFile, setSelectedFile] = useState(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem("emp_token");
@@ -56,6 +57,29 @@ const Header = () => {
       setImage(modifiedImage);
     }
   }, [navigation]);
+
+  useEffect(() => {
+    const positionDropdown = () => {
+      if (dropdownRef.current) {
+        const dropdown = dropdownRef.current;
+        const rect = dropdown.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+
+        if (rect.right > viewportWidth) {
+          dropdown.style.left = 'auto';
+          dropdown.style.right = '0';
+        } else {
+          dropdown.style.left = '';
+          dropdown.style.right = '';
+        }
+      }
+    };
+
+    window.addEventListener('resize', positionDropdown);
+    positionDropdown(); // Initial positioning
+
+    return () => window.removeEventListener('resize', positionDropdown);
+  }, []);
 
   const handleSignOut = () => {
     localStorage.removeItem("emp_token");
@@ -156,9 +180,9 @@ const Header = () => {
     }
   };
 
-
-
-
+  const handleImageClick = useCallback((imageUrl) => {
+    window.open(imageUrl, '_blank');
+  }, []);
 
   return (
     <>
@@ -167,7 +191,7 @@ const Header = () => {
           <div className="container-xxl">
             {/* header rightbar icon */}
             <div className="h-right d-flex align-items-center mr-5 mr-lg-0 order-1">
-              <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center">
+              <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center zindex-popover">
                 <div className="u-info me-2">
                   <p className="mb-0 text-end line-height-sm ">
                     <span className="font-weight-bold">{employeeName}</span>
@@ -187,7 +211,8 @@ const Header = () => {
                     alt="profile"
                   />
                 </a>
-                <div className="dropdown-menu rounded-lg shadow border-0 dropdown-animation dropdown-menu-end p-0 m-0">
+                <div className="dropdown-menu rounded-lg shadow border-0 dropdown-animation dropdown-menu-end p-0 m-0"
+                     ref={dropdownRef}>
                   <div className="card border-0 w280">
                     <div className="card-body pb-0">
                       <div className="d-flex py-1">
@@ -195,6 +220,19 @@ const Header = () => {
                           className="avatar rounded-circle"
                           src={`${import.meta.env.VITE_BASE_URL}` + image}
                           alt="profile"
+                          style={{
+                            transition: 'transform 0.3s ease-in-out',
+                            cursor: 'pointer',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.transform = 'scale(8)';
+                            e.target.style.zIndex = '100';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.transform = 'scale(1)';
+                            e.target.style.zIndex = '1';
+                          }}
+                          onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image}`)}
                         />
                         <div className="flex-fill ms-3">
                           <p className="mb-0">
@@ -517,6 +555,16 @@ const Header = () => {
         </nav >
         <ToastContainer />
       </div >
+      <style jsx>{`
+        .dropdown-menu {
+          position: absolute !important;
+        }
+        @media (max-width: 767px) {
+          .zindex-popover {
+            position: static !important;
+          }
+        }
+      `}</style>
     </>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Sidebar from "../employeeCompt/EmployeeSidebar";
 import Header from "../employeeCompt/EmployeeHeader";
 import axios from "axios";
@@ -18,6 +18,8 @@ const Tasks = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const messageContainerRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [tasksPerPage, setTasksPerPage] = useState(10);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,12 +121,47 @@ const Tasks = () => {
 
   // Modify filtering logic based on filterStatus and searchQuery
   const filteredTasks = tasks.filter((task) => {
-    const matchesSearch = task.projectName.toLowerCase().includes(searchQuery.toLowerCase());
+    const searchTerms = searchQuery.toLowerCase().split(' ');
+    const taskData = [
+      task.projectName.toLowerCase(),
+      task.taskStatus.toLowerCase(),
+      task.description.toLowerCase(),
+      new Date(task.taskEndDate).toLocaleDateString().toLowerCase(),
+      task.taskAssignPerson.employeeName.toLowerCase(),
+      task.assignedBy.toLowerCase(),
+      task.taskPriority.toLowerCase()
+    ].join(' ');
+
+    const matchesSearch = searchTerms.every(term => taskData.includes(term));
     const matchesFilter = filterStatus === "All" || task.taskStatus === filterStatus;
 
     return matchesSearch && matchesFilter;
   });
 
+  const handleImageClick = useCallback((imageUrl) => {
+    window.open(imageUrl, '_blank');
+  }, []);
+
+  // Pagination logic
+  const indexOfLastTask = currentPage * tasksPerPage;
+  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+  const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Next page
+  const nextPage = () => setCurrentPage((prevPage) => Math.min(prevPage + 1, Math.ceil(filteredTasks.length / tasksPerPage)));
+
+  // Previous page
+  const prevPage = () => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+
+  // Handle tasks per page change
+  const handleTasksPerPageChange = (e) => {
+    const value = e.target.value;
+    setTasksPerPage(value === 'all' ? filteredTasks.length : parseInt(value, 10));
+    setCurrentPage(1); // Reset to first page when changing the number of tasks per page
+  };
 
   return (
     <>
@@ -165,7 +202,7 @@ const Tasks = () => {
                             className="form-control"
                             aria-label="search"
                             aria-describedby="addon-wrapping"
-                            placeholder="Enter Project Name"
+                            placeholder="Search tasks (project, status, description, due date, etc.)"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                           />
@@ -187,7 +224,7 @@ const Tasks = () => {
                           </button>
                         </div>
                       </div>
-                      <ul className="nav nav-tabs tab-body-header rounded prtab-set" style={{ cursor: 'pointer' }} role="tablist">
+                      <ul className="nav nav-tabs tab-body-header rounded prtab-set" style={{ cursor: 'pointer',height:"fit-content" }} role="tablist">
                         <li className="nav-item">
                           <a
                             className={`nav-link ${filterStatus === "All" ? "active" : ""}`}
@@ -237,6 +274,7 @@ const Tasks = () => {
                         <tr>
                           <th>Sr.No</th>
                           <th>Project Name</th>
+                          <th>Description</th>
                           <th>Status</th>
                           <th>Due Date</th>
                           <th>Assigned To</th>
@@ -244,7 +282,7 @@ const Tasks = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredTasks.map((task, index) => {
+                        {currentTasks.map((task, index) => {
                           const getFormattedDate = (date) => {
                             const newDate = new Date(date);
                             return `${newDate.getDate()}/${newDate.getMonth() + 1}/${newDate.getFullYear()}`;
@@ -252,32 +290,95 @@ const Tasks = () => {
                           return (
                             <tr key={task._id}>
                               <td><span className="fw-bold fs-6">{index + 1}.</span></td>
-                              <td>{task.projectName}</td>
                               <td>
+                                {task.projectName}
+                                <br />
                                 <span
-                                  className={`badge ${taskStatuses[task._id] === "Not Started"
-                                    ? "bg-warning text-dark"
-                                    : taskStatuses[task._id] === "In Progress"
-                                      ? "bg-info text-dark"
-                                      : "bg-success"
-                                    }`}
+                                  className={`badge ${
+                                    taskStatuses[task._id] === "Not Started"
+                                      ? "bg-warning text-dark"
+                                      : taskStatuses[task._id] === "In Progress"
+                                        ? "bg-info text-dark"
+                                        : "bg-success"
+                                  }`}
                                 >
                                   {taskStatuses[task._id]}
                                 </span>
                               </td>
-                              <td>{getFormattedDate(task.taskEndDate)}</td>
-                              <td>{task.taskAssignPerson.employeeName}</td>
                               <td>
-                                <button
-                                  className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#taskMessages"
-                                  onClick={() => {
-                                    setSelectedTask(task);
-                                    fetchMessages(task._id);
+                                <p
+                                  className="py-2 mb-0 task-description"
+                                  style={{
+                                    maxHeight: "5em",
+                                    overflowY: "auto",
+                                    width: "200px",  // Adjust this value as needed
                                   }}
                                 >
-                                </button>
+                                  {task.description}
+                                </p>
+                              </td>
+                              <td>
+                                <select
+                                  className="form-select"
+                                  aria-label="Default select Status"
+                                  name="taskStatus"
+                                  onChange={(e) => handleTaskUpdate(e, task._id)}
+                                  value={taskStatuses[task._id]}
+                                >
+                                  <option value="Not Started">Not Started</option>
+                                  <option value="In Progress">In Progress</option>
+                                  <option value="Completed">Completed</option>
+                                </select>
+                              </td>
+                              <td>{getFormattedDate(task.taskEndDate)}</td>
+                              <td className="">
+                                <img
+                                  src={`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage.replace('uploads/', '')}`}
+                                  alt=""
+                                  className="avatar rounded-circle"
+                                  style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    transition: 'transform 0.3s ease-in-out',
+                                    cursor: 'pointer',
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.target.style.transform = 'scale(4)';
+                                    e.target.style.zIndex = '100';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.target.style.transform = 'scale(1)';
+                                    e.target.style.zIndex = '1';
+                                  }}
+                                  onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage.replace('uploads/', '')}`)}
+                                />
+                                <br/>
+                                {task.taskAssignPerson.employeeName}
+                              </td>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <button
+                                    className="btn btn-outline-secondary btn-sm me-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#taskMessages"
+                                    onClick={() => {
+                                      setSelectedTask(task);
+                                      fetchMessages(task._id);
+                                    }}
+                                  >
+                                    <i className="bi bi-chat-left-dots"></i>
+                                  </button>
+                                  <Link
+                                    to="/images"
+                                    className="btn btn-outline-secondary btn-sm"
+                                    state={{
+                                      images: task.taskImages,
+                                      projectName: task.projectName,
+                                    }}
+                                  >
+                                    <i className="bi-paperclip"></i>
+                                  </Link>
+                                </div>
                               </td>
                             </tr>
                           );
@@ -287,7 +388,7 @@ const Tasks = () => {
                   ) : (
                     // Grid View Rendering
                     <div className="row">
-                      {filteredTasks.map((task, index) => {
+                      {currentTasks.map((task, index) => {
                         const getFormattedDate = (date) => {
                           const newDate = new Date(date);
                           const day = newDate.getDate();
@@ -299,7 +400,7 @@ const Tasks = () => {
 
                         return (
                           <div className="col-md-4 mb-4" key={task._id}>
-                            <div className="card" style={{ width: "18rem" }}>
+                            <div className="card task-card" style={{ width: "18rem" }}>
                               <div className="card-body dd-handle">
                                 <div className="d-flex justify-content-between">
 
@@ -318,6 +419,19 @@ const Tasks = () => {
                                         className="avatar rounded-circle small-avt"
                                         src={`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage.replace('uploads/', '')}`}
                                         alt=""
+                                        style={{
+                                          transition: 'transform 0.3s ease-in-out',
+                                          cursor: 'pointer',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.target.style.transform = 'scale(8)';
+                                          e.target.style.zIndex = '100';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.target.style.transform = 'scale(1)';
+                                          e.target.style.zIndex = '1';
+                                        }}
+                                        onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage.replace('uploads/', '')}`)}
                                       />
                                     </div>
                                     <div>{task.taskAssignPerson.employeeName}</div>
@@ -399,6 +513,39 @@ const Tasks = () => {
                   )}
                 </div>
 
+                <div className="d-flex justify-content-between align-items-center mt-3">
+                  <div className="mb-3">
+                    <label htmlFor="tasksPerPage" className="form-label">Tasks per page:</label>
+                    <select
+                      id="tasksPerPage"
+                      className="form-select"
+                      value={tasksPerPage}
+                      onChange={handleTasksPerPageChange}
+                    >
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                      <option value="all">Show All</option>
+                    </select>
+                  </div>
+
+                  <nav>
+                    <ul className="pagination">
+                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                        <button className="page-link" onClick={prevPage}>&laquo;</button>
+                      </li>
+                      {Array.from({ length: Math.ceil(filteredTasks.length / tasksPerPage) }, (_, i) => (
+                        <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                          <button className="page-link bg-white" onClick={() => paginate(i + 1)}>{i + 1}</button>
+                        </li>
+                      ))}
+                      <li className={`page-item ${currentPage === Math.ceil(filteredTasks.length / tasksPerPage) ? 'disabled' : ''}`}>
+                        <button className="page-link" onClick={nextPage}>&raquo;</button>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
 
               </div>
             </div>

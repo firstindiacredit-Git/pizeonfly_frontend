@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 // import { Link } from "react-router-dom";
@@ -353,6 +353,10 @@ const Member = () => {
     }
   };
 
+  const handleImageClick = useCallback((imageUrl) => {
+    window.open(imageUrl, '_blank');
+  }, []);
+
   return (
     <>
       <div id="mytask-layout">
@@ -434,12 +438,26 @@ const Member = () => {
                           <div className="card teacher-card">
                             <div className="card-body d-flex">
                               <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w220">
-                                <img
-                                  // src={employee.employeeImage}
-                                  src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
-                                  alt=""
-                                  className="avatar xl rounded-circle img-thumbnail shadow-sm"
-                                />
+                                <div className="position-relative d-inline-block">
+                                  <img
+                                    src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
+                                    alt=""
+                                    className="avatar xl rounded-circle img-thumbnail shadow-sm"
+                                    style={{
+                                      transition: 'transform 0.3s ease-in-out',
+                                      cursor: 'pointer',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.target.style.transform = 'scale(2.5)';
+                                      e.target.style.zIndex = '100';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.target.style.transform = 'scale(1)';
+                                      e.target.style.zIndex = '1';
+                                    }}
+                                    onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`)}
+                                  />
+                                </div>
                                 <div className="about-info mt-3">
                                   <div className="followers me-2">
                                     <i className="bi bi-person-vcard-fill text-danger fs-6 me-2" />

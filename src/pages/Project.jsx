@@ -699,29 +699,11 @@ const Project = () => {
                               </thead>
                               <tbody>
                                 {filteredProjects.map((project, index) => {
-                                  const getFormattedDate = (date) => {
+                                  const getFormattedDate = (date, includeTime = false) => {
                                     const newDate = new Date(date);
                                     let day = newDate.getDate();
                                     let month = newDate.getMonth() + 1;
                                     const year = newDate.getFullYear();
-                                    let hour = newDate.getHours();
-                                    let min = newDate.getMinutes();
-                                    let period = "AM";
-
-                                    // Convert hours to 12-hour format
-                                    if (hour === 0) {
-                                      hour = 12;
-                                    } else if (hour >= 12) {
-                                      period = "PM";
-                                      if (hour > 12) {
-                                        hour -= 12;
-                                      }
-                                    }
-
-                                    // Adding leading zero to minutes if necessary
-                                    if (min < 10) {
-                                      min = "0" + min;
-                                    }
 
                                     // Adding leading zero to day and month if necessary
                                     if (day < 10) {
@@ -731,7 +713,30 @@ const Project = () => {
                                       month = "0" + month;
                                     }
 
-                                    return `${day}/${month}/${year} --${hour}:${min} ${period}`;
+                                    if (includeTime) {
+                                      let hour = newDate.getHours();
+                                      let min = newDate.getMinutes();
+                                      let period = "AM";
+
+                                      // Convert hours to 12-hour format
+                                      if (hour === 0) {
+                                        hour = 12;
+                                      } else if (hour >= 12) {
+                                        period = "PM";
+                                        if (hour > 12) {
+                                          hour -= 12;
+                                        }
+                                      }
+
+                                      // Adding leading zero to minutes if necessary
+                                      if (min < 10) {
+                                        min = "0" + min;
+                                      }
+
+                                      return `${day}/${month}/${year} (${hour}:${min} ${period})`;
+                                    }
+
+                                    return `${day}/${month}/${year}`;
                                   };
 
                                   return (
@@ -740,8 +745,8 @@ const Project = () => {
                                       <td><span className="fw-bold fs-6">{index + 1}.</span></td>
                                       <td>
                                         <div className="d-flex gap-2">
-                                          <div className="">
-                                            <Link to="/tasks">
+                                          <div className="d-flex justify-content-around">
+                                            <Link to="/tasks" state={{ projectName: project.projectName }}>
                                               {project.projectName}
                                             </Link>
 
@@ -758,19 +763,17 @@ const Project = () => {
                                           </div>
                                         </div>
                                         <div className="text-muted">
-                                          -{getFormattedDate(project.projectDate)}
+                                          -{getFormattedDate(project.projectDate, true)}
                                         </div>
                                       </td>
                                       <td>
                                         {project.clientAssignPerson?.map(client => client.clientName + ", ")}
                                       </td>
                                       <td>
-                                        {getFormattedDate(
-                                          project.projectStartDate
-                                        )}
+                                        {getFormattedDate(project.projectStartDate)}
                                       </td>
                                       <td>
-                                        {getFormattedDate(project.projectEndDate)}{" "}
+                                        {getFormattedDate(project.projectEndDate)}
                                       </td>
                                       <td>
                                         {project.taskAssignPerson.map(
@@ -830,29 +833,11 @@ const Project = () => {
                       ) : (
                         <div className="row">
                           {filteredProjects.map((project, index) => {
-                            const getFormattedDate = (date) => {
+                            const getFormattedDate = (date, includeTime = false) => {
                               const newDate = new Date(date);
                               let day = newDate.getDate();
                               let month = newDate.getMonth() + 1;
                               const year = newDate.getFullYear();
-                              let hour = newDate.getHours();
-                              let min = newDate.getMinutes();
-                              let period = "AM";
-
-                              // Convert hours to 12-hour format
-                              if (hour === 0) {
-                                hour = 12;
-                              } else if (hour >= 12) {
-                                period = "PM";
-                                if (hour > 12) {
-                                  hour -= 12;
-                                }
-                              }
-
-                              // Adding leading zero to minutes if necessary
-                              if (min < 10) {
-                                min = "0" + min;
-                              }
 
                               // Adding leading zero to day and month if necessary
                               if (day < 10) {
@@ -862,7 +847,30 @@ const Project = () => {
                                 month = "0" + month;
                               }
 
-                              return `${day}/${month}/${year} --${hour}:${min} ${period}`;
+                              if (includeTime) {
+                                let hour = newDate.getHours();
+                                let min = newDate.getMinutes();
+                                let period = "AM";
+
+                                // Convert hours to 12-hour format
+                                if (hour === 0) {
+                                  hour = 12;
+                                } else if (hour >= 12) {
+                                  period = "PM";
+                                  if (hour > 12) {
+                                    hour -= 12;
+                                  }
+                                }
+
+                                // Adding leading zero to minutes if necessary
+                                if (min < 10) {
+                                  min = "0" + min;
+                                }
+
+                                return `${day}/${month}/${year} ${hour}:${min} ${period}`;
+                              }
+
+                              return `${day}/${month}/${year}`;
                             };
                             return (
 
