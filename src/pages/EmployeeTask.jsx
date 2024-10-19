@@ -41,13 +41,19 @@ const Tasks = () => {
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/author`, {
           headers: { Authorization: token }
         });
-        
-        // Check the structure of the response
+
         console.log('API response:', response.data);
-        
-        // Ensure tasks is an array
+
         const tasksData = Array.isArray(response.data.tasks) ? response.data.tasks : [];
-        setTasks(tasksData);
+
+        // Sort tasks by taskDate (assuming taskDate exists, otherwise use taskEndDate)
+        const sortedTasks = tasksData.sort((a, b) => {
+          const dateA = new Date(a.taskDate);
+          const dateB = new Date(b.taskDate);
+          return dateB - dateA; // Sort in descending order (most recent first)
+        });
+
+        setTasks(sortedTasks);
       } catch (error) {
         console.error('Error fetching tasks:', error);
       }
@@ -228,7 +234,7 @@ const Tasks = () => {
                           </button>
                         </div>
                       </div>
-                      <ul className="nav nav-tabs tab-body-header rounded prtab-set" style={{ cursor: 'pointer',height:"fit-content" }} role="tablist">
+                      <ul className="nav nav-tabs tab-body-header rounded prtab-set" style={{ cursor: 'pointer', height: "fit-content" }} role="tablist">
                         <li className="nav-item">
                           <a
                             className={`nav-link ${filterStatus === "All" ? "active" : ""}`}
@@ -298,13 +304,12 @@ const Tasks = () => {
                                 {task.projectName}
                                 <br />
                                 <span
-                                  className={`badge ${
-                                    taskStatuses[task._id] === "Not Started"
-                                      ? "bg-warning text-dark"
-                                      : taskStatuses[task._id] === "In Progress"
-                                        ? "bg-info text-dark"
-                                        : "bg-success"
-                                  }`}
+                                  className={`badge ${taskStatuses[task._id] === "Not Started"
+                                    ? "bg-warning text-dark"
+                                    : taskStatuses[task._id] === "In Progress"
+                                      ? "bg-info text-dark"
+                                      : "bg-success"
+                                    }`}
                                 >
                                   {taskStatuses[task._id]}
                                 </span>
@@ -356,7 +361,7 @@ const Tasks = () => {
                                   }}
                                   onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage.replace('uploads/', '')}`)}
                                 />
-                                <br/>
+                                <br />
                                 {task.taskAssignPerson.employeeName}
                               </td>
                               <td>
@@ -406,10 +411,9 @@ const Tasks = () => {
                           <div className="col-md-4 mb-4" key={task._id}>
                             <div className="card task-card" style={{ width: "18rem" }}>
                               <div className="card-body dd-handle">
-                                <div className="d-flex justify-content-between">
-
+                                <div className="">
                                   <h5 className="fw-bold">{index + 1}. {task.projectName}</h5>
-
+                                  <div className="text-muted"style={{marginTop:"-0.8rem", marginLeft:"1.5rem"}}>{getFormattedDate(task.taskDate)}</div>
                                 </div>
                                 <div className="task-info d-flex align-items-center justify-content-between">
                                   <h6 className="py-1 px-2 rounded-1 d-inline-block fw-bold small-14 mb-0">
