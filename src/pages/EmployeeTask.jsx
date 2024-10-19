@@ -4,6 +4,7 @@ import Header from "../employeeCompt/EmployeeHeader";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import "./Loading.css";
+import io from 'socket.io-client';
 
 const Tasks = () => {
   const [viewMode, setViewMode] = useState("grid");
@@ -16,10 +17,14 @@ const Tasks = () => {
   const [filterStatus, setFilterStatus] = useState("All");
   const [selectedTask, setSelectedTask] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [content, setContent] = useState('');
+  const [files, setFiles] = useState([]);
+  const [notifications, setNotifications] = useState({});
   const messageContainerRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [tasksPerPage, setTasksPerPage] = useState(10);
+  const messageInputRef = useRef(null);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,6 +104,8 @@ const Tasks = () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/taskMessages/${taskId}`);
       setMessages(response.data);
+      // Reset notification count for this task
+      setNotifications(prev => ({ ...prev, [taskId]: 0 }));
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -107,20 +114,37 @@ const Tasks = () => {
   const userName = userData.employeeName
     ;
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || !selectedTask) return;
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!content.trim() || !selectedTask) return;
+
+    const userData = JSON.parse(localStorage.getItem('emp_user'));
+    const senderId = userData.employeeName;
+
+    const formData = new FormData();
+    formData.append('content', content);
+    formData.append('senderId', senderId);
+    formData.append('taskId', selectedTask._id);
+
+    for (let file of files) {
+      formData.append('files', file);
+    }
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/taskMessage`, {
-        content: newMessage,
-        senderId: userName, // Assuming you store the employee ID in localStorage
-        taskId: selectedTask._id
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/taskMessage`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      setMessages([...messages, response.data]);
-      setNewMessage("");
+      setContent('');
+      setFiles([]);
     } catch (error) {
       console.error("Error sending message:", error);
     }
+  };
+
+  const handleFileChange = (e) => {
+    setFiles(Array.from(e.target.files));
   };
 
   useEffect(() => {
@@ -128,6 +152,54 @@ const Tasks = () => {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   }, [messages]);
+
+  useEffect(() => {
+    const newSocket = io(`${import.meta.env.VITE_BASE_URL}`);
+    setSocket(newSocket);
+
+    return () => newSocket.close();
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewTaskMessage = (message) => {
+      setMessages(prevMessages => [...prevMessages, message]);
+      setNotifications(prev => ({
+        ...prev,
+        [message.taskId]: (prev[message.taskId] || 0) + 1
+      }));
+    };
+
+    const handleNewTaskNotification = ({ taskId }) => {
+      setNotifications(prev => ({
+        ...prev,
+        [taskId]: (prev[taskId] || 0) + 1
+      }));
+    };
+
+    socket.on('new task message', handleNewTaskMessage);
+    socket.on('new task notification', handleNewTaskNotification);
+
+    return () => {
+      socket.off('new task message', handleNewTaskMessage);
+      socket.off('new task notification', handleNewTaskNotification);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    tasks.forEach(task => {
+      socket.emit('join task', task._id);
+    });
+
+    return () => {
+      tasks.forEach(task => {
+        socket.emit('leave task', task._id);
+      });
+    };
+  }, [socket, tasks]);
 
   // Modify filtering logic based on filterStatus and searchQuery
   const filteredTasks = Array.isArray(tasks) ? tasks.filter((task) => {
@@ -367,7 +439,7 @@ const Tasks = () => {
                               <td>
                                 <div className="d-flex align-items-center">
                                   <button
-                                    className="btn btn-outline-secondary btn-sm me-2"
+                                    className="btn btn-outline-secondary btn-sm me-2 position-relative"
                                     data-bs-toggle="modal"
                                     data-bs-target="#taskMessages"
                                     onClick={() => {
@@ -376,6 +448,11 @@ const Tasks = () => {
                                     }}
                                   >
                                     <i className="bi bi-chat-left-dots"></i>
+                                    {notifications[task._id] > 0 && (
+                                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {notifications[task._id]}
+                                      </span>
+                                    )}
                                   </button>
                                   <Link
                                     to="/images"
@@ -413,7 +490,7 @@ const Tasks = () => {
                               <div className="card-body dd-handle">
                                 <div className="">
                                   <h5 className="fw-bold">{index + 1}. {task.projectName}</h5>
-                                  <div className="text-muted"style={{marginTop:"-0.8rem", marginLeft:"1.5rem"}}>{getFormattedDate(task.taskDate)}</div>
+                                  <div className="text-muted" style={{ marginTop: "-0.8rem", marginLeft: "1.5rem" }}>{getFormattedDate(task.taskDate)}</div>
                                 </div>
                                 <div className="task-info d-flex align-items-center justify-content-between">
                                   <h6 className="py-1 px-2 rounded-1 d-inline-block fw-bold small-14 mb-0">
@@ -470,14 +547,21 @@ const Tasks = () => {
                                             </span>
                                           </div>
                                           <button
-                                            className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                            className="btn btn-outline-secondary btn-sm me-2 position-relative"
                                             data-bs-toggle="modal"
                                             data-bs-target="#taskMessages"
                                             onClick={() => {
                                               setSelectedTask(task);
                                               fetchMessages(task._id);
                                             }}
-                                          ></button>
+                                          >
+                                            <i className="bi bi-chat-left-dots"></i>
+                                            {notifications[task._id] > 0 && (
+                                              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                {notifications[task._id]}
+                                              </span>
+                                            )}
+                                          </button>
                                         </div>
                                       </li>
                                     </ul>
@@ -579,19 +663,66 @@ const Tasks = () => {
                     <strong>{message.senderId}: </strong>
                     {message.content}
                     <span className="px-3 text-muted">{new Date(message.createdAt).toLocaleString()}</span>
+                    {message.fileUrls && message.fileUrls.map((fileUrl, fileIndex) => {
+                      if (fileUrl) {
+                        const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}${fileUrl.replace('uploads/', '')}`;
+                        const fileExtension = cleanFileUrl.split('.').pop().toLowerCase();
+
+                        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                          return (
+                            <div key={fileIndex} className="px-3">
+                              <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer">
+                                <img src={cleanFileUrl} alt={`Attachment ${fileIndex + 1}`} style={{ maxWidth: '5rem', cursor: 'pointer' }} />
+                              </a>
+                            </div>
+                          );
+                        } else if (fileExtension === 'pdf') {
+                          return (
+                            <div key={fileIndex} className="px-3">
+                              <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer" className="">PDF File</a>
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div key={fileIndex} className="px-3">
+                              <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer" className="">Download File</a>
+                            </div>
+                          );
+                        }
+                      }
+                      return null;
+                    })}
                   </div>
                 ))}
               </div>
             </div>
             <div className="modal-footer">
-              <input
-                type="text"
-                className="form-control"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message..."
-              />
-              <button type="button" className="btn btn-primary" onClick={handleSendMessage}>Send</button>
+              <form onSubmit={handleSendMessage} className="w-100">
+                <div className="mb-3">
+                  <label htmlFor="currentMessage" className="form-label">Add Message</label>
+                  <textarea
+                    className="form-control"
+                    id="currentMessage"
+                    name="message"
+                    rows="3"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    required
+                    ref={messageInputRef}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="fileUpload" className="form-label">Upload Files</label>
+                  <input
+                    type="file"
+                    className="form-control"
+                    id="fileUpload"
+                    onChange={handleFileChange}
+                    multiple
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary">Send</button>
+              </form>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import { MultiSelect } from "react-multi-select-component";
@@ -7,6 +7,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Loading.css";
+import Select from 'react-select';
+import io from 'socket.io-client';
 
 const Tasks = () => {
   const location = useLocation();
@@ -142,7 +144,7 @@ const Tasks = () => {
   const [currentPage, setCurrentPage] = useState(1); // State for current page
   const [tasksPerPage, setTasksPerPage] = useState(10); // Default to 10 tasks per page
   const [selectedTaskId, setSelectedTaskId] = useState(null);
-  const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
 
   const fetchData = async () => {
@@ -168,7 +170,7 @@ const Tasks = () => {
         filteredTasks = filteredTasks.filter(task => task.projectName === filteredProjectName);
       }
       if (filteredEmployeeName) {
-        filteredTasks = filteredTasks.filter(task => 
+        filteredTasks = filteredTasks.filter(task =>
           task.taskAssignPerson.employeeName === filteredEmployeeName
         );
       }
@@ -409,9 +411,48 @@ const Tasks = () => {
     }) || [];
   // console.log(assignEmployee, 23423);
 
+  const [messages, setMessages] = useState([]);
+  const [content, setContent] = useState('');
+  const [files, setFiles] = useState([]);
+  const [notifications, setNotifications] = useState({});
+  const [selectTask, setSelectTask] = useState({});
+  const messageInputRef = useRef(null);
+  const [socket, setSocket] = useState(null);
+
   const userData = JSON.parse(localStorage.getItem('user')); // Assuming 'user' is the key where user info is stored
   const userId = userData._id; // User ID
   const userName = userData.username;
+
+  useEffect(() => {
+    const newSocket = io(`${import.meta.env.VITE_BASE_URL}`);
+    setSocket(newSocket);
+
+    return () => newSocket.close();
+  }, []);
+
+  useEffect(() => {
+    if (socket == null) return;
+
+    tasks.forEach(task => {
+      socket.emit('join task', task._id);
+    });
+
+    socket.on('new task message', (message) => {
+      setMessages(prevMessages => [...prevMessages, message]);
+    });
+
+    socket.on('new task notification', ({ taskId }) => {
+      setNotifications(prev => ({ ...prev, [taskId]: (prev[taskId] || 0) + 1 }));
+    });
+
+    return () => {
+      tasks.forEach(task => {
+        socket.emit('leave task', task._id);
+      });
+      socket.off('new task message');
+      socket.off('new task notification');
+    };
+  }, [socket, tasks]);
 
   const fetchTaskMessages = async (taskId) => {
     try {
@@ -424,19 +465,46 @@ const Tasks = () => {
 
   const handleSubmitMessage = async (e) => {
     e.preventDefault();
-    const messageContent = e.target.elements.message.value;
+    const userDetails = JSON.parse(localStorage.getItem('user'));
+    const senderId = userDetails.username;
+
+    const formData = new FormData();
+    formData.append('content', content);
+    formData.append('senderId', senderId);
+    formData.append('taskId', selectTask._id);
+
+    for (let file of files) {
+      formData.append('files', file);
+    }
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/taskMessage`, {
-        content: messageContent,
-        senderId: userName, // Sender ID from localStorage
-        taskId: selectedTaskId,
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/taskMessage`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      setMessages([...messages, response.data]); // Update messages
-      e.target.reset(); // Reset form
+      setContent('');
+      setFiles([]);
     } catch (error) {
-      console.error("Error submitting message:", error);
+      console.error("Error sending message:", error);
     }
+  };
+
+  const handleFileChange = (e) => {
+    setFiles(Array.from(e.target.files));
+  };
+
+  const handleOpenMessages = (task) => {
+    setSelectTask(task);
+    fetchTaskMessages(task._id);
+    setNotifications(prev => ({ ...prev, [task._id]: 0 }));
+
+    setTimeout(() => {
+      if (messageInputRef.current) {
+        messageInputRef.current.focus();
+        messageInputRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 300);
   };
 
   const globalSearch = () => {
@@ -462,7 +530,23 @@ const Tasks = () => {
     setCurrentPage(1); // Reset to first page when changing the number of tasks per page
   };
 
+  const projectOptions = projects.map(project => ({
+    value: project.projectName,
+    label: project.projectName
+  }));
+  // Custom styles for react-select
+  const customStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      backgroundColor: 'transparent',
+      border: 'none',
+      boxShadow: 'none',
+      '&:hover': {
+        borderColor: '#80bdff'
+      },
 
+    }),
+  };
 
 
 
@@ -663,7 +747,7 @@ const Tasks = () => {
                                   />
                                 </td>
                                 <td style={{ backgroundColor }}>
-                                  {task.taskAssignPerson.employeeName}
+                                  {task.taskAssignPerson && task.taskAssignPerson.employeeName ? task.taskAssignPerson.employeeName : 'Unassigned'}
                                   <p className="text-muted">By:-{task.assignedBy}</p>
                                 </td>
                                 <td style={{ backgroundColor }}>
@@ -715,11 +799,18 @@ const Tasks = () => {
                                   )}
 
                                   <button
-                                    className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                    className="btn btn-sm position-relative"
                                     data-bs-toggle="modal"
                                     data-bs-target="#taskMessage"
-                                    onClick={() => handleViewMessages(task._id)}
-                                  ></button>
+                                    onClick={() => handleOpenMessages(task)}
+                                  >
+                                    <i className="bi bi-chat-left-dots"></i>
+                                    {notifications[task._id] > 0 && (
+                                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {notifications[task._id]}
+                                      </span>
+                                    )}
+                                  </button>
                                 </td>
                               </tr>
                             );
@@ -772,7 +863,7 @@ const Tasks = () => {
                                 onChange={(e) => taskHandleChange(e, task._id)}
                                 style={{ resize: 'none' }}
                               />
-                              <p className="mb-1">Assigned to: {task.taskAssignPerson.employeeName}</p>
+                              <p className="mb-1">Assigned to: {task.taskAssignPerson && task.taskAssignPerson.employeeName ? task.taskAssignPerson.employeeName : 'Unassigned'}</p>
                               <p className="mb-1">By: {task.assignedBy}</p>
                               <input
                                 type="date"
@@ -819,12 +910,17 @@ const Tasks = () => {
                                   <span className="badge bg-success">Completed</span>
                                 )}
                                 <button
-                                  className="btn btn-sm btn-outline-secondary"
+                                  className="btn btn-sm position-relative"
                                   data-bs-toggle="modal"
                                   data-bs-target="#taskMessage"
-                                  onClick={() => handleViewMessages(task._id)}
+                                  onClick={() => handleOpenMessages(task)}
                                 >
-                                  <i className="bi bi-chat-left-dots"></i> Messages
+                                  <i className="bi bi-chat-left-dots"></i>
+                                  {notifications[task._id] > 0 && (
+                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                      {notifications[task._id]}
+                                    </span>
+                                  )}
                                 </button>
                               </div>
                             </div>
@@ -913,6 +1009,19 @@ const Tasks = () => {
                     <div className="modal-body">
                       <div className="mb-3">
                         <label className="form-label">Project Name <span className="text-danger">*</span></label>
+                        {/* <Select
+                          className="form-control"
+                          styles={customStyles}
+                          options={projectOptions}
+                          placeholder="Search and select project"
+                          onChange={(selectedOption) => {
+                            setFormData({
+                              ...formData,
+                              projectName: selectedOption.value
+                            });
+                          }}
+                          value={projectOptions.find(option => option.value === formData.projectName)}
+                        /> */}
                         <select
                           className="form-select"
                           placeholder="Add Category"
@@ -1016,6 +1125,7 @@ const Tasks = () => {
                           </label>
                           <div>
                             <MultiSelect
+
                               options={assignEmployee}
                               value={selectedEmployees}
                               onChange={setSelectedEmployees}
@@ -1348,23 +1458,54 @@ const Tasks = () => {
                   </div>
                 </div>
               </div>
-
               {/* Message Modal */}
               <div className="modal fade" id="taskMessage" tabIndex={-1} aria-labelledby="taskMessageLabel" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered modal-lg">
                   <div className="modal-content">
                     <div className="modal-header">
-                      <h5 className="modal-title" id="addUserLabel">Task Messages</h5>
+                      <h5 className="modal-title" id="taskMessageLabel">{selectTask.projectName} - Task Messages</h5>
                       <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div className="modal-body">
-                      <ul className="list-group">
-                        {messages.map(message => (
-                          <li key={message._id} className="list-group-item">
-                            <div className="d-flex border-bottom py-1">
-                              <strong>{message.senderId}: </strong> -
-                              <span className="px-3 text-break">{message.content}</span>
-                              <span className="px-3 text-muted">{new Date(message.createdAt).toLocaleString()}</span>
+                    <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                      {/* Message List */}
+                      <ul className="list-group mb-3">
+                        {messages.map((message) => (
+                          <li key={message._id}>
+                            <div className="border-bottom">
+                              <div className="d-flex py-1">
+                                <h6 className="fw-bold px-3">{message.senderId}</h6> -
+                                <span className="px-3 text-break">{message.content}</span>
+                                {message.fileUrls && message.fileUrls.map((fileUrl, index) => {
+                                  if (fileUrl) {
+                                    const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}${fileUrl.replace('uploads/', '')}`;
+                                    const fileExtension = cleanFileUrl.split('.').pop().toLowerCase();
+
+                                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                      return (
+                                        <div key={index} className="px-3">
+                                          <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer">
+                                            <img src={cleanFileUrl} alt={`Attachment ${index + 1}`} style={{ maxWidth: '5rem', cursor: 'pointer' }} />
+                                          </a>
+                                        </div>
+                                      );
+                                    } else if (fileExtension === 'pdf') {
+                                      return (
+                                        <div key={index} className="px-3">
+                                          <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer" className="">PDF File</a>
+                                        </div>
+                                      );
+                                    } else {
+                                      return (
+                                        <div key={index} className="px-3">
+                                          <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer" className="">Download File</a>
+                                        </div>
+                                      );
+                                    }
+                                  }
+                                  return null;
+                                })}
+                              </div>
+                              <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
                             </div>
                           </li>
                         ))}
@@ -1379,7 +1520,20 @@ const Tasks = () => {
                             id="currentMessage"
                             name="message"
                             rows="3"
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
                             required
+                            ref={messageInputRef}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label htmlFor="fileUpload" className="form-label">Upload Files</label>
+                          <input
+                            type="file"
+                            className="form-control"
+                            id="fileUpload"
+                            onChange={handleFileChange}
+                            multiple
                           />
                         </div>
                         <button type="submit" className="btn btn-dark">Submit</button>

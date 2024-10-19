@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Sidebar from "../employeeCompt/EmployeeSidebar";
 import Header from "../employeeCompt/EmployeeHeader";
 import { Link } from "react-router-dom";
@@ -62,6 +62,7 @@ const Project = () => {
   const [files, setFiles] = useState([]);
   const [socket, setSocket] = useState(null);
   const [notifications, setNotifications] = useState({});
+  const messageInputRef = useRef(null);
 
   useEffect(() => {
     const newSocket = io(`${import.meta.env.VITE_BASE_URL}`);
@@ -163,6 +164,14 @@ const Project = () => {
     fetchProjectMessages(project._id);
     // Clear notifications for this project
     setNotifications(prev => ({...prev, [project._id]: 0}));
+    
+    // Use setTimeout to ensure the modal is open before we try to focus and scroll
+    setTimeout(() => {
+      if (messageInputRef.current) {
+        messageInputRef.current.focus();
+        messageInputRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 300); // Adjust this delay if needed
   };
 
   return (
@@ -342,9 +351,9 @@ const Project = () => {
                     </h5>
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
-                  <div className="modal-body">
+                  <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
                     {/* Message List */}
-                    <ul className="list-group">
+                    <ul className="list-group mb-3">
                       {messages.map((message) => (
                         <li key={message._id}>
                           <div className="border-bottom">
@@ -352,32 +361,37 @@ const Project = () => {
                               <h6 className="fw-bold px-3">{message.senderId}</h6> -
                               <span className="px-3 text-break">{message.content}</span>
                               {message.fileUrls && message.fileUrls.map((fileUrl, index) => {
-                                const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                                if (fileUrl) {
+                                  // Remove 'uploads/' from the file path and add VITE_BASE_URL
+                                  const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}${fileUrl.replace('uploads/', '')}`;
+                                  const fileExtension = cleanFileUrl.split('.').pop().toLowerCase();
 
-                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                                  // Display image if the file is an image
-                                  return (
-                                    <div key={index} className="px-3">
-                                      <a href={fileUrl} target="_blank" rel="noopener noreferrer">
-                                        <img src={fileUrl} alt={`Attachment ${index + 1}`} style={{ maxWidth: '5rem', cursor: 'pointer' }} />
-                                      </a>
-                                    </div>
-                                  );
-                                } else if (fileExtension === 'pdf') {
-                                  // Provide a download link for PDF
-                                  return (
-                                    <div key={index} className="px-3">
-                                      <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="">PDF File</a>
-                                    </div>
-                                  );
-                                } else {
-                                  // Default for other file types (e.g., DOC, XLS)
-                                  return (
-                                    <div key={index} className="px-3">
-                                      <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="">Download File</a>
-                                    </div>
-                                  );
+                                  if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                    // Display image if the file is an image
+                                    return (
+                                      <div key={index} className="px-3">
+                                        <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer">
+                                          <img src={cleanFileUrl} alt={`Attachment ${index + 1}`} style={{ maxWidth: '5rem', cursor: 'pointer' }} />
+                                        </a>
+                                      </div>
+                                    );
+                                  } else if (fileExtension === 'pdf') {
+                                    // Provide a download link for PDF
+                                    return (
+                                      <div key={index} className="px-3">
+                                        <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer" className="">PDF File</a>
+                                      </div>
+                                    );
+                                  } else {
+                                    // Default for other file types (e.g., DOC, XLS)
+                                    return (
+                                      <div key={index} className="px-3">
+                                        <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer" className="">Download File</a>
+                                      </div>
+                                    );
+                                  }
                                 }
+                                return null;
                               })}
                             </div>
                             <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
@@ -400,6 +414,7 @@ const Project = () => {
                           value={content}
                           onChange={(e) => setContent(e.target.value)}
                           required
+                          ref={messageInputRef}
                         />
                       </div>
                       <div className="mb-3">
@@ -409,7 +424,7 @@ const Project = () => {
                           className="form-control"
                           id="fileUpload"
                           onChange={messageFileChange}
-                          multiple // Allow multiple files
+                          multiple
                         />
                       </div>
                       <button type="submit" className="btn btn-dark">Submit</button>
