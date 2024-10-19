@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
-// import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,6 +12,7 @@ const Member = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [viewMode, setViewMode] = useState('grid');
 
   //CREATE EMPLOYEE
   const [formData, setFormData] = useState({
@@ -393,22 +394,12 @@ const Member = () => {
                               aria-label="search"
                               aria-describedby="addon-wrapping"
                               value={searchQuery}
-                              // onChange={(e) => setSearchQuery(e.target.value)}
                               onChange={(e) => {
                                 setSearchQuery(e.target.value);
                                 handleSearch(e.target.value);
                               }}
                               placeholder="Enter Employee Name"
                             />
-                            {/* <button
-                              type="button"
-                              className="input-group-text add-member-top"
-                              id="addon-wrappingone"
-                              data-bs-toggle="modal"
-                              data-bs-target="#addUser"
-                            >
-                              <i className="fa fa-plus" />
-                            </button> */}
                             <button
                               type="button"
                               className="input-group-text"
@@ -420,118 +411,243 @@ const Member = () => {
                           </div>
                         </div>
                       </div>
+
+                      <div className="d-flex justify-content-between">
+                        <div></div>
+                        <div className="d-flex gap-2">
+                          <button
+                            className={`bi bi-list-task ${viewMode === 'list' ? 'bg-primary' : 'bg-secondary'} text-white border-0 rounded`}
+                            onClick={() => setViewMode('list')}
+                          ></button>
+                          <button
+                            className={`bi bi-grid-3x3-gap-fill ${viewMode === 'grid' ? 'bg-primary' : 'bg-secondary'} text-white border-0 rounded`}
+                            onClick={() => setViewMode('grid')}
+                          ></button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
+
                 {/* Row End */}
                 {loading ? (
                   <div className="custom-loader "></div>
                 ) : (
-                  <div className="row g-3 row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-2 row-deck py-1 pb-4">
-                    {employees.map((employee) => {
-                      const newDate = new Date(employee?.joiningDate);
-                      const date = newDate.getDate();
-                      const month = newDate.getMonth() + 1; // months are 0-indexed
-                      const year = newDate.getFullYear();
-                      return (
-                        <div className="col" key={employee.employeeId}>
-                          <div className="card teacher-card">
-                            <div className="card-body d-flex">
-                              <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w220">
-                                <div className="position-relative d-inline-block">
-                                  <img
-                                    src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
-                                    alt=""
-                                    className="avatar xl rounded-circle img-thumbnail shadow-sm"
-                                    style={{
-                                      transition: 'transform 0.3s ease-in-out',
-                                      cursor: 'pointer',
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      e.target.style.transform = 'scale(2.5)';
-                                      e.target.style.zIndex = '100';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.target.style.transform = 'scale(1)';
-                                      e.target.style.zIndex = '1';
-                                    }}
-                                    onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`)}
-                                  />
+                  viewMode === 'grid' ? (
+                    <div className="row g-3 row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-2 row-deck py-1 pb-4">
+                      {employees.map((employee) => {
+                        const newDate = new Date(employee?.joiningDate);
+                        const date = newDate.getDate();
+                        const month = newDate.getMonth() + 1; // months are 0-indexed
+                        const year = newDate.getFullYear();
+                        return (
+                          <div className="col" key={employee.employeeId}>
+                            <div className="card teacher-card">
+                              <div className="card-body d-flex">
+                                <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w220">
+                                  <div className="position-relative d-inline-block">
+                                    <img
+                                      src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
+                                      alt=""
+                                      className="avatar xl rounded-circle img-thumbnail shadow-sm"
+                                      style={{
+                                        transition: 'transform 0.3s ease-in-out',
+                                        cursor: 'pointer',
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.target.style.transform = 'scale(2.5)';
+                                        e.target.style.zIndex = '100';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.target.style.transform = 'scale(1)';
+                                        e.target.style.zIndex = '1';
+                                      }}
+                                      onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`)}
+                                    />
+                                  </div>
+                                  <div className="about-info mt-3">
+                                    <div className="followers me-2">
+                                      <i className="bi bi-person-vcard-fill text-danger fs-6 me-2" />
+                                      <span>{employee.employeeId}</span>
+                                    </div>
+                                    <div className="followers me-2">
+                                      {/* <i className="bi bi-person-fill text-primary fs-6 me-2" />
+                        <span>{employee.username}</span> */}
+                                    </div>
+                                    <div className="own-video">
+                                      <i className="bi bi-telephone-fill text-success fs-6 me-2" />
+                                      <span>{employee.phone}</span>
+                                    </div>
+                                    <p className="rounded-1 d-inline-block fw-bold small-11 mb-1 d-flex">
+                                      <i className="bi bi-envelope-at-fill text-primary fs-6 me-1" />
+                                      {employee.emailid}
+                                    </p>
+                                  </div>
                                 </div>
-                                <div className="about-info mt-3">
-                                  <div className="followers me-2">
-                                    <i className="bi bi-person-vcard-fill text-danger fs-6 me-2" />
-                                    <span>{employee.employeeId}</span>
-                                  </div>
-                                  <div className="followers me-2">
-                                    {/* <i className="bi bi-person-fill text-primary fs-6 me-2" />
-                      <span>{employee.username}</span> */}
-                                  </div>
-                                  <div className="own-video">
-                                    <i className="bi bi-telephone-fill text-success fs-6 me-2" />
-                                    <span>{employee.phone}</span>
-                                  </div>
-                                  <p className="rounded-1 d-inline-block fw-bold small-11 mb-1 d-flex">
-                                    <i className="bi bi-envelope-at-fill text-primary fs-6 me-1" />
-                                    {employee.emailid}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="teacher-info border-start ps-xl-4 ps-md-3 ps-sm-4 ps-4 w-100">
-                                <div>
-                                  <div className="d-flex justify-content-between">
-                                    <h6 className="mb-0 mt-2 fw-bold d-block fs-6">
-                                      {employee.employeeName}
-                                    </h6>
-                                    <div
-                                      className="btn-group"
-                                      role="group"
-                                      aria-label="Basic outlined example"
-                                    >
-                                      <button
-                                        type="button"
-                                        className="btn btn-outline-secondary"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editemp"
-                                        onClick={() => setToEdit(employee._id)}
+                                <div className="teacher-info border-start ps-xl-4 ps-md-3 ps-sm-4 ps-4 w-100">
+                                  <div>
+                                    <div className="d-flex justify-content-between">
+                                      <h6 className="mb-0 mt-2 fw-bold d-block fs-6">
+                                        {employee.employeeName}
+                                      </h6>
+                                      <div
+                                        className="btn-group"
+                                        role="group"
+                                        aria-label="Basic outlined example"
                                       >
-                                        <i className="icofont-edit text-success" />
-                                      </button>
-                                      <button
-                                        type="button"
-                                        className="btn btn-outline-secondary"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteproject"
-                                        onClick={() => {
-                                          setDeletableId(employee._id);
-                                        }}
-                                      >
-                                        <i className="icofont-ui-delete text-danger" />
-                                      </button>
+                                        <button
+                                          type="button"
+                                          className="btn btn-outline-secondary"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#editemp"
+                                          onClick={() => setToEdit(employee._id)}
+                                        >
+                                          <i className="icofont-edit text-success" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          className="btn btn-outline-secondary"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#deleteproject"
+                                          onClick={() => {
+                                            setDeletableId(employee._id);
+                                          }}
+                                        >
+                                          <i className="icofont-ui-delete text-danger" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div className="d-flex justify-content-between">
+                                      <span className="light-info-bg py-1 px-2 rounded-1 d-inline-block fw-bold small-11 mb-0 mt-1">
+                                        <i className="bi bi-calendar-check-fill text-primary fs-6 me-2" />
+                                        {date}/{month}/{year}
+                                      </span>
+                                      <span className="light-info-bg p-2 rounded-1 d-inline-block fw-bold small-11 mb-0 mt-1">
+                                        {employee.designation}
+                                      </span>
                                     </div>
                                   </div>
-                                  <div className="d-flex justify-content-between">
-                                    <span className="light-info-bg py-1 px-2 rounded-1 d-inline-block fw-bold small-11 mb-0 mt-1">
-                                      <i className="bi bi-calendar-check-fill text-primary fs-6 me-2" />
-                                      {date}/{month}/{year}
-                                    </span>
-                                    <span className="light-info-bg p-2 rounded-1 d-inline-block fw-bold small-11 mb-0 mt-1">
-                                      {employee.designation}
-                                    </span>
+                                  <div className="video-setting-icon mt-2 pt-2 border-top">
+                                    <p>{employee.description}</p>
                                   </div>
-                                </div>
-                                <div className="video-setting-icon mt-2 pt-2 border-top">
-                                  <p>{employee.description}</p>
-                                </div>
-                                <div className="d-flex justify-content-center">
+                                  <div>
+                                    <Link
+                                      to="/projects"
+                                      state={{ employeeName: employee.employeeName }}
+                                      className="btn btn-sm btn-outline-secondary me-2"
+                                    >
+                                      View Projects
+                                    </Link>
+                                    <Link
+                                      to="/tasks"
+                                      state={{ employeeName: employee.employeeName }}
+                                      className="btn btn-sm btn-outline-secondary"
+                                    >
+                                      View Tasks
+                                    </Link>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="row clearfix">
+                      <div className="col-md-12">
+                        <div className="card">
+                          <div className="card-body">
+                            <table className="table table-hover align-middle mb-0">
+                              <thead>
+                                <tr>
+                                  <th>Employee</th>
+                                  <th>Employee ID</th>
+                                  <th>Phone</th>
+                                  <th>Email</th>
+                                  <th>Department</th>
+                                  <th>Designation</th>
+                                  <th>Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {employees.map((employee) => (
+                                  <tr key={employee.employeeId}>
+                                    <td>
+                                      <div className="d-flex align-items-center">
+                                        <img
+                                          src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
+                                          alt=""
+                                          className="avatar lg rounded-circle img-thumbnail"
+                                          style={{
+                                            transition: 'transform 0.3s ease-in-out',
+                                            cursor: 'pointer',
+                                            marginRight: '10px'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.target.style.transform = 'scale(2.5)';
+                                            e.target.style.zIndex = '100';
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.target.style.transform = 'scale(1)';
+                                            e.target.style.zIndex = '1';
+                                          }}
+                                          onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`)}
+                                        />
+                                        <div>
+                                          <h6 className="mb-0">{employee.employeeName}</h6>
+                                          <span>{new Date(employee.joiningDate).toLocaleDateString()}</span>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td>{employee.employeeId}</td>
+                                    <td>{employee.phone}</td>
+                                    <td>{employee.emailid}
+                                      <Link
+                                        to="/projects"
+                                        state={{ employeeName: employee.employeeName }}
+                                        className="btn btn-sm btn-outline-secondary me-2"
+                                      >
+                                        View Projects
+                                      </Link>
+                                      <Link
+                                        to="/tasks"
+                                        state={{ employeeName: employee.employeeName }}
+                                        className="btn btn-sm btn-outline-secondary"
+                                      >
+                                        View Tasks
+                                      </Link>
+                                    </td>
+                                    <td>{employee.department}</td>
+                                    <td>{employee.designation}</td>
+                                    <td>
+                                      <button
+                                        className="btn btn-sm btn-outline-secondary me-2"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editemp"
+                                        onClick={() => setToEdit(employee._id)}
+                                      >
+                                        <i className="icofont-edit text-success"></i>
+                                      </button>
+                                      <button
+                                        className="btn btn-sm btn-outline-secondary me-2"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteproject"
+                                        onClick={() => setDeletableId(employee._id)}
+                                      >
+                                        <i className="icofont-ui-delete text-danger"></i>
+                                      </button>
+
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    </div>
+                  )
                 )}
               </div>
             </div>
@@ -1075,7 +1191,7 @@ const Member = () => {
                         htmlFor="exampleFormControlInput877"
                         className="form-label"
                       >
-                        Employee Name
+                        Employee Name <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
@@ -1087,29 +1203,12 @@ const Member = () => {
                         onChange={handleChange}
                       />
                     </div>
-                    {/* <div className="mb-3">
-                      <label
-                        htmlFor="exampleFormControlInput977"
-                        className="form-label"
-                      >
-                        Employee Company
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="exampleFormControlInput977"
-                        placeholder="Employee Company"
-                        name="employeeCompany"
-                        value={formData.employeeCompany}
-                        onChange={handleChange}
-                      />
-                    </div> */}
                     <div className="mb-3">
                       <label
                         htmlFor="formFileMultipleoneone"
                         className="form-label"
                       >
-                        Employee Image
+                        Employee Image <span className="text-danger">*</span>
                       </label>
                       <input
                         className="form-control"
@@ -1127,7 +1226,7 @@ const Member = () => {
                               htmlFor="exampleFormControlInput1778"
                               className="form-label"
                             >
-                              Employee ID
+                              Employee ID <span className="text-danger">*</span>
                             </label>
                             <input
                               type="text"
@@ -1158,29 +1257,13 @@ const Member = () => {
                           </div>
                         </div>
                         <div className="row g-3 mb-3">
-                          {/* <div className="col">
-                            <label
-                              htmlFor="exampleFormControlInput177"
-                              className="form-label"
-                            >
-                              User Name
-                            </label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="exampleFormControlInput177"
-                              placeholder="User Name"
-                              name="username"
-                              value={formData.username}
-                              onChange={handleChange}
-                            />
-                          </div> */}
+
                           <div className="col">
                             <label
                               htmlFor="exampleFormControlInput477"
                               className="form-label"
                             >
-                              Email ID
+                              Email ID <span className="text-danger">*</span>
                             </label>
                             <input
                               type="email"
@@ -1197,7 +1280,7 @@ const Member = () => {
                               htmlFor="exampleFormControlInput277"
                               className="form-label"
                             >
-                              Password
+                              Password <span className="text-danger">*</span>
                             </label>
                             <input
                               type="Password"
@@ -1241,7 +1324,7 @@ const Member = () => {
                               value={formData.department}
                               onChange={handleChange}
                             />
-                            <select
+                            {/* <select
                               className="form-select mt-2"
                               aria-label="Department options"
                               onChange={(e) => setFormData({ ...formData, department: e.target.value })}
@@ -1252,11 +1335,19 @@ const Member = () => {
                               <option value="Marketing">Marketing</option>
                               <option value="Manager">Manager</option>
                               <button>Add Department</button>
-                            </select>
+                            </select> */}
                           </div>
                           <div className="col">
                             <label className="form-label">Designation</label>
-                            <select
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Enter designation"
+                              name="designation"
+                              value={formData.designation}
+                              onChange={handleChange}
+                            />
+                            {/* <select
                               className="form-select"
                               aria-label="Default select Project Category"
                               name="designation"
@@ -1289,7 +1380,7 @@ const Member = () => {
                                 Project Manager
                               </option>
                               <option value={"Other"}>Other</option>
-                            </select>
+                            </select> */}
                           </div>
                         </div>
                       </form>

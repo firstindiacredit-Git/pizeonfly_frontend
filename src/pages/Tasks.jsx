@@ -12,6 +12,7 @@ const Tasks = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [filteredProjectName, setFilteredProjectName] = useState(null);
+  const [filteredEmployeeName, setFilteredEmployeeName] = useState(null);
 
   const [viewMode, setViewMode] = useState('list'); // Default is list view
 
@@ -161,10 +162,16 @@ const Tasks = () => {
 
       formattedTasks.sort((a, b) => new Date(b.taskDate) - new Date(a.taskDate));
 
-      // Filter tasks if there's a filtered project name
-      const filteredTasks = filteredProjectName
-        ? formattedTasks.filter(task => task.projectName === filteredProjectName)
-        : formattedTasks;
+      // Filter tasks if there's a filtered project name or employee name
+      let filteredTasks = formattedTasks;
+      if (filteredProjectName) {
+        filteredTasks = filteredTasks.filter(task => task.projectName === filteredProjectName);
+      }
+      if (filteredEmployeeName) {
+        filteredTasks = filteredTasks.filter(task => 
+          task.taskAssignPerson.employeeName === filteredEmployeeName
+        );
+      }
 
       setTasks(filteredTasks);
       setProjects(projectsResponse.data);
@@ -179,6 +186,8 @@ const Tasks = () => {
   useEffect(() => {
     const projectNameFromState = location.state?.projectName;
     const projectNameFromStorage = localStorage.getItem('filteredProjectName');
+    const employeeNameFromState = location.state?.employeeName;
+    const employeeNameFromStorage = localStorage.getItem('filteredEmployeeName');
 
     if (projectNameFromState) {
       setFilteredProjectName(projectNameFromState);
@@ -187,17 +196,26 @@ const Tasks = () => {
       setFilteredProjectName(projectNameFromStorage);
     }
 
+    if (employeeNameFromState) {
+      setFilteredEmployeeName(employeeNameFromState);
+      localStorage.setItem('filteredEmployeeName', employeeNameFromState);
+    } else if (employeeNameFromStorage) {
+      setFilteredEmployeeName(employeeNameFromStorage);
+    }
+
     fetchData();
   }, []);
 
   useEffect(() => {
     fetchData();
-  }, [filteredProjectName]);
+  }, [filteredProjectName, filteredEmployeeName]);
 
   // Update the clearFilter function
   const clearFilter = () => {
     setFilteredProjectName(null);
+    setFilteredEmployeeName(null);
     localStorage.removeItem('filteredProjectName');
+    localStorage.removeItem('filteredEmployeeName');
     navigate('/tasks', { replace: true }); // This will clear the location state
   };
 
@@ -555,9 +573,10 @@ const Tasks = () => {
                         <i className="fa fa-search" />
                       </button>
                     </div>
-                    {filteredProjectName && (
+                    {(filteredProjectName || filteredEmployeeName) && (
                       <div className="d-flex justify-content-evenly mt-2">
-                        <strong>{filteredProjectName}</strong> -
+                        {filteredProjectName && <strong>Project: {filteredProjectName}</strong>}
+                        {filteredEmployeeName && <strong>Employee: {filteredEmployeeName}</strong>}
                         <button type="button" className="btn btn-dark btn-set-task w-sm-100 me-2" onClick={clearFilter}>Clear Filter</button>
                       </div>
                     )}
@@ -893,7 +912,7 @@ const Tasks = () => {
                     </div>
                     <div className="modal-body">
                       <div className="mb-3">
-                        <label className="form-label">Project Name</label>
+                        <label className="form-label">Project Name <span className="text-danger">*</span></label>
                         <select
                           className="form-select"
                           placeholder="Add Category"
@@ -976,7 +995,7 @@ const Tasks = () => {
                                 htmlFor="datepickerdedone"
                                 className="form-label"
                               >
-                                Task End Date
+                                Task End Date <span className="text-danger">*</span>
                               </label>
                               <input
                                 type="date"
@@ -993,7 +1012,7 @@ const Tasks = () => {
                       <div className="row g-3 mb-3">
                         <div className="col-sm">
                           <label className="form-label">
-                            Task Assign Person
+                            Task Assign Person <span className="text-danger">*</span>
                           </label>
                           <div>
                             <MultiSelect
@@ -1029,7 +1048,7 @@ const Tasks = () => {
                           htmlFor="exampleFormControlTextarea786"
                           className="form-label"
                         >
-                          Task Name
+                          Task Name <span className="text-danger">*</span>
                         </label>
                         <textarea
                           className="form-control"

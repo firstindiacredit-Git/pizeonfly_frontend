@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import io from 'socket.io-client';
 import { MultiSelect } from "react-multi-select-component";
@@ -115,29 +115,62 @@ const Project = () => {
   const [selectProject, setSelectProject] = useState({});
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [activeTab, setActiveTab] = useState("All");
-  useEffect(() => {
-    const fetchProjects = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/projects`
-        );
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [filteredEmployeeName, setFilteredEmployeeName] = useState(null);
 
-        console.log(response.data, 'projects');
-        const sortedProjects = response?.data?.sort(
-          (a, b) => new Date(b.projectDate) - new Date(a.projectDate)
-        );
-        setProjects(sortedProjects);
-        setFilteredProjects(sortedProjects);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  useEffect(() => {
+    const employeeNameFromState = location.state?.employeeName;
+    const employeeNameFromStorage = localStorage.getItem('filteredEmployeeName');
+
+    if (employeeNameFromState) {
+      setFilteredEmployeeName(employeeNameFromState);
+      localStorage.setItem('filteredEmployeeName', employeeNameFromState);
+    } else if (employeeNameFromStorage) {
+      setFilteredEmployeeName(employeeNameFromStorage);
+    }
 
     fetchProjects();
   }, []);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [filteredEmployeeName]);
+
+  const fetchProjects = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}api/projects`
+      );
+
+      let projectsData = response.data;
+
+      if (filteredEmployeeName) {
+        projectsData = projectsData.filter(project =>
+          project.taskAssignPerson.some(person => person.employeeName === filteredEmployeeName)
+        );
+      }
+
+      const sortedProjects = projectsData.sort(
+        (a, b) => new Date(b.projectDate) - new Date(a.projectDate)
+      );
+
+      setProjects(sortedProjects);
+      setFilteredProjects(sortedProjects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearFilter = () => {
+    setFilteredEmployeeName(null);
+    localStorage.removeItem('filteredEmployeeName');
+    navigate('/projects', { replace: true });
+  };
+
   useEffect(() => {
     filterProjects();
   }, [activeTab, projects, searchTerm]);
@@ -379,7 +412,7 @@ const Project = () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/clients`);
         console.log(response.data);
-        
+
         setClients(response.data);
       } catch (error) {
         console.error("Error fetching clients:", error);
@@ -524,7 +557,7 @@ const Project = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      
+
       // The server will emit the socket event, so we don't need to update messages here
       setContent('');
       setFiles([]);
@@ -572,8 +605,8 @@ const Project = () => {
               <div className="container-xxl">
                 <div className="row align-items-center">
                   <div className="border-bottom mb-4">
-                    <div className="card-header py-3 px-0 d-sm-flex align-items-center justify-content-between ">
-                      <h3 className="fw-bold py-3 mb-0">Projects</h3>
+                    <div className="card-header py-3 px-0 d-sm-flex align-items-center justify-content-between border-bottom">
+                      <h3 className="fw-bold flex-fill mb-0 mt-sm-0">Projects</h3>
                       <div className="d-flex me-2">
                         {role === 'superadmin' && (
                           <button
@@ -646,6 +679,19 @@ const Project = () => {
                         </div>
                       </div>
 
+                      {filteredEmployeeName && (
+                        <div className="d-flex justify-content-evenly mt-3 gap-2">
+                          <strong className="mt-1">Projects for: {filteredEmployeeName} </strong>
+                          <button
+                            type="button"
+                            className="btn btn-dark btn-set-task"
+                            onClick={clearFilter}
+                          >
+                            Clear Filter
+                          </button>
+                        </div>
+                      )}
+
                       <div className="order-0 ms-1">
                         <div className="input-group">
                           <input
@@ -687,7 +733,7 @@ const Project = () => {
                                 <tr>
                                   <th>Sr.No.</th>
                                   <th>Project Name</th>
-                                  <th style={{width:"6rem"}}>Clients</th>
+                                  <th style={{ width: "6rem" }}>Clients</th>
                                   <th>Start Date</th>
                                   <th>End Date</th>
                                   <th>Members</th>
@@ -980,7 +1026,7 @@ const Project = () => {
                         htmlFor="exampleFormControlInput77"
                         className="form-label"
                       >
-                        Project Name
+                        Project Name <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
@@ -993,7 +1039,15 @@ const Project = () => {
                       />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">Project Category</label>
+                      <label className="form-label">Project Category <span className="text-danger">*</span></label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Project Category"
+                        name="projectCategory"
+                        value={formData.projectCategory}
+                        onChange={handleChange}
+                      />
                       <select
                         className="form-select"
                         aria-label="Default select Project Category"
@@ -1039,7 +1093,7 @@ const Project = () => {
                               htmlFor="datepickerded"
                               className="form-label"
                             >
-                              Project Start Date
+                              Project Start Date <span className="text-danger">*</span>
                             </label>
                             <input
                               type="date"
@@ -1055,7 +1109,7 @@ const Project = () => {
                               htmlFor="datepickerdedone"
                               className="form-label"
                             >
-                              Project End Date
+                              Project End Date <span className="text-danger">*</span>
                             </label>
                             <input
                               type="date"
@@ -1073,7 +1127,7 @@ const Project = () => {
                               htmlFor="formFileMultipleone"
                               className="form-label"
                             >
-                              Project Assign Person
+                              Project Assign Person <span className="text-danger">*</span>
                             </label>
                             <div>
                               <MultiSelect
@@ -1458,7 +1512,7 @@ const Project = () => {
                                 }
                               })}
                             </div>
-                            <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft:"1rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
+                            <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
 
                           </div>
 
