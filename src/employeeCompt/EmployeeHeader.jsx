@@ -311,13 +311,13 @@ const Header = () => {
                               <strong>Aadhaar Card - </strong>
                               {aadhaarCard ? (
                                 aadhaarCard.toLowerCase().endsWith('.pdf') ? (
-                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard}`, 'pdf')}>View PDF</a>
+                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
                                 ) : (
                                   <img
-                                    src={`${import.meta.env.VITE_BASE_URL}${aadhaarCard}`}
+                                    src={`${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`}
                                     alt="Aadhaar Card"
                                     className="avatar sm img-thumbnail shadow-sm"
-                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard}`, 'image')}
+                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, 'image')}
                                     style={{ cursor: 'pointer' }}
                                   />
                                 )
@@ -330,13 +330,13 @@ const Header = () => {
                               <strong>Pan Card - </strong>
                               {panCard ? (
                                 panCard.toLowerCase().endsWith('.pdf') ? (
-                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard}`, 'pdf')}>View PDF</a>
+                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '') }`, 'pdf')}>View PDF</a>
                                 ) : (
                                   <img
-                                    src={`${import.meta.env.VITE_BASE_URL}${panCard}`}
+                                    src={`${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`}
                                     alt="Pan Card"
                                     className="avatar sm img-thumbnail shadow-sm"
-                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard}`, 'image')}
+                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, 'image')}
                                     style={{ cursor: 'pointer' }}
                                   />
                                 )
@@ -349,13 +349,13 @@ const Header = () => {
                               <strong>Resume - </strong>
                               {resume ? (
                                 resume.toLowerCase().endsWith('.pdf') ? (
-                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume}`, 'pdf')}>View PDF</a>
+                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
                                 ) : (
                                   <img
-                                    src={`${import.meta.env.VITE_BASE_URL}${resume}`}
+                                    src={`${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`}
                                     alt="Resume"
                                     className="avatar sm img-thumbnail shadow-sm"
-                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume}`, 'image')}
+                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, 'image')}
                                     style={{ cursor: 'pointer' }}
                                   />
                                 )

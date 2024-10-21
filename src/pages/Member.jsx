@@ -576,13 +576,13 @@ const Member = () => {
                                       <strong>Aadhaar Card - </strong>
                                       {employee.aadhaarCard ? (
                                         employee.aadhaarCard.toLowerCase().endsWith('.pdf') ? (
-                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard}`, 'pdf')}>View PDF</a>
+                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
                                         ) : (
                                           <img
-                                            src={`${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard}`}
+                                            src={`${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`}
                                             alt="Aadhaar Card"
                                             className="avatar sm img-thumbnail shadow-sm"
-                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard}`)}
+                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`)}
                                             style={{ cursor: 'pointer' }}
                                           />
                                         )
@@ -595,13 +595,13 @@ const Member = () => {
                                       <strong>Pan Card - </strong>
                                       {employee.panCard ? (
                                         employee.panCard.toLowerCase().endsWith('.pdf') ? (
-                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.panCard}`, 'pdf')}>View PDF</a>
+                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
                                         ) : (
                                           <img
-                                            src={`${import.meta.env.VITE_BASE_URL}${employee.panCard}`}
+                                            src={`${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`}
                                             alt="Pan Card"
                                             className="avatar sm img-thumbnail shadow-sm"
-                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.panCard}`)}
+                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`)}
                                             style={{ cursor: 'pointer' }}
                                           />
                                         )
@@ -614,13 +614,13 @@ const Member = () => {
                                       <strong>Resume - </strong>
                                       {employee.resume ? (
                                         employee.resume.toLowerCase().endsWith('.pdf') ? (
-                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.resume}`, 'pdf')}>View PDF</a>
+                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
                                         ) : (
                                           <img
-                                            src={`${import.meta.env.VITE_BASE_URL}${employee.resume}`}
+                                            src={`${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`}
                                             alt="Resume"
                                             className="avatar sm img-thumbnail shadow-sm"
-                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.resume}`)}
+                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`)}
                                             style={{ cursor: 'pointer' }}
                                           />
                                         )
