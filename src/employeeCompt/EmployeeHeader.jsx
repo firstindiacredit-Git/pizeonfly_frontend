@@ -8,6 +8,9 @@ const Header = () => {
   const [employeeName, setEmployeeName] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState("");
+  const [aadhaarCard, setAadhaarCard] = useState("");
+  const [panCard, setPanCard] = useState("");
+  const [resume, setResume] = useState("");
   const navigation = useNavigate();
 
   const [employeeData, setEmployeeData] = useState({
@@ -23,9 +26,13 @@ const Header = () => {
     department: "",
     designation: "",
     description: "",
+    aadhaarCard: null,
+    panCard: null,
+    resume: null,
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const dropdownRef = useRef(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("emp_token");
@@ -52,6 +59,9 @@ const Header = () => {
       });
       setEmployeeName(user.employeeName);
       setEmail(user.emailid);
+      setAadhaarCard(user.aadhaarCard);
+      setPanCard(user.panCard);
+      setResume(user.resume);
       // Remove 'uploads/' from the employeeImage path
       const modifiedImage = user.employeeImage.replace('uploads/', '');
       setImage(modifiedImage);
@@ -127,6 +137,17 @@ const Header = () => {
       formData.append("employeeImage", selectedFile);
     }
 
+    // Add new file uploads
+    if (employeeData.aadhaarCard) {
+      formData.append("aadhaarCard", employeeData.aadhaarCard);
+    }
+    if (employeeData.panCard) {
+      formData.append("panCard", employeeData.panCard);
+    }
+    if (employeeData.resume) {
+      formData.append("resume", employeeData.resume);
+    }
+
     try {
       const token = localStorage.getItem("emp_token");
       const employeeId = JSON.parse(localStorage.getItem("emp_user"))._id;
@@ -184,6 +205,50 @@ const Header = () => {
     window.open(imageUrl, '_blank');
   }, []);
 
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleFileClick = useCallback((e, fileUrl, fileType) => {
+    e.preventDefault(); // Prevent default link behavior
+    e.stopPropagation(); // Stop event propagation
+    if (fileType === 'pdf') {
+      setPdfUrl(fileUrl);
+    } else {
+      setSelectedImage(fileUrl);
+    }
+  }, []);
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+
+  const closePdfViewer = () => {
+    setPdfUrl(null);
+  };
+
+  useEffect(() => {
+    // Check if any required document is missing
+    const checkMissingDocuments = () => {
+      const user = JSON.parse(localStorage.getItem("emp_user"));
+      if (user && (!user.aadhaarCard || !user.panCard || !user.resume)) {
+        toast.error("Please update your profile with missing documents.", {
+          style: {
+            backgroundColor: "#4c3575",
+            color: "white",
+          },
+        });
+      }
+    };
+
+    // Initial check
+    checkMissingDocuments();
+
+    // Set up interval to check every minute
+    const intervalId = setInterval(checkMissingDocuments, 60000);
+
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <>
       <div className="header">
@@ -212,7 +277,7 @@ const Header = () => {
                   />
                 </a>
                 <div className="dropdown-menu rounded-lg shadow border-0 dropdown-animation dropdown-menu-end p-0 m-0"
-                     ref={dropdownRef}>
+                  ref={dropdownRef}>
                   <div className="card border-0 w280">
                     <div className="card-body pb-0">
                       <div className="d-flex py-1">
@@ -241,6 +306,64 @@ const Header = () => {
                             </span>
                           </p>
                           <p style={{ width: "210px", fontSize: "small" }}>{email}</p>
+                          {/* <img src={`${import.meta.env.VITE_BASE_URL}` + resume} alt="" className="avatar sm img-thumbnail shadow-sm" /> */}
+                            <div style={{marginTop:"-18px"}}>
+                              <strong>Aadhaar Card - </strong>
+                              {aadhaarCard ? (
+                                aadhaarCard.toLowerCase().endsWith('.pdf') ? (
+                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard}`, 'pdf')}>View PDF</a>
+                                ) : (
+                                  <img
+                                    src={`${import.meta.env.VITE_BASE_URL}${aadhaarCard}`}
+                                    alt="Aadhaar Card"
+                                    className="avatar sm img-thumbnail shadow-sm"
+                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard}`, 'image')}
+                                    style={{ cursor: 'pointer' }}
+                                  />
+                                )
+                              ) : (
+                                <i className="bi bi-x-lg text-danger"></i>
+                              )}
+                            </div>
+
+                            <div>
+                              <strong>Pan Card - </strong>
+                              {panCard ? (
+                                panCard.toLowerCase().endsWith('.pdf') ? (
+                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard}`, 'pdf')}>View PDF</a>
+                                ) : (
+                                  <img
+                                    src={`${import.meta.env.VITE_BASE_URL}${panCard}`}
+                                    alt="Pan Card"
+                                    className="avatar sm img-thumbnail shadow-sm"
+                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard}`, 'image')}
+                                    style={{ cursor: 'pointer' }}
+                                  />
+                                )
+                              ) : (
+                                <i className="bi bi-x-lg text-danger"></i>
+                              )}
+                            </div>
+
+                            <div>
+                              <strong>Resume - </strong>
+                              {resume ? (
+                                resume.toLowerCase().endsWith('.pdf') ? (
+                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume}`, 'pdf')}>View PDF</a>
+                                ) : (
+                                  <img
+                                    src={`${import.meta.env.VITE_BASE_URL}${resume}`}
+                                    alt="Resume"
+                                    className="avatar sm img-thumbnail shadow-sm"
+                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume}`, 'image')}
+                                    style={{ cursor: 'pointer' }}
+                                  />
+                                )
+                              ) : (
+                                <i className="bi bi-x-lg text-danger"></i>
+                              )}
+                            </div>
+
                         </div>
                       </div>
                       <div>
@@ -348,6 +471,37 @@ const Header = () => {
                         id="formFileMultipleoneone"
                         name="employeeImage"
                         onChange={handleFileChange}
+                      />
+                    </div>
+                    {/* New file upload fields */}
+                    <div className="mb-3">
+                      <label htmlFor="aadhaarCardUpload" className="form-label">Aadhaar Card</label>
+                      <input
+                        type="file"
+                        className="form-control"
+                        id="aadhaarCardUpload"
+                        name="aadhaarCard"
+                        onChange={(e) => setEmployeeData({ ...employeeData, aadhaarCard: e.target.files[0] })}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="panCardUpload" className="form-label">PAN Card</label>
+                      <input
+                        type="file"
+                        className="form-control"
+                        id="panCardUpload"
+                        name="panCard"
+                        onChange={(e) => setEmployeeData({ ...employeeData, panCard: e.target.files[0] })}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="resumeUpload" className="form-label">Resume</label>
+                      <input
+                        type="file"
+                        className="form-control"
+                        id="resumeUpload"
+                        name="resume"
+                        onChange={(e) => setEmployeeData({ ...employeeData, resume: e.target.files[0] })}
                       />
                     </div>
                     <div className="deadline-form">
@@ -486,6 +640,7 @@ const Header = () => {
                         onChange={handleChange}
                       />
                     </div>
+
                   </div>
                   <div className="modal-footer">
                     <button
@@ -550,10 +705,53 @@ const Header = () => {
               </div>
             </div>
 
+            {/* PDF Viewer Modal */}
+            {pdfUrl && (
+              <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal-dialog modal-dialog-centered modal-lg">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title">PDF Viewer</h5>
+                      <button type="button" className="btn-close" onClick={closePdfViewer}></button>
+                    </div>
+                    <div className="modal-body">
+                      <iframe src={pdfUrl} style={{ width: '100%', height: '500px' }} title="PDF Viewer"></iframe>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Image Viewer Modal */}
+            {selectedImage && !pdfUrl && (
+              <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal-dialog modal-dialog-centered modal-lg">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title">Image Viewer</h5>
+                      <button type="button" className="btn-close" onClick={closeImageModal}></button>
+                    </div>
+                    <div className="modal-body">
+                      <img src={selectedImage} alt="Enlarged view" style={{ width: '100%', height: 'auto' }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
           </div>
         </nav >
-        <ToastContainer />
+        <ToastContainer 
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div >
       <style jsx>{`
         .dropdown-menu {

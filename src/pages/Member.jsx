@@ -19,9 +19,11 @@ const Member = () => {
     employeeName: "",
     employeeCompany: "",
     employeeImage: null,
+    resume: null,
+    aadhaarCard: null,
+    panCard: null,
     employeeId: "",
     joiningDate: "",
-    // username: "",
     password: "",
     emailid: "",
     phone: "+91 ",
@@ -31,17 +33,16 @@ const Member = () => {
   });
 
   const handleChange = (e) => {
-    // console.log(e.target.name);
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleImageChange = (e) => {
+  const handleFileChange = (e) => {
     setFormData({
       ...formData,
-      employeeImage: e.target.files[0],
+      [e.target.name]: e.target.files[0],
     });
   };
 
@@ -51,9 +52,11 @@ const Member = () => {
     try {
       const formDataToSend = new FormData();
       for (let key in formData) {
-        formDataToSend.append(key, formData[key]);
+        if (formData[key] !== null) {
+          formDataToSend.append(key, formData[key]);
+        }
       }
-      console.log(formData);
+
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}api/employees`,
         formDataToSend,
@@ -71,9 +74,11 @@ const Member = () => {
         employeeName: "",
         employeeCompany: "",
         employeeImage: null,
+        resume: null,
+        aadhaarCard: null,
+        panCard: null,
         employeeId: "",
         joiningDate: "",
-        // username: "",
         password: "",
         emailid: "",
         phone: "+91 ",
@@ -86,9 +91,6 @@ const Member = () => {
       const modalElement = document.getElementById("createemp");
       const modal = window.bootstrap.Modal.getInstance(modalElement);
       modal.hide();
-
-      // console.log(response.data);
-      // window.location.reload();
 
       toast.success("Employee Added Successfully!", {
         style: {
@@ -189,6 +191,9 @@ const Member = () => {
     employeeName: "",
     employeeCompany: "",
     employeeImage: null,
+    resume: null,
+    aadhaarCard: null,
+    panCard: null,
     employeeId: "",
     joiningDate: "",
     username: "",
@@ -226,6 +231,9 @@ const Member = () => {
           employeeName: data.employeeName,
           employeeCompany: data.employeeCompany,
           employeeImage: data.employeeImage,
+          resume: data.resume,
+          aadhaarCard: data.aadhaarCard,
+          panCard: data.panCard,
           employeeId: data.employeeId,
           joiningDate: fStartDate,
           username: data.username,
@@ -252,23 +260,15 @@ const Member = () => {
     }));
   };
 
-  const handleImageChanges = (e) => {
-    const file = e.target.files[0];
-    setEmployeeData((prevState) => ({
-      ...prevState,
-      employeeImage: file,
-    }));
-  };
-
-
   const updateSubmit = async (e) => {
     e.preventDefault();
     try {
       const formDataToSend = new FormData();
       delete employeeData?.taskAssignPerson;
       for (const key in employeeData) {
-        // console.log(key);
-        formDataToSend.append(key, employeeData[key]);
+        if (employeeData[key] !== null) {
+          formDataToSend.append(key, employeeData[key]);
+        }
       }
       const response = await axios.put(
         `${import.meta.env.VITE_BASE_URL}api/employees/${toEdit}`,
@@ -288,6 +288,9 @@ const Member = () => {
             employeeName: updatedEmployee.employeeName,
             employeeCompany: updatedEmployee.employeeCompany,
             employeeImage: updatedEmployee.employeeImage,
+            resume: updatedEmployee.resume,
+            aadhaarCard: updatedEmployee.aadhaarCard,
+            panCard: updatedEmployee.panCard,
             employeeId: updatedEmployee.employeeId,
             joiningDate: updatedEmployee.joiningDate,
             username: updatedEmployee.username,
@@ -357,6 +360,29 @@ const Member = () => {
   const handleImageClick = useCallback((imageUrl) => {
     window.open(imageUrl, '_blank');
   }, []);
+
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
+
+
+  const handleFileClick = useCallback((e, fileUrl, fileType) => {
+    e.preventDefault(); // Prevent default link behavior
+    e.stopPropagation(); // Stop event propagation
+    if (fileType === 'pdf') {
+      // For PDFs, open in an iframe within the modal
+      setPdfUrl(fileUrl);
+    } else {
+      // For images, open in the modal as before
+      setSelectedImage(fileUrl);
+    }
+  }, []);
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+  const closePdfViewer = () => {
+    setPdfUrl(null);
+  };
+
 
   return (
     <>
@@ -471,8 +497,6 @@ const Member = () => {
                                       <span>{employee.employeeId}</span>
                                     </div>
                                     <div className="followers me-2">
-                                      {/* <i className="bi bi-person-fill text-primary fs-6 me-2" />
-                        <span>{employee.username}</span> */}
                                     </div>
                                     <div className="own-video">
                                       <i className="bi bi-telephone-fill text-success fs-6 me-2" />
@@ -546,6 +570,66 @@ const Member = () => {
                                       View Tasks
                                     </Link>
                                   </div>
+
+                                  <div className="mt-2">
+                                    <div>
+                                      <strong>Aadhaar Card - </strong>
+                                      {employee.aadhaarCard ? (
+                                        employee.aadhaarCard.toLowerCase().endsWith('.pdf') ? (
+                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard}`, 'pdf')}>View PDF</a>
+                                        ) : (
+                                          <img
+                                            src={`${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard}`}
+                                            alt="Aadhaar Card"
+                                            className="avatar sm img-thumbnail shadow-sm"
+                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard}`)}
+                                            style={{ cursor: 'pointer' }}
+                                          />
+                                        )
+                                      ) : (
+                                        <i className="bi bi-x-lg text-danger"></i>
+                                      )}
+                                    </div>
+
+                                    <div>
+                                      <strong>Pan Card - </strong>
+                                      {employee.panCard ? (
+                                        employee.panCard.toLowerCase().endsWith('.pdf') ? (
+                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.panCard}`, 'pdf')}>View PDF</a>
+                                        ) : (
+                                          <img
+                                            src={`${import.meta.env.VITE_BASE_URL}${employee.panCard}`}
+                                            alt="Pan Card"
+                                            className="avatar sm img-thumbnail shadow-sm"
+                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.panCard}`)}
+                                            style={{ cursor: 'pointer' }}
+                                          />
+                                        )
+                                      ) : (
+                                        <i className="bi bi-x-lg text-danger"></i>
+                                      )}
+                                    </div>
+
+                                    <div>
+                                      <strong>Resume - </strong>
+                                      {employee.resume ? (
+                                        employee.resume.toLowerCase().endsWith('.pdf') ? (
+                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.resume}`, 'pdf')}>View PDF</a>
+                                        ) : (
+                                          <img
+                                            src={`${import.meta.env.VITE_BASE_URL}${employee.resume}`}
+                                            alt="Resume"
+                                            className="avatar sm img-thumbnail shadow-sm"
+                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.resume}`)}
+                                            style={{ cursor: 'pointer' }}
+                                          />
+                                        )
+                                      ) : (
+                                        <i className="bi bi-x-lg text-danger"></i>
+                                      )}
+                                    </div>
+                                  </div>
+
                                 </div>
                               </div>
                             </div>
@@ -953,17 +1037,62 @@ const Member = () => {
                     </div>
                     <div className="mb-3">
                       <label
-                        htmlFor="formFileMultipleoneone"
+                        htmlFor="updateEmployeeImage"
                         className="form-label"
                       >
-                        Employee Profile
+                        Employee Image
                       </label>
                       <input
                         className="form-control"
                         type="file"
-                        id="formFileMultipleoneone"
+                        id="updateEmployeeImage"
                         name="employeeImage"
-                        onChange={handleImageChanges}
+                        onChange={updateChange}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label
+                        htmlFor="updateResume"
+                        className="form-label"
+                      >
+                        Resume
+                      </label>
+                      <input
+                        className="form-control"
+                        type="file"
+                        id="updateResume"
+                        name="resume"
+                        onChange={updateChange}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label
+                        htmlFor="updateAadhaar"
+                        className="form-label"
+                      >
+                        Aadhaar Card
+                      </label>
+                      <input
+                        className="form-control"
+                        type="file"
+                        id="updateAadhaar"
+                        name="aadhaarCard"
+                        onChange={updateChange}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label
+                        htmlFor="updatePan"
+                        className="form-label"
+                      >
+                        PAN Card
+                      </label>
+                      <input
+                        className="form-control"
+                        type="file"
+                        id="updatePan"
+                        name="panCard"
+                        onChange={updateChange}
                       />
                     </div>
                     <div className="deadline-form">
@@ -1215,7 +1344,52 @@ const Member = () => {
                         type="file"
                         id="formFileMultipleoneone"
                         name="employeeImage"
-                        onChange={handleImageChange}
+                        onChange={handleFileChange}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label
+                        htmlFor="resumeUpload"
+                        className="form-label"
+                      >
+                        Resume
+                      </label>
+                      <input
+                        className="form-control"
+                        type="file"
+                        id="resumeUpload"
+                        name="resume"
+                        onChange={handleFileChange}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label
+                        htmlFor="aadhaarUpload"
+                        className="form-label"
+                      >
+                        Aadhaar Card
+                      </label>
+                      <input
+                        className="form-control"
+                        type="file"
+                        id="aadhaarUpload"
+                        name="aadhaarCard"
+                        onChange={handleFileChange}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label
+                        htmlFor="panUpload"
+                        className="form-label"
+                      >
+                        PAN Card
+                      </label>
+                      <input
+                        className="form-control"
+                        type="file"
+                        id="panUpload"
+                        name="panCard"
+                        onChange={handleFileChange}
                       />
                     </div>
                     <div className="deadline-form">
@@ -1472,6 +1646,39 @@ const Member = () => {
                 </div>
               </div>
             </div>
+            {/* PDF Viewer Modal */}
+            {pdfUrl && (
+              <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal-dialog modal-dialog-centered modal-lg">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title">PDF Viewer</h5>
+                      <button type="button" className="btn-close" onClick={closePdfViewer}></button>
+                    </div>
+                    <div className="modal-body">
+                      <iframe src={pdfUrl} style={{ width: '100%', height: '500px' }} title="PDF Viewer"></iframe>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Image Viewer Modal */}
+            {selectedImage && !pdfUrl && (
+              <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal-dialog modal-dialog-centered modal-lg">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title">Image Viewer</h5>
+                      <button type="button" className="btn-close" onClick={closeImageModal}></button>
+                    </div>
+                    <div className="modal-body">
+                      <img src={selectedImage} alt="Enlarged view" style={{ width: '100%', height: 'auto' }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         </div>
         <ToastContainer />
