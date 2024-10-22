@@ -340,7 +340,7 @@ const Client = () => {
                                                                 <img
                                                                     src={
                                                                         `${import.meta.env.VITE_BASE_URL}` +
-                                                                        client.clientImage
+                                                                        client.clientImage.replace('uploads/', '')
                                                                     }
                                                                     alt=""
                                                                     className="avatar xl rounded-circle img-thumbnail shadow-sm"
@@ -415,7 +415,7 @@ const Client = () => {
                                                                 {clients.map(client => (
                                                                     <tr key={client._id}>
                                                                         <td>
-                                                                            <img className="avatar rounded-circle" src={`${import.meta.env.VITE_BASE_URL}${client.clientImage}`} alt="" />
+                                                                            <img className="avatar rounded-circle" src={`${import.meta.env.VITE_BASE_URL}${client.clientImage.replace('uploads/', '')}`} alt="" />
                                                                             <p className="fw-bold ms-1">{client.clientName}</p>
                                                                         </td>
                                                                         <td>{client.businessName}</td>
