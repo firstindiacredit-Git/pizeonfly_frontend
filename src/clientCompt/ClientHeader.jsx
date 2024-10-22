@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+// import bootstrap from 'bootstrap';
 
 const ClientHeader = () => {
   const [clientName, setClientName] = useState("");
@@ -18,6 +21,17 @@ const ClientHeader = () => {
     description: "",
   });
 
+  const [editClientData, setEditClientData] = useState({
+    clientName: "",
+    businessName: "",
+    clientImage: null,
+    clientEmail: "",
+    clientPassword: "",
+    clientPhone: "",
+    clientAddress: "",
+    clientGst: "",
+  });
+
   useEffect(() => {
     const token = localStorage.getItem("client_token");
 
@@ -30,6 +44,10 @@ const ClientHeader = () => {
         ...clientData,
         clientName: user.clientName,
         clientEmail: user.clientEmail,
+      });
+      setEditClientData({
+        ...user,
+        clientPassword: "", // Don't populate the password field
       });
       setClientName(user.clientName);
       setEmail(user.clientEmail);
@@ -58,11 +76,76 @@ const ClientHeader = () => {
     fetchData();
   }, []);
 
+  const handleEditChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "clientImage") {
+      setEditClientData({ ...editClientData, [name]: files[0] });
+    } else {
+      setEditClientData({ ...editClientData, [name]: value });
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("client_token");
+    const user = JSON.parse(localStorage.getItem("client_user"));
+    const formData = new FormData();
+
+    const allowedUpdates = ['clientName', 'businessName', 'clientImage', 'clientEmail', 'clientPhone', 'clientAddress', 'clientGst'];
+
+    allowedUpdates.forEach((key) => {
+      if (editClientData[key] !== null && editClientData[key] !== undefined) {
+        if (key === 'clientImage' && editClientData[key] instanceof File) {
+          formData.append(key, editClientData[key], editClientData[key].name);
+        } else {
+          formData.append(key, editClientData[key]);
+        }
+      }
+    });
+
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_BASE_URL}api/clients/${user._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const updatedUser = response.data;
+        localStorage.setItem("client_user", JSON.stringify(updatedUser));
+        setClientData(updatedUser);
+        setClientName(updatedUser.clientName);
+        setEmail(updatedUser.clientEmail);
+        setImage(updatedUser.clientImage);
+        toast.success("Profile updated successfully!"); // Toast notification
+        // Close the modal
+        const modal = document.getElementById('editProfile');
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        bootstrapModal.hide();
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      if (error.response) {
+        toast.error(`Failed to update profile: ${error.response.data.message || error.response.data.error}`);
+      } else if (error.request) {
+        toast.error("Failed to update profile: No response from server. Please try again.");
+      } else {
+        toast.error("Failed to update profile. Please try again.");
+      }
+    }
+  };
+
   return (
     <>
+      <ToastContainer /> {/* Add this at the top level of your component */}
       <div className="header">
         <nav className="navbar py-4">
-        <div className="container-xxl">
+          <div className="container-xxl">
             {/* header rightbar icon */}
             <div className="h-right d-flex align-items-center mr-5 mr-lg-0 order-1">
               <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center">
@@ -108,16 +191,15 @@ const ClientHeader = () => {
                       </div>
                     </div>
                     <div className="list-group m-2 ">
-                      {/* <Link
+                      <Link
                         type=""
                         className="list-group-item list-group-item-action border-0"
                         data-bs-toggle="modal"
-                        data-bs-target="#editemp"
-                        onClick={() => setToEdit(employees._id)}
+                        data-bs-target="#editProfile"
                       >
                         <i className="icofont-ui-user-group fs-6 me-3" /> Edit
                         Profile
-                      </Link> */}
+                      </Link>
                       {/* <Link
                         type=""
                         className="list-group-item list-group-item-action border-0"
@@ -154,6 +236,104 @@ const ClientHeader = () => {
             </div>
 
 
+            
+
+            {/* Edit Profile Modal */}
+            <div className="modal fade" id="editProfile" tabIndex={-1} aria-hidden="true">
+              <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title fw-bold">Edit Profile</h5>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                  </div>
+                  <div className="modal-body">
+                    <form onSubmit={handleEditSubmit}>
+                      {/* Add form fields for editing profile */}
+                      <div className="mb-3">
+                        <label htmlFor="clientName" className="form-label">Name</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="clientName"
+                          name="clientName"
+                          value={editClientData.clientName}
+                          onChange={handleEditChange}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="businessName" className="form-label">Business Name</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="businessName"
+                          name="businessName"
+                          value={editClientData.businessName}
+                          onChange={handleEditChange}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="clientImage" className="form-label">Profile Image</label>
+                        <input
+                          type="file"
+                          className="form-control"
+                          id="clientImage"
+                          name="clientImage"
+                          onChange={handleEditChange}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="clientEmail" className="form-label">Email</label>
+                        <input
+                          type="email"
+                          className="form-control"
+                          id="clientEmail"
+                          name="clientEmail"
+                          value={editClientData.clientEmail}
+                          onChange={handleEditChange}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="clientPhone" className="form-label">Phone</label>
+                        <input
+                          type="tel"
+                          className="form-control"
+                          id="clientPhone"
+                          name="clientPhone"
+                          value={editClientData.clientPhone}
+                          onChange={handleEditChange}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="clientAddress" className="form-label">Address</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="clientAddress"
+                          name="clientAddress"
+                          value={editClientData.clientAddress}
+                          onChange={handleEditChange}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="clientGst" className="form-label">GST No.</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="clientGst"
+                          name="clientGst"
+                          value={editClientData.clientGst}
+                          onChange={handleEditChange}
+                        />
+                      </div>
+                      <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" className="btn btn-primary">Save Changes</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
 
           </div>
         </nav>

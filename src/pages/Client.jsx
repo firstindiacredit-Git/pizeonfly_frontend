@@ -11,6 +11,7 @@ const Client = () => {
 
     const [clients, setClients] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [viewMode, setViewMode] = useState('grid');
 
     // Create a client
     const [formData, setFormData] = useState({
@@ -268,7 +269,7 @@ const Client = () => {
                             <div className="container-xxl">
                                 <div className="row clearfix">
                                     <div className="col-md-12">
-                                        <div className="card border-0 mb-4 no-bg">
+                                        <div className="card border-0 mb-2 no-bg">
                                             <div className="card-header py-3 px-0 d-flex align-items-center  justify-content-between border-bottom">
                                                 <h3 className=" fw-bold flex-fill mb-0">Clients</h3>
                                                 <div className="col-auto d-flex">
@@ -307,6 +308,20 @@ const Client = () => {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                             <div className="d-flex justify-content-between mt-2">
+                                                <div></div>
+                                                <div className="d-flex gap-2">
+                                                    <button
+                                                        className={`bi bi-list-task ${viewMode === 'list' ? 'bg-primary' : 'bg-secondary'} text-white border-0 rounded`}
+                                                        onClick={() => setViewMode('list')}
+                                                    ></button>
+                                                    <button
+                                                        className={`bi bi-grid-3x3-gap-fill ${viewMode === 'grid' ? 'bg-primary' : 'bg-secondary'} text-white border-0 rounded`}
+                                                        onClick={() => setViewMode('grid')}
+                                                    ></button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -314,68 +329,119 @@ const Client = () => {
                                 {loading ? (
                                     <div className="custom-loader "></div>
                                 ) : (
-                                    <div className="row g-3 row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-2 row-deck py-1 pb-4">
-                                        {clients.map(client => (
-                                            <div className="col" key={client._id}>
-                                                <div className="card teacher-card">
-                                                    <div className="card-body  d-flex" >
-                                                        <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w220">
-                                                            <img
-                                                                src={
-                                                                    `${import.meta.env.VITE_BASE_URL}` +
-                                                                    client.clientImage
-                                                                }
-                                                                alt=""
-                                                                className="avatar xl rounded-circle img-thumbnail shadow-sm"
-                                                            />
-                                                            <div className="about-info d-flex align-items-center mt-1 justify-content-center flex-column">
-                                                                <h6 className="mb-0 fw-bold d-block fs-6 mt-2">{client.clientName}</h6>
-                                                                <div
-                                                                    className="btn-group mt-2"
-                                                                    role="group"
-                                                                    aria-label="Basic outlined example"
-                                                                >
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn btn-outline-secondary"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#editproject"
-                                                                        onClick={() => setToEdit(client._id)}
+                                    viewMode === 'grid' ? (
+                                        // Existing grid view
+                                        <div className="row g-3 row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-2 row-deck py-1 pb-4">
+                                            {clients.map(client => (
+                                                <div className="col" key={client._id}>
+                                                    <div className="card teacher-card">
+                                                        <div className="card-body  d-flex" >
+                                                            <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w220">
+                                                                <img
+                                                                    src={
+                                                                        `${import.meta.env.VITE_BASE_URL}` +
+                                                                        client.clientImage
+                                                                    }
+                                                                    alt=""
+                                                                    className="avatar xl rounded-circle img-thumbnail shadow-sm"
+                                                                />
+                                                                <div className="about-info d-flex align-items-center mt-1 justify-content-center flex-column">
+                                                                    <h6 className="mb-0 fw-bold d-block fs-6 mt-2">{client.clientName}</h6>
+                                                                    <div
+                                                                        className="btn-group mt-2"
+                                                                        role="group"
+                                                                        aria-label="Basic outlined example"
                                                                     >
-                                                                        <i className="icofont-edit text-success" />
-                                                                    </button>
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn btn-outline-secondary"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#deleteproject"
-                                                                        onClick={() => {
-                                                                            setDeletableId(client._id);
-                                                                        }}
-                                                                    >
-                                                                        <i className="icofont-ui-delete text-danger" />
-                                                                    </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-outline-secondary"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#editproject"
+                                                                            onClick={() => setToEdit(client._id)}
+                                                                        >
+                                                                            <i className="icofont-edit text-success" />
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-outline-secondary"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#deleteproject"
+                                                                            onClick={() => {
+                                                                                setDeletableId(client._id);
+                                                                            }}
+                                                                        >
+                                                                            <i className="icofont-ui-delete text-danger" />
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div className="teacher-info border-start ps-xl-4 ps-md-3 ps-sm-4 ps-4 w-100">
-                                                            <h6 className="mb-0 mt-2  fw-bold d-block fs-6">
-                                                                {client.businessName}
-                                                            </h6>
-                                                            <span className="py-1 fw-bold small-11 mb-0 mt-1 text-muted">
-                                                                Phone No. - {client.clientPhone}
-                                                            </span>
-                                                            <div className="video-setting-icon mt-3 pt-3 border-top">
-                                                                <p>Email - {client.clientEmail}</p>
-                                                                <p>Address - {client.clientAddress}</p>
-                                                                <p>GST No. - {client.clientGst}</p>
+                                                            <div className="teacher-info border-start ps-xl-4 ps-md-3 ps-sm-4 ps-4 w-100">
+                                                                <h6 className="mb-0 mt-2  fw-bold d-block fs-6">
+                                                                    {client.businessName}
+                                                                </h6>
+                                                                <span className="py-1 fw-bold small-11 mb-0 mt-1 text-muted">
+                                                                    Phone No. - {client.clientPhone}
+                                                                </span>
+                                                                <div className="video-setting-icon mt-3 pt-3 border-top">
+                                                                    <p>Email - {client.clientEmail}</p>
+                                                                    <p>Address - {client.clientAddress}</p>
+                                                                    <p>GST No. - {client.clientGst}</p>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        // New list view
+                                        <div className="row clearfix g-3">
+                                            <div className="col-sm-12">
+                                                <div className="card mb-3">
+                                                    <div className="card-body">
+                                                        <table id="myProjectTable" className="table table-hover align-middle mb-0" style={{ width: '100%' }}>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style={{width: '12%'}}>Client Name</th>
+                                                                    <th>Business Name</th>
+                                                                    <th>Phone</th>
+                                                                    <th>Email</th>
+                                                                    <th>Address</th>
+                                                                    <th>GST No.</th>
+                                                                    <th>Actions</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {clients.map(client => (
+                                                                    <tr key={client._id}>
+                                                                        <td>
+                                                                            <img className="avatar rounded-circle" src={`${import.meta.env.VITE_BASE_URL}${client.clientImage}`} alt="" />
+                                                                            <p className="fw-bold ms-1">{client.clientName}</p>
+                                                                        </td>
+                                                                        <td>{client.businessName}</td>
+                                                                        <td>{client.clientPhone}</td>
+                                                                        <td>{client.clientEmail}</td>
+                                                                        <td>{client.clientAddress}</td>
+                                                                        <td>{client.clientGst}</td>
+                                                                        <td>
+                                                                            <div className="btn-group" role="group" aria-label="Basic outlined example">
+                                                                                <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editproject" onClick={() => setToEdit(client._id)}>
+                                                                                    <i className="icofont-edit text-success"></i>
+                                                                                </button>
+                                                                                <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#deleteproject" onClick={() => setDeletableId(client._id)}>
+                                                                                    <i className="icofont-ui-delete text-danger"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    )
                                 )}
                             </div>
                         </div>
