@@ -266,7 +266,7 @@ const Project = () => {
                                       )}
                                     </td>
                                     <td>
-                                      <div className="d-flex justify-content-center">0%</div>
+                                      <div className="d-flex justify-content-center">{project.progress}%</div>
                                     </td>
                                     <td>
                                       <button

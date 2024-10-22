@@ -407,7 +407,7 @@ const Client = () => {
                                     <div className="modal-body">
                                         <div className="mb-3">
                                             <label htmlFor="exampleFormControlInput877" className="form-label">
-                                                Client Name
+                                                Client Name <span className="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -419,7 +419,7 @@ const Client = () => {
                                         </div>
                                         <div className="mb-3">
                                             <label htmlFor="exampleFormControlInput977" className="form-label">
-                                                Business Name
+                                                Business Name <span className="text-danger">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -450,7 +450,7 @@ const Client = () => {
                                                             htmlFor="exampleFormControlInput477"
                                                             className="form-label"
                                                         >
-                                                            Email ID
+                                                            Email ID <span className="text-danger">*</span>
                                                         </label>
                                                         <input
                                                             type="email"
@@ -465,7 +465,7 @@ const Client = () => {
                                                             htmlFor="exampleFormControlInput277"
                                                             className="form-label"
                                                         >
-                                                            Password
+                                                            Password <span className="text-danger">*</span>
                                                         </label>
                                                         <input
                                                             type="password"

@@ -247,12 +247,12 @@ const Project = () => {
     projectStartDate: "",
     projectEndDate: "",
     taskAssignPerson: "",
+    clientAssignPerson: "", // Add this line
     description: "",
   });
   const [toEdit, setToEdit] = useState("");
-  // console.log(projectFormData);
+
   useEffect(() => {
-    // Assuming fetchData() fetches the data of the item to edit based on its ID
     const fetchData = async () => {
       try {
         const response = await axios.get(
@@ -277,10 +277,11 @@ const Project = () => {
         setProjectFormData({
           projectName: data.projectName,
           projectCategory: data.projectCategory,
-          projectImage: data.projectImage, // Assuming this is a URL or a reference to the image
+          projectImage: data.projectImage,
           projectStartDate: fStartDate,
           projectEndDate: fEndDate,
           taskAssignPerson: data.taskAssignPerson,
+          clientAssignPerson: data.clientAssignPerson, // Add this line
           description: data.description,
         });
 
@@ -296,6 +297,15 @@ const Project = () => {
         });
         setSelectedEmployees(selectedEmp);
         // console.log(selectedEmp);
+
+        // Add this block for selectedClients
+        const selectedCli = data.clientAssignPerson?.map((c) => {
+          return {
+            label: c.clientName,
+            value: c._id,
+          };
+        });
+        setSelectedClients(selectedCli);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -318,12 +328,22 @@ const Project = () => {
     try {
       const formDataToSend = new FormData();
       delete projectFormData?.taskAssignPerson;
+      delete projectFormData?.clientAssignPerson;
       for (const key in projectFormData) {
         formDataToSend.append(key, projectFormData[key]);
       }
       for (let obj of selectedEmployees) {
         formDataToSend.append("taskAssignPerson", obj.value);
       }
+      for (let obj of selectedClients) {
+        formDataToSend.append("clientAssignPerson", obj.value);
+      }
+
+      // Log the data being sent
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(key, value);
+      }
+
       const response = await axios.put(
         `${import.meta.env.VITE_BASE_URL}api/projects/${toEdit}`,
         formDataToSend,
@@ -333,28 +353,6 @@ const Project = () => {
           },
         }
       );
-      // console.log(response.data);
-      const updatedProject = response.data;
-      const updatedProjectData = projects.map((pro) => {
-        if (pro._id === toEdit) {
-          return {
-            ...pro,
-            projectName: updatedProject.projectName,
-            projectCategory: updatedProject.projectCategory,
-            projectImage: updatedProject.projectImage,
-            projectStartDate: updatedProject.projectStartDate,
-            projectEndDate: updatedProject.projectEndDate,
-            taskAssignPerson: updatedProject.taskAssignPerson,
-            description: updatedProject.description,
-          };
-        } else {
-          return pro;
-        }
-      });
-      // console.log(updatedProjectData);
-
-      setProjects(updatedProjectData);
-      // setProjectFormData(formDataToSend)
 
       // Close the modal programmatically
       const modalElement = document.getElementById("editproject");
@@ -589,8 +587,8 @@ const Project = () => {
     setSelectProject(project);
     fetchProjectMessages(project._id);
     // Clear notifications for this project
-    setNotifications(prev => ({...prev, [project._id]: 0}));
-    
+    setNotifications(prev => ({ ...prev, [project._id]: 0 }));
+
     // Use setTimeout to ensure the modal is open before we try to focus and scroll
     setTimeout(() => {
       if (messageInputRef.current) {
@@ -1360,6 +1358,22 @@ const Project = () => {
                                 value={selectedEmployees}
                                 onChange={setSelectedEmployees}
                                 labelledBy="Select Employees"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        {/* Add this new block for Project Assign Client */}
+                        <div className="row g-3 mb-3">
+                          <div className="col-sm-12">
+                            <label className="form-label">
+                              Project Assign Client
+                            </label>
+                            <div>
+                              <MultiSelect
+                                options={assignClient}
+                                value={selectedClients}
+                                onChange={setSelectedClients}
+                                labelledBy="Select Clients"
                               />
                             </div>
                           </div>

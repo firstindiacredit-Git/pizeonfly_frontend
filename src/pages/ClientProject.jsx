@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../employeeCompt/EmployeeSidebar";
-import Header from "../employeeCompt/EmployeeHeader";
+import Sidebar from "../clientCompt/ClientSidebar";
+import Header from "../clientCompt/ClientHeader";
 import { Link } from "react-router-dom";
 import axios from "axios";
 // import { io } from 'socket.io-client';
@@ -81,8 +81,8 @@ const ClientProject = () => {
 
   const messageSubmit = async (e) => {
     e.preventDefault();
-    const userDetails = JSON.parse(localStorage.getItem('Client_user'));
-    const senderId = userDetails.employeeName; // Assuming user ID is stored in local storage
+    const userDetails = JSON.parse(localStorage.getItem('client_user'));
+    const senderId = userDetails.clientName; // Assuming user ID is stored in local storage
 
     const formData = new FormData();
     formData.append('content', content);
@@ -95,16 +95,17 @@ const ClientProject = () => {
     }
 
     try {
-      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+      console.log('Message sent:', response.data);
       setContent('');
       setFiles([]); // Reset the files input
       fetchProjectMessages(selectProject._id); // Refresh messages
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("Error sending message:", error.response ? error.response.data : error.message);
     }
   };
 
@@ -219,7 +220,7 @@ const ClientProject = () => {
                                       )}
                                     </td>
                                     <td>
-                                      <div className="d-flex justify-content-center">0%</div>
+                                      <div className="d-flex justify-content-center">{project.progress}%</div>
                                     </td>
                                     <td>
                                       <button
@@ -265,6 +266,8 @@ const ClientProject = () => {
                               </figcaption>
                               <p>Start Date: {getFormattedDate(project.projectStartDate)}</p>
                               <p>End Date: {getFormattedDate(project.projectEndDate)}</p>
+                              <p>Project Progress: {project.progress}%</p>
+                              
                               <p>Members: {project.taskAssignPerson.map((name) => name.employeeName + ", ")}</p>
                               <button
                                 className="bi bi-chat-left-dots btn outline-secondary text-primary"
@@ -337,7 +340,7 @@ const ClientProject = () => {
                                 }
                               })}
                             </div>
-                            <p className="text-muted" style={{ marginTop: "-2rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
+                            <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft:"1rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
 
                           </div>
 
