@@ -403,8 +403,8 @@ const Project = () => {
   });
 
   //get client
-  const [clients, setClients] = useState([]); // To store list of clients
-  const [selectedClients, setSelectedClients] = useState([]); // For selected clients
+  const [clients, setClients] = useState([]);
+  const [selectedClients, setSelectedClients] = useState([]);
   useEffect(() => {
     const fetchClients = async () => {
       try {
@@ -618,13 +618,13 @@ const Project = () => {
               <div className="container-xxl">
                 <div className="row align-items-center">
                   <div className="border-bottom mb-4">
-                    <div className="card-header py-3 px-0 d-sm-flex align-items-center justify-content-between border-bottom">
-                      <h3 className="fw-bold flex-fill mb-0 mt-sm-0">Projects</h3>
-                      <div className="d-flex me-2">
+                    <div className="card-header py-3 px-0 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between border-bottom">
+                      <h3 className="fw-bold flex-fill mb-2 mb-sm-0">Projects</h3>
+                      <div className="d-flex flex-column flex-sm-row align-items-center">
                         {role === 'superadmin' && (
                           <button
                             type="button"
-                            className="btn btn-dark w-sm-100"
+                            className="btn btn-dark mb-2 mb-sm-0 me-sm-2"
                             data-bs-toggle="modal"
                             data-bs-target="#createproject"
                           >
@@ -633,13 +633,12 @@ const Project = () => {
                           </button>
                         )}
                         <ul
-                          className="nav nav-tabs tab-body-header rounded ms-1 prtab-set w-sm-100"
+                          className="nav nav-tabs tab-body-header rounded prtab-set"
                           role="tablist"
                         >
                           <li className="nav-item">
                             <a
-                              className={`nav-link ${activeTab === "All" ? "active" : ""
-                                }`}
+                              className={`nav-link ${activeTab === "All" ? "active" : ""}`}
                               onClick={() => setActiveTab("All")}
                               data-bs-toggle="tab"
                               href="#All-list"
@@ -650,8 +649,7 @@ const Project = () => {
                           </li>
                           <li className="nav-item">
                             <a
-                              className={`nav-link ${activeTab === "In Progress" ? "active" : ""
-                                }`}
+                              className={`nav-link ${activeTab === "In Progress" ? "active" : ""}`}
                               onClick={() => setActiveTab("In Progress")}
                               data-bs-toggle="tab"
                               href="#Started-list"
@@ -662,8 +660,7 @@ const Project = () => {
                           </li>
                           <li className="nav-item">
                             <a
-                              className={`nav-link ${activeTab === "Completed" ? "active" : ""
-                                }`}
+                              className={`nav-link ${activeTab === "Completed" ? "active" : ""}`}
                               onClick={() => setActiveTab("Completed")}
                               data-bs-toggle="tab"
                               href="#Completed-list"
@@ -673,9 +670,7 @@ const Project = () => {
                             </a>
                           </li>
                         </ul>
-
                       </div>
-
                     </div>
                     <div className="d-flex justify-content-between mb-4">
                       <div>
@@ -738,10 +733,8 @@ const Project = () => {
                       {viewMode === "list" ? (
                         <div className="card mb-3">
                           <div className="card-body">
-                            <table
-                              className="table table-hover align-middle mb-0"
-                              style={{ width: "100%" }}
-                            >
+                            {/* Desktop view - remains unchanged */}
+                            <table className="table table-hover align-middle mb-0 d-none d-md-table" style={{ width: "100%" }}>
                               <thead>
                                 <tr>
                                   <th>Sr.No.</th>
@@ -843,6 +836,16 @@ const Project = () => {
                                         <div className="d-flex justify-content-center">
                                           {project.progress}%
                                         </div>
+                                        <div className="progress mt-1" style={{ height: "10px" }}>
+                                          <div
+                                            className="progress-bar"
+                                            role="progressbar"
+                                            style={{ width: `${project.progress}%` }}
+                                            aria-valuenow={project.progress}
+                                            aria-valuemin="0"
+                                            aria-valuemax="100"
+                                          ></div>
+                                        </div>
                                       </td>
                                       <td>
                                         <button
@@ -884,6 +887,129 @@ const Project = () => {
                                 })}
                               </tbody>
                             </table>
+
+                            {/* Mobile view - responsive table */}
+                            <div className="d-md-none">
+                              <div className="table-responsive">
+                                <table className="table table-hover">
+                                  <thead>
+                                    <tr>
+                                      <th>Project</th>
+                                      <th>Details</th>
+                                      <th>Actions</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {filteredProjects.map((project, index) => {
+                                      const getFormattedDate = (date, includeTime = false) => {
+                                        const newDate = new Date(date);
+                                        let day = newDate.getDate();
+                                        let month = newDate.getMonth() + 1;
+                                        const year = newDate.getFullYear();
+
+                                        // Adding leading zero to day and month if necessary
+                                        if (day < 10) {
+                                          day = "0" + day;
+                                        }
+                                        if (month < 10) {
+                                          month = "0" + month;
+                                        }
+
+                                        if (includeTime) {
+                                          let hour = newDate.getHours();
+                                          let min = newDate.getMinutes();
+                                          let period = "AM";
+
+                                          // Convert hours to 12-hour format
+                                          if (hour === 0) {
+                                            hour = 12;
+                                          } else if (hour >= 12) {
+                                            period = "PM";
+                                            if (hour > 12) {
+                                              hour -= 12;
+                                            }
+                                          }
+
+                                          // Adding leading zero to minutes if necessary
+                                          if (min < 10) {
+                                            min = "0" + min;
+                                          }
+
+                                          return `${day}/${month}/${year} (${hour}:${min} ${period})`;
+                                        }
+
+                                        return `${day}/${month}/${year}`;
+                                      };
+
+                                      return (
+                                        <tr key={project.id}>
+                                          <td>
+                                            <strong>{index + 1}. {project.projectName}</strong>
+                                            <br />
+                                            <small>{getFormattedDate(project.projectDate, true)}</small>
+                                          </td>
+                                          <td>
+                                            <small>
+                                              <strong>Clients:</strong> {project.clientAssignPerson?.map(client => client.clientName).join(", ")}<br />
+                                              <strong>Start:</strong> {getFormattedDate(project.projectStartDate)}<br />
+                                              <strong>End:</strong> {getFormattedDate(project.projectEndDate)}<br />
+                                              <strong>Members:</strong> {project.taskAssignPerson.map(name => name.employeeName).join(", ")}<br />
+                                              <strong>Progress:</strong> {project.progress}%
+                                            </small>
+                                            <div className="progress mt-1" style={{ height: "10px" }}>
+                                              <div
+                                                className="progress-bar"
+                                                role="progressbar"
+                                                style={{ width: `${project.progress}%` }}
+                                                aria-valuenow={project.progress}
+                                                aria-valuemin="0"
+                                                aria-valuemax="100"
+                                              ></div>
+                                            </div>
+                                          </td>
+                                          <td>
+                                            <div className="btn-group-vertical btn-group-sm" role="group">
+                                              <button
+                                                type="button"
+                                                onClick={() => setToEdit(project._id)}
+                                                className="btn btn-outline-secondary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editproject"
+                                              >
+                                                <i className="icofont-edit text-success"></i>
+                                              </button>
+                                              <button
+                                                type="button"
+                                                className="btn btn-outline-secondary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteproject"
+                                                onClick={() => setDeletableId(project._id)}
+                                              >
+                                                <i className="icofont-ui-delete text-danger"></i>
+                                              </button>
+                                              <button
+                                                className="btn btn-outline-secondary position-relative"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#addUser"
+                                                type="button"
+                                                onClick={() => handleOpenMessages(project)}
+                                              >
+                                                <i className="bi bi-chat-left-dots text-primary"></i>
+                                                {notifications[project._id] > 0 && (
+                                                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                    {notifications[project._id]}
+                                                  </span>
+                                                )}
+                                              </button>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ) : (

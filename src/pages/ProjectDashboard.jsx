@@ -14,6 +14,16 @@ const ProjectDashboard = () => {
   const [totalClients, setTotalClients] = useState(0);
   const [totalEmployees, setTotalEmployees] = useState(0);
   const [projectStatusCounts, setProjectStatusCounts] = useState({ completed: 0, inProgress: 0 });
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchTotalProjects = async () => {
@@ -168,34 +178,33 @@ const ProjectDashboard = () => {
         <div className="main px-lg-4 px-md-4">
           <Header />
           <div className="body d-flex py-lg-3 py-md-2">
-            <div className="container-xxl ">
+            <div className="container-xxl">
               <div className="text-center">
-                {/* <img
-                  src="Images/picon.png"
-                  className="img-fluid "
-                  alt="No Data"
-                  style={{height:"rem"}}
-                /> */}
-                <div style={{ height: "9rem" }}>
-
+                <div style={{ height: isMobile ? "6rem" : "9rem" }}>
                   <img
                     src="Images/icon.png"
                     className="img-fluid"
                     alt="No Data"
-                    style={{ height: "5rem" }}
+                    style={{
+                      height: isMobile ? "3rem" : "5rem",
+                      maxHeight: "100%",
+                      width: "auto"
+                    }}
                   />
-                  <p className="fs-6" style={{ color: "#4989fd" }}>An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span></p>
+                  <p className="fs-6" style={{ color: "#4989fd", fontSize: isMobile ? "0.8rem" : "1rem" }}>
+                    An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span>
+                  </p>
                 </div>
                 <div className="row justify-content-center">
-                  <div className="col-6 col-md-7">
-                    <div className="card shadow-lg mb-4">
+                  <div className="col-12 col-md-8 mb-4">
+                    <div className="card shadow-lg">
                       <div className="card-body">
                         <h5 className="card-title text-center mb-4">Overall Summary</h5>
                         <Bar data={chartData} options={chartOptions} />
                       </div>
                     </div>
                   </div>
-                  <div className="col-6 col-md-4">
+                  <div className="col-12 col-md-4 mb-4">
                     <div className="card shadow-lg">
                       <div className="card-body">
                         <h5 className="card-title text-center">Project Status</h5>
@@ -246,7 +255,7 @@ const ProjectDashboard = () => {
           </div>
         </div>
         <ToastContainer />
-      </div >
+      </div>
     </>
   );
 };

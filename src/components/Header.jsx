@@ -79,7 +79,7 @@ const Header = () => {
           <div className="container-xxl">
             {/* header rightbar icon */}
             <div className="h-right d-flex align-items-center mr-5 mr-lg-0 order-1">
-              <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center">
+              <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center" style={{ position: 'relative' }}>
                 <div className="u-info me-2">
                   <p className="mb-0 text-end line-height-sm ">
                     <span className="font-weight-bold">{username}</span>
@@ -99,7 +99,16 @@ const Header = () => {
                     alt="profile"
                   />
                 </a>
-                <div className="dropdown-menu rounded-lg shadow border-0 dropdown-animation dropdown-menu-end p-0 m-0">
+                <div 
+                  className="dropdown-menu rounded-lg shadow border-0 dropdown-animation p-0 m-0"
+                  style={{
+                    position: 'absolute',
+                    inset: '0px auto auto 0px',
+                    margin: '0px',
+                    transform: 'translate(-220px, 40px)',
+                    minWidth: '280px',
+                  }}
+                >
                   <div className="card border-0 w280">
                     <div className="card-body pb-0">
                       <div className="d-flex py-1">
