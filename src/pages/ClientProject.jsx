@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef  } from "react";
 import Sidebar from "../clientCompt/ClientSidebar";
 import Header from "../clientCompt/ClientHeader";
 import { Link } from "react-router-dom";
 import axios from "axios";
-// import { io } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./Loading.css";
@@ -68,6 +68,51 @@ const ClientProject = () => {
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]); // State for multiple file uploads
+  const [socket, setSocket] = useState(null);
+  const [notifications, setNotifications] = useState({});
+  const messageInputRef = useRef(null);
+
+
+  useEffect(() => {
+    const newSocket = io(`${import.meta.env.VITE_BASE_URL}`);
+    setSocket(newSocket);
+
+    return () => newSocket.close();
+  }, []);
+
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on('new message', (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    socket.on('new notification', (notification) => {
+      setNotifications(prev => ({
+        ...prev,
+        [notification.projectId]: (prev[notification.projectId] || 0) + 1
+      }));
+    });
+
+    return () => {
+      socket.off('new message');
+      socket.off('new notification');
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket == null) return;
+
+    projects.forEach(project => {
+      socket.emit('join project', project._id);
+    });
+
+    return () => {
+      projects.forEach(project => {
+        socket.emit('leave project', project._id);
+      });
+    };
+  }, [socket, projects]);
 
   const fetchProjectMessages = async (projectId) => {
     try {
@@ -95,17 +140,16 @@ const ClientProject = () => {
     }
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, formData, {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/projectMessage`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log('Message sent:', response.data);
       setContent('');
-      setFiles([]); // Reset the files input
-      fetchProjectMessages(selectProject._id); // Refresh messages
+      setFiles([]);
+      // No need to manually fetch messages here, as the socket will handle real-time updates
     } catch (error) {
-      console.error("Error sending message:", error.response ? error.response.data : error.message);
+      console.error("Error sending message:", error);
     }
   };
 
@@ -125,6 +169,21 @@ const ClientProject = () => {
       return () => clearInterval(interval); // Clean up interval on component unmount
     }
   }, [selectProject]);
+
+  const handleOpenMessages = (project) => {
+    setSelectProject(project);
+    fetchProjectMessages(project._id);
+    // Clear notifications for this project
+    setNotifications(prev => ({ ...prev, [project._id]: 0 }));
+
+    // Use setTimeout to ensure the modal is open before we try to focus and scroll
+    setTimeout(() => {
+      if (messageInputRef.current) {
+        messageInputRef.current.focus();
+        messageInputRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 300); // Adjust this delay if needed
+  };
 
 
 
@@ -224,15 +283,18 @@ const ClientProject = () => {
                                     </td>
                                     <td>
                                       <button
-                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary"
+                                        className="d-flex justify-content-center bi bi-chat-left-dots btn outline-secondary text-primary position-relative"
                                         data-bs-toggle="modal"
                                         data-bs-target="#addUser"
                                         type="button"
-                                        onClick={() => {
-                                          setSelectProject(project);
-                                          fetchProjectMessages(project._id);
-                                        }}
-                                      ></button>
+                                        onClick={() => handleOpenMessages(project)}
+                                      >
+                                        {notifications[project._id] > 0 && (
+                                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            {notifications[project._id]}
+                                          </span>
+                                        )}
+                                      </button>
                                     </td>
                                   </tr>
                                 );
@@ -267,18 +329,20 @@ const ClientProject = () => {
                               <p>Start Date: {getFormattedDate(project.projectStartDate)}</p>
                               <p>End Date: {getFormattedDate(project.projectEndDate)}</p>
                               <p>Project Progress: {project.progress}%</p>
-                              
+
                               <p>Members: {project.taskAssignPerson.map((name) => name.employeeName + ", ")}</p>
                               <button
-                                className="bi bi-chat-left-dots btn outline-secondary text-primary"
+                                className="bi bi-chat-left-dots btn outline-secondary text-primary position-relative"
                                 data-bs-toggle="modal"
                                 data-bs-target="#addUser"
-                                onClick={() => {
-                                  setSelectProject(project);
-                                  fetchProjectMessages(project._id);
-                                }}
+                                onClick={() => handleOpenMessages(project)}
                               >
                                 Add Message
+                                {notifications[project._id] > 0 && (
+                                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {notifications[project._id]}
+                                  </span>
+                                )}
                               </button>
                             </div>
                           </div>
@@ -302,9 +366,9 @@ const ClientProject = () => {
                     </h5>
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
-                  <div className="modal-body">
+                  <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
                     {/* Message List */}
-                    <ul className="list-group">
+                    <ul className="list-group mb-3">
                       {messages.map((message) => (
                         <li key={message._id}>
                           <div className="border-bottom">
@@ -312,35 +376,40 @@ const ClientProject = () => {
                               <h6 className="fw-bold px-3">{message.senderId}</h6> -
                               <span className="px-3 text-break">{message.content}</span>
                               {message.fileUrls && message.fileUrls.map((fileUrl, index) => {
-                                const fileExtension = fileUrl.split('.').pop().toLowerCase();
+                                if (fileUrl) {
+                                  // Remove 'uploads/' from the file path and add VITE_BASE_URL
+                                  const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}${fileUrl.replace('uploads/', '')}`;
+                                  const fileExtension = cleanFileUrl.split('.').pop().toLowerCase();
 
-                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                                  // Display image if the file is an image
-                                  return (
-                                    <div key={index} className="px-3">
-                                      <a href={fileUrl} target="_blank" rel="noopener noreferrer">
-                                        <img src={fileUrl} alt={`Attachment ${index + 1}`} style={{ maxWidth: '5rem', cursor: 'pointer' }} />
-                                      </a>
-                                    </div>
-                                  );
-                                } else if (fileExtension === 'pdf') {
-                                  // Provide a download link for PDF
-                                  return (
-                                    <div key={index} className="px-3">
-                                      <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="">PDF File</a>
-                                    </div>
-                                  );
-                                } else {
-                                  // Default for other file types (e.g., DOC, XLS)
-                                  return (
-                                    <div key={index} className="px-3">
-                                      <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="">Download File</a>
-                                    </div>
-                                  );
+                                  if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                    // Display image if the file is an image
+                                    return (
+                                      <div key={index} className="px-3">
+                                        <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer">
+                                          <img src={cleanFileUrl} alt={`Attachment ${index + 1}`} style={{ maxWidth: '5rem', cursor: 'pointer' }} />
+                                        </a>
+                                      </div>
+                                    );
+                                  } else if (fileExtension === 'pdf') {
+                                    // Provide a download link for PDF
+                                    return (
+                                      <div key={index} className="px-3">
+                                        <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer" className="">PDF File</a>
+                                      </div>
+                                    );
+                                  } else {
+                                    // Default for other file types (e.g., DOC, XLS)
+                                    return (
+                                      <div key={index} className="px-3">
+                                        <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer" className="">Download File</a>
+                                      </div>
+                                    );
+                                  }
                                 }
+                                return null;
                               })}
                             </div>
-                            <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft:"1rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
+                            <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
 
                           </div>
 
@@ -360,6 +429,7 @@ const ClientProject = () => {
                           value={content}
                           onChange={(e) => setContent(e.target.value)}
                           required
+                          ref={messageInputRef}
                         />
                       </div>
                       <div className="mb-3">
@@ -369,7 +439,7 @@ const ClientProject = () => {
                           className="form-control"
                           id="fileUpload"
                           onChange={messageFileChange}
-                          multiple // Allow multiple files
+                          multiple
                         />
                       </div>
                       <button type="submit" className="btn btn-dark">Submit</button>
