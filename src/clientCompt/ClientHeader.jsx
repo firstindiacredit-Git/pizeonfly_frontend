@@ -108,7 +108,7 @@ const ClientHeader = () => {
                       </div>
                     </div>
                     <div className="list-group m-2 ">
-                      <Link
+                      {/* <Link
                         type=""
                         className="list-group-item list-group-item-action border-0"
                         data-bs-toggle="modal"
@@ -117,15 +117,15 @@ const ClientHeader = () => {
                       >
                         <i className="icofont-ui-user-group fs-6 me-3" /> Edit
                         Profile
-                      </Link>
-                      <Link
+                      </Link> */}
+                      {/* <Link
                         type=""
                         className="list-group-item list-group-item-action border-0"
                         data-bs-toggle="modal"
                         data-bs-target="#taskMessage"
                       >
                         <i className="icofont-ui-message fs-6 me-3" /> Message
-                      </Link>
+                      </Link> */}
                       <button
                         onClick={handleSignOut}
                         className="list-group-item list-group-item-action border-0 "
