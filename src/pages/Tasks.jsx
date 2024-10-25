@@ -567,17 +567,17 @@ const Tasks = () => {
                   <div className="border-0 mb-4">
                     <div className="card-header py-3 no-bg bg-transparent d-flex align-items-center px-0 justify-content-between border-bottom flex-wrap">
                       <h3 className="fw-bold mb-0">Task Management</h3>
-                      <div className="col-auto d-flex w-sm-100">
+
+                      <div className="col-auto d-flex w-sm-100 flex-wrap">
                         <button
                           type="button"
-                          className="btn btn-dark btn-set-task w-sm-100 me-2"
+                          className="btn btn-dark btn-set-task w-sm-100 me-2 mb-2 mb-md-0"
                           data-bs-toggle="modal"
                           data-bs-target="#createtask"
                         >
                           <i className="icofont-plus-circle me-2 fs-6" />
                           Create Task
                         </button>
-
 
                         <ul className="nav nav-tabs tab-body-header rounded ms-1 prtab-set w-sm-100" role="tablist">
                           <li className="nav-item">
@@ -625,65 +625,66 @@ const Tasks = () => {
                             </a>
                           </li>
                         </ul>
-
                       </div>
+                      
                     </div>
                   </div>
                 </div>{" "}
-                <div className="d-flex justify-content-between">
-
-                  <div>
+                <div className="row g-3 mb-3">
+                  <div className="col-12 col-md-4">
                     <h6>Change View</h6>
-                    <div className="d-flex justify-content-around">
-                      <button className="bi bi-list-task bg-primary text-white border-0 rounded" onClick={() => setViewMode('list')}></button>
-                      <button className="bi bi-grid-3x3-gap-fill bg-primary text-white border-0 rounded" onClick={() => setViewMode('row')}></button>
+                    <div className="d-flex">
+                      <button className="btn btn-outline-primary me-2" onClick={() => setViewMode('list')}>
+                        <i className="bi bi-list-task"></i>
+                      </button>
+                      <button className="btn btn-outline-primary" onClick={() => setViewMode('row')}>
+                        <i className="bi bi-grid-3x3-gap-fill"></i>
+                      </button>
                     </div>
                   </div>
 
-                  <div className="order-0">
+                  <div className="col-12 col-md-4">
                     <div className="input-group">
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Global Search"
+                        placeholder="Search"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{ width: "19rem", height: "3rem" }}
                       />
                       <button
                         type="button"
-                        className="input-group-text"
+                        className="btn btn-outline-secondary"
                       >
                         <i className="fa fa-search" />
                       </button>
                     </div>
                     {(filteredProjectName || filteredEmployeeName) && (
-                      <div className="d-flex justify-content-evenly mt-2">
-                        {filteredProjectName && <strong>Project: {filteredProjectName}</strong>}
-                        {filteredEmployeeName && <strong>Employee: {filteredEmployeeName}</strong>}
-                        <button type="button" className="btn btn-dark btn-set-task w-sm-100 me-2" onClick={clearFilter}>Clear Filter</button>
+                      <div className="mt-2">
+                        {filteredProjectName && <strong className="me-2">Project: {filteredProjectName}</strong>}
+                        {filteredEmployeeName && <strong className="me-2">Employee: {filteredEmployeeName}</strong>}
+                        <button type="button" className="btn btn-sm btn-outline-secondary" onClick={clearFilter}>Clear Filter</button>
                       </div>
                     )}
                   </div>
 
-
-
-                  <div className=" text-end mb-3" >
-                    <p className="fw-bold">Filter by Date</p>
-
-                    <input
-                      className="form-control"
-                      type="date"
-                      value={filterDate}
-                      onChange={(e) => setFilterDate(e.target.value)}
-                      style={{ width: '10rem' }}
-                    /></div>
+                  <div className="col-12 col-md-4">
+                    <div className="text-md-end">
+                      <p className="mb-2 fw-bold">Filter by Date</p>
+                      <input
+                        className="form-control"
+                        type="date"
+                        value={filterDate}
+                        onChange={(e) => setFilterDate(e.target.value)}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Row end  */}
                 {viewMode === 'list' ? (
-                  <div className="modal-body">
-                    <table className="table table-bordered">
+                  <div className="table-responsive">
+                    <table className="table table-bordered table-hover">
                       <thead>
                         <tr>
                           <th scope="col" >SrNo.</th>
@@ -698,7 +699,11 @@ const Tasks = () => {
                       </thead>
                       <tbody>
                         {loading ? (
-                          <div className="custom-loader" style={{ marginTop: "20vh", marginLeft: "-8rem" }}></div>
+                          <tr>
+                            <td colSpan="8">
+                              <div className="custom-loader" style={{ margin: "20px auto" }}></div>
+                            </td>
+                          </tr>
                         ) : (
                           currentTasks.map((task, index) => {
                             const currentDate = new Date();
@@ -839,8 +844,8 @@ const Tasks = () => {
                       }
 
                       return (
-                        <div key={task._id} className="col-md-4 mb-4">
-                          <div className="card task-card" style={{ width: "18rem", backgroundColor }}>
+                        <div key={task._id} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                          <div className="card task-card h-100" style={{ backgroundColor }}>
                             <div className="card-body">
                               <div className="d-flex justify-content-between align-items-center mb-2">
                                 <span className="fw-bold fs-6">{index + 1}. </span>
@@ -931,53 +936,52 @@ const Tasks = () => {
                   </div>
                 )}
 
-
-                <div className="d-flex justify-content-around">
-                  {/* Add this dropdown menu */}
-                  <div className="mb-3">
-                    <label htmlFor="tasksPerPage" className="form-label">Tasks per page:</label>
-                    <select
-                      id="tasksPerPage"
-                      className="form-select"
-                      value={tasksPerPage}
-                      onChange={handleTasksPerPageChange}
-                    >
-                      <option value="10">10</option>
-                      <option value="25">25</option>
-                      <option value="50">50</option>
-                      <option value="100">100</option>
-                      <option value="all">Show All</option>
-                    </select>
+                {/* Pagination controls */}
+                <div className="row mt-3">
+                  <div className="col-12 col-md-6 mb-3">
+                    <div className="d-flex align-items-center">
+                      <label htmlFor="tasksPerPage" className="form-label me-2 mb-0">Tasks per page:</label>
+                      <select
+                        id="tasksPerPage"
+                        className="form-select"
+                        style={{ width: 'auto' }}
+                        value={tasksPerPage}
+                        onChange={handleTasksPerPageChange}
+                      >
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="all">Show All</option>
+                      </select>
+                    </div>
                   </div>
-                  <nav className="d-flex justify-content-center mt-5">
-                    <ul className="pagination">
-                      <li className="page-item">
-                        <button onClick={prevPage} className="page-link" disabled={currentPage === 1}>
-                          &laquo;
-                        </button>
-                      </li>
-
-                      {/* Only show pages between startPage and endPage */}
-                      {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
-                        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                          <button onClick={() => paginate(page)} className="page-link bg-white  ">
-                            {page}
-                          </button>
-                        </li>
-                      ))}
-
-                      {/* Next 5 pages button */}
-                      {endPage < totalPages && (
+                  <div className="col-12 col-md-6">
+                    <nav aria-label="Page navigation">
+                      <ul className="pagination justify-content-md-end">
                         <li className="page-item">
-                          <button onClick={() => paginate(endPage + 1)} className="page-link">
-                            &raquo;
+                          <button onClick={prevPage} className="page-link" disabled={currentPage === 1}>
+                            &laquo;
                           </button>
                         </li>
-                      )}
-                    </ul>
-                  </nav>
+                        {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
+                          <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                            <button onClick={() => paginate(page)} className="page-link bg-white">
+                              {page}
+                            </button>
+                          </li>
+                        ))}
+                        {endPage < totalPages && (
+                          <li className="page-item">
+                            <button onClick={() => paginate(endPage + 1)} className="page-link">
+                              &raquo;
+                            </button>
+                          </li>
+                        )}
+                      </ul>
+                    </nav>
+                  </div>
                 </div>
-
 
               </div>
             </div>

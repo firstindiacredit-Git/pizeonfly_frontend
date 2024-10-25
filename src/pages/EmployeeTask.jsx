@@ -25,6 +25,7 @@ const Tasks = () => {
   const [tasksPerPage, setTasksPerPage] = useState(10);
   const messageInputRef = useRef(null);
   const [socket, setSocket] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -245,6 +246,15 @@ const Tasks = () => {
     setCurrentPage(1); // Reset to first page when changing the number of tasks per page
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <>
       <div id="mytask-layout">
@@ -261,8 +271,6 @@ const Tasks = () => {
                   <div className="border-0 mb-4">
                     <div className="card-header py-3 no-bg bg-transparent d-flex align-items-center px-0 justify-content-between border-bottom flex-wrap mb-3">
                       <h3 className="fw-bold mb-0">Task Management</h3>
-                    </div>
-                    <div className="col-auto d-flex justify-content-between">
                       <div>
                         <h6>Change View</h6>
                         <div className="d-flex justify-content-around">
@@ -276,7 +284,9 @@ const Tasks = () => {
                           ></button>
                         </div>
                       </div>
+                    </div>
 
+                    <div className="col-auto d-flex justify-content-between gap-5">
                       <div className="order-0">
                         <div className="input-group">
                           <input
@@ -306,51 +316,68 @@ const Tasks = () => {
                           </button>
                         </div>
                       </div>
-                      <ul className="nav nav-tabs tab-body-header rounded prtab-set" style={{ cursor: 'pointer', height: "fit-content" }} role="tablist">
-                        <li className="nav-item">
-                          <a
-                            className={`nav-link ${filterStatus === "All" ? "active" : ""}`}
-                            onClick={() => setFilterStatus("All")}
-                            role="tab"
-                          >
-                            All
-                          </a>
-                        </li>
-                        <li className="nav-item">
-                          <a
-                            className={`nav-link ${filterStatus === "Not Started" ? "active" : ""}`}
-                            onClick={() => setFilterStatus("Not Started")}
-                            role="tab"
-                          >
-                            Not Started
-                          </a>
-                        </li>
-                        <li className="nav-item">
-                          <a
-                            className={`nav-link ${filterStatus === "In Progress" ? "active" : ""}`}
-                            onClick={() => setFilterStatus("In Progress")}
-                            role="tab"
-                          >
-                            In Progress
-                          </a>
-                        </li>
-                        <li className="nav-item">
-                          <a
-                            className={`nav-link ${filterStatus === "Completed" ? "active" : ""}`}
-                            onClick={() => setFilterStatus("Completed")}
-                            role="tab"
-                          >
-                            Completed
-                          </a>
-                        </li>
-                      </ul>
+
+                      <div className="filter-container">
+                        <select 
+                          className="form-select d-md-none" 
+                          value={filterStatus} 
+                          onChange={(e) => setFilterStatus(e.target.value)}
+                          style={{ width: 'auto' }}
+                        >
+                          <option value="All">All</option>
+                          <option value="Not Started">Not Started</option>
+                          <option value="In Progress">In Progress</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                        
+                        <ul className="nav nav-tabs tab-body-header rounded prtab-set d-none d-md-flex" style={{ cursor: 'pointer', height: "fit-content" }} role="tablist">
+                          <li className="nav-item">
+                            <a
+                              className={`nav-link ${filterStatus === "All" ? "active" : ""}`}
+                              onClick={() => setFilterStatus("All")}
+                              role="tab"
+                            >
+                              All
+                            </a>
+                          </li>
+                          <li className="nav-item">
+                            <a
+                              className={`nav-link ${filterStatus === "Not Started" ? "active" : ""}`}
+                              onClick={() => setFilterStatus("Not Started")}
+                              role="tab"
+                            >
+                              Not Started
+                            </a>
+                          </li>
+                          <li className="nav-item">
+                            <a
+                              className={`nav-link ${filterStatus === "In Progress" ? "active" : ""}`}
+                              onClick={() => setFilterStatus("In Progress")}
+                              role="tab"
+                            >
+                              In Progress
+                            </a>
+                          </li>
+                          <li className="nav-item">
+                            <a
+                              className={`nav-link ${filterStatus === "Completed" ? "active" : ""}`}
+                              onClick={() => setFilterStatus("Completed")}
+                              role="tab"
+                            >
+                              Completed
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
+                                      
                   </div>
                 </div>{" "}
                 {/* Row end  */}
                 <div className="row">
                   {viewMode === "list" ? (
                     // List View Rendering
+                    <div className="table-responsive">
                     <table className="table table-hover align-middle mb-0" style={{ width: "100%" }}>
                       <thead>
                         <tr>
@@ -471,6 +498,7 @@ const Tasks = () => {
                         })}
                       </tbody>
                     </table>
+                    </div>
                   ) : (
                     // Grid View Rendering
                     <div className="row">

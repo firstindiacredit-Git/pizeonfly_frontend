@@ -17,6 +17,16 @@ const EmployeeDashboard = () => {
     inProgress: 0,
     notStarted: 0
   })
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,6 +141,9 @@ const EmployeeDashboard = () => {
     },
   }
 
+  // Add this function to determine if it's a small screen
+  const isSmallScreen = () => window.innerWidth <= 576;
+
   return (
     <>
       <div id="mytask-layout">
@@ -147,15 +160,17 @@ const EmployeeDashboard = () => {
                         src="Images/icon.png"
                         className="img-fluid"
                         alt="No Data"
-                        style={{ height: "5rem" }}
+                        style={{
+                          height: isMobile ? "3rem" : "5rem",
+                          maxHeight: "100%",
+                          width: "auto"
+                        }}
                       />
                       <p className="fs-6" style={{ color: "#4989fd" }}>An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span></p>
                     </div>
                     <div className="mt-2 mb-2">
-
-
                       <div className="row justify-content-center">
-                        <div className="col-6 col-md-7">
+                        <div className={`col-12 ${isSmallScreen() ? 'mb-4' : 'col-md-7'}`}>
                           <div className="card shadow-lg mb-4">
                             <div className="card-body">
                               <h5 className="card-title text-center mb-4">Overall Summary</h5>
@@ -163,7 +178,7 @@ const EmployeeDashboard = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="col-6 col-md-4">
+                        <div className={`col-12 ${isSmallScreen() ? '' : 'col-md-4'}`}>
                           <div className="card shadow-lg">
                             <div className="card-body">
                               <h5 className="card-title text-center">Project Status</h5>

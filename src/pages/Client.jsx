@@ -282,42 +282,44 @@ const Client = () => {
                                                         <i className="icofont-plus-circle me-2 fs-6" />
                                                         Add Client
                                                     </button>
-                                                    <div className="order-0 col-lg-8 col-md-5 col-sm-10 col-12 mb-3 mb-md-0 ">
-                                                        <div className="input-group">
-                                                            <input
-                                                                type="search"
-                                                                className="form-control"
-                                                                aria-label="search"
-                                                                aria-describedby="addon-wrapping"
-                                                                value={searchQuery}
-                                                                onChange={(e) => {
-                                                                    setSearchQuery(e.target.value);
-                                                                    handleSearchSubmit(e.target.value);
-                                                                }}
-                                                                placeholder="Enter Client Name"
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                className="input-group-text"
-                                                                id="addon-wrapping"
-                                                                onClick={handleSearchSubmit}
-                                                            >
-                                                                <i className="fa fa-search" />
-                                                            </button>
-                                                        </div>
-                                                    </div>
+
                                                 </div>
                                             </div>
 
-                                             <div className="d-flex justify-content-between mt-2">
-                                                <div></div>
+                                            <div className="d-flex justify-content-between mt-2">
+                                                <div className="">
+                                                    <div className="input-group">
+                                                        <input
+                                                            type="search"
+                                                            className="form-control"
+                                                            aria-label="search"
+                                                            aria-describedby="addon-wrapping"
+                                                            value={searchQuery}
+                                                            onChange={(e) => {
+                                                                setSearchQuery(e.target.value);
+                                                                handleSearchSubmit(e.target.value);
+                                                            }}
+                                                            placeholder="Enter Client Name"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            className="input-group-text"
+                                                            id="addon-wrapping"
+                                                            onClick={handleSearchSubmit}
+                                                        >
+                                                            <i className="fa fa-search" />
+                                                        </button>
+                                                    </div>
+                                                </div>
                                                 <div className="d-flex gap-2">
                                                     <button
                                                         className={`bi bi-list-task ${viewMode === 'list' ? 'bg-primary' : 'bg-secondary'} text-white border-0 rounded`}
+                                                        style={{ width: '2.5rem' }}
                                                         onClick={() => setViewMode('list')}
                                                     ></button>
                                                     <button
                                                         className={`bi bi-grid-3x3-gap-fill ${viewMode === 'grid' ? 'bg-primary' : 'bg-secondary'} text-white border-0 rounded`}
+                                                        style={{ width: '2.5rem' }}
                                                         onClick={() => setViewMode('grid')}
                                                     ></button>
                                                 </div>
@@ -399,44 +401,50 @@ const Client = () => {
                                             <div className="col-sm-12">
                                                 <div className="card mb-3">
                                                     <div className="card-body">
-                                                        <table id="myProjectTable" className="table table-hover align-middle mb-0" style={{ width: '100%' }}>
-                                                            <thead>
-                                                                <tr>
-                                                                    <th style={{width: '12%'}}>Client Name</th>
-                                                                    <th>Business Name</th>
-                                                                    <th>Phone</th>
-                                                                    <th>Email</th>
-                                                                    <th>Address</th>
-                                                                    <th>GST No.</th>
-                                                                    <th>Actions</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {clients.map(client => (
-                                                                    <tr key={client._id}>
-                                                                        <td>
-                                                                            <img className="avatar rounded-circle" src={`${import.meta.env.VITE_BASE_URL}${client.clientImage.replace('uploads/', '')}`} alt="" />
-                                                                            <p className="fw-bold ms-1">{client.clientName}</p>
-                                                                        </td>
-                                                                        <td>{client.businessName}</td>
-                                                                        <td>{client.clientPhone}</td>
-                                                                        <td>{client.clientEmail}</td>
-                                                                        <td>{client.clientAddress}</td>
-                                                                        <td>{client.clientGst}</td>
-                                                                        <td>
-                                                                            <div className="btn-group" role="group" aria-label="Basic outlined example">
-                                                                                <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editproject" onClick={() => setToEdit(client._id)}>
-                                                                                    <i className="icofont-edit text-success"></i>
-                                                                                </button>
-                                                                                <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#deleteproject" onClick={() => setDeletableId(client._id)}>
-                                                                                    <i className="icofont-ui-delete text-danger"></i>
-                                                                                </button>
-                                                                            </div>
-                                                                        </td>
+                                                        <div className="table-responsive">
+                                                            <table id="myProjectTable" className="table table-hover align-middle mb-0" style={{ width: '100%' }}>
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Client</th>
+                                                                        <th>Business Name</th>
+                                                                        <th>Contact</th>
+                                                                        <th>Address</th>
+                                                                        <th>Actions</th>
                                                                     </tr>
-                                                                ))}
-                                                            </tbody>
-                                                        </table>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {clients.map(client => (
+                                                                        <tr key={client._id}>
+                                                                            <td>
+                                                                                <div className="d-flex align-items-center">
+                                                                                    <img className="avatar rounded-circle me-2" src={`${import.meta.env.VITE_BASE_URL}${client.clientImage.replace('uploads/', '')}`} alt="" style={{width: '40px', height: '40px'}} />
+                                                                                    <div>
+                                                                                        <h6 className="mb-0">{client.clientName}</h6>
+                                                                                        <small>{client.clientEmail}</small>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>{client.businessName}</td>
+                                                                            <td>
+                                                                                <div>{client.clientPhone}</div>
+                                                                                <small>{client.clientGst}</small>
+                                                                            </td>
+                                                                            <td>{client.clientAddress}</td>
+                                                                            <td>
+                                                                                <div className="btn-group" role="group" aria-label="Basic outlined example">
+                                                                                    <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editproject" onClick={() => setToEdit(client._id)}>
+                                                                                        <i className="icofont-edit text-success"></i>
+                                                                                    </button>
+                                                                                    <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#deleteproject" onClick={() => setDeletableId(client._id)}>
+                                                                                        <i className="icofont-ui-delete text-danger"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

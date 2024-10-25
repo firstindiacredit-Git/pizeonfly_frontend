@@ -642,91 +642,96 @@ const Member = () => {
                       <div className="col-md-12">
                         <div className="card">
                           <div className="card-body">
-                            <table className="table table-hover align-middle mb-0">
-                              <thead>
-                                <tr>
-                                  <th>Employee</th>
-                                  <th>Employee ID</th>
-                                  <th>Phone</th>
-                                  <th>Email</th>
-                                  <th>Department</th>
-                                  <th>Designation</th>
-                                  <th>Actions</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {employees.map((employee) => (
-                                  <tr key={employee.employeeId}>
-                                    <td>
-                                      <div className="d-flex align-items-center">
-                                        <img
-                                          src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
-                                          alt=""
-                                          className="avatar lg rounded-circle img-thumbnail"
-                                          style={{
-                                            transition: 'transform 0.3s ease-in-out',
-                                            cursor: 'pointer',
-                                            marginRight: '10px'
-                                          }}
-                                          onMouseEnter={(e) => {
-                                            e.target.style.transform = 'scale(2.5)';
-                                            e.target.style.zIndex = '100';
-                                          }}
-                                          onMouseLeave={(e) => {
-                                            e.target.style.transform = 'scale(1)';
-                                            e.target.style.zIndex = '1';
-                                          }}
-                                          onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`)}
-                                        />
-                                        <div>
-                                          <h6 className="mb-0">{employee.employeeName}</h6>
-                                          <span>{new Date(employee.joiningDate).toLocaleDateString()}</span>
-                                        </div>
-                                      </div>
-                                    </td>
-                                    <td>{employee.employeeId}</td>
-                                    <td>{employee.phone}</td>
-                                    <td>{employee.emailid}
-                                      <Link
-                                        to="/projects"
-                                        state={{ employeeName: employee.employeeName }}
-                                        className="btn btn-sm btn-outline-secondary me-2"
-                                      >
-                                        View Projects
-                                      </Link>
-                                      <Link
-                                        to="/tasks"
-                                        state={{ employeeName: employee.employeeName }}
-                                        className="btn btn-sm btn-outline-secondary"
-                                      >
-                                        View Tasks
-                                      </Link>
-                                    </td>
-                                    <td>{employee.department}</td>
-                                    <td>{employee.designation}</td>
-                                    <td>
-                                      <button
-                                        className="btn btn-sm btn-outline-secondary me-2"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editemp"
-                                        onClick={() => setToEdit(employee._id)}
-                                      >
-                                        <i className="icofont-edit text-success"></i>
-                                      </button>
-                                      <button
-                                        className="btn btn-sm btn-outline-secondary me-2"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteproject"
-                                        onClick={() => setDeletableId(employee._id)}
-                                      >
-                                        <i className="icofont-ui-delete text-danger"></i>
-                                      </button>
-
-                                    </td>
+                            <div className="table-responsive">
+                              <table className="table table-hover align-middle mb-0">
+                                <thead>
+                                  <tr>
+                                    <th>Employee</th>
+                                    <th>Contact</th>
+                                    <th>Department</th>
+                                    <th>Actions</th>
                                   </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                                </thead>
+                                <tbody>
+                                  {employees.map((employee) => {
+                                    const newDate = new Date(employee?.joiningDate);
+                                    const date = newDate.getDate();
+                                    const month = newDate.getMonth() + 1; // months are 0-indexed
+                                    const year = newDate.getFullYear();
+                                    return (
+                                      <tr key={employee.employeeId}>
+                                        <td>
+                                          <div className="d-flex align-items-center">
+                                            <img
+                                              src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
+                                              alt=""
+                                              className="avatar rounded-circle me-2"
+                                              style={{
+                                                width: '40px',
+                                                height: '40px',
+                                                objectFit: 'cover',
+                                                cursor: 'pointer'
+                                              }}
+                                              onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`)}
+                                            />
+                                            <div>
+                                              <h6 className="mb-0">{employee.employeeName}</h6>
+                                              <small>{employee.employeeId}</small>
+                                            </div>
+                                          </div>
+                                        </td>
+                                        <td>
+                                          <div>{employee.phone}</div>
+                                          <small>{employee.emailid}</small>
+                                          <div> <i className="bi bi-calendar-check-fill text-primary fs-6 me-2" />
+                                            {date}/{month}/{year}</div>
+                                        </td>
+                                        <td>
+                                          <div>{employee.department}</div>
+                                          <small>{employee.designation}</small>
+                                        </td>
+                                        <td>
+                                          <div className="btn-group" role="group">
+                                            <button
+                                              className="btn btn-sm btn-outline-secondary"
+                                              data-bs-toggle="modal"
+                                              data-bs-target="#editemp"
+                                              onClick={() => setToEdit(employee._id)}
+                                            >
+                                              <i className="icofont-edit text-success"></i>
+                                            </button>
+                                            <button
+                                              className="btn btn-sm btn-outline-secondary"
+                                              data-bs-toggle="modal"
+                                              data-bs-target="#deleteproject"
+                                              onClick={() => setDeletableId(employee._id)}
+                                            >
+                                              <i className="icofont-ui-delete text-danger"></i>
+                                            </button>
+                                          </div>
+                                          <div className="mt-2">
+                                            <Link
+                                              to="/projects"
+                                              state={{ employeeName: employee.employeeName }}
+                                              className="btn btn-sm btn-outline-secondary me-1"
+                                            >
+                                              Projects
+                                            </Link>
+                                            <Link
+                                              to="/tasks"
+                                              state={{ employeeName: employee.employeeName }}
+                                              className="btn btn-sm btn-outline-secondary"
+                                            >
+                                              Tasks
+                                            </Link>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
                         </div>
                       </div>

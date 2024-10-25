@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,6 +10,8 @@ const Header = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const navigation = useNavigate();
+  const [dropdownPosition, setDropdownPosition] = useState({});
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -72,6 +74,24 @@ const Header = () => {
     }
   };
 
+  const handleDropdownToggle = (e) => {
+    e.preventDefault();
+    const rect = e.target.getBoundingClientRect();
+    const isRightAligned = window.innerWidth - rect.right < rect.left;
+    
+    setDropdownPosition({
+      position: 'fixed',
+      top: `${rect.bottom}px`,
+      [isRightAligned ? 'right' : 'left']: isRightAligned 
+        ? `${window.innerWidth - rect.right}px`
+        : `${rect.left}px`,
+    });
+
+    if (dropdownRef.current) {
+      dropdownRef.current.classList.toggle('show');
+    }
+  };
+
   return (
     <>
       <div className="header">
@@ -79,7 +99,7 @@ const Header = () => {
           <div className="container-xxl">
             {/* header rightbar icon */}
             <div className="h-right d-flex align-items-center mr-5 mr-lg-0 order-1">
-              <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center" style={{ position: 'relative' }}>
+              <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center zindex-popover">
                 <div className="u-info me-2">
                   <p className="mb-0 text-end line-height-sm ">
                     <span className="font-weight-bold">{username}</span>
@@ -90,8 +110,7 @@ const Header = () => {
                   className="nav-link dropdown-toggle pulse p-0"
                   href="#"
                   role="button"
-                  data-bs-toggle="dropdown"
-                  data-bs-display="static"
+                  onClick={handleDropdownToggle}
                 >
                   <img
                     className="avatar lg rounded-circle img-thumbnail"
@@ -100,14 +119,9 @@ const Header = () => {
                   />
                 </a>
                 <div 
+                  ref={dropdownRef}
                   className="dropdown-menu rounded-lg shadow border-0 dropdown-animation p-0 m-0"
-                  style={{
-                    position: 'absolute',
-                    inset: '0px auto auto 0px',
-                    margin: '0px',
-                    transform: 'translate(-220px, 40px)',
-                    minWidth: '280px',
-                  }}
+                  style={dropdownPosition}
                 >
                   <div className="card border-0 w280">
                     <div className="card-body pb-0">
@@ -233,6 +247,16 @@ const Header = () => {
         </div>
         <ToastContainer />
       </div>
+
+      {/* Add this style tag at the end of the component */}
+      <style jsx>{`
+        @media (max-width: 786px) {
+          .dropdown-menu-right {
+            right: 0 !important;
+            left: auto !important;
+          }
+        }
+      `}</style>
     </>
   );
 };

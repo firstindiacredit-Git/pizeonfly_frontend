@@ -211,7 +211,7 @@ const Project = () => {
                 </div>{" "}
                 {/* Row end  */}
                 {viewMode === "list" && (
-                  <div className="row g-3 mb-3 row-deck">
+                  <div className="row g-3 mb-3 row-deck table-responsive">
                     <div className="col-md-12">
                       <div className="card mb-3">
                         <div className="card-body">
