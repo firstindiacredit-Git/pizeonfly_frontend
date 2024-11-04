@@ -132,6 +132,54 @@ const Sidebar = () => {
                   </li>
                 </ul>
               </li>
+
+              <li className="collapsed">
+                <a
+                  className="m-link"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#tools-Components"
+                  href="#"
+                >
+                  <i className="icofont-tools-alt-2" /> <span>Tools</span>{" "}
+                  <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+                </a>
+                <ul className="sub-menu collapse" id="tools-Components">
+                  <li>
+                    <Link className="ms-link" to="https://pizeonflyurl.vercel.app/">
+                      <span>URL Shortner</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="ms-link" to="#">
+                      <span>QR Code Generator</span>
+                    </Link>
+                  </li>
+                </ul>
+              </li>
+              <li className="collapsed">
+                <a
+                  className="m-link"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#accounts-Components"
+                  href="#"
+                >
+                  <i className="icofont-document-folder" /> <span>Accounts</span>{" "}
+                  <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+                </a>
+                <ul className="sub-menu collapse" id="accounts-Components">
+                  <li>
+                    <Link className="ms-link" to="#">
+                      <span>Create Invoice</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="ms-link" to="#">
+                      <span>All Invoice</span>
+                    </Link>
+                  </li>
+                </ul>
+              </li>
+
               <li className="collapsed">
                 <a
                   className="m-link"
@@ -159,7 +207,7 @@ const Sidebar = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link className="ms-link" to="/calander">
+                    <Link className="ms-link" to="#">
                       <span>Chat</span>
                     </Link>
                   </li>

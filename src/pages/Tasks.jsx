@@ -708,15 +708,11 @@ const Tasks = () => {
                           currentTasks.map((task, index) => {
                             const currentDate = new Date();
                             const taskEndDate = new Date(task.taskEndDate);
-                            const taskStartDate = new Date(task.taskDate);
                             const isOverdue = taskEndDate < currentDate && task.taskStatus !== 'Completed';
-                            const isCompletedAfterDue = task.taskStatus === 'Completed' && taskEndDate < currentDate && taskEndDate.getTime() !== taskStartDate.getTime();
 
                             let backgroundColor = '';
                             if (isOverdue) {
                               backgroundColor = '#f6c8b7';
-                            } else if (isCompletedAfterDue) {
-                              backgroundColor = '#c6f2c1';
                             }
 
                             return (
@@ -832,19 +828,15 @@ const Tasks = () => {
                     {currentTasks.map((task, index) => {
                       const currentDate = new Date();
                       const taskEndDate = new Date(task.taskEndDate);
-                      const taskStartDate = new Date(task.taskDate);
                       const isOverdue = taskEndDate < currentDate && task.taskStatus !== 'Completed';
-                      const isCompletedAfterDue = task.taskStatus === 'Completed' && taskEndDate < currentDate && taskEndDate.getTime() !== taskStartDate.getTime();
 
                       let backgroundColor = '';
                       if (isOverdue) {
                         backgroundColor = '#f6c8b7';
-                      } else if (isCompletedAfterDue) {
-                        backgroundColor = '#c6f2c1';
                       }
 
                       return (
-                        <div key={task._id} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                        <div key={task._id} className="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
                           <div className="card task-card h-100" style={{ backgroundColor }}>
                             <div className="card-body">
                               <div className="d-flex justify-content-between align-items-center mb-2">
@@ -899,7 +891,7 @@ const Tasks = () => {
                                   data-bs-toggle="modal"
                                   data-bs-target="#dremovetask"
                                   onClick={() => setDeletableId(task._id)}
-                                  className="btn btn-sm btn-danger"
+                                  className="btn btn-sm btn-danger text-white"
                                 >
                                   <i className="bi bi-trash"></i> Delete
                                 </button>
