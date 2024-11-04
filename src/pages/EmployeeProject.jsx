@@ -12,7 +12,7 @@ const Project = () => {
   const [viewMode, setViewMode] = useState("list");
 
   const [employees, setEmployees] = useState([]);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -163,8 +163,8 @@ const Project = () => {
     setSelectProject(project);
     fetchProjectMessages(project._id);
     // Clear notifications for this project
-    setNotifications(prev => ({...prev, [project._id]: 0}));
-    
+    setNotifications(prev => ({ ...prev, [project._id]: 0 }));
+
     // Use setTimeout to ensure the modal is open before we try to focus and scroll
     setTimeout(() => {
       if (messageInputRef.current) {
@@ -222,6 +222,7 @@ const Project = () => {
                             <thead>
                               <tr>
                                 <th>Project Name</th>
+                                <th>Client Name</th>
                                 <th>Start Date</th>
                                 <th>End Date</th>
                                 <th>Members</th>
@@ -258,6 +259,11 @@ const Project = () => {
                                         {project.projectCategory}
                                       </figcaption>
                                     </td>
+                                    <td>
+                                      {project.clientAssignPerson.map(
+                                        (name) => name.clientName + ", "
+                                      )}
+                                    </td>
                                     <td>{getFormattedDate(project.projectStartDate)}</td>
                                     <td>{getFormattedDate(project.projectEndDate)} </td>
                                     <td>
@@ -265,6 +271,7 @@ const Project = () => {
                                         (name) => name.employeeName + ", "
                                       )}
                                     </td>
+
                                     <td>
                                       <div className="d-flex justify-content-center">{project.progress}%</div>
                                     </td>

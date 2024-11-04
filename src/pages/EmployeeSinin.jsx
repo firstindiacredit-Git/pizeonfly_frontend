@@ -111,15 +111,26 @@ const Signin = () => {
                       <span>Employee Panel</span>
                     </div>
                     <div className="col-12 text-center mb-4">
-                      <Link
-                        className="btn btn-lg btn-outline-secondary btn-block"
-                        to="/"
-                      >
-                        <span className="d-flex justify-content-center align-items-center gap-2">
-                          <i className="bi bi-person-plus-fill"></i>
-                          Sign in as an Admin
-                        </span>
-                      </Link>
+                      <div className="d-flex gap-5">
+                        <Link
+                          className="btn btn-lg btn-outline-secondary btn-block"
+                          to="/"
+                        >
+                          <span className="d-flex justify-content-center align-items-center gap-2">
+                            <i className="bi bi-person-plus-fill"></i>
+                            Admin Sign In
+                          </span>
+                        </Link>
+                        <Link
+                          className="btn btn-lg btn-outline-secondary btn-block"
+                          to="/clientsignin"
+                        >
+                          <span className="d-flex justify-content-center align-items-center gap-2">
+                            <i className="bi bi-person-plus-fill"></i>
+                            Client Sign In
+                          </span>
+                        </Link>
+                      </div>
                       <span className="dividers text-muted mt-4">OR</span>
                     </div>
                     <div className="col-12">
@@ -157,7 +168,7 @@ const Signin = () => {
                             className="form-control form-control-lg"
                             placeholder="***************"
                           />
-                          <div className="d-flex" style={{position: "absolute", color: "black", marginLeft:"20rem"}}>
+                          <div className="d-flex" style={{ position: "absolute", color: "black", marginLeft: "20rem" }}>
                             <i onClick={toggleShowPassword} className={`bi mt-2 form-control ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
                           </div>
                         </div>

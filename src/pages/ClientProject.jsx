@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef  } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Sidebar from "../clientCompt/ClientSidebar";
 import Header from "../clientCompt/ClientHeader";
 import { Link } from "react-router-dom";
@@ -49,6 +49,8 @@ const ClientProject = () => {
             authorization: `Bearer ${Token}`, // Ensure Bearer token format
           },
         });
+        console.log(response.data);
+
         setProjects(response.data); // Set fetched projects to state
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -235,6 +237,7 @@ const ClientProject = () => {
                             <thead>
                               <tr>
                                 <th>Project Name</th>
+                                <th>Client Name</th>
                                 <th>Start Date</th>
                                 <th>End Date</th>
                                 <th>Members</th>
@@ -270,6 +273,11 @@ const ClientProject = () => {
                                       <figcaption className="blockquote-footer">
                                         {project.projectCategory}
                                       </figcaption>
+                                    </td>
+                                    <td>
+                                      {project.clientAssignPerson.map(
+                                        (name) => name.clientName + ", "
+                                      )}
                                     </td>
                                     <td>{getFormattedDate(project.projectStartDate)}</td>
                                     <td>{getFormattedDate(project.projectEndDate)} </td>
@@ -331,13 +339,13 @@ const ClientProject = () => {
                               <p>Project Progress: {project.progress}%</p>
 
                               <p>Members: {project.taskAssignPerson.map((name) => name.employeeName + ", ")}</p>
+                              <p>Members: {project.clientAssignPerson.map((name) => name.clientName + ", ")}</p>
                               <button
                                 className="bi bi-chat-left-dots btn outline-secondary text-primary position-relative"
                                 data-bs-toggle="modal"
                                 data-bs-target="#addUser"
                                 onClick={() => handleOpenMessages(project)}
                               >
-                                Add Message
                                 {notifications[project._id] > 0 && (
                                   <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                     {notifications[project._id]}
