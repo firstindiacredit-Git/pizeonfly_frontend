@@ -626,7 +626,7 @@ const Tasks = () => {
                           </li>
                         </ul>
                       </div>
-                      
+
                     </div>
                   </div>
                 </div>{" "}
@@ -776,17 +776,19 @@ const Tasks = () => {
                                     <option value="Lowest">Lowest</option>
                                   </select>
                                 </td>
-                                <td style={{ display: 'flex', justifyContent: 'center', gap: '2vh', marginTop: '1.1rem', backgroundColor }}>
-                                  <button
-                                    onClick={() => taskHandleSubmit(task._id)}
-                                    className="bi bi-check2 bg-primary text-white border-0 rounded"
-                                  />
-                                  <button
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#dremovetask"
-                                    onClick={() => setDeletableId(task._id)}
-                                    className="bi bi-trash bg-danger text-white border-0 rounded"
-                                  />
+                                <td className="bg-transparent">
+                                  <div className="d-flex gap-2 bg-transparent">
+                                    <button
+                                      onClick={() => taskHandleSubmit(task._id)}
+                                      className="bi bi-check2 bg-primary text-white border-0 rounded"
+                                    />
+                                    <button
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#dremovetask"
+                                      onClick={() => setDeletableId(task._id)}
+                                      className="bi bi-trash bg-danger text-white border-0 rounded"
+                                    />
+                                  </div>
                                 </td>
                                 <td style={{ backgroundColor }} className="">
                                   {task.taskStatus === 'Not Started' && (

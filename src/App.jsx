@@ -19,7 +19,8 @@ import EmployeeTasks from './pages/EmployeeTask'
 import Images from './pages/Image'
 import Client from './pages/Client'
 import Calander from './pages/Calander'
-
+import UrlShortner from './pages/tools/UrlShortner'
+import QrCodeGenerate from './pages/tools/QrCodeGenerate'
 // import Test from './pages/test'
 
 
@@ -49,6 +50,8 @@ function App() {
         <Route path='/clients' element={<Client/>}></Route>   
         <Route path='/calander' element={<Calander/>}></Route>   
 
+        <Route path='/urlShortner' element={<UrlShortner/>}></Route>   
+        <Route path='/qrCodeGenerate' element={<QrCodeGenerate/>}></Route>   
 
 
           
