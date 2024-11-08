@@ -50,6 +50,7 @@ function App() {
         <Route path='/clients' element={<Client/>}></Route>   
         <Route path='/calander' element={<Calander/>}></Route>   
 
+
         <Route path='/urlShortner' element={<UrlShortner/>}></Route>   
         <Route path='/qrCodeGenerate' element={<QrCodeGenerate/>}></Route>   
 
