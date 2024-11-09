@@ -168,7 +168,7 @@ const UrlShortner = () => {
                                                                 </td>
                                                                 <td>
                                                                     <div>
-                                                                        <a href={`${BASE_URL}api/r/${url.short_url}`} target="_blank" rel="noopener noreferrer">{BASE_URL}api/r/{url.short_url}</a>
+                                                                        <a href={`${BASE_URL}/${url.short_url}`} target="_blank" rel="noopener noreferrer">{BASE_URL}api/r/{url.short_url}</a>
                                                                     </div>
                                                                     <button className='btn btn-sm btn-primary' onClick={() => navigator.clipboard.writeText(`${BASE_URL}api/r/${url.short_url}`)}>
                                                                         <i class="bi bi-copy"></i>
