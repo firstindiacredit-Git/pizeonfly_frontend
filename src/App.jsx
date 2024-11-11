@@ -21,6 +21,7 @@ import Client from './pages/Client'
 import Calander from './pages/Calander'
 import UrlShortner from './pages/tools/UrlShortner'
 import QrCodeGenerate from './pages/tools/QrCodeGenerate'
+import SaasManager from './pages/tools/SaasManager'
 // import Test from './pages/test'
 
 
@@ -53,6 +54,7 @@ function App() {
 
         <Route path='/urlShortner' element={<UrlShortner/>}></Route>   
         <Route path='/qrCodeGenerate' element={<QrCodeGenerate/>}></Route>   
+        <Route path='/saasManager' element={<SaasManager/>}></Route>   
 
 
           

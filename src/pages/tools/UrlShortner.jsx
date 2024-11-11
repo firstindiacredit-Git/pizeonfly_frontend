@@ -14,6 +14,7 @@ const UrlShortner = () => {
     const [loading, setLoading] = useState(false);
     const userId = localStorage.getItem('user'); // Assuming userId is stored in localStorage
     const [selectedQR, setSelectedQR] = useState(null);
+    const [copiedId, setCopiedId] = useState(null);
 
     const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -71,6 +72,12 @@ const UrlShortner = () => {
         } catch (error) {
             toast.error('Error deleting URL');
         }
+    };
+
+    const handleCopy = async (text, id) => {
+        await navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
     };
 
     const QRModal = ({ qr, onClose }) => {
@@ -162,9 +169,14 @@ const UrlShortner = () => {
                                                                     <div>
                                                                         <a href={url.original_url} target="_blank" rel="noopener noreferrer">{url.original_url}</a>
                                                                     </div>
-                                                                    <button className='btn btn-sm btn-primary' onClick={() => navigator.clipboard.writeText(url.original_url)}>
-                                                                        <i class="bi bi-copy"></i>
-                                                                    </button>
+                                                                    <div className="position-relative">
+                                                                        {copiedId === `original-${url._id}` &&
+                                                                            <small className="position-absolute" style={{ top: '0px', left: '40px', color: 'green', backgroundColor: '#cacaca', padding: '5px', borderRadius: '5px' }}>Link Copied!</small>
+                                                                        }
+                                                                        <button className='btn btn-sm btn-primary' onClick={() => handleCopy(url.original_url, `original-${url._id}`)}>
+                                                                            <i className="bi bi-copy"></i>
+                                                                        </button>
+                                                                    </div>
                                                                 </td>
                                                                 <td>
                                                                     <div>
@@ -172,9 +184,14 @@ const UrlShortner = () => {
                                                                             {`${BASE_URL}${url.short_url}`}
                                                                         </a>
                                                                     </div>
-                                                                    <button className='btn btn-sm btn-primary' onClick={() => navigator.clipboard.writeText(`${BASE_URL}${url.short_url}`)}>
-                                                                        <i className="bi bi-copy"></i>
-                                                                    </button>
+                                                                    <div className="position-relative">
+                                                                        {copiedId === `short-${url._id}` &&
+                                                                            <small className="position-absolute" style={{ top: '0px', left: '40px', color: 'green', backgroundColor: '#cacaca', padding: '5px', borderRadius: '5px' }}>Link Copied!</small>
+                                                                        }
+                                                                        <button className='btn btn-sm btn-primary' onClick={() => handleCopy(`${BASE_URL}${url.short_url}`, `short-${url._id}`)}>
+                                                                            <i className="bi bi-copy"></i>
+                                                                        </button>
+                                                                    </div>
                                                                 </td>
                                                                 <td>
                                                                     <img

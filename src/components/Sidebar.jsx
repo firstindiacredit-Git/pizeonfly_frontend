@@ -145,9 +145,9 @@ const Sidebar = () => {
                 </a>
                 <ul className="sub-menu collapse" id="tools-Components">
                   <li>
-                    <Link className="ms-link" 
-                    // to="https://pizeonflyurl.vercel.app/"
-                    to="/urlShortner"
+                    <Link className="ms-link"
+                      // to="https://pizeonflyurl.vercel.app/"
+                      to="/urlShortner"
                     >
                       <span>URL Shortner</span>
                     </Link>
@@ -155,6 +155,11 @@ const Sidebar = () => {
                   <li>
                     <Link className="ms-link" to="/qrCodeGenerate">
                       <span>QR Code Generator</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="ms-link" to="/saasManager">
+                      <span>Saas Manager</span>
                     </Link>
                   </li>
                 </ul>
