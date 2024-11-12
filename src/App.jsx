@@ -19,6 +19,10 @@ import EmployeeTasks from './pages/EmployeeTask'
 import Images from './pages/Image'
 import Client from './pages/Client'
 import Calander from './pages/Calander'
+import CreateInvoice from './pages/CreateInvoice'
+import AllInvoice from './pages/AllInvoice'
+import UpdateInvoice from './pages/UpdateInvoice'
+
 import UrlShortner from './pages/tools/UrlShortner'
 import QrCodeGenerate from './pages/tools/QrCodeGenerate'
 import SaasManager from './pages/tools/SaasManager'
@@ -50,6 +54,9 @@ function App() {
         <Route path='/images' element={<Images/>}></Route>   
         <Route path='/clients' element={<Client/>}></Route>   
         <Route path='/calander' element={<Calander/>}></Route>   
+        <Route path='/create-invoice' element={<CreateInvoice/>}></Route>   
+        <Route path='/all-invoice' element={<AllInvoice/>}></Route>  
+        <Route path='/update-invoice' element={<UpdateInvoice/>}></Route>  
 
 
         <Route path='/urlShortner' element={<UrlShortner/>}></Route>   

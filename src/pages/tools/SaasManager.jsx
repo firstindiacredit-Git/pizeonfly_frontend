@@ -19,10 +19,10 @@ const SaasManager = () => {
                                 src="https://pizeonflytools.vercel.app/"
                                 style={{
                                     width: "100%",
-                                    height: "90vh",
+                                    height: "95vh",
                                     border: "none",
                                     position: "relative",
-                                    top: "-55px",
+                                    top: "",
                                 }}
                                 title="Saas Management Tool"
                             />

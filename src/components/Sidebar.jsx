@@ -176,12 +176,12 @@ const Sidebar = () => {
                 </a>
                 <ul className="sub-menu collapse" id="accounts-Components">
                   <li>
-                    <Link className="ms-link" to="#">
+                    <Link className="ms-link" to="/create-invoice">
                       <span>Create Invoice</span>
                     </Link>
                   </li>
                   <li>
-                    <Link className="ms-link" to="#">
+                    <Link className="ms-link" to="/all-invoice">
                       <span>All Invoice</span>
                     </Link>
                   </li>
