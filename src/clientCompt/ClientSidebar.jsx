@@ -64,6 +64,51 @@ const ClientSidebar = () => {
                                 </li> */}
                             </ul>
                         </li>
+
+                        {/* Add Tools Menu */}
+                        <li className="collapsed">
+                            <a
+                                className="m-link"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#tools-Components"
+                                href="#"
+                            >
+                                <i className="icofont-tools-alt-2" /> <span>Tools</span>{" "}
+                                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+                            </a>
+                            <ul className="sub-menu collapse" id="tools-Components">
+                                <li>
+                                    <Link className="ms-link" to="/clients-urlShortner">
+                                        <span>URL Shortner</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="ms-link" to="/clients-qrCodeGenerate">
+                                        <span>QR Code Generator</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="ms-link" to="/clients-saasManager">
+                                        <span>Saas Manager</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="ms-link" to="/clients-htmlTemplateGenerator">
+                                        <span>HTML Template Generator</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="ms-link" to="/clients-cardValidator">
+                                        <span>Card Validator</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="ms-link" to="/clients-miscellaneous">
+                                        <span>Miscellaneous</span>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
                     {/* Menu: menu collepce btn */}
                     <button

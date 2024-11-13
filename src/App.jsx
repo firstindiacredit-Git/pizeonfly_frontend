@@ -29,6 +29,20 @@ import SaasManager from './pages/tools/SaasManager'
 import Miscellaneous from './pages/tools/Miscellaneous'
 import HtmlTemplateGenerator from './pages/tools/HtmlTemplateGenerator'
 import CardValidator from './pages/tools/CardValidator'
+import EmployeeCardValidator from './pages/employee-tools/CardValidator'
+import EmployeeHtmlTemplateGenerator from './pages/employee-tools/HtmlTemplateGenerator'
+import EmployeeMiscellaneous from './pages/employee-tools/Miscellaneous'
+import EmployeeSaasManager from './pages/employee-tools/SaasManager'
+import EmployeeQrCodeGenerate from './pages/employee-tools/QrCodeGenerate'
+import EmployeeUrlShortner from './pages/employee-tools/UrlShortner'
+
+import ClientCardValidator from './pages/clients-tools/CardValidator'
+import ClientHtmlTemplateGenerator from './pages/clients-tools/HtmlTemplateGenerator'
+import ClientMiscellaneous from './pages/clients-tools/Miscellaneous'
+import ClientSaasManager from './pages/clients-tools/SaasManager'
+import ClientQrCodeGenerate from './pages/clients-tools/QrCodeGenerate'
+import ClientUrlShortner from './pages/clients-tools/UrlShortner'
+
 // import Test from './pages/test'
 
 
@@ -68,6 +82,22 @@ function App() {
         <Route path='/miscellaneous' element={<Miscellaneous/>}></Route>   
         <Route path='/htmlTemplateGenerator' element={<HtmlTemplateGenerator/>}></Route>   
         <Route path='/cardValidator' element={<CardValidator/>}></Route>   
+
+        <Route path='/employee-htmlTemplateGenerator' element={<EmployeeHtmlTemplateGenerator/>}></Route>   
+        <Route path='/employee-cardValidator' element={<EmployeeCardValidator/>}></Route>  
+        <Route path='/employee-miscellaneous' element={<EmployeeMiscellaneous/>}></Route>  
+        <Route path='/employee-saasManager' element={<EmployeeSaasManager/>}></Route>  
+        <Route path='/employee-qrCodeGenerate' element={<EmployeeQrCodeGenerate/>}></Route>  
+        <Route path='/employee-urlShortner' element={<EmployeeUrlShortner/>}></Route>  
+
+        <Route path='/clients-cardValidator' element={<ClientCardValidator/>}></Route>  
+        <Route path='/clients-htmlTemplateGenerator' element={<ClientHtmlTemplateGenerator/>}></Route>  
+        <Route path='/clients-miscellaneous' element={<ClientMiscellaneous/>}></Route> 
+        <Route path='/clients-saasManager' element={<ClientSaasManager/>}></Route>  
+        <Route path='/clients-qrCodeGenerate' element={<ClientQrCodeGenerate/>}></Route>  
+        <Route path='/clients-urlShortner' element={<ClientUrlShortner/>}></Route>   
+
+        
 
 
 

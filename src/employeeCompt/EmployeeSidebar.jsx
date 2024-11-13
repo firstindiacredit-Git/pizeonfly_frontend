@@ -48,7 +48,7 @@ const EmployeeSidebar = () => {
                             >
                                 <i className="icofont-briefcase" />
                                 <span>Projects</span>{" "}
-                                <span className="arrow icofont-dotted-down ms.-auto text-end fs-5" />
+                                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
                             </a>
                             {/* Menu: Sub menu ul */}
                             <ul className="sub-menu collapse" id="project-Components">
@@ -60,6 +60,50 @@ const EmployeeSidebar = () => {
                                 <li>
                                     <Link className="ms-link" to="/employee-tasks">
                                         <span>Tasks</span>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </li>
+                        {/* Add Tools Menu */}
+                        <li className="collapsed">
+                            <a
+                                className="m-link"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#tools-Components"
+                                href="#"
+                            >
+                                <i className="icofont-tools-alt-2" /> <span>Tools</span>{" "}
+                                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+                            </a>
+                            <ul className="sub-menu collapse" id="tools-Components">
+                                <li>
+                                    <Link className="ms-link" to="/employee-urlShortner">
+                                        <span>URL Shortner</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="ms-link" to="/employee-qrCodeGenerate">
+                                        <span>QR Code Generator</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="ms-link" to="/employee-saasManager">
+                                        <span>Saas Manager</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="ms-link" to="/employee-htmlTemplateGenerator">
+                                        <span>HTML Template Generator</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="ms-link" to="/employee-cardValidator">
+                                        <span>Card Validator</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="ms-link" to="/employee-miscellaneous">
+                                        <span>Miscellaneous</span>
                                     </Link>
                                 </li>
                             </ul>
