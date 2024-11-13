@@ -3,7 +3,7 @@ import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 // import axios from 'axios';
 
-const SaasManager = () => {
+const CardValidator = () => {
     return (
         <>
             <div id="mytask-layout">
@@ -12,19 +12,19 @@ const SaasManager = () => {
                     <Header />
 
                     <div className="body d-flex py-lg-3 py-md-2 flex-column">
-                        <h4 className="mb-0 fw-bold">Saas Manager</h4>
+                        {/* <h4 className="mb-0 fw-bold">Card Validator</h4> */}
                         
                         <div className="flex-grow-1 mt-3" style={{ minHeight: "80vh", overflow: "hidden" }}>
                             <iframe 
-                                src="https://pizeonflytools.vercel.app/"
+                                src="https://cardvalidator.vercel.app/"
                                 style={{
                                     width: "100%",
-                                    height: "82vh",
+                                    height: "78vh",
                                     border: "none",
                                     position: "relative",
-                                    top: "-4.5rem",
+                                    top: "",
                                 }}
-                                title="Saas Management Tool"
+                                title="Card Validator"
                             />
                         </div>
                     </div>
@@ -34,4 +34,4 @@ const SaasManager = () => {
     );
 };
 
-export default SaasManager;
+export default CardValidator;

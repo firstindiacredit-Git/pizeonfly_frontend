@@ -3,7 +3,7 @@ import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 // import axios from 'axios';
 
-const SaasManager = () => {
+const HtmlTemplateGenerator = () => {
     return (
         <>
             <div id="mytask-layout">
@@ -12,19 +12,20 @@ const SaasManager = () => {
                     <Header />
 
                     <div className="body d-flex py-lg-3 py-md-2 flex-column">
-                        <h4 className="mb-0 fw-bold">Saas Manager</h4>
+                        <h4 className="mb-0 fw-bold">HTML Template Generator</h4>
                         
                         <div className="flex-grow-1 mt-3" style={{ minHeight: "80vh", overflow: "hidden" }}>
                             <iframe 
-                                src="https://pizeonflytools.vercel.app/"
+                                src="https://html-template-generator.vercel.app/"
                                 style={{
-                                    width: "100%",
-                                    height: "82vh",
+                                    width: "200%",
+                                    height: "120vh",
                                     border: "none",
                                     position: "relative",
-                                    top: "-4.5rem",
+                                    transform: "scale(0.6)",
+                                    transformOrigin: "0 0",
                                 }}
-                                title="Saas Management Tool"
+                                title="HTML Template Generator"
                             />
                         </div>
                     </div>
@@ -34,4 +35,4 @@ const SaasManager = () => {
     );
 };
 
-export default SaasManager;
+export default HtmlTemplateGenerator;

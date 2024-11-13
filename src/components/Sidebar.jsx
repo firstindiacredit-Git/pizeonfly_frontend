@@ -162,6 +162,22 @@ const Sidebar = () => {
                       <span>Saas Manager</span>
                     </Link>
                   </li>
+
+                  <li>
+                    <Link className="ms-link" to="/htmlTemplateGenerator">
+                      <span>HTML Template Generator</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="ms-link" to="/cardValidator">
+                      <span>Card Validator</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="ms-link" to="/miscellaneous">
+                      <span>Miscellaneous</span>
+                    </Link>
+                  </li>
                 </ul>
               </li>
               <li className="collapsed">

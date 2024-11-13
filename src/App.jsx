@@ -26,6 +26,9 @@ import UpdateInvoice from './pages/UpdateInvoice'
 import UrlShortner from './pages/tools/UrlShortner'
 import QrCodeGenerate from './pages/tools/QrCodeGenerate'
 import SaasManager from './pages/tools/SaasManager'
+import Miscellaneous from './pages/tools/Miscellaneous'
+import HtmlTemplateGenerator from './pages/tools/HtmlTemplateGenerator'
+import CardValidator from './pages/tools/CardValidator'
 // import Test from './pages/test'
 
 
@@ -62,9 +65,9 @@ function App() {
         <Route path='/urlShortner' element={<UrlShortner/>}></Route>   
         <Route path='/qrCodeGenerate' element={<QrCodeGenerate/>}></Route>   
         <Route path='/saasManager' element={<SaasManager/>}></Route>   
-
-
-          
+        <Route path='/miscellaneous' element={<Miscellaneous/>}></Route>   
+        <Route path='/htmlTemplateGenerator' element={<HtmlTemplateGenerator/>}></Route>   
+        <Route path='/cardValidator' element={<CardValidator/>}></Route>   
 
 
 

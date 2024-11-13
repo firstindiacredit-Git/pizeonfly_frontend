@@ -339,14 +339,28 @@ const Client = () => {
                                                     <div className="card teacher-card">
                                                         <div className="card-body  d-flex" >
                                                             <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w220">
-                                                                <img
-                                                                    src={
-                                                                        `${import.meta.env.VITE_BASE_URL}` +
-                                                                        client.clientImage.replace('uploads/', '')
-                                                                    }
-                                                                    alt=""
-                                                                    className="avatar xl rounded-circle img-thumbnail shadow-sm"
-                                                                />
+                                                                <div className="position-relative d-inline-block">
+                                                                    <img
+                                                                        src={
+                                                                            `${import.meta.env.VITE_BASE_URL}` +
+                                                                            client.clientImage.replace('uploads/', '')
+                                                                        }
+                                                                        alt=""
+                                                                        className="avatar xl rounded-circle img-thumbnail shadow-sm"
+                                                                        style={{
+                                                                            transition: 'transform 0.3s ease-in-out',
+                                                                            cursor: 'pointer',
+                                                                        }}
+                                                                        onMouseEnter={(e) => {
+                                                                            e.target.style.transform = 'scale(2.5)';
+                                                                            e.target.style.zIndex = '100';
+                                                                        }}
+                                                                        onMouseLeave={(e) => {
+                                                                            e.target.style.transform = 'scale(1)';
+                                                                            e.target.style.zIndex = '1';
+                                                                        }}
+                                                                    />
+                                                                </div>
                                                                 <div className="about-info d-flex align-items-center mt-1 justify-content-center flex-column">
                                                                     <h6 className="mb-0 fw-bold d-block fs-6 mt-2">{client.clientName}</h6>
                                                                     <div
@@ -417,7 +431,7 @@ const Client = () => {
                                                                         <tr key={client._id}>
                                                                             <td>
                                                                                 <div className="d-flex align-items-center">
-                                                                                    <img className="avatar rounded-circle me-2" src={`${import.meta.env.VITE_BASE_URL}${client.clientImage.replace('uploads/', '')}`} alt="" style={{width: '40px', height: '40px'}} />
+                                                                                    <img className="avatar rounded-circle me-2" src={`${import.meta.env.VITE_BASE_URL}${client.clientImage.replace('uploads/', '')}`} alt="" style={{ width: '40px', height: '40px' }} />
                                                                                     <div>
                                                                                         <h6 className="mb-0">{client.clientName}</h6>
                                                                                         <small>{client.clientEmail}</small>
