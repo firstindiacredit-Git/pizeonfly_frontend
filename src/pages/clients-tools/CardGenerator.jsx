@@ -3,7 +3,7 @@ import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 // import axios from 'axios';
 
-const Miscellaneous = () => {
+const CardGenerator = () => {
     return (
         <>
             <div id="mytask-layout">
@@ -12,21 +12,20 @@ const Miscellaneous = () => {
                     <Header />
 
                     <div className="body d-flex py-lg-3 py-md-2 flex-column">
-                        <h4 className="mb-0 fw-bold">Miscellaneous Tools</h4>
-
+                        <h4 className="mb-0 fw-bold">Card Generator</h4>
+                        
                         <div className="flex-grow-1 mt-3" style={{ minHeight: "80vh", overflow: "hidden" }}>
-                            <iframe
-                                src="https://tools-collection-sigma.vercel.app/"
+                            <iframe 
+                                src="https://creadit-card-generator.vercel.app/"
                                 style={{
                                     width: "100%",
-                                    height: "75vh",
+                                    height: "78vh",
                                     border: "none",
                                     position: "relative",
+                                    top: "",
                                 }}
-                                title="Miscellaneous Tools"
-                                allow="camera 'none'; microphone 'none'; display-capture 'none'"
+                                title="Card Generator"
                             />
-
                         </div>
                     </div>
                 </div>
@@ -35,4 +34,4 @@ const Miscellaneous = () => {
     );
 };
 
-export default Miscellaneous;
+export default CardGenerator;

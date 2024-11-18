@@ -18,6 +18,10 @@
     "datatables.net-responsive": "^3.0.2",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
+    "fabric": "^6.5.0",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "konva": "^9.3.16",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.5",
     "react-bootstrap-icons": "^1.11.4",
@@ -25,13 +29,15 @@
     "react-chartjs-2": "^5.2.0",
     "react-datepicker": "^6.9.0",
     "react-dom": "^18.2.0",
+    "react-konva": "^18.2.10",
     "react-multi-select-component": "^4.3.4",
     "react-pdf": "^9.1.1",
     "react-qr-code": "^2.0.15",
     "react-router-dom": "^6.23.0",
     "react-select": "^5.8.1",
     "react-toastify": "^10.0.5",
-    "socket.io-client": "^4.8.0"
+    "socket.io-client": "^4.8.0",
+    "wavesurfer.js": "^7.8.8"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

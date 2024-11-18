@@ -174,8 +174,18 @@ const Sidebar = () => {
                     </Link>
                   </li>
                   <li>
+                    <Link className="ms-link" to="/cardGenerator">
+                      <span>Card Generator</span>
+                    </Link>
+                  </li>
+                  <li>
                     <Link className="ms-link" to="/miscellaneous">
                       <span>Miscellaneous</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="ms-link" to="/miscellaneous1">
+                      <span>Miscellaneous1</span>
                     </Link>
                   </li>
                 </ul>

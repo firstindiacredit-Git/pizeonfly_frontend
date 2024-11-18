@@ -102,6 +102,12 @@ const EmployeeSidebar = () => {
                                     </Link>
                                 </li>
                                 <li>
+                                    <Link className="ms-link" to="/employee-cardGenerator">
+                                        <span>Card Generator</span>
+                                    </Link>
+                                </li>
+                                
+                                <li>
                                     <Link className="ms-link" to="/employee-miscellaneous">
                                         <span>Miscellaneous</span>
                                     </Link>

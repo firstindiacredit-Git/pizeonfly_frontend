@@ -103,6 +103,11 @@ const ClientSidebar = () => {
                                     </Link>
                                 </li>
                                 <li>
+                                    <Link className="ms-link" to="/clients-cardGenerator">
+                                        <span>Card Generator</span>
+                                    </Link>
+                                </li>
+                                <li>
                                     <Link className="ms-link" to="/clients-miscellaneous">
                                         <span>Miscellaneous</span>
                                     </Link>
