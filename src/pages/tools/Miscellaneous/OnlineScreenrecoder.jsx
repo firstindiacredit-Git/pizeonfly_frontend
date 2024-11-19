@@ -89,7 +89,7 @@ const OnlineScreenrecoder = () => {
                     <Header />
                     <div className="body d-flex py-lg-3 py-md-2 flex-column">
                         <div className="d-flex align-items-center gap-3">
-                            <Link to="/miscellaneous1" >
+                            <Link to="/miscellaneous" >
                                 <i className="bi bi-arrow-left fs-4" />
                             </Link>
                             <h4 className="mb-0 fw-bold">Online Screen Recorder</h4>

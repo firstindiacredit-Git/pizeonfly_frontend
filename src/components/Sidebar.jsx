@@ -163,7 +163,7 @@ const Sidebar = () => {
                     </Link>
                   </li>
 
-                  <li>
+                  {/* <li>
                     <Link className="ms-link" to="/htmlTemplateGenerator">
                       <span>HTML Template Generator</span>
                     </Link>
@@ -177,17 +177,17 @@ const Sidebar = () => {
                     <Link className="ms-link" to="/cardGenerator">
                       <span>Card Generator</span>
                     </Link>
-                  </li>
+                  </li> */}
                   <li>
                     <Link className="ms-link" to="/miscellaneous">
                       <span>Miscellaneous</span>
                     </Link>
                   </li>
-                  <li>
+                  {/* <li>
                     <Link className="ms-link" to="/miscellaneous1">
                       <span>Miscellaneous1</span>
                     </Link>
-                  </li>
+                  </li> */}
                 </ul>
               </li>
               <li className="collapsed">
@@ -230,7 +230,7 @@ const Sidebar = () => {
                   <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
                 </a>
                 <ul className="sub-menu collapse" id="more-Components">
-                  <li>
+                  {/* <li>
                     <Link className="ms-link" to="/calander">
                       <span>Calendar</span>
                       {isHolidayTomorrow && (
@@ -239,7 +239,7 @@ const Sidebar = () => {
                         </div>
                       )}
                     </Link>
-                  </li>
+                  </li> */}
                   <li>
                     <Link className="ms-link" to="#">
                       <span>Chat</span>
@@ -250,14 +250,14 @@ const Sidebar = () => {
             </>
           )}
         </ul>
-        <button
+        {/* <button
           type="button"
           className="btn btn-link sidebar-mini-btn text-light"
         >
           <span className="ms-2">
             <i className="icofont-bubble-right" />
           </span>
-        </button>
+        </button> */}
       </div>
     </div>
   );

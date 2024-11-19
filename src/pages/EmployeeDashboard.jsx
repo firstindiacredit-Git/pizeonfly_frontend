@@ -189,7 +189,7 @@ const EmployeeDashboard = () => {
                       </div>
                       <div className="row justify-content-center mt-3">
                         <div className="col-12 col-md-6 mb-4">
-                          <Link to="/projects">
+                          <Link to="/employee-projects">
                             <div className="card shadow-lg">
                               <div className="card-body text-center">
                                 <h5 className="card-title">Total Projects Assigned</h5>
@@ -200,7 +200,7 @@ const EmployeeDashboard = () => {
                           </Link>
                         </div>
                         <div className="col-12 col-md-6 mb-4">
-                          <Link to="/projects">
+                          <Link to="/employee-tasks">
                             <div className="card shadow-lg">
                               <div className="card-body text-center">
                                 <h5 className="card-title">Total Tasks Assigned</h5>

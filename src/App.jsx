@@ -26,12 +26,11 @@ import UpdateInvoice from './pages/UpdateInvoice'
 import UrlShortner from './pages/tools/UrlShortner'
 import QrCodeGenerate from './pages/tools/QrCodeGenerate'
 import SaasManager from './pages/tools/SaasManager'
-import Miscellaneous from './pages/tools/Miscellaneous/Miscellaneous'
 import HtmlTemplateGenerator from './pages/tools/HtmlTemplateGenerator'
 import CardValidator from './pages/tools/CardValidator'
 import CardGenerator from './pages/tools/CardGenerator'
 
-import Miscellaneous1 from './pages/tools/Miscellaneous/Miscellaneous1'
+import Miscellaneous from './pages/tools/Miscellaneous/Miscellaneous'
 import OnlineScreenrecorder from './pages/tools/Miscellaneous/OnlineScreenrecoder'
 import OnlineScreenshot from './pages/tools/Miscellaneous/OnlineScreenshot'
 import SpeechToText from './pages/tools/Miscellaneous/SpeechToText'
@@ -89,12 +88,11 @@ function App() {
         <Route path='/urlShortner' element={<UrlShortner />}></Route>
         <Route path='/qrCodeGenerate' element={<QrCodeGenerate />}></Route>
         <Route path='/saasManager' element={<SaasManager />}></Route>
-        <Route path='/miscellaneous' element={<Miscellaneous />}></Route>
         <Route path='/htmlTemplateGenerator' element={<HtmlTemplateGenerator />}></Route>
         <Route path='/cardValidator' element={<CardValidator />}></Route>
         <Route path='/cardGenerator' element={<CardGenerator />}></Route>
 
-        <Route path='/miscellaneous1' element={<Miscellaneous1 />}></Route>
+        <Route path='/miscellaneous' element={<Miscellaneous />}></Route>
         <Route path='/online-screenrecorder' element={<OnlineScreenrecorder/>}></Route>
         <Route path='/online-screenshot' element={<OnlineScreenshot/>}></Route>
         <Route path='/speech-to-text' element={<SpeechToText/>}></Route>

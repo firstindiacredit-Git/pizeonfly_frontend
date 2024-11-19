@@ -6,6 +6,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Link } from "react-router-dom";
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import Chat from "../components/Chat";
+import FloatingMenu from '../components/FloatingMenu';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -216,31 +218,37 @@ const ProjectDashboard = () => {
 
                 <div className="row justify-content-center mt-4">
                   <div className="col-12 col-md-4 mb-4">
-                    <div className="card shadow-lg">
-                      <div className="card-body">
-                        <h5 className="card-title text-center">Projects</h5>
-                        <h2 className="text-center mb-4" style={{ color: 'rgba(255, 99, 132, 1)' }}>{totalProjects}</h2>
-                        <Bar data={projectsChartData} options={chartOptions} />
+                    <Link to="/projects">
+                      <div className="card shadow-lg">
+                        <div className="card-body">
+                          <h5 className="card-title text-center">Projects</h5>
+                          <h2 className="text-center mb-4" style={{ color: 'rgba(255, 99, 132, 1)' }}>{totalProjects}</h2>
+                          <Bar data={projectsChartData} options={chartOptions} />
+                        </div>
                       </div>
-                    </div>
+                    </Link>
                   </div>
                   <div className="col-12 col-md-4 mb-4">
-                    <div className="card shadow-lg">
-                      <div className="card-body">
-                        <h5 className="card-title text-center">Clients</h5>
-                        <h2 className="text-center mb-4" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalClients}</h2>
-                        <Bar data={clientsChartData} options={chartOptions} />
+                    <Link to="/clients">
+                      <div className="card shadow-lg">
+                        <div className="card-body">
+                          <h5 className="card-title text-center">Clients</h5>
+                          <h2 className="text-center mb-4" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalClients}</h2>
+                          <Bar data={clientsChartData} options={chartOptions} />
+                        </div>
                       </div>
-                    </div>
+                    </Link>
                   </div>
                   <div className="col-12 col-md-4 mb-4">
-                    <div className="card shadow-lg">
-                      <div className="card-body">
-                        <h5 className="card-title text-center">Employees</h5>
-                        <h2 className="text-center mb-4" style={{ color: 'rgba(75, 192, 192, 1)' }}>{totalEmployees}</h2>
-                        <Bar data={employeesChartData} options={chartOptions} />
+                    <Link to="/members">
+                      <div className="card shadow-lg">
+                        <div className="card-body">
+                          <h5 className="card-title text-center">Employees</h5>
+                          <h2 className="text-center mb-4" style={{ color: 'rgba(75, 192, 192, 1)' }}>{totalEmployees}</h2>
+                          <Bar data={employeesChartData} options={chartOptions} />
+                        </div>
                       </div>
-                    </div>
+                    </Link>
                   </div>
 
                 </div>
@@ -255,6 +263,7 @@ const ProjectDashboard = () => {
           </div>
         </div>
         <ToastContainer />
+        <FloatingMenu isMobile={isMobile} />
       </div>
     </>
   );
