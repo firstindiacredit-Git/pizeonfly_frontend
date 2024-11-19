@@ -70,7 +70,7 @@ const FloatingMenu = ({ isMobile }) => {
                     }}
                     onClick={toggleMenu}
                 >
-                    <i className="bi bi-list" style={{ fontSize: '1.8rem' }}></i>
+                    <i className="bi bi-list" style={{ fontSize: '1.5rem' }}></i>
                 </button>
             </div>
 

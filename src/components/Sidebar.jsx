@@ -214,7 +214,7 @@ const Sidebar = () => {
                 </ul>
               </li>
 
-              <li className="collapsed">
+              {/* <li className="collapsed">
                 <a
                   className="m-link"
                   data-bs-toggle="collapse"
@@ -230,7 +230,7 @@ const Sidebar = () => {
                   <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
                 </a>
                 <ul className="sub-menu collapse" id="more-Components">
-                  {/* <li>
+                  <li>
                     <Link className="ms-link" to="/calander">
                       <span>Calendar</span>
                       {isHolidayTomorrow && (
@@ -239,14 +239,14 @@ const Sidebar = () => {
                         </div>
                       )}
                     </Link>
-                  </li> */}
+                  </li>
                   <li>
                     <Link className="ms-link" to="#">
                       <span>Chat</span>
                     </Link>
                   </li>
                 </ul>
-              </li>
+              </li> */}
             </>
           )}
         </ul>
