@@ -21,7 +21,7 @@ const CreateInvoice = () => {
     invoiceNumber: '',
     invoiceDate: '',
     invoiceDueDate: '',
-    billedBy: 'First India Credit \n\n3rd Floor, Rana Tower, Opp: Mahindra Aura, \nNew Palam Vihar, Phase I, Gurugram, Haryana, \nIndia - 122017 \n\nGSTIN: 06AATFG8894M1Z8 \nPAN: AATFG8894M \nEmail:vinay@techninza.in',
+    billedBy: 'First India Credit \n\n88,Sant Nagar,Near India Post Office, \nEast of Kailash, New Delhi, Delhi, \nIndia - 110065  \n\nGSTIN: 06AATFG8894M1Z8 \nPAN: AATFG8894M \nEmail:fzal9000i@gmail.com',
     clientDetail: '',
     country: '',
     state: '',
