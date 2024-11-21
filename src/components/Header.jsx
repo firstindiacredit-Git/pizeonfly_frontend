@@ -12,16 +12,41 @@ const Header = () => {
   const navigation = useNavigate();
   const [dropdownPosition, setDropdownPosition] = useState({});
   const dropdownRef = useRef(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const fileInputRef = useRef(null);
+  const [user, setUser] = useState(null);
+
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "Images/superadminimg.jpg";
+    
+    // Remove any backslashes and replace with forward slashes
+    const cleanPath = imagePath.replace(/\\/g, '/');
+    
+    // Remove 'uploads/' from the path if it exists
+    const pathWithoutUploads = cleanPath.replace('uploads/', '');
+    
+    // Combine with the backend URL
+    const imageUrl = `${import.meta.env.VITE_BASE_URL}${pathWithoutUploads}`;
+    // console.log("imageUrl", imageUrl);
+    return imageUrl;
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      navigation("/");
-    }
-    const user = JSON.parse(localStorage.getItem("user"));
+    const userData = JSON.parse(localStorage.getItem("user"));
+    
+    // console.log("Token:", token);
+    // console.log("User Data from localStorage:", userData);
+    
     if (token) {
-      setUserName(user.username);
-      setEmail(user.email);
+      setUserName(userData.username);
+      setEmail(userData.email);
+      setUser(userData);
+      
+      // console.log("State after setting user data:");
+      // console.log("Username:", userData.username);
+      // console.log("Email:", userData.email);
+      // console.log("Complete User Object:", userData);
     } else {
       navigation("/");
     }
@@ -92,6 +117,61 @@ const Header = () => {
     }
   };
 
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const formData = new FormData();
+      formData.append('username', username);
+      if (selectedImage) {
+        formData.append('profileImage', selectedImage);
+      }
+
+      // console.log("Before API call - FormData contents:");
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      const response = await axios.put(
+        `${import.meta.env.VITE_BASE_URL}api/update-profile`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
+
+      // console.log("API Response:", response.data);
+
+      // Update local storage with new user data
+      const updatedUser = { ...JSON.parse(localStorage.getItem("user")), ...response.data.user };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      // Close the modal programmatically
+      const modalElement = document.getElementById("profileModal");
+      const modal = window.bootstrap.Modal.getInstance(modalElement);
+      modal.hide();
+
+      toast.success("Profile updated successfully!", {
+        style: {
+          backgroundColor: "#4c3575",
+          color: "white",
+        },
+      });
+      setSelectedImage(null);
+      
+      //reload after 5 sec
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
+
+    } catch (error) {
+      toast.error("Failed to update profile");
+    }
+  };
+
   return (
     <>
       <div className="header">
@@ -114,7 +194,7 @@ const Header = () => {
                 >
                   <img
                     className="avatar lg rounded-circle img-thumbnail"
-                    src="Images/superadminimg.jpg"
+                    src={getImageUrl(user?.profileImage)}
                     alt="profile"
                   />
                 </a>
@@ -128,12 +208,13 @@ const Header = () => {
                       <div className="d-flex py-1">
                         <img
                           className="avatar rounded-circle"
-                          src="Images/superadminimg.jpg"
+                          src={getImageUrl(user?.profileImage)}
                           alt="profile"
                         />
                         <div className="flex-fill ms-3">
-                          <p className="mb-0">
+                          <p className="mb-0 d-flex align-items-center gap-1">
                             <span className="font-weight-bold">{username}</span>
+                            {/* <i className="bi bi-pencil-fill" style={{fontSize: "10px"}}/> */}
                           </p>
                           <small className="">{email}</small>
                         </div>
@@ -143,6 +224,14 @@ const Header = () => {
                       </div>
                     </div>
                     <div className="list-group m-2 ">
+                      <button
+                        className="list-group-item list-group-item-action border-0"
+                        data-bs-toggle="modal"
+                        data-bs-target="#profileModal"
+                      >
+                        <i className="bi bi-person fs-6 me-3" />
+                        Edit Profile
+                      </button>
                       <button
                         className="list-group-item list-group-item-action border-0 "
                         data-bs-toggle="modal"
@@ -241,6 +330,72 @@ const Header = () => {
                     </div>
                   </form>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Add Profile Edit Modal */}
+        <div
+          className="modal fade"
+          id="profileModal"
+          tabIndex={-1}
+          aria-labelledby="profileLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-body">
+                <form onSubmit={handleProfileUpdate}>
+                  <div className="container">
+                    <div className="row">
+                      <div className="col-12">
+                        <label className="fw-bold fs-5">Edit Profile</label>
+                        <div className="mb-3 mt-3 text-center">
+                          <img
+                            src={selectedImage 
+                              ? URL.createObjectURL(selectedImage) 
+                              : getImageUrl(user?.profileImage)}
+                            alt="Profile"
+                            className="rounded-circle"
+                            style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                          />
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="d-none"
+                            accept="image/*"
+                            onChange={(e) => setSelectedImage(e.target.files[0])}
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-dark mt-2"
+                            onClick={() => fileInputRef.current.click()}
+                          >
+                            Change Photo
+                          </button>
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label fw-bold">Username</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={username}
+                            onChange={(e) => setUserName(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row mt-3">
+                      <div className="col-12 d-flex justify-content-end">
+                        <button type="submit" className="btn btn-dark">
+                          Save Changes
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

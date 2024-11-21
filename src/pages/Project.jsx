@@ -13,7 +13,7 @@ const Project = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currProj, setCurrProj] = useState({});
-  const [viewMode, setViewMode] = useState("list");
+  const [viewMode, setViewMode] = useState("grid");
   const [searchTerm, setSearchTerm] = useState("");
   const [notifications, setNotifications] = useState({});
 
@@ -1061,8 +1061,11 @@ const Project = () => {
                                   <div className="card-body">
                                     <div className="d-flex justify-content-between">
                                       <span className="fw-bold fs-5" >{index + 1}. </span>
-                                      <h5 className="card-title">
-                                        {project.projectName}</h5>
+                                      <Link to="/tasks" state={{ projectName: project.projectName }}>
+                                        <h5 className="card-title">
+                                          {project.projectName}
+                                        </h5>
+                                      </Link>
                                       <Link
                                         to="/images"
                                         state={{
