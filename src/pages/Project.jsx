@@ -598,10 +598,119 @@ const Project = () => {
     }, 300); // Adjust this delay if needed
   };
 
+  // Add this where you display your project cards/list items
+  const ProjectProgressBar = ({ project }) => {
+    const total = project.totalTasks;
+    const completed = project.taskStats.completed;
+    const inProgress = project.taskStats.inProgress;
+    const notStarted = project.taskStats.notStarted;
 
+    // Calculate percentages
+    const completedPercent = total ? ((completed/total)*100).toFixed(1) : 0;
+    const inProgressPercent = total ? ((inProgress/total)*100).toFixed(1) : 0;
+    const notStartedPercent = total ? ((notStarted/total)*100).toFixed(1) : 0;
 
+    return (
+        <div className="project-progress mb-3">
+            <div className="d-flex justify-content-between mb-1">
+                <span className="fw-bold">Task Progress</span>
+                <span className="fw-bold">{total} Total Tasks</span>
+            </div>
+            <div className="progress" style={{ height: "20px" }}>
+                <div 
+                    className="progress-bar bg-success" 
+                    style={{ width: `${completedPercent}%` }}
+                    title={`Completed: ${completed} (${completedPercent}%)`}
+                >
+                    {completed}
+                </div>
+                <div 
+                    className="progress-bar bg-warning" 
+                    style={{ width: `${inProgressPercent}%` }}
+                    title={`In Progress: ${inProgress} (${inProgressPercent}%)`}
+                >
+                    {inProgress}
+                </div>
+                <div 
+                    className="progress-bar bg-secondary" 
+                    style={{ width: `${notStartedPercent}%` }}
+                    title={`Not Started: ${notStarted} (${notStartedPercent}%)`}
+                >
+                    {notStarted}
+                </div>
+            </div>
+            <div className="d-flex justify-content-between mt-2 small">
+                <div>
+                    <span className="text-success fw-bold">Completed:{completed} </span>
+                    <span className="d-flex justify-content-center"> ({completedPercent}%)</span>
+                </div>
+                <div>
+                    <span className="text-warning fw-bold">In Progress: {inProgress}</span>
+                    <span className="d-flex justify-content-center"> ({inProgressPercent}%)</span>
+                </div>
+                <div>
+                    <span className="text-secondary fw-bold">Not Started: {notStarted}</span>
+                    <span className="d-flex justify-content-center"> ({notStartedPercent}%)</span>
+                </div>
+            </div>
+        </div>
+    );
+  };
 
+  const EmployeeTaskProgress = ({ employee }) => {
+    const total = employee.totalTasks;
+    const completed = employee.completed;
+    const inProgress = employee.inProgress;
+    const notStarted = employee.notStarted;
 
+    // Calculate percentages
+    const completedPercent = total ? ((completed/total)*100).toFixed(1) : 0;
+    const inProgressPercent = total ? ((inProgress/total)*100).toFixed(1) : 0;
+    const notStartedPercent = total ? ((notStarted/total)*100).toFixed(1) : 0;
+
+    return (
+        <div className="employee-progress mb-3">
+            <div className="d-flex justify-content-between align-items-center mb-2">
+                <span className="fw-bold">{employee.employeeName}</span>
+                <span className="small text-muted">{total} Tasks</span>
+            </div>
+            <div className="progress" style={{ height: "15px" }}>
+                {completed > 0 && (
+                    <div 
+                        className="progress-bar bg-success" 
+                        style={{ width: `${completedPercent}%` }}
+                        title={`Completed: ${completed} (${completedPercent}%)`}
+                    >
+                        {completed}
+                    </div>
+                )}
+                {inProgress > 0 && (
+                    <div 
+                        className="progress-bar bg-warning" 
+                        style={{ width: `${inProgressPercent}%` }}
+                        title={`In Progress: ${inProgress} (${inProgressPercent}%)`}
+                    >
+                        {inProgress}
+                    </div>
+                )}
+                {notStarted > 0 && (
+                    <div 
+                        className="progress-bar bg-secondary" 
+                        style={{ width: `${notStartedPercent}%` }}
+                        title={`Not Started: ${notStarted} (${notStartedPercent}%)`}
+                    >
+                        {notStarted}
+                    </div>
+                )}
+            </div>
+            <div className="d-flex justify-content-between mt-1 small">
+                <span className="text-success">Done: {completed} ({completedPercent}%)</span>
+                <span className="text-warning">In Progress: {inProgress} ({inProgressPercent}%)</span>
+                <span className="text-secondary">Not Started: {notStarted} ({notStartedPercent}%)</span>
+            </div>
+        </div>
+    );
+  };
 
   return (
     <>
@@ -621,7 +730,7 @@ const Project = () => {
                     <div className="card-header py-3 px-0 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between border-bottom">
                       <h3 className="fw-bold flex-fill mb-2 mb-sm-0">Projects</h3>
                       <div className="d-flex flex-column flex-sm-row align-items-center">
-                        {role === 'superadmin' && (
+                        {/* {role === 'superadmin' && ( */}
                           <button
                             type="button"
                             className="btn btn-dark mb-2 mb-sm-0 me-sm-2"
@@ -631,7 +740,7 @@ const Project = () => {
                             <i className="icofont-plus-circle me-1" />
                             Create Project
                           </button>
-                        )}
+                        {/* )} */}
                         <ul
                           className="nav nav-tabs tab-body-header rounded prtab-set"
                           role="tablist"
@@ -1079,46 +1188,56 @@ const Project = () => {
                                       </Link>
                                     </div>
                                     <p className="card-text">
-                                      Start Date: {getFormattedDate(project.projectStartDate)}
+                                      <div className="d-flex justify-content-between">
+                                        <span className="text-muted fw-bold">Start: {getFormattedDate(project.projectStartDate)}</span>
+                                        <span className="text-muted fw-bold">End: {getFormattedDate(project.projectEndDate)}</span>
+                                      </div>
                                       <br />
-                                      End Date: {getFormattedDate(project.projectEndDate)}
                                       <br />
                                       Members:{" "}
                                       {project.taskAssignPerson.map(
                                         (name) => name.employeeName + ", "
                                       )}
                                       <br />
-                                      Progress: {project.progress}%
+                                      <br />
+                                      Clients: {project.clientAssignPerson?.map(client => client.clientName + ", ")}
+                                      <br />
+                                      {/* Total Tasks: {project.totalTasks}
+                                      <br /> */}
+                                      {/* Progress: {project.progress}% */}
                                     </p>
-                                    <button
-                                      onClick={() => setToEdit(project._id)}
-                                      className="btn icofont-edit text-success"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#editproject"
-                                    >
-                                      Edit
-                                    </button>
-                                    <button
-                                      className="btn icofont-ui-delete text-danger"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#deleteproject"
-                                      onClick={() => setDeletableId(project._id)}
-                                    >
-                                      Delete
-                                    </button>
-                                    <button
-                                      className="btn bi bi-chat-left-dots text-primary position-relative"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#addUser"
-                                      onClick={() => handleOpenMessages(project)}
-                                    >
-                                      Message
-                                      {notifications[project._id] > 0 && (
-                                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                          {notifications[project._id]}
-                                        </span>
-                                      )}
-                                    </button>
+                                    <ProjectProgressBar project={project} />
+                                    <div className="d-flex justify-content-between">
+                                      <button
+                                        onClick={() => setToEdit(project._id)}
+                                        className="btn icofont-edit text-success"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editproject"
+                                      >
+                                        Edit
+                                      </button>
+                                      <button
+                                        className="btn icofont-ui-delete text-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteproject"
+                                        onClick={() => setDeletableId(project._id)}
+                                      >
+                                        Delete
+                                      </button>
+                                      <button
+                                        className="btn bi bi-chat-left-dots text-primary position-relative"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#addUser"
+                                        onClick={() => handleOpenMessages(project)}
+                                      >
+                                        Message
+                                        {notifications[project._id] > 0 && (
+                                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            {notifications[project._id]}
+                                          </span>
+                                        )}
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
                               </div>

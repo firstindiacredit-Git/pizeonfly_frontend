@@ -23,6 +23,14 @@ const Client = () => {
         clientAddress: '',
         clientGst: '',
         clientImage: null, // Initialize clientImage state to null
+        linkedin: '',
+        instagram: '',
+        youtube: '',
+        facebook: '',
+        pinterest: '',
+        github: '',
+        website: '',
+        other: '',
     });
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -45,6 +53,14 @@ const Client = () => {
             formDataToSend.append('clientAddress', formData.clientAddress);
             formDataToSend.append('clientGst', formData.clientGst);
             formDataToSend.append('clientImage', formData.clientImage); // Append the image file to the form data
+            formDataToSend.append('linkedin', formData.linkedin);
+            formDataToSend.append('instagram', formData.instagram);
+            formDataToSend.append('youtube', formData.youtube);
+            formDataToSend.append('facebook', formData.facebook);
+            formDataToSend.append('pinterest', formData.pinterest);
+            formDataToSend.append('github', formData.github);
+            formDataToSend.append('website', formData.website);
+            formDataToSend.append('other', formData.other);
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/clients`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -64,6 +80,14 @@ const Client = () => {
                 clientAddress: '',
                 clientGst: '',
                 clientImage: null, // Reset the clientImage state to null
+                linkedin: '',
+                instagram: '',
+                youtube: '',
+                facebook: '',
+                pinterest: '',
+                github: '',
+                website: '',
+                other: '',
             });
             // Close the modal programmatically
             const modalElement = document.getElementById("createproject");
@@ -132,6 +156,14 @@ const Client = () => {
         clientAddress: '',
         clientGst: '',
         clientImage: null,
+        linkedin: '',
+        instagram: '',
+        youtube: '',
+        facebook: '',
+        pinterest: '',
+        github: '',
+        website: '',
+        other: ''
     });
     const [toEdit, setToEdit] = useState("");
 
@@ -151,6 +183,14 @@ const Client = () => {
                     clientAddress: response.data.clientAddress,
                     clientGst: response.data.clientGst,
                     clientImage: response.data.clientImage,
+                    linkedin: response.data.socialLinks?.linkedin || '',
+                    instagram: response.data.socialLinks?.instagram || '',
+                    youtube: response.data.socialLinks?.youtube || '',
+                    facebook: response.data.socialLinks?.facebook || '',
+                    pinterest: response.data.socialLinks?.pinterest || '',
+                    github: response.data.socialLinks?.github || '',
+                    website: response.data.socialLinks?.website || '',
+                    other: response.data.socialLinks?.other || ''
                 });
             } catch (error) {
                 console.error('Error fetching client data:', error);
@@ -337,7 +377,7 @@ const Client = () => {
                                             {clients.map(client => (
                                                 <div className="col" key={client._id}>
                                                     <div className="card teacher-card">
-                                                        <div className="card-body  d-flex" >
+                                                        <div className="card-body d-flex">
                                                             <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w220">
                                                                 <div className="position-relative d-inline-block">
                                                                     <img
@@ -392,7 +432,7 @@ const Client = () => {
                                                                 </div>
                                                             </div>
                                                             <div className="teacher-info border-start ps-xl-4 ps-md-3 ps-sm-4 ps-4 w-100">
-                                                                <h6 className="mb-0 mt-2  fw-bold d-block fs-6">
+                                                                <h6 className="mb-0 mt-2 fw-bold d-block fs-6">
                                                                     {client.businessName}
                                                                 </h6>
                                                                 <span className="py-1 fw-bold small-11 mb-0 mt-1 text-muted">
@@ -402,6 +442,51 @@ const Client = () => {
                                                                     <p>Email - {client.clientEmail}</p>
                                                                     <p>Address - {client.clientAddress}</p>
                                                                     <p>GST No. - {client.clientGst}</p>
+                                                                    <div className="social-links mt-3">
+                                                                        <h6 className="mb-2">Social Links:</h6>
+                                                                        <div className="d-flex flex-wrap gap-2">
+                                                                            {client.socialLinks?.linkedin && (
+                                                                                <a href={client.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
+                                                                                    <i className="bi bi-linkedin"></i>
+                                                                                </a>
+                                                                            )}
+                                                                            {client.socialLinks?.instagram && (
+                                                                                <a href={client.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-danger">
+                                                                                    <i className="bi bi-instagram"></i>
+                                                                                </a>
+                                                                            )}
+                                                                            {client.socialLinks?.youtube && (
+                                                                                <a href={client.socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-danger">
+                                                                                    <i className="bi bi-youtube"></i>
+                                                                                </a>
+                                                                            )}
+                                                                            {client.socialLinks?.facebook && (
+                                                                                <a href={client.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
+                                                                                    <i className="bi bi-facebook"></i>
+                                                                                </a>
+                                                                            )}
+                                                                            {client.socialLinks?.pinterest && (
+                                                                                <a href={client.socialLinks.pinterest} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-danger">
+                                                                                    <i className="bi bi-pinterest"></i>
+                                                                                </a>
+                                                                            )}
+                                                                            {client.socialLinks?.github && (
+                                                                                <a href={client.socialLinks.github} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-dark">
+                                                                                    <i className="bi bi-github"></i>
+                                                                                </a>
+                                                                            )}
+                                                                            {client.socialLinks?.website && (
+                                                                                <a href={client.socialLinks.website} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-info">
+                                                                                    <i className="bi bi-globe"></i>
+                                                                                </a>
+                                                                            )}
+                                                                            {client.socialLinks?.other && (
+                                                                                <a href={client.socialLinks.other} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-secondary">
+                                                                                    <i className="bi bi-link-45deg"></i>
+                                                                                </a>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -415,50 +500,74 @@ const Client = () => {
                                             <div className="col-sm-12">
                                                 <div className="card mb-3">
                                                     <div className="card-body">
-                                                        <div className="table-responsive">
-                                                            <table id="myProjectTable" className="table table-hover align-middle mb-0" style={{ width: '100%' }}>
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Client</th>
-                                                                        <th>Business Name</th>
-                                                                        <th>Contact</th>
-                                                                        <th>Address</th>
-                                                                        <th>Actions</th>
+                                                        <table id="myProjectTable" className="table table-hover align-middle mb-0" style={{ width: '100%' }}>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Client</th>
+                                                                    <th>Business Name</th>
+                                                                    <th>Contact</th>
+                                                                    <th>Address</th>
+                                                                    <th>Social Links</th>
+                                                                    <th>Actions</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {clients.map(client => (
+                                                                    <tr key={client._id}>
+                                                                        <td>
+                                                                            <div className="d-flex align-items-center">
+                                                                                <img className="avatar rounded-circle me-2" src={`${import.meta.env.VITE_BASE_URL}${client.clientImage.replace('uploads/', '')}`} alt="" style={{ width: '40px', height: '40px' }} />
+                                                                                <div>
+                                                                                    <h6 className="mb-0">{client.clientName}</h6>
+                                                                                    <small>{client.clientEmail}</small>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>{client.businessName}</td>
+                                                                        <td>
+                                                                            <div>{client.clientPhone}</div>
+                                                                            <small>{client.clientGst}</small>
+                                                                        </td>
+                                                                        <td>{client.clientAddress}</td>
+                                                                        <td>
+                                                                            <div className="d-flex gap-2">
+                                                                                {client.socialLinks?.linkedin && (
+                                                                                    <a href={client.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
+                                                                                        <i className="bi bi-linkedin"></i>
+                                                                                    </a>
+                                                                                )}
+                                                                                {client.socialLinks?.instagram && (
+                                                                                    <a href={client.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-danger">
+                                                                                        <i className="bi bi-instagram"></i>
+                                                                                    </a>
+                                                                                )}
+                                                                                {client.socialLinks?.youtube && (
+                                                                                    <a href={client.socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-danger">
+                                                                                        <i className="bi bi-youtube"></i>
+                                                                                    </a>
+                                                                                )}
+                                                                                {client.socialLinks?.facebook && (
+                                                                                    <a href={client.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
+                                                                                        <i className="bi bi-facebook"></i>
+                                                                                    </a>
+                                                                                )}
+                                                                                {/* Add more social links as needed */}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div className="btn-group" role="group" aria-label="Basic outlined example">
+                                                                                <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editproject" onClick={() => setToEdit(client._id)}>
+                                                                                    <i className="icofont-edit text-success"></i>
+                                                                                </button>
+                                                                                <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#deleteproject" onClick={() => setDeletableId(client._id)}>
+                                                                                    <i className="icofont-ui-delete text-danger"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </td>
                                                                     </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {clients.map(client => (
-                                                                        <tr key={client._id}>
-                                                                            <td>
-                                                                                <div className="d-flex align-items-center">
-                                                                                    <img className="avatar rounded-circle me-2" src={`${import.meta.env.VITE_BASE_URL}${client.clientImage.replace('uploads/', '')}`} alt="" style={{ width: '40px', height: '40px' }} />
-                                                                                    <div>
-                                                                                        <h6 className="mb-0">{client.clientName}</h6>
-                                                                                        <small>{client.clientEmail}</small>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </td>
-                                                                            <td>{client.businessName}</td>
-                                                                            <td>
-                                                                                <div>{client.clientPhone}</div>
-                                                                                <small>{client.clientGst}</small>
-                                                                            </td>
-                                                                            <td>{client.clientAddress}</td>
-                                                                            <td>
-                                                                                <div className="btn-group" role="group" aria-label="Basic outlined example">
-                                                                                    <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editproject" onClick={() => setToEdit(client._id)}>
-                                                                                        <i className="icofont-edit text-success"></i>
-                                                                                    </button>
-                                                                                    <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#deleteproject" onClick={() => setDeletableId(client._id)}>
-                                                                                        <i className="icofont-ui-delete text-danger"></i>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </td>
-                                                                        </tr>
-                                                                    ))}
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
                                             </div>
@@ -616,6 +725,115 @@ const Client = () => {
                                                 />
                                             </div>
                                         </div>
+                                        <div className="mb-3">
+                                            <label className="form-label">Social Media & Website Links</label>
+                                            <div className="row g-3">
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-linkedin"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="LinkedIn URL"
+                                                            name="linkedin"
+                                                            value={formData.linkedin || ''}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-instagram"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="Instagram URL"
+                                                            name="instagram"
+                                                            value={formData.instagram || ''}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-youtube"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="YouTube URL"
+                                                            name="youtube"
+                                                            value={formData.youtube || ''}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-facebook"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="Facebook URL"
+                                                            name="facebook"
+                                                            value={formData.facebook || ''}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-pinterest"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="Pinterest URL"
+                                                            name="pinterest"
+                                                            value={formData.pinterest || ''}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-github"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="GitHub URL"
+                                                            name="github"
+                                                            value={formData.github || ''}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-globe"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="Website URL"
+                                                            name="website"
+                                                            value={formData.website || ''}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-link-45deg"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="Other URL"
+                                                            name="other"
+                                                            value={formData.other || ''}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="modal-footer">
                                         <button
@@ -749,6 +967,115 @@ const Client = () => {
                                                     value={clientData.clientGst}
                                                     onChange={updateChange}
                                                 />
+                                            </div>
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label">Social Media & Website Links</label>
+                                            <div className="row g-3">
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-linkedin"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="LinkedIn URL"
+                                                            name="linkedin"
+                                                            value={clientData.linkedin || ''}
+                                                            onChange={updateChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-instagram"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="Instagram URL"
+                                                            name="instagram"
+                                                            value={clientData.instagram || ''}
+                                                            onChange={updateChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-youtube"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="YouTube URL"
+                                                            name="youtube"
+                                                            value={clientData.youtube || ''}
+                                                            onChange={updateChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-facebook"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="Facebook URL"
+                                                            name="facebook"
+                                                            value={clientData.facebook || ''}
+                                                            onChange={updateChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-pinterest"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="Pinterest URL"
+                                                            name="pinterest"
+                                                            value={clientData.pinterest || ''}
+                                                            onChange={updateChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-github"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="GitHub URL"
+                                                            name="github"
+                                                            value={clientData.github || ''}
+                                                            onChange={updateChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-globe"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="Website URL"
+                                                            name="website"
+                                                            value={clientData.website || ''}
+                                                            onChange={updateChange}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="input-group mb-3">
+                                                        <span className="input-group-text"><i className="bi bi-link-45deg"></i></span>
+                                                        <input
+                                                            type="url"
+                                                            className="form-control"
+                                                            placeholder="Other URL"
+                                                            name="other"
+                                                            value={clientData.other || ''}
+                                                            onChange={updateChange}
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

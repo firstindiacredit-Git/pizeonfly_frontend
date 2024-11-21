@@ -1145,7 +1145,7 @@ const Tasks = () => {
                             <option placeholder="set priority">
                               Set Priority
                             </option>
-                            <option value={"Heighest"}>Highest</option>
+                            <option value={"Highest"}>Highest</option>
                             <option value={"Medium"}>Medium</option>
                             <option value={"Lowest"}>Lowest</option>
                           </select>
@@ -1413,7 +1413,7 @@ const Tasks = () => {
                             <option placeholder="set priority">
                               Set Priority
                             </option>
-                            <option value={"Heighest"}>Highest</option>
+                            <option value={"Highest"}>Highest</option>
                             <option value={"Medium"}>Medium</option>
                             <option value={"Lowest"}>Lowest</option>
                           </select>

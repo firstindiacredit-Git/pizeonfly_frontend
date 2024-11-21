@@ -46,52 +46,54 @@ const Sidebar = () => {
           </div>
         </div>
         {/* Menu: main ul */}
-        <ul className="menu-list flex-grow-1 mt-3">
-          <li className="collapsed">
-            <a
-              className="m-link"
-              data-bs-toggle="collapse"
-              data-bs-target="#dashboard-Components"
-              href="#"
-            >
-              <i className="icofont-home fs-5" /> <span>Dashboard</span>{" "}
-              <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
-            </a>
-            {/* Menu: Sub menu ul */}
-            <ul className="sub-menu collapse show" id="dashboard-Components">
-              <li>
-                <Link className="ms-link" to="/project-dashboard">
-                  <span>Admin Dashboard</span>
-                </Link>
-              </li>
-            </ul>
-          </li>
-          <li className="collapsed">
-            <a
-              className="m-link"
-              data-bs-toggle="collapse"
-              data-bs-target="#project-Components"
-              href="#"
-            >
-              <i className="icofont-briefcase" />
-              <span>Projects</span>{" "}
-              <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
-            </a>
-            {/* Menu: Sub menu ul */}
-            <ul className="sub-menu collapse" id="project-Components">
-              <li>
-                <Link className="ms-link" to="/projects">
-                  <span>Projects</span>
-                </Link>
-              </li>
-              <li>
-                <Link className="ms-link" to="/tasks">
-                  <span>Tasks</span>
-                </Link>
-              </li>
-            </ul>
-          </li>
-          {role === 'superadmin' && (
+        {/* {role === 'superadmin' && (
+          )} */}
+          <ul className="menu-list flex-grow-1 mt-3">
+            <li className="collapsed">
+              <a
+                className="m-link"
+                data-bs-toggle="collapse"
+                data-bs-target="#dashboard-Components"
+                href="#"
+              >
+                <i className="icofont-home fs-5" /> <span>Dashboard</span>{" "}
+                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+              </a>
+              {/* Menu: Sub menu ul */}
+              <ul className="sub-menu collapse show" id="dashboard-Components">
+                <li>
+                  <Link className="ms-link" to="/project-dashboard">
+                    <span>Admin Dashboard</span>
+                  </Link>
+                </li>
+              </ul>
+            </li>
+            <li className="collapsed">
+              <a
+                className="m-link"
+                data-bs-toggle="collapse"
+                data-bs-target="#project-Components"
+                href="#"
+              >
+                <i className="icofont-briefcase" />
+                <span>Projects</span>{" "}
+                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+              </a>
+              {/* Menu: Sub menu ul */}
+              <ul className="sub-menu collapse" id="project-Components">
+                <li>
+                  <Link className="ms-link" to="/projects">
+                    <span>Projects</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link className="ms-link" to="/tasks">
+                    <span>Tasks</span>
+                  </Link>
+                </li>
+              </ul>
+            </li>
+
             <>
               <li className="collapsed">
                 <a
@@ -248,8 +250,8 @@ const Sidebar = () => {
                 </ul>
               </li> */}
             </>
-          )}
-        </ul>
+          </ul>
+        
         {/* <button
           type="button"
           className="btn btn-link sidebar-mini-btn text-light"
