@@ -30,6 +30,13 @@ const Member = () => {
     department: "",
     designation: "",
     description: "",
+    linkedin: "",
+    instagram: "",
+    youtube: "",
+    facebook: "",
+    github: "",
+    website: "",
+    other: ""
   });
 
   const handleChange = (e) => {
@@ -85,6 +92,13 @@ const Member = () => {
         department: "",
         designation: "",
         description: "",
+        linkedin: "",
+        instagram: "",
+        youtube: "",
+        facebook: "",
+        github: "",
+        website: "",
+        other: ""
       });
 
       // Close the modal programmatically
@@ -132,7 +146,7 @@ const Member = () => {
           ...prevFormData,
           employeeId: newId,
         }));
-        console.log(response.data, "lll");
+        console.log(response.data);
 
         // Save the fetched employees
         const modifiedEmployees = response.data.map(employee => ({
@@ -203,6 +217,13 @@ const Member = () => {
     department: "",
     designation: "",
     description: "",
+    linkedin: "",
+    instagram: "",
+    youtube: "",
+    facebook: "",
+    github: "",
+    website: "",
+    other: ""
   });
   const [toEdit, setToEdit] = useState("");
   // console.log(projectFormData);
@@ -243,6 +264,13 @@ const Member = () => {
           department: data.department,
           designation: data.designation,
           description: data.description,
+          linkedin: data.socialLinks?.linkedin || '',
+          instagram: data.socialLinks?.instagram || '',
+          youtube: data.socialLinks?.youtube || '',
+          facebook: data.socialLinks?.facebook || '',
+          github: data.socialLinks?.github || '',
+          website: data.socialLinks?.website || '',
+          other: data.socialLinks?.other || ''
         });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -253,78 +281,101 @@ const Member = () => {
     }
   }, [toEdit]);
   const updateChange = (e) => {
-    const { name, value, files } = e.target;
-    setEmployeeData((prevState) => ({
-      ...prevState,
-      [name]: files ? files[0] : value,
-    }));
+    const { name, value, type, files } = e.target;
+
+    if (type === 'file') {
+      setEmployeeData(prev => ({
+        ...prev,
+        [name]: files[0]
+      }));
+    } else {
+      setEmployeeData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
-  const updateSubmit = async (e) => {
-    e.preventDefault();
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  const handleEditClick = (employee) => {
+    setSelectedEmployee(employee);
+    setEmployeeData({
+      ...employee,
+      linkedin: employee.socialLinks?.linkedin || '',
+      instagram: employee.socialLinks?.instagram || '',
+      youtube: employee.socialLinks?.youtube || '',
+      facebook: employee.socialLinks?.facebook || '',
+      github: employee.socialLinks?.github || '',
+      website: employee.socialLinks?.website || '',
+      other: employee.socialLinks?.other || ''
+    });
+  };
+
+  const updateSubmit = async () => {
     try {
-      const formDataToSend = new FormData();
-      delete employeeData?.taskAssignPerson;
-      for (const key in employeeData) {
-        if (employeeData[key] !== null) {
-          formDataToSend.append(key, employeeData[key]);
+      const formData = new FormData();
+
+      // Add basic fields
+      Object.keys(employeeData).forEach(key => {
+        if (employeeData[key] !== null &&
+          key !== 'socialLinks' &&
+          key !== '_id' &&
+          key !== '__v' &&
+          key !== 'createdAt' &&
+          key !== 'updatedAt') {
+          // Ensure social link values are strings
+          if (typeof employeeData[key] === 'string') {
+            formData.append(key, employeeData[key]);
+          }
         }
+      });
+
+      // Add social links fields individually, ensuring they're strings
+      formData.append('linkedin', String(employeeData.linkedin || ''));
+      formData.append('instagram', String(employeeData.instagram || ''));
+      formData.append('youtube', String(employeeData.youtube || ''));
+      formData.append('facebook', String(employeeData.facebook || ''));
+      formData.append('github', String(employeeData.github || ''));
+      formData.append('website', String(employeeData.website || ''));
+      formData.append('other', String(employeeData.other || ''));
+
+      // Add files if they exist
+      if (employeeData.employeeImage instanceof File) {
+        formData.append('employeeImage', employeeData.employeeImage);
       }
+      if (employeeData.resume instanceof File) {
+        formData.append('resume', employeeData.resume);
+      }
+      if (employeeData.aadhaarCard instanceof File) {
+        formData.append('aadhaarCard', employeeData.aadhaarCard);
+      }
+      if (employeeData.panCard instanceof File) {
+        formData.append('panCard', employeeData.panCard);
+      }
+
       const response = await axios.put(
-        `${import.meta.env.VITE_BASE_URL}api/employees/${toEdit}`,
-        formDataToSend,
+        `${import.meta.env.VITE_BASE_URL}api/employees/${selectedEmployee._id}`,
+        formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
-      // console.log(response.data);
-      const updatedEmployee = response.data;
-      const updatedEmployeeData = employees.map((pro) => {
-        if (pro._id === toEdit) {
-          return {
-            ...pro,
-            employeeName: updatedEmployee.employeeName,
-            employeeCompany: updatedEmployee.employeeCompany,
-            employeeImage: updatedEmployee.employeeImage,
-            resume: updatedEmployee.resume,
-            aadhaarCard: updatedEmployee.aadhaarCard,
-            panCard: updatedEmployee.panCard,
-            employeeId: updatedEmployee.employeeId,
-            joiningDate: updatedEmployee.joiningDate,
-            username: updatedEmployee.username,
-            password: updatedEmployee.password,
-            emailid: updatedEmployee.emailid,
-            phone: updatedEmployee.phone,
-            department: updatedEmployee.department,
-            designation: updatedEmployee.designation,
-            description: updatedEmployee.description,
-          };
-        } else {
-          return pro;
-        }
-      });
-      setEmployees(updatedEmployeeData);
 
-      const modalElement = document.getElementById("editemp");
-      const modal = window.bootstrap.Modal.getInstance(modalElement);
-      modal.hide();
-      // window.location.reload();
-
-      toast.success("Employee Updated Successfully!", {
-        style: {
-          backgroundColor: "#4c3575",
-          color: "white",
-        },
-      });
-      // Reload the page after 5 seconds
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000);
-
+      if (response.status === 200) {
+        toast.success('Employee updated successfully!');
+        // Close modal and refresh data
+        const modal = document.getElementById('editemp');
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        bootstrapModal.hide();
+        // Refresh your employee list
+        fetchEmployees();
+      }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error updating employee:', error);
+      toast.error(error.response?.data?.message || 'Failed to update employee');
     }
   };
 
@@ -507,6 +558,53 @@ const Member = () => {
                                       {employee.emailid}
                                     </p>
                                   </div>
+                                  {/* social links */}
+                                  <div className="social-links mt-3">
+                                    <div className="d-flex flex-wrap gap-2">
+                                      {employee.socialLinks?.linkedin && (
+                                        <a href={employee.socialLinks.linkedin} target="_blank" rel="noopener noreferrer"
+                                          className="btn btn-sm btn-outline-primary">
+                                          <i className="bi bi-linkedin"></i>
+                                        </a>
+                                      )}
+                                      {employee.socialLinks?.instagram && (
+                                        <a href={employee.socialLinks.instagram} target="_blank" rel="noopener noreferrer"
+                                          className="btn btn-sm btn-outline-danger">
+                                          <i className="bi bi-instagram"></i>
+                                        </a>
+                                      )}
+                                      {employee.socialLinks?.youtube && (
+                                        <a href={employee.socialLinks.youtube} target="_blank" rel="noopener noreferrer"
+                                          className="btn btn-sm btn-outline-danger">
+                                          <i className="bi bi-youtube"></i>
+                                        </a>
+                                      )}
+                                      {employee.socialLinks?.facebook && (
+                                        <a href={employee.socialLinks.facebook} target="_blank" rel="noopener noreferrer"
+                                          className="btn btn-sm btn-outline-primary">
+                                          <i className="bi bi-facebook"></i>
+                                        </a>
+                                      )}
+                                      {employee.socialLinks?.github && (
+                                        <a href={employee.socialLinks.github} target="_blank" rel="noopener noreferrer"
+                                          className="btn btn-sm btn-outline-dark">
+                                          <i className="bi bi-github"></i>
+                                        </a>
+                                      )}
+                                      {employee.socialLinks?.website && (
+                                        <a href={employee.socialLinks.website} target="_blank" rel="noopener noreferrer"
+                                          className="btn btn-sm btn-outline-info">
+                                          <i className="bi bi-globe"></i>
+                                        </a>
+                                      )}
+                                      {employee.socialLinks?.other && (
+                                        <a href={employee.socialLinks.other} target="_blank" rel="noopener noreferrer"
+                                          className="btn btn-sm btn-outline-secondary">
+                                          <i className="bi bi-link-45deg"></i>
+                                        </a>
+                                      )}
+                                    </div>
+                                  </div>
                                 </div>
                                 <div className="teacher-info border-start ps-xl-4 ps-md-3 ps-sm-4 ps-4 w-100">
                                   <div>
@@ -524,7 +622,7 @@ const Member = () => {
                                           className="btn btn-outline-secondary"
                                           data-bs-toggle="modal"
                                           data-bs-target="#editemp"
-                                          onClick={() => setToEdit(employee._id)}
+                                          onClick={() => handleEditClick(employee)}
                                         >
                                           <i className="icofont-edit text-success" />
                                         </button>
@@ -696,7 +794,7 @@ const Member = () => {
                                               className="btn btn-sm btn-outline-secondary"
                                               data-bs-toggle="modal"
                                               data-bs-target="#editemp"
-                                              onClick={() => setToEdit(employee._id)}
+                                              onClick={() => handleEditClick(employee)}
                                             >
                                               <i className="icofont-edit text-success"></i>
                                             </button>
@@ -1255,6 +1353,102 @@ const Member = () => {
                             </select>
                           </div>
                         </div>
+                        <div className="mb-3">
+                          <label className="form-label">Social Media & Website Links</label>
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-linkedin"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="LinkedIn Profile URL"
+                                  name="linkedin"
+                                  value={employeeData.linkedin || ''}
+                                  onChange={updateChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-instagram"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="Instagram Profile URL"
+                                  name="instagram"
+                                  value={employeeData.instagram || employeeData.socialLinks?.instagram || ''}
+                                  onChange={updateChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-youtube"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="YouTube Channel URL"
+                                  name="youtube"
+                                  value={employeeData.youtube || employeeData.socialLinks?.youtube || ''}
+                                  onChange={updateChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-facebook"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="Facebook Profile URL"
+                                  name="facebook"
+                                  value={employeeData.facebook || employeeData.socialLinks?.facebook || ''}
+                                  onChange={updateChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-github"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="GitHub Profile URL"
+                                  name="github"
+                                  value={employeeData.github || employeeData.socialLinks?.github || ''}
+                                  onChange={updateChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-globe"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="Personal Website URL"
+                                  name="website"
+                                  value={employeeData.website || employeeData.socialLinks?.website || ''}
+                                  onChange={updateChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-link-45deg"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="Other URL"
+                                  name="other"
+                                  value={employeeData.other || employeeData.socialLinks?.other || ''}
+                                  onChange={updateChange}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </form>
                     </div>
                     <div className="mb-3">
@@ -1560,6 +1754,102 @@ const Member = () => {
                               </option>
                               <option value={"Other"}>Other</option>
                             </select> */}
+                          </div>
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Social Media & Website Links</label>
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-linkedin"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="LinkedIn Profile URL"
+                                  name="linkedin"
+                                  value={formData.linkedin}
+                                  onChange={handleChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-instagram"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="Instagram Profile URL"
+                                  name="instagram"
+                                  value={formData.instagram}
+                                  onChange={handleChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-youtube"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="YouTube Channel URL"
+                                  name="youtube"
+                                  value={formData.youtube}
+                                  onChange={handleChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-facebook"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="Facebook Profile URL"
+                                  name="facebook"
+                                  value={formData.facebook}
+                                  onChange={handleChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-github"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="GitHub Profile URL"
+                                  name="github"
+                                  value={formData.github}
+                                  onChange={handleChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-globe"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="Personal Website URL"
+                                  name="website"
+                                  value={formData.website}
+                                  onChange={handleChange}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-link-45deg"></i></span>
+                                <input
+                                  type="url"
+                                  className="form-control"
+                                  placeholder="Other URL"
+                                  name="other"
+                                  value={formData.other}
+                                  onChange={handleChange}
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </form>

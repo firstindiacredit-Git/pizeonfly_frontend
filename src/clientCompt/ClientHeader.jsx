@@ -30,6 +30,14 @@ const ClientHeader = () => {
     clientPhone: "",
     clientAddress: "",
     clientGst: "",
+    linkedin: "",
+    instagram: "",
+    youtube: "",
+    facebook: "",
+    pinterest: "",
+    github: "",
+    website: "",
+    other: ""
   });
 
   useEffect(() => {
@@ -47,7 +55,15 @@ const ClientHeader = () => {
       });
       setEditClientData({
         ...user,
-        clientPassword: "", // Don't populate the password field
+        clientPassword: "",
+        linkedin: user.socialLinks?.linkedin || "",
+        instagram: user.socialLinks?.instagram || "",
+        youtube: user.socialLinks?.youtube || "",
+        facebook: user.socialLinks?.facebook || "",
+        pinterest: user.socialLinks?.pinterest || "",
+        github: user.socialLinks?.github || "",
+        website: user.socialLinks?.website || "",
+        other: user.socialLinks?.other || ""
       });
       setClientName(user.clientName);
       setEmail(user.clientEmail);
@@ -91,7 +107,12 @@ const ClientHeader = () => {
     const user = JSON.parse(localStorage.getItem("client_user"));
     const formData = new FormData();
 
-    const allowedUpdates = ['clientName', 'businessName', 'clientImage', 'clientEmail', 'clientPhone', 'clientAddress', 'clientGst'];
+    const allowedUpdates = [
+      'clientName', 'businessName', 'clientImage',
+      'clientEmail', 'clientPhone', 'clientAddress',
+      'clientGst', 'linkedin', 'instagram', 'youtube',
+      'facebook', 'pinterest', 'github', 'website', 'other'
+    ];
 
     allowedUpdates.forEach((key) => {
       if (editClientData[key] !== null && editClientData[key] !== undefined) {
@@ -122,7 +143,8 @@ const ClientHeader = () => {
         setClientName(updatedUser.clientName);
         setEmail(updatedUser.clientEmail);
         setImage(updatedUser.clientImage);
-        toast.success("Profile updated successfully!"); // Toast notification
+        toast.success("Profile updated successfully!");
+
         // Close the modal
         const modal = document.getElementById('editProfile');
         const bootstrapModal = bootstrap.Modal.getInstance(modal);
@@ -189,6 +211,50 @@ const ClientHeader = () => {
                       <div>
                         <hr className="dropdown-divider border-dark" />
                       </div>
+                      <div className="social-links mt-3">
+                        <div className="d-flex flex-wrap gap-2">
+                          {editClientData.linkedin && (
+                            <a href={editClientData.linkedin} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
+                              <i className="bi bi-linkedin"></i>
+                            </a>
+                          )}
+                          {editClientData.instagram && (
+                            <a href={editClientData.instagram} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-danger">
+                              <i className="bi bi-instagram"></i>
+                            </a>
+                          )}
+                          {editClientData.youtube && (
+                            <a href={editClientData.youtube} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-danger">
+                              <i className="bi bi-youtube"></i>
+                            </a>
+                          )}
+                          {editClientData.facebook && (
+                            <a href={editClientData.facebook} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
+                              <i className="bi bi-facebook"></i>
+                            </a>
+                          )}
+                          {editClientData.pinterest && (
+                            <a href={editClientData.pinterest} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-danger">
+                              <i className="bi bi-pinterest"></i>
+                            </a>
+                          )}
+                          {editClientData.github && (
+                            <a href={editClientData.github} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-dark">
+                              <i className="bi bi-github"></i>
+                            </a>
+                          )}
+                          {editClientData.website && (
+                            <a href={editClientData.website} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-info">
+                              <i className="bi bi-globe"></i>
+                            </a>
+                          )}
+                          {editClientData.other && (
+                            <a href={editClientData.other} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-secondary">
+                              <i className="bi bi-link-45deg"></i>
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     </div>
                     <div className="list-group m-2 ">
                       <Link
@@ -236,7 +302,7 @@ const ClientHeader = () => {
             </div>
 
 
-            
+
 
             {/* Edit Profile Modal */}
             <div className="modal fade" id="editProfile" tabIndex={-1} aria-hidden="true">
@@ -324,6 +390,123 @@ const ClientHeader = () => {
                           value={editClientData.clientGst}
                           onChange={handleEditChange}
                         />
+                      </div>
+                      <div className="border-top pt-3 mt-3">
+                        <h6 className="mb-3">Social Links</h6>
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <label htmlFor="linkedin" className="form-label">
+                              <i className="bi bi-linkedin me-2"></i>LinkedIn
+                            </label>
+                            <input
+                              type="url"
+                              className="form-control"
+                              id="linkedin"
+                              name="linkedin"
+                              value={editClientData.linkedin}
+                              onChange={handleEditChange}
+                              placeholder="https://linkedin.com/in/username"
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label htmlFor="instagram" className="form-label">
+                              <i className="bi bi-instagram me-2"></i>Instagram
+                            </label>
+                            <input
+                              type="url"
+                              className="form-control"
+                              id="instagram"
+                              name="instagram"
+                              value={editClientData.instagram}
+                              onChange={handleEditChange}
+                              placeholder="https://instagram.com/username"
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label htmlFor="youtube" className="form-label">
+                              <i className="bi bi-youtube me-2"></i>YouTube
+                            </label>
+                            <input
+                              type="url"
+                              className="form-control"
+                              id="youtube"
+                              name="youtube"
+                              value={editClientData.youtube}
+                              onChange={handleEditChange}
+                              placeholder="https://youtube.com/@channel"
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label htmlFor="facebook" className="form-label">
+                              <i className="bi bi-facebook me-2"></i>Facebook
+                            </label>
+                            <input
+                              type="url"
+                              className="form-control"
+                              id="facebook"
+                              name="facebook"
+                              value={editClientData.facebook}
+                              onChange={handleEditChange}
+                              placeholder="https://facebook.com/profile"
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label htmlFor="pinterest" className="form-label">
+                              <i className="bi bi-pinterest me-2"></i>Pinterest
+                            </label>
+                            <input
+                              type="url"
+                              className="form-control"
+                              id="pinterest"
+                              name="pinterest"
+                              value={editClientData.pinterest}
+                              onChange={handleEditChange}
+                              placeholder="https://pinterest.com/username"
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label htmlFor="github" className="form-label">
+                              <i className="bi bi-github me-2"></i>GitHub
+                            </label>
+                            <input
+                              type="url"
+                              className="form-control"
+                              id="github"
+                              name="github"
+                              value={editClientData.github}
+                              onChange={handleEditChange}
+                              placeholder="https://github.com/username"
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label htmlFor="website" className="form-label">
+                              <i className="bi bi-globe me-2"></i>Website
+                            </label>
+                            <input
+                              type="url"
+                              className="form-control"
+                              id="website"
+                              name="website"
+                              value={editClientData.website}
+                              onChange={handleEditChange}
+                              placeholder="https://yourwebsite.com"
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label htmlFor="other" className="form-label">
+                              <i className="bi bi-link-45deg me-2"></i>Other
+                            </label>
+                            <input
+                              type="url"
+                              className="form-control"
+                              id="other"
+                              name="other"
+                              value={editClientData.other}
+                              onChange={handleEditChange}
+                              placeholder="https://other-link.com"
+                            />
+                          </div>
+                        </div>
                       </div>
                       <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

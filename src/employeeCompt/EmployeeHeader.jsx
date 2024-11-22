@@ -29,6 +29,15 @@ const Header = () => {
     aadhaarCard: null,
     panCard: null,
     resume: null,
+    socialLinks: {
+      linkedin: "",
+      instagram: "",
+      youtube: "",
+      facebook: "",
+      github: "",
+      website: "",
+      other: ""
+    }
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const dropdownRef = useRef(null);
@@ -36,35 +45,33 @@ const Header = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("emp_token");
-
     if (!token) {
       navigation("/");
     }
     const user = JSON.parse(localStorage.getItem("emp_user"));
-    if (token) {
+    if (user) {
       setEmployeeData({
-        ...employeeData,
-        employeeName: user.employeeName,
-        employeeCompany: user.employeeCompany || "", // Add more fields as needed
-        employeeId: user.employeeId || "", // Ensure employeeId is set
-        joiningDate: user.joiningDate ? user.joiningDate.split('T')[0] : "", // Format date if necessary
-        username: user.username || "",
-        password: user.password || "",
+        employeeName: user.employeeName || "",
+        employeeId: user.employeeId || "",
+        joiningDate: user.joiningDate || "",
         emailid: user.emailid || "",
+        password: user.password || "",
         phone: user.phone || "",
-        department: user.department || "",
-        designation: user.designation || "",
         description: user.description || "",
-        employeeImage: user.employeeImage ? user.employeeImage.replace('uploads/', '') : null,
+        // Add social links
+        socialLinks: {
+          linkedin: user.socialLinks?.linkedin || "",
+          instagram: user.socialLinks?.instagram || "",
+          youtube: user.socialLinks?.youtube || "",
+          facebook: user.socialLinks?.facebook || "",
+          github: user.socialLinks?.github || "",
+          website: user.socialLinks?.website || "",
+          other: user.socialLinks?.other || ""
+        }
       });
       setEmployeeName(user.employeeName);
       setEmail(user.emailid);
-      setAadhaarCard(user.aadhaarCard);
-      setPanCard(user.panCard);
-      setResume(user.resume);
-      // Remove 'uploads/' from the employeeImage path
-      const modifiedImage = user.employeeImage.replace('uploads/', '');
-      setImage(modifiedImage);
+      setImage(user.employeeImage);
     }
   }, [navigation]);
 
@@ -126,6 +133,8 @@ const Header = () => {
 
   const updateSubmit = async () => {
     const formData = new FormData();
+
+    // Add basic fields
     formData.append("employeeName", employeeData.employeeName);
     formData.append("joiningDate", employeeData.joiningDate);
     formData.append("emailid", employeeData.emailid);
@@ -133,18 +142,23 @@ const Header = () => {
     formData.append("phone", employeeData.phone);
     formData.append("description", employeeData.description);
 
+    // Add social links
+    Object.entries(employeeData.socialLinks || {}).forEach(([key, value]) => {
+      formData.append(key, value || '');
+    });
+
     if (selectedFile) {
       formData.append("employeeImage", selectedFile);
     }
 
-    // Add new file uploads
-    if (employeeData.aadhaarCard) {
+    // Add document files if they exist
+    if (employeeData.aadhaarCard instanceof File) {
       formData.append("aadhaarCard", employeeData.aadhaarCard);
     }
-    if (employeeData.panCard) {
+    if (employeeData.panCard instanceof File) {
       formData.append("panCard", employeeData.panCard);
     }
-    if (employeeData.resume) {
+    if (employeeData.resume instanceof File) {
       formData.append("resume", employeeData.resume);
     }
 
@@ -164,40 +178,22 @@ const Header = () => {
       );
 
       if (response.status === 200) {
-        // Update localStorage with new user data
-        const updatedUser = response.data;
-        localStorage.setItem("emp_user", JSON.stringify(updatedUser));
+        localStorage.setItem("emp_user", JSON.stringify(response.data));
+        toast.success("Profile updated successfully!");
 
-        // Update local state to reflect new data
-        setEmployeeName(updatedUser.employeeName);
-        const updatedImage = updatedUser.employeeImage.replace('uploads/', '');
-        setImage(updatedImage);
-
-        // Close the modal
+        // Close modal
         const modalElement = document.getElementById("editemp");
-        const modal = window.bootstrap.Modal.getInstance(modalElement);
+        const modal = bootstrap.Modal.getInstance(modalElement);
         modal.hide();
 
-        // Show toast notification
-        toast.success("Your Profile Updated Successfully!", {
-          style: {
-            backgroundColor: "#4c3575",
-            color: "white",
-          },
-        });
-
-        // Reload the page after 5 seconds
+        // Reload after 2 seconds
         setTimeout(() => {
           window.location.reload();
-        }, 5000);
+        }, 2000);
       }
-    } catch (err) {
-      if (err.response && err.response.status === 413) {
-        toast.error("Uploaded file is too large. Please select a smaller file.");
-      } else {
-        console.log(err);
-        alert("Error updating profile.");
-      }
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      toast.error(error.response?.data?.message || "Failed to update profile");
     }
   };
 
@@ -306,68 +302,115 @@ const Header = () => {
                             </span>
                           </p>
                           <p style={{ width: "210px", fontSize: "small" }}>{email}</p>
-                          {/* <img src={`${import.meta.env.VITE_BASE_URL}` + resume} alt="" className="avatar sm img-thumbnail shadow-sm" /> */}
-                            <div style={{marginTop:"-18px"}}>
-                              <strong>Aadhaar Card - </strong>
-                              {aadhaarCard ? (
-                                aadhaarCard.toLowerCase().endsWith('.pdf') ? (
-                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
-                                ) : (
-                                  <img
-                                    src={`${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`}
-                                    alt="Aadhaar Card"
-                                    className="avatar sm img-thumbnail shadow-sm"
-                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, 'image')}
-                                    style={{ cursor: 'pointer' }}
-                                  />
-                                )
-                              ) : (
-                                <i className="bi bi-x-lg text-danger"></i>
-                              )}
-                            </div>
 
-                            <div>
-                              <strong>Pan Card - </strong>
-                              {panCard ? (
-                                panCard.toLowerCase().endsWith('.pdf') ? (
-                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '') }`, 'pdf')}>View PDF</a>
-                                ) : (
-                                  <img
-                                    src={`${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`}
-                                    alt="Pan Card"
-                                    className="avatar sm img-thumbnail shadow-sm"
-                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, 'image')}
-                                    style={{ cursor: 'pointer' }}
-                                  />
-                                )
+                          <div style={{ marginTop: "-18px" }}>
+                            <strong>Aadhaar Card - </strong>
+                            {aadhaarCard ? (
+                              aadhaarCard.toLowerCase().endsWith('.pdf') ? (
+                                <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
                               ) : (
-                                <i className="bi bi-x-lg text-danger"></i>
-                              )}
-                            </div>
+                                <img
+                                  src={`${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`}
+                                  alt="Aadhaar Card"
+                                  className="avatar sm img-thumbnail shadow-sm"
+                                  onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, 'image')}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                              )
+                            ) : (
+                              <i className="bi bi-x-lg text-danger"></i>
+                            )}
+                          </div>
 
-                            <div>
-                              <strong>Resume - </strong>
-                              {resume ? (
-                                resume.toLowerCase().endsWith('.pdf') ? (
-                                  <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
-                                ) : (
-                                  <img
-                                    src={`${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`}
-                                    alt="Resume"
-                                    className="avatar sm img-thumbnail shadow-sm"
-                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, 'image')}
-                                    style={{ cursor: 'pointer' }}
-                                  />
-                                )
+                          <div>
+                            <strong>Pan Card - </strong>
+                            {panCard ? (
+                              panCard.toLowerCase().endsWith('.pdf') ? (
+                                <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
                               ) : (
-                                <i className="bi bi-x-lg text-danger"></i>
-                              )}
-                            </div>
+                                <img
+                                  src={`${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`}
+                                  alt="Pan Card"
+                                  className="avatar sm img-thumbnail shadow-sm"
+                                  onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, 'image')}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                              )
+                            ) : (
+                              <i className="bi bi-x-lg text-danger"></i>
+                            )}
+                          </div>
+
+                          <div>
+                            <strong>Resume - </strong>
+                            {resume ? (
+                              resume.toLowerCase().endsWith('.pdf') ? (
+                                <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
+                              ) : (
+                                <img
+                                  src={`${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`}
+                                  alt="Resume"
+                                  className="avatar sm img-thumbnail shadow-sm"
+                                  onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, 'image')}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                              )
+                            ) : (
+                              <i className="bi bi-x-lg text-danger"></i>
+                            )}
+                          </div>
 
                         </div>
                       </div>
                       <div>
                         <hr className="dropdown-divider border-dark" />
+                      </div>
+                      {/* Add this after the employee info in the dropdown */}
+                      <div className="social-links mt-3">
+                        <div className="d-flex flex-wrap gap-2">
+                          {employeeData.socialLinks?.linkedin && (
+                            <a href={employeeData.socialLinks.linkedin} target="_blank" rel="noopener noreferrer"
+                              className="btn btn-sm btn-outline-primary">
+                              <i className="bi bi-linkedin"></i>
+                            </a>
+                          )}
+                          {employeeData.socialLinks?.instagram && (
+                            <a href={employeeData.socialLinks.instagram} target="_blank" rel="noopener noreferrer"
+                              className="btn btn-sm btn-outline-danger">
+                              <i className="bi bi-instagram"></i>
+                            </a>
+                          )}
+                          {employeeData.socialLinks?.youtube && (
+                            <a href={employeeData.socialLinks.youtube} target="_blank" rel="noopener noreferrer"
+                              className="btn btn-sm btn-outline-danger">
+                              <i className="bi bi-youtube"></i>
+                            </a>
+                          )}
+                          {employeeData.socialLinks?.facebook && (
+                            <a href={employeeData.socialLinks.facebook} target="_blank" rel="noopener noreferrer"
+                              className="btn btn-sm btn-outline-primary">
+                              <i className="bi bi-facebook"></i>
+                            </a>
+                          )}
+                          {employeeData.socialLinks?.github && (
+                            <a href={employeeData.socialLinks.github} target="_blank" rel="noopener noreferrer"
+                              className="btn btn-sm btn-outline-dark">
+                              <i className="bi bi-github"></i>
+                            </a>
+                          )}
+                          {employeeData.socialLinks?.website && (
+                            <a href={employeeData.socialLinks.website} target="_blank" rel="noopener noreferrer"
+                              className="btn btn-sm btn-outline-info">
+                              <i className="bi bi-globe"></i>
+                            </a>
+                          )}
+                          {employeeData.socialLinks?.other && (
+                            <a href={employeeData.socialLinks.other} target="_blank" rel="noopener noreferrer"
+                              className="btn btn-sm btn-outline-secondary">
+                              <i className="bi bi-link-45deg"></i>
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="list-group m-2 ">
@@ -640,7 +683,157 @@ const Header = () => {
                         onChange={handleChange}
                       />
                     </div>
+                    <div className="border-top pt-3 mt-3">
+                      <h6 className="mb-3">Social Links</h6>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label htmlFor="linkedin" className="form-label">
+                            <i className="bi bi-linkedin me-2"></i>LinkedIn
+                          </label>
+                          <input
+                            type="url"
+                            className="form-control"
+                            id="linkedin"
+                            name="linkedin"
+                            value={employeeData.socialLinks?.linkedin || ''}
+                            onChange={(e) => setEmployeeData({
+                              ...employeeData,
+                              socialLinks: {
+                                ...employeeData.socialLinks,
+                                linkedin: e.target.value
+                              }
+                            })}
+                            placeholder="https://linkedin.com/in/username"
+                          />
+                        </div>
 
+                        <div className="col-md-6">
+                          <label htmlFor="instagram" className="form-label">
+                            <i className="bi bi-instagram me-2"></i>Instagram
+                          </label>
+                          <input
+                            type="url"
+                            className="form-control"
+                            id="instagram"
+                            name="instagram"
+                            value={employeeData.socialLinks?.instagram || ''}
+                            onChange={(e) => setEmployeeData({
+                              ...employeeData,
+                              socialLinks: {
+                                ...employeeData.socialLinks,
+                                instagram: e.target.value
+                              }
+                            })}
+                            placeholder="https://instagram.com/username"
+                          />
+                        </div>
+
+                        <div className="col-md-6">
+                          <label htmlFor="youtube" className="form-label">
+                            <i className="bi bi-youtube me-2"></i>YouTube
+                          </label>
+                          <input
+                            type="url"
+                            className="form-control"
+                            id="youtube"
+                            name="youtube"
+                            value={employeeData.socialLinks?.youtube || ''}
+                            onChange={(e) => setEmployeeData({
+                              ...employeeData,
+                              socialLinks: {
+                                ...employeeData.socialLinks,
+                                youtube: e.target.value
+                              }
+                            })}
+                            placeholder="https://youtube.com/c/username"
+                          />
+                        </div>
+
+                        <div className="col-md-6">
+                          <label htmlFor="facebook" className="form-label">
+                            <i className="bi bi-facebook me-2"></i>Facebook
+                          </label>
+                          <input
+                            type="url"
+                            className="form-control"
+                            id="facebook"
+                            name="facebook"
+                            value={employeeData.socialLinks?.facebook || ''}
+                            onChange={(e) => setEmployeeData({
+                              ...employeeData,
+                              socialLinks: {
+                                ...employeeData.socialLinks,
+                                facebook: e.target.value
+                              }
+                            })}
+                            placeholder="https://facebook.com/username"
+                          />
+                        </div>
+
+                        <div className="col-md-6">
+                          <label htmlFor="github" className="form-label">
+                            <i className="bi bi-github me-2"></i>GitHub
+                          </label>
+                          <input
+                            type="url"
+                            className="form-control"
+                            id="github"
+                            name="github"
+                            value={employeeData.socialLinks?.github || ''}
+                            onChange={(e) => setEmployeeData({
+                              ...employeeData,
+                              socialLinks: {
+                                ...employeeData.socialLinks,
+                                github: e.target.value
+                              }
+                            })}
+                            placeholder="https://github.com/username"
+                          />
+                        </div>
+
+                        <div className="col-md-6">
+                          <label htmlFor="website" className="form-label">
+                            <i className="bi bi-globe me-2"></i>Website
+                          </label>
+                          <input
+                            type="url"
+                            className="form-control"
+                            id="website"
+                            name="website"
+                            value={employeeData.socialLinks?.website || ''}
+                            onChange={(e) => setEmployeeData({
+                              ...employeeData,
+                              socialLinks: {
+                                ...employeeData.socialLinks,
+                                website: e.target.value
+                              }
+                            })}
+                            placeholder="https://yourwebsite.com"
+                          />
+                        </div>
+
+                        <div className="col-md-6">
+                          <label htmlFor="other" className="form-label">
+                            <i className="bi bi-link-45deg me-2"></i>Other
+                          </label>
+                          <input
+                            type="url"
+                            className="form-control"
+                            id="other"
+                            name="other"
+                            value={employeeData.socialLinks?.other || ''}
+                            onChange={(e) => setEmployeeData({
+                              ...employeeData,
+                              socialLinks: {
+                                ...employeeData.socialLinks,
+                                other: e.target.value
+                              }
+                            })}
+                            placeholder="https://other-link.com"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div className="modal-footer">
                     <button
@@ -741,7 +934,7 @@ const Header = () => {
 
           </div>
         </nav >
-        <ToastContainer 
+        <ToastContainer
           position="top-right"
           autoClose={5000}
           hideProgressBar={false}
