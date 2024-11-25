@@ -45,7 +45,7 @@ const Signin = () => {
         localStorage.setItem("emp_token", token);
         localStorage.setItem("emp_user", JSON.stringify(user));
         setIsAuthenticated(true);
-        navigate("/employee-tasks");
+        navigate("/employee-dashboard");
       } else {
         setError("Incorrect email or password");
       }

@@ -303,7 +303,7 @@ const Header = () => {
                           </p>
                           <p style={{ width: "210px", fontSize: "small" }}>{email}</p>
 
-                          <div style={{ marginTop: "-18px" }}>
+                          {/* <div style={{ marginTop: "-18px" }}>
                             <strong>Aadhaar Card - </strong>
                             {aadhaarCard ? (
                               aadhaarCard.toLowerCase().endsWith('.pdf') ? (
@@ -358,7 +358,7 @@ const Header = () => {
                             ) : (
                               <i className="bi bi-x-lg text-danger"></i>
                             )}
-                          </div>
+                          </div> */}
 
                         </div>
                       </div>
@@ -366,7 +366,7 @@ const Header = () => {
                         <hr className="dropdown-divider border-dark" />
                       </div>
                       {/* Add this after the employee info in the dropdown */}
-                      <div className="social-links mt-3">
+                      {/* <div className="social-links mt-3">
                         <div className="d-flex flex-wrap gap-2">
                           {employeeData.socialLinks?.linkedin && (
                             <a href={employeeData.socialLinks.linkedin} target="_blank" rel="noopener noreferrer"
@@ -411,7 +411,8 @@ const Header = () => {
                             </a>
                           )}
                         </div>
-                      </div>
+                      </div> */}
+
                     </div>
                     <div className="list-group m-2 ">
                       <Link

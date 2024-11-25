@@ -606,54 +606,54 @@ const Project = () => {
     const notStarted = project.taskStats.notStarted;
 
     // Calculate percentages
-    const completedPercent = total ? ((completed/total)*100).toFixed(1) : 0;
-    const inProgressPercent = total ? ((inProgress/total)*100).toFixed(1) : 0;
-    const notStartedPercent = total ? ((notStarted/total)*100).toFixed(1) : 0;
+    const completedPercent = total ? ((completed / total) * 100).toFixed(1) : 0;
+    const inProgressPercent = total ? ((inProgress / total) * 100).toFixed(1) : 0;
+    const notStartedPercent = total ? ((notStarted / total) * 100).toFixed(1) : 0;
 
     return (
-        <div className="project-progress mb-3">
-            <div className="d-flex justify-content-between mb-1">
-                <span className="fw-bold">Task Progress</span>
-                <span className="fw-bold">{total} Total Tasks</span>
-            </div>
-            <div className="progress" style={{ height: "20px" }}>
-                <div 
-                    className="progress-bar bg-success" 
-                    style={{ width: `${completedPercent}%` }}
-                    title={`Completed: ${completed} (${completedPercent}%)`}
-                >
-                    {completed}
-                </div>
-                <div 
-                    className="progress-bar bg-warning" 
-                    style={{ width: `${inProgressPercent}%` }}
-                    title={`In Progress: ${inProgress} (${inProgressPercent}%)`}
-                >
-                    {inProgress}
-                </div>
-                <div 
-                    className="progress-bar bg-secondary" 
-                    style={{ width: `${notStartedPercent}%` }}
-                    title={`Not Started: ${notStarted} (${notStartedPercent}%)`}
-                >
-                    {notStarted}
-                </div>
-            </div>
-            <div className="d-flex justify-content-between mt-2 small">
-                <div>
-                    <span className="text-success fw-bold">Completed:{completed} </span>
-                    <span className="d-flex justify-content-center"> ({completedPercent}%)</span>
-                </div>
-                <div>
-                    <span className="text-warning fw-bold">In Progress: {inProgress}</span>
-                    <span className="d-flex justify-content-center"> ({inProgressPercent}%)</span>
-                </div>
-                <div>
-                    <span className="text-secondary fw-bold">Not Started: {notStarted}</span>
-                    <span className="d-flex justify-content-center"> ({notStartedPercent}%)</span>
-                </div>
-            </div>
+      <div className="project-progress mb-3">
+        <div className="d-flex justify-content-between mb-1">
+          <span className="fw-bold">Task Progress</span>
+          <span className="fw-bold">{total} Total Tasks</span>
         </div>
+        <div className="progress" style={{ height: "20px" }}>
+          <div
+            className="progress-bar bg-success"
+            style={{ width: `${completedPercent}%` }}
+            title={`Completed: ${completed} (${completedPercent}%)`}
+          >
+            {completed}
+          </div>
+          <div
+            className="progress-bar bg-primary"
+            style={{ width: `${inProgressPercent}%` }}
+            title={`In Progress: ${inProgress} (${inProgressPercent}%)`}
+          >
+            {inProgress}
+          </div>
+          <div
+            className="progress-bar bg-danger"
+            style={{ width: `${notStartedPercent}%` }}
+            title={`Not Started: ${notStarted} (${notStartedPercent}%)`}
+          >
+            {notStarted}
+          </div>
+        </div>
+        <div className="d-flex justify-content-between mt-2 small">
+          <div>
+            <span className="text-success fw-bold">Completed:{completed} </span>
+            <span className="d-flex justify-content-center"> ({completedPercent}%)</span>
+          </div>
+          <div>
+            <span className="text-primary fw-bold">In Progress: {inProgress}</span>
+            <span className="d-flex justify-content-center"> ({inProgressPercent}%)</span>
+          </div>
+          <div>
+            <span className="text-danger fw-bold">Not Started: {notStarted}</span>
+            <span className="d-flex justify-content-center"> ({notStartedPercent}%)</span>
+          </div>
+        </div>
+      </div>
     );
   };
 
@@ -664,51 +664,51 @@ const Project = () => {
     const notStarted = employee.notStarted;
 
     // Calculate percentages
-    const completedPercent = total ? ((completed/total)*100).toFixed(1) : 0;
-    const inProgressPercent = total ? ((inProgress/total)*100).toFixed(1) : 0;
-    const notStartedPercent = total ? ((notStarted/total)*100).toFixed(1) : 0;
+    const completedPercent = total ? ((completed / total) * 100).toFixed(1) : 0;
+    const inProgressPercent = total ? ((inProgress / total) * 100).toFixed(1) : 0;
+    const notStartedPercent = total ? ((notStarted / total) * 100).toFixed(1) : 0;
 
     return (
-        <div className="employee-progress mb-3">
-            <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="fw-bold">{employee.employeeName}</span>
-                <span className="small text-muted">{total} Tasks</span>
-            </div>
-            <div className="progress" style={{ height: "15px" }}>
-                {completed > 0 && (
-                    <div 
-                        className="progress-bar bg-success" 
-                        style={{ width: `${completedPercent}%` }}
-                        title={`Completed: ${completed} (${completedPercent}%)`}
-                    >
-                        {completed}
-                    </div>
-                )}
-                {inProgress > 0 && (
-                    <div 
-                        className="progress-bar bg-warning" 
-                        style={{ width: `${inProgressPercent}%` }}
-                        title={`In Progress: ${inProgress} (${inProgressPercent}%)`}
-                    >
-                        {inProgress}
-                    </div>
-                )}
-                {notStarted > 0 && (
-                    <div 
-                        className="progress-bar bg-secondary" 
-                        style={{ width: `${notStartedPercent}%` }}
-                        title={`Not Started: ${notStarted} (${notStartedPercent}%)`}
-                    >
-                        {notStarted}
-                    </div>
-                )}
-            </div>
-            <div className="d-flex justify-content-between mt-1 small">
-                <span className="text-success">Done: {completed} ({completedPercent}%)</span>
-                <span className="text-warning">In Progress: {inProgress} ({inProgressPercent}%)</span>
-                <span className="text-secondary">Not Started: {notStarted} ({notStartedPercent}%)</span>
-            </div>
+      <div className="employee-progress mb-3">
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <span className="fw-bold">{employee.employeeName}</span>
+          <span className="small text-muted">{total} Tasks</span>
         </div>
+        <div className="progress" style={{ height: "15px" }}>
+          {completed > 0 && (
+            <div
+              className="progress-bar bg-success"
+              style={{ width: `${completedPercent}%` }}
+              title={`Completed: ${completed} (${completedPercent}%)`}
+            >
+              {completed}
+            </div>
+          )}
+          {inProgress > 0 && (
+            <div
+              className="progress-bar bg-warning"
+              style={{ width: `${inProgressPercent}%` }}
+              title={`In Progress: ${inProgress} (${inProgressPercent}%)`}
+            >
+              {inProgress}
+            </div>
+          )}
+          {notStarted > 0 && (
+            <div
+              className="progress-bar bg-secondary"
+              style={{ width: `${notStartedPercent}%` }}
+              title={`Not Started: ${notStarted} (${notStartedPercent}%)`}
+            >
+              {notStarted}
+            </div>
+          )}
+        </div>
+        <div className="d-flex justify-content-between mt-1 small">
+          <span className="text-success">Done: {completed} ({completedPercent}%)</span>
+          <span className="text-warning">In Progress: {inProgress} ({inProgressPercent}%)</span>
+          <span className="text-secondary">Not Started: {notStarted} ({notStartedPercent}%)</span>
+        </div>
+      </div>
     );
   };
 
@@ -731,15 +731,15 @@ const Project = () => {
                       <h3 className="fw-bold flex-fill mb-2 mb-sm-0">Projects</h3>
                       <div className="d-flex flex-column flex-sm-row align-items-center">
                         {/* {role === 'superadmin' && ( */}
-                          <button
-                            type="button"
-                            className="btn btn-dark mb-2 mb-sm-0 me-sm-2"
-                            data-bs-toggle="modal"
-                            data-bs-target="#createproject"
-                          >
-                            <i className="icofont-plus-circle me-1" />
-                            Create Project
-                          </button>
+                        <button
+                          type="button"
+                          className="btn btn-dark mb-2 mb-sm-0 me-sm-2"
+                          data-bs-toggle="modal"
+                          data-bs-target="#createproject"
+                        >
+                          <i className="icofont-plus-circle me-1" />
+                          Create Project
+                        </button>
                         {/* )} */}
                         <ul
                           className="nav nav-tabs tab-body-header rounded prtab-set"
@@ -907,7 +907,7 @@ const Project = () => {
                                       <td>
                                         <div className="d-flex gap-2">
                                           <div className="d-flex justify-content-around">
-                                            <Link to="/tasks" state={{ projectName: project.projectName }}>
+                                            <Link to="/tasks" className="text-capitalize fw-bold" state={{ projectName: project.projectName }}>
                                               {project.projectName}
                                             </Link>
 
@@ -1053,7 +1053,7 @@ const Project = () => {
                                       return (
                                         <tr key={project.id}>
                                           <td>
-                                            <strong>{index + 1}. {project.projectName}</strong>
+                                            <strong >{index + 1}. {project.projectName}</strong>
                                             <br />
                                             <small>{getFormattedDate(project.projectDate, true)}</small>
                                           </td>
@@ -1171,7 +1171,7 @@ const Project = () => {
                                     <div className="d-flex justify-content-between">
                                       <span className="fw-bold fs-5" >{index + 1}. </span>
                                       <Link to="/tasks" state={{ projectName: project.projectName }}>
-                                        <h5 className="card-title">
+                                        <h5 className="card-title text-capitalize fw-bold">
                                           {project.projectName}
                                         </h5>
                                       </Link>

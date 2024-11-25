@@ -197,24 +197,6 @@ const ProjectDashboard = () => {
                     An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span>
                   </p>
                 </div>
-                <div className="row justify-content-center">
-                  <div className="col-12 col-md-8 mb-4">
-                    <div className="card shadow-lg">
-                      <div className="card-body">
-                        <h5 className="card-title text-center mb-4">Overall Summary</h5>
-                        <Bar data={chartData} options={chartOptions} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-12 col-md-4 mb-4">
-                    <div className="card shadow-lg">
-                      <div className="card-body">
-                        <h5 className="card-title text-center">Project Status</h5>
-                        <Doughnut data={projectStatusChartData} options={projectStatusChartOptions} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 <div className="row justify-content-center mt-4">
                   <div className="col-12 col-md-4 mb-4">
@@ -252,6 +234,27 @@ const ProjectDashboard = () => {
                   </div>
 
                 </div>
+                
+                <div className="row justify-content-center">
+                  <div className="col-12 col-md-8 mb-4">
+                    <div className="card shadow-lg">
+                      <div className="card-body">
+                        <h5 className="card-title text-center mb-4">Overall Summary</h5>
+                        <Bar data={chartData} options={chartOptions} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-12 col-md-4 mb-4">
+                    <div className="card shadow-lg">
+                      <div className="card-body">
+                        <h5 className="card-title text-center">Project Status</h5>
+                        <Doughnut data={projectStatusChartData} options={projectStatusChartOptions} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+               
 
                 <div className="mt-4 mb-2">
                   <Link to="https://pizeonfly.com/" className="text-muted">

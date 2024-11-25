@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
+    "@mui/icons-material": "^6.1.8",
+    "@mui/material": "^6.1.8",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.5",
@@ -33,6 +37,7 @@
     "react-multi-select-component": "^4.3.4",
     "react-pdf": "^9.1.1",
     "react-qr-code": "^2.0.15",
+    "react-quill": "^2.0.0",
     "react-router-dom": "^6.23.0",
     "react-select": "^5.8.1",
     "react-toastify": "^10.0.5",
