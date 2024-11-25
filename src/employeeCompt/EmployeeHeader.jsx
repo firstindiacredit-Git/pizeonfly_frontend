@@ -279,7 +279,7 @@ const Header = () => {
                       <div className="d-flex py-1">
                         <img
                           className="avatar rounded-circle"
-                          src={`${import.meta.env.VITE_BASE_URL}` + image}
+                          src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`}
                           alt="profile"
                           style={{
                             transition: 'transform 0.3s ease-in-out',
