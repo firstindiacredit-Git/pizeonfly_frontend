@@ -770,7 +770,7 @@ const EmployeeDashboard = () => {
                         <div className="profile-image-container position-relative">
                           <img
                             className="avatar rounded-circle border border-2 border-primary p-1"
-                            src={`${import.meta.env.VITE_BASE_URL}${image}`}
+                            src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`}
                             alt="profile"
                             style={{
                               transition: 'all 0.3s ease-in-out',
@@ -789,7 +789,7 @@ const EmployeeDashboard = () => {
                               e.target.style.zIndex = '1';
                               e.target.style.borderRadius = '50%';
                             }}
-                            onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image}`)}
+                            onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
                           />
                         </div>
 

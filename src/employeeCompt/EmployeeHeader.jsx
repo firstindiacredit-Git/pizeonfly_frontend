@@ -268,7 +268,7 @@ const Header = () => {
                 >
                   <img
                     className="avatar lg rounded-circle img-thumbnail"
-                    src={`${import.meta.env.VITE_BASE_URL}` + image}
+                    src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`}
                     alt="profile"
                   />
                 </a>
@@ -293,7 +293,7 @@ const Header = () => {
                             e.target.style.transform = 'scale(1)';
                             e.target.style.zIndex = '1';
                           }}
-                          onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image}`)}
+                          onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
                         />
                         <div className="flex-fill ms-3">
                           <p className="mb-0">
