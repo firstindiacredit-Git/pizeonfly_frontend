@@ -84,6 +84,9 @@ const EmployeeDashboard = () => {
     todoList: null
   });
 
+  // Add employeeId from localStorage
+  const [currentEmployeeId, setCurrentEmployeeId] = useState(null);
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -93,6 +96,13 @@ const EmployeeDashboard = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Get employeeId when component mounts
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("emp_user"));
+    if (user && user.employeeId) {
+      setCurrentEmployeeId(user.employeeId);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -143,34 +153,45 @@ const EmployeeDashboard = () => {
     }
   }, []);
 
-  // Add new useEffect for fetching dashboard data
+  // Modified useEffect for fetching dashboard data
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (!currentEmployeeId) return;
+
       try {
-        // Fetch Excel Sheet data
-        const excelResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
-        });
+        // Fetch Excel Sheet data with employeeId
+        const excelResponse = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${currentEmployeeId}`,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
+          }
+        );
         if (excelResponse.data.tables) {
           setTables(excelResponse.data.tables);
           setDashboardIds(prev => ({ ...prev, excelSheet: excelResponse.data._id }));
         }
         setLoading(prev => ({ ...prev, excelSheet: false }));
 
-        // Fetch NotePad data
-        const noteResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}api/employeeNotePad`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
-        });
+        // Fetch NotePad data with employeeId
+        const noteResponse = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${currentEmployeeId}`,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
+          }
+        );
         if (noteResponse.data.notes) {
           setNotes(noteResponse.data.notes);
           setDashboardIds(prev => ({ ...prev, notePad: noteResponse.data._id }));
         }
         setLoading(prev => ({ ...prev, notePad: false }));
 
-        // Fetch TodoList data
-        const todoResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}api/employeeTodoList`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
-        });
+        // Fetch TodoList data with employeeId
+        const todoResponse = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}api/employeeTodoList/${currentEmployeeId}`,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
+          }
+        );
         if (todoResponse.data.todos) {
           setTodos(todoResponse.data.todos);
           setDashboardIds(prev => ({ ...prev, todoList: todoResponse.data._id }));
@@ -193,7 +214,7 @@ const EmployeeDashboard = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [currentEmployeeId]);
 
   const createChartData = (label, value, color) => ({
     labels: [label],
@@ -287,108 +308,170 @@ const EmployeeDashboard = () => {
 
   // Excel sheet functions
   const handleCellChange = async (tableIndex, rowIndex, colIndex, value) => {
-    try {
-      const newTables = [...tables];
-      newTables[tableIndex].data[rowIndex][colIndex] = value;
-      setTables(newTables);
+    if (!currentEmployeeId) {
+        console.error('No employee ID found');
+        setError(prev => ({ ...prev, excelSheet: 'Employee ID not found' }));
+        return;
+    }
 
-      const token = localStorage.getItem('emp_token');
-      if (dashboardIds.excelSheet) {
-        const response = await axios.put(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-          { tables: newTables },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        if (response.data.excelSheet) {
-          setTables(JSON.parse(response.data.excelSheet));
+    try {
+        const newTables = [...tables];
+        newTables[tableIndex].data[rowIndex][colIndex] = value;
+        setTables(newTables);
+
+        const token = localStorage.getItem('emp_token');
+        if (dashboardIds.excelSheet) {
+            const response = await axios.put(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (response.data.tables) {
+                setTables(response.data.tables);
+            }
+        } else {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
         }
-      } else {
-        const response = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
-          { tables: newTables },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
-      }
     } catch (error) {
-      console.error('Error saving excel sheet:', error);
-      setError(prev => ({ ...prev, excelSheet: 'Failed to save changes' }));
+        console.error('Error saving excel sheet:', error);
+        setError(prev => ({ ...prev, excelSheet: 'Failed to save changes' }));
     }
   };
 
   const addRow = async (tableIndex) => {
-    try {
-      const newTables = [...tables];
-      const cols = newTables[tableIndex].cols;
-      newTables[tableIndex].rows++;
-      newTables[tableIndex].data.push(Array(cols).fill(''));
-      setTables(newTables);
+    if (!currentEmployeeId) {
+        console.error('No employee ID found');
+        setError(prev => ({ ...prev, excelSheet: 'Employee ID not found' }));
+        return;
+    }
 
-      const token = localStorage.getItem('emp_token');
-      if (dashboardIds.excelSheet) {
-        await axios.put(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-          { tables: newTables },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
+    try {
+        const newTables = [...tables];
+        const cols = newTables[tableIndex].cols;
+        newTables[tableIndex].rows++;
+        newTables[tableIndex].data.push(Array(cols).fill(''));
+        setTables(newTables);
+
+        const token = localStorage.getItem('emp_token');
+        if (dashboardIds.excelSheet) {
+            await axios.put(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } else {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
+        }
     } catch (error) {
-      console.error('Error adding row:', error);
-      setError(prev => ({ ...prev, excelSheet: 'Failed to add row' }));
+        console.error('Error adding row:', error);
+        setError(prev => ({ ...prev, excelSheet: 'Failed to add row' }));
     }
   };
 
   const addColumn = async (tableIndex) => {
-    try {
-      const newTables = [...tables];
-      newTables[tableIndex].cols++;
-      newTables[tableIndex].data = newTables[tableIndex].data.map(row => [...row, '']);
-      setTables(newTables);
+    if (!currentEmployeeId) {
+        console.error('No employee ID found');
+        setError(prev => ({ ...prev, excelSheet: 'Employee ID not found' }));
+        return;
+    }
 
-      const token = localStorage.getItem('emp_token');
-      if (dashboardIds.excelSheet) {
-        await axios.put(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-          { tables: newTables },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
+    try {
+        const newTables = [...tables];
+        newTables[tableIndex].cols++;
+        newTables[tableIndex].data = newTables[tableIndex].data.map(row => [...row, '']);
+        setTables(newTables);
+
+        const token = localStorage.getItem('emp_token');
+        if (dashboardIds.excelSheet) {
+            await axios.put(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } else {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
+        }
     } catch (error) {
-      console.error('Error adding column:', error);
-      setError(prev => ({ ...prev, excelSheet: 'Failed to add column' }));
+        console.error('Error adding column:', error);
+        setError(prev => ({ ...prev, excelSheet: 'Failed to add column' }));
     }
   };
 
   const addTable = async () => {
-    try {
-      const newTable = {
-        id: tables.length + 1,
-        rows: 3,
-        cols: 3,
-        data: Array(3).fill().map(() => Array(3).fill('')),
-        name: `Table ${tables.length + 1}`
-      };
-      const newTables = [...tables, newTable];
-      setTables(newTables);
+    if (!currentEmployeeId) {
+        console.error('No employee ID found');
+        setError(prev => ({ ...prev, excelSheet: 'Employee ID not found' }));
+        return;
+    }
 
-      const token = localStorage.getItem('emp_token');
-      if (dashboardIds.excelSheet) {
-        await axios.put(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-          { tables: newTables },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      } else {
-        const response = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
-          { tables: newTables },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
-      }
+    try {
+        const newTable = {
+            id: tables.length + 1,
+            rows: 3,
+            cols: 3,
+            data: Array(3).fill().map(() => Array(3).fill('')),
+            name: `Table ${tables.length + 1}`
+        };
+        const newTables = [...tables, newTable];
+        setTables(newTables);
+
+        const token = localStorage.getItem('emp_token');
+        if (dashboardIds.excelSheet) {
+            await axios.put(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } else {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
+        }
     } catch (error) {
-      console.error('Error adding table:', error);
-      setError(prev => ({ ...prev, excelSheet: 'Failed to add table' }));
+        console.error('Error adding table:', error);
+        setError(prev => ({ ...prev, excelSheet: 'Failed to add table' }));
     }
   };
 
@@ -405,13 +488,19 @@ const EmployeeDashboard = () => {
         if (dashboardIds.todoList) {
           await axios.put(
             `${import.meta.env.VITE_BASE_URL}api/employeeTodoList/${dashboardIds.todoList}`,
-            { todos: updatedTodos },
+            { 
+              todos: updatedTodos,
+              employeeId: currentEmployeeId 
+            },
             { headers: { Authorization: `Bearer ${token}` } }
           );
         } else {
           const response = await axios.post(
             `${import.meta.env.VITE_BASE_URL}api/employeeTodoList`,
-            { todos: updatedTodos },
+            { 
+              todos: updatedTodos,
+              employeeId: currentEmployeeId 
+            },
             { headers: { Authorization: `Bearer ${token}` } }
           );
           setDashboardIds(prev => ({ ...prev, todoList: response.data._id }));
@@ -502,47 +591,85 @@ const EmployeeDashboard = () => {
 
   // Add these new functions
   const deleteRow = async (tableIndex, rowIndex) => {
-    try {
-      const newTables = [...tables];
-      newTables[tableIndex].data.splice(rowIndex, 1);
-      newTables[tableIndex].rows--;
-      setTables(newTables);
+    if (!currentEmployeeId) {
+        console.error('No employee ID found');
+        setError(prev => ({ ...prev, excelSheet: 'Employee ID not found' }));
+        return;
+    }
 
-      const token = localStorage.getItem('emp_token');
-      if (dashboardIds.excelSheet) {
-        await axios.put(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-          { tables: newTables },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
+    try {
+        const newTables = [...tables];
+        newTables[tableIndex].data.splice(rowIndex, 1);
+        newTables[tableIndex].rows--;
+        setTables(newTables);
+
+        const token = localStorage.getItem('emp_token');
+        if (dashboardIds.excelSheet) {
+            await axios.put(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } else {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
+        }
     } catch (error) {
-      console.error('Error deleting row:', error);
-      setError(prev => ({ ...prev, excelSheet: 'Failed to delete row' }));
+        console.error('Error deleting row:', error);
+        setError(prev => ({ ...prev, excelSheet: 'Failed to delete row' }));
     }
   };
 
   const deleteColumn = async (tableIndex, colIndex) => {
-    try {
-      const newTables = [...tables];
-      newTables[tableIndex].data = newTables[tableIndex].data.map(row => {
-        row.splice(colIndex, 1);
-        return row;
-      });
-      newTables[tableIndex].cols--;
-      setTables(newTables);
+    if (!currentEmployeeId) {
+        console.error('No employee ID found');
+        setError(prev => ({ ...prev, excelSheet: 'Employee ID not found' }));
+        return;
+    }
 
-      const token = localStorage.getItem('emp_token');
-      if (dashboardIds.excelSheet) {
-        await axios.put(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-          { tables: newTables },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
+    try {
+        const newTables = [...tables];
+        newTables[tableIndex].data = newTables[tableIndex].data.map(row => {
+            row.splice(colIndex, 1);
+            return row;
+        });
+        newTables[tableIndex].cols--;
+        setTables(newTables);
+
+        const token = localStorage.getItem('emp_token');
+        if (dashboardIds.excelSheet) {
+            await axios.put(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } else {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
+                { 
+                    tables: newTables,
+                    employeeId: currentEmployeeId 
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
+        }
     } catch (error) {
-      console.error('Error deleting column:', error);
-      setError(prev => ({ ...prev, excelSheet: 'Failed to delete column' }));
+        console.error('Error deleting column:', error);
+        setError(prev => ({ ...prev, excelSheet: 'Failed to delete column' }));
     }
   };
 
@@ -577,29 +704,38 @@ const EmployeeDashboard = () => {
     }
   };
 
-  // Update NotePad functions
+  // Modify handleNotesChange function
   const handleNotesChange = async (value) => {
-    try {
-      setNotes(value);
-      const token = localStorage.getItem('emp_token');
+    if (!currentEmployeeId) {
+        console.error('No employee ID found');
+        setError(prev => ({ ...prev, notePad: 'Employee ID not found' }));
+        return;
+    }
 
-      if (dashboardIds.notePad) {
-        await axios.put(
-          `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${dashboardIds.notePad}`,
-          { notes: value },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      } else {
+    try {
+        setNotes(value); // Optimistic update
+        const token = localStorage.getItem('emp_token');
+
         const response = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}api/employeeNotePad`,
-          { notes: value },
-          { headers: { Authorization: `Bearer ${token}` } }
+            `${import.meta.env.VITE_BASE_URL}api/employeeNotePad`,
+            { 
+                notes: value,
+                employeeId: currentEmployeeId 
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
         );
-        setDashboardIds(prev => ({ ...prev, notePad: response.data._id }));
-      }
+
+        if (response.data._id) {
+            setDashboardIds(prev => ({ ...prev, notePad: response.data._id }));
+        }
+        if (response.data.notes) {
+            setNotes(response.data.notes);
+        }
     } catch (error) {
-      console.error('Error saving notepad:', error);
-      setError(prev => ({ ...prev, notePad: 'Failed to save changes' }));
+        console.error('Error saving notepad:', error);
+        setError(prev => ({ ...prev, notePad: 'Failed to save changes' }));
+        // Revert to previous value if save fails
+        setNotes(prev => prev);
     }
   };
 
