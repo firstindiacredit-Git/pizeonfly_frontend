@@ -44,11 +44,13 @@ const Tasks = () => {
     const fetchTasks = async () => {
       try {
         const token = localStorage.getItem('emp_token');
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/author`, {
-          headers: { Authorization: token }
+        const token1 = localStorage.getItem('emp_user_id');
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/author`, {
+          // headers: { Authorization: token }
+          _id: token1
         });
 
-        console.log('API response:', response.data);
+        // console.log('API response:', response.data);
 
         const tasksData = Array.isArray(response.data.tasks) ? response.data.tasks : [];
 

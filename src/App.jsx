@@ -37,6 +37,7 @@ import SpeechToText from './pages/tools/Miscellaneous/SpeechToText'
 import TextToSpeech from './pages/tools/Miscellaneous/TextToSpeech'
 import OnlineVoiceRecorder from './pages/tools/Miscellaneous/OnlineVoiceRecorder'
 import OnlineWebcamTest from './pages/tools/Miscellaneous/OnlineWebcamTest'
+import MembersDashboard from './pages/members/MembersDashboard'
 
 import EmployeeCardValidator from './pages/employee-tools/CardValidator'
 import EmployeeHtmlTemplateGenerator from './pages/employee-tools/HtmlTemplateGenerator'
@@ -70,6 +71,7 @@ function App() {
 
         <Route path='/project-dashboard' element={<ProjectDashboard />}></Route>
         <Route path='/employee-dashboard' element={<EmployeeDashboard />}></Route>
+        <Route path='/members/MembersDashboard' element={<MembersDashboard />}></Route>
         <Route path='/client-dashboard' element={<ClientDashboard />}></Route>
         <Route path='/members' element={<Member />}></Route>
         <Route path='/projects' element={<Project />}></Route>

@@ -303,6 +303,7 @@ const Member = () => {
     setEmployeeData({
       ...employee,
       linkedin: employee.socialLinks?.linkedin || '',
+      linkedin: employee.socialLinks?.linkedin || '',
       instagram: employee.socialLinks?.instagram || '',
       youtube: employee.socialLinks?.youtube || '',
       facebook: employee.socialLinks?.facebook || '',
@@ -434,6 +435,16 @@ const Member = () => {
     setPdfUrl(null);
   };
 
+  const handleEmployeeClick = (employee) => {
+    console.log(employee.employeeId)
+    navigate('/members/MembersDashboard', { 
+      state: { 
+        employeeId: employee._id ,
+        employeeCode: employee.employeeId,
+        employee
+      }
+    });
+  };
 
   return (
     <>
@@ -609,7 +620,12 @@ const Member = () => {
                                 <div className="teacher-info border-start ps-xl-4 ps-md-3 ps-sm-4 ps-4 w-100">
                                   <div>
                                     <div className="d-flex justify-content-between">
-                                      <h6 className="mb-0 mt-2 fw-bold d-block fs-6">
+                                      
+                                      <h6 
+                                        className="mb-0 mt-2 fw-bold d-block fs-6"
+                                        onClick={() => handleEmployeeClick(employee)}
+                                        style={{ cursor: 'pointer' }}
+                                      >
                                         {employee.employeeName}
                                       </h6>
                                       <div

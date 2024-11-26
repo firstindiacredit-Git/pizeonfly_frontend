@@ -10,10 +10,12 @@ import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import { Checkbox, IconButton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { useNavigate } from 'react-router-dom';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
 const EmployeeDashboard = () => {
+  const navigate = useNavigate();
   const [totalProjects, setTotalProjects] = useState(0)
   const [totalTasks, setTotalTasks] = useState(0)
   const [taskStatusCount, setTaskStatusCount] = useState({
@@ -105,20 +107,26 @@ const EmployeeDashboard = () => {
   }, []);
 
   useEffect(() => {
+    // console.log(currentEmployeeId + "currentEmployeeId")
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('emp_token')
+        // const token = localStorage.getItem('emp_token')
+        const token = localStorage.getItem('emp_user_id')? localStorage.getItem('emp_user_id') : navigate.state.employeeId
         const [projectsResponse, tasksResponse, taskStatusResponse] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_BASE_URL}api/totalAssigneeProjects`, {
-            headers: { Authorization: `Bearer ${token}` }
+          axios.post(`${import.meta.env.VITE_BASE_URL}api/totalAssigneeProjects`, {
+            // headers: { Authorization: `Bearer ${token}` }
+            _id: token
           }),
-          axios.get(`${import.meta.env.VITE_BASE_URL}api/totalAssigneeTasks`, {
-            headers: { Authorization: `Bearer ${token}` }
+          axios.post(`${import.meta.env.VITE_BASE_URL}api/totalAssigneeTasks`, {
+            // headers: { Authorization: `Bearer ${token}` }
+            _id: token
           }),
-          axios.get(`${import.meta.env.VITE_BASE_URL}api/author`, {
-            headers: { Authorization: token }
+          axios.post(`${import.meta.env.VITE_BASE_URL}api/author`, {
+            // headers: { Authorization: token }
+            _id: token
           })
         ])
+        // console.log(projectsResponse.data.totalProjects + "projectsResponse")
         setTotalProjects(projectsResponse.data.totalProjects)
         setTotalTasks(tasksResponse.data.totalTasks)
         setTaskStatusCount(taskStatusResponse.data.taskStatusCount)
@@ -161,10 +169,10 @@ const EmployeeDashboard = () => {
       try {
         // Fetch Excel Sheet data with employeeId
         const excelResponse = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${currentEmployeeId}`,
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
-          }
+          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${currentEmployeeId}`
+          // {
+          //   headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
+          // }
         );
         if (excelResponse.data.tables) {
           setTables(excelResponse.data.tables);
@@ -174,10 +182,10 @@ const EmployeeDashboard = () => {
 
         // Fetch NotePad data with employeeId
         const noteResponse = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${currentEmployeeId}`,
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
-          }
+          `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${currentEmployeeId}`
+          // {
+          //   headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
+          // }
         );
         if (noteResponse.data.notes) {
           setNotes(noteResponse.data.notes);
@@ -187,10 +195,10 @@ const EmployeeDashboard = () => {
 
         // Fetch TodoList data with employeeId
         const todoResponse = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/employeeTodoList/${currentEmployeeId}`,
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
-          }
+          `${import.meta.env.VITE_BASE_URL}api/employeeTodoList/${currentEmployeeId}`
+          // {
+          //   headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
+          // }
         );
         if (todoResponse.data.todos) {
           setTodos(todoResponse.data.todos);

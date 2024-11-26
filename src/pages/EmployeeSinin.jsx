@@ -44,15 +44,16 @@ const Signin = () => {
       if (token) {
         localStorage.setItem("emp_token", token);
         localStorage.setItem("emp_user", JSON.stringify(user));
+        localStorage.setItem("emp_user_id", user._id);
         setIsAuthenticated(true);
         navigate("/employee-dashboard");
       } else {
         setError("Incorrect email or password");
       }
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 3000);
 
     } catch (error) {
       if (error.response && error.response.status === 401) {
