@@ -11,10 +11,11 @@ import 'react-quill/dist/quill.snow.css'
 import { Checkbox, IconButton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useLocation } from 'react-router-dom';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
-const EmployeeDashboard = () => {
+const MemberDashboard = () => {
     const [currentEmployeeId, setCurrentEmployeeId] = useState("");
 
     const location = useLocation();
@@ -100,6 +101,10 @@ const EmployeeDashboard = () => {
         notePad: null,
         todoList: null
     });
+
+    // Add new state variables
+    const [editingTodo, setEditingTodo] = useState(null);
+    const [editedTodoText, setEditedTodoText] = useState('');
 
     // Add employeeId from localStorage
 
@@ -455,7 +460,14 @@ const EmployeeDashboard = () => {
         e.preventDefault();
         if (newTodo.trim()) {
             try {
-                const updatedTodos = [...todos, { text: newTodo, completed: false }];
+                const newTodoItem = {
+                    text: newTodo,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                const updatedTodos = [...todos, newTodoItem];
+                setTodos(updatedTodos);
+                setNewTodo('');
 
                 const payload = {
                     todos: updatedTodos,
@@ -463,22 +475,17 @@ const EmployeeDashboard = () => {
                 };
 
                 if (dashboardIds.todoList) {
-                    // Update existing todo list
                     await axios.put(
                         `${import.meta.env.VITE_BASE_URL}api/employeeTodoList/${dashboardIds.todoList}`,
                         payload
                     );
                 } else {
-                    // Create new todo list
                     const response = await axios.post(
                         `${import.meta.env.VITE_BASE_URL}api/employeeTodoList`,
                         payload
                     );
                     setDashboardIds(prev => ({ ...prev, todoList: response.data._id }));
                 }
-
-                setTodos(updatedTodos);
-                setNewTodo('');
             } catch (error) {
                 console.error('Error saving todo:', error);
                 setError(prev => ({ ...prev, todoList: 'Failed to save changes' }));
@@ -668,6 +675,107 @@ const EmployeeDashboard = () => {
         } catch (error) {
             console.error('Error saving notepad:', error);
             setError(prev => ({ ...prev, notePad: 'Failed to save changes' }));
+        }
+    };
+
+    // Add these new functions
+    const clearNotePad = async () => {
+        try {
+            setNotes('');
+            if (dashboardIds.notePad) {
+                await axios.put(
+                    `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${dashboardIds.notePad}`,
+                    {
+                        notes: '',
+                        employeeId: employeeCode
+                    }
+                );
+            }
+        } catch (error) {
+            console.error('Error clearing notepad:', error);
+            setError(prev => ({ ...prev, notePad: 'Failed to clear notepad' }));
+        }
+    };
+
+    // Add this new function
+    const clearAllTodos = async () => {
+        try {
+            setTodos([]);
+            if (dashboardIds.todoList) {
+                await axios.put(
+                    `${import.meta.env.VITE_BASE_URL}api/employeeTodoList/${dashboardIds.todoList}`,
+                    { todos: [] }
+                );
+            }
+        } catch (error) {
+            console.error('Error clearing todos:', error);
+            setError(prev => ({ ...prev, todoList: 'Failed to clear todos' }));
+        }
+    };
+
+    const startEditing = (index, text) => {
+        setEditingTodo(index);
+        setEditedTodoText(text);
+    };
+
+    const handleEditTodo = async (index) => {
+        try {
+            const newTodos = [...todos];
+            newTodos[index] = {
+                ...newTodos[index],
+                text: editedTodoText
+            };
+            setTodos(newTodos);
+            setEditingTodo(null);
+
+            if (dashboardIds.todoList) {
+                await axios.put(
+                    `${import.meta.env.VITE_BASE_URL}api/employeeTodoList/${dashboardIds.todoList}`,
+                    { todos: newTodos }
+                );
+            }
+        } catch (error) {
+            console.error('Error updating todo:', error);
+            setError(prev => ({ ...prev, todoList: 'Failed to update todo' }));
+        }
+    };
+
+    const getTimeAgo = (date) => {
+        const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+        let interval = seconds / 31536000;
+
+        if (interval > 1) return Math.floor(interval) + " years ago";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " months ago";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " days ago";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " hrs ago";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " mins ago";
+        return Math.floor(seconds) + " sec ago";
+    };
+
+    const handleDragEnd = async (result) => {
+        if (!result.destination) return;
+
+        const items = Array.from(todos);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+
+        setTodos(items);
+
+        // Update in backend
+        try {
+            if (dashboardIds.todoList) {
+                await axios.put(
+                    `${import.meta.env.VITE_BASE_URL}api/employeeTodoList/${dashboardIds.todoList}`,
+                    { todos: items },
+                );
+            }
+        } catch (error) {
+            console.error('Error updating todo order:', error);
+            setError(prev => ({ ...prev, todoList: 'Failed to update todo order' }));
         }
     };
 
@@ -1056,6 +1164,187 @@ const EmployeeDashboard = () => {
 
                                         <div className="row justify-content-center mt-3">
 
+
+
+                                            {/* NotePad */}
+                                            <div className="col-12 col-md-8 mb-4">
+                                                <div className="card shadow-lg mb-4">
+                                                    <div className="card-body">
+                                                        <div className="d-flex justify-content-between align-items-center mb-3">
+                                                            <h5 className="card-title m-0">NotePad</h5>
+                                                            <button
+                                                                className="btn btn-warning btn-sm"
+                                                                onClick={clearNotePad}
+                                                            >
+                                                                Clear All
+                                                            </button>
+                                                        </div>
+                                                        {loading.notePad ? (
+                                                            <div className="text-center">
+                                                                <div className="spinner-border text-primary" role="status">
+                                                                    <span className="visually-hidden">Loading...</span>
+                                                                </div>
+                                                            </div>
+                                                        ) : error.notePad ? (
+                                                            <div className="alert alert-danger">{error.notePad}</div>
+                                                        ) : (
+                                                            <ReactQuill
+                                                                value={notes}
+                                                                onChange={handleNotesChange}
+                                                                style={{ height: '310px', marginBottom: '50px' }}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Todo List */}
+                                            <div className="col-12 col-md-4 mb-4">
+                                                <div className="card shadow-lg">
+                                                    <div className="card-body">
+                                                        <div className="d-flex justify-content-between align-items-center mb-3">
+                                                            <h5 className="card-title m-0">Todo List</h5>
+                                                            {todos.length > 0 && (
+                                                                <button
+                                                                    className="btn btn-warning btn-sm"
+                                                                    onClick={clearAllTodos}
+                                                                >
+                                                                    Clear All
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                        {loading.todoList ? (
+                                                            <div className="text-center">
+                                                                <div className="spinner-border text-primary" role="status">
+                                                                    <span className="visually-hidden">Loading...</span>
+                                                                </div>
+                                                            </div>
+                                                        ) : error.todoList ? (
+                                                            <div className="alert alert-danger">{error.todoList}</div>
+                                                        ) : (
+                                                            <>
+                                                                <form onSubmit={addTodo} className="mb-3">
+                                                                    <div className="input-group">
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control"
+                                                                            value={newTodo}
+                                                                            onChange={(e) => setNewTodo(e.target.value)}
+                                                                            placeholder="Add new task..."
+                                                                        />
+                                                                        <button type="submit" className="btn btn-primary">Add</button>
+                                                                    </div>
+                                                                </form>
+                                                                <DragDropContext onDragEnd={handleDragEnd}>
+                                                                    <Droppable droppableId="todos">
+                                                                        {(provided) => (
+                                                                            <ul
+                                                                                className="list-group"
+                                                                                {...provided.droppableProps}
+                                                                                ref={provided.innerRef}
+                                                                            >
+                                                                                {todos.map((todo, index) => (
+                                                                                    <Draggable
+                                                                                        key={todo.createdAt || index}
+                                                                                        draggableId={todo.createdAt || `todo-${index}`}
+                                                                                        index={index}
+                                                                                    >
+                                                                                        {(provided) => (
+                                                                                            <li
+                                                                                                ref={provided.innerRef}
+                                                                                                {...provided.draggableProps}
+                                                                                                {...provided.dragHandleProps}
+                                                                                                className="list-group-item"
+                                                                                            >
+                                                                                                <div className="d-flex justify-content-between align-items-center">
+                                                                                                    <div className="d-flex align-items-center" style={{ width: '100%' }}>
+                                                                                                        <span className="me-2" style={{
+                                                                                                            minWidth: '25px',
+                                                                                                            color: '#666',
+                                                                                                            fontWeight: '500'
+                                                                                                        }}>
+                                                                                                            {index + 1}.
+                                                                                                        </span>
+                                                                                                        {editingTodo === index ? (
+                                                                                                            <div className="d-flex align-items-center flex-grow-1">
+                                                                                                                <input
+                                                                                                                    type="text"
+                                                                                                                    className="form-control form-control-sm me-2"
+                                                                                                                    value={editedTodoText}
+                                                                                                                    onChange={(e) => setEditedTodoText(e.target.value)}
+                                                                                                                    onKeyPress={(e) => {
+                                                                                                                        if (e.key === 'Enter') {
+                                                                                                                            handleEditTodo(index);
+                                                                                                                        }
+                                                                                                                    }}
+                                                                                                                    autoFocus
+                                                                                                                />
+                                                                                                                <button
+                                                                                                                    className="btn btn-sm btn-success me-2"
+                                                                                                                    onClick={() => handleEditTodo(index)}
+                                                                                                                >
+                                                                                                                    Save
+                                                                                                                </button>
+                                                                                                                <button
+                                                                                                                    className="btn btn-sm btn-secondary"
+                                                                                                                    onClick={() => setEditingTodo(null)}
+                                                                                                                >
+                                                                                                                    Cancel
+                                                                                                                </button>
+                                                                                                            </div>
+                                                                                                        ) : (
+                                                                                                            <>
+                                                                                                                <span className='text-start'
+                                                                                                                    style={{
+                                                                                                                        textDecoration: todo.completed ? 'line-through' : 'none',
+                                                                                                                        marginLeft: '8px',
+                                                                                                                        flex: 1,
+                                                                                                                        overflow: 'hidden',
+                                                                                                                        color: todo.completed ? '#888' : 'inherit',
+                                                                                                                        cursor: 'pointer'
+                                                                                                                    }}
+                                                                                                                    onClick={() => startEditing(index, todo.text)}
+                                                                                                                >
+                                                                                                                    {todo.text}
+                                                                                                                </span>
+                                                                                                                <Checkbox
+                                                                                                                    checked={todo.completed || false}
+                                                                                                                    onChange={() => toggleTodo(index)}
+                                                                                                                    style={{ height: '10px', width: '10px' }}
+                                                                                                                />
+                                                                                                                <IconButton
+                                                                                                                    onClick={() => deleteTodo(index)}
+                                                                                                                    size="small"
+                                                                                                                    style={{ marginLeft: '8px' }}
+                                                                                                                >
+                                                                                                                    <DeleteIcon style={{ height: '20px', width: '20px' }} />
+                                                                                                                </IconButton>
+                                                                                                            </>
+                                                                                                        )}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <span className='text-muted' style={{ fontSize: '0.7rem', marginRight: '10px' }}>
+                                                                                                    {todo.createdAt ? (
+                                                                                                        <>
+                                                                                                            {new Date(todo.createdAt).toLocaleString()} ({getTimeAgo(todo.createdAt)})
+                                                                                                        </>
+                                                                                                    ) : 'No date'}
+                                                                                                </span>
+                                                                                            </li>
+                                                                                        )}
+                                                                                    </Draggable>
+                                                                                ))}
+                                                                                {provided.placeholder}
+                                                                            </ul>
+                                                                        )}
+                                                                    </Droppable>
+                                                                </DragDropContext>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             {/* Excel Sheet */}
                                             <div className="card shadow-lg mb-5">
                                                 <div className="card-body">
@@ -1168,98 +1457,6 @@ const EmployeeDashboard = () => {
                                                 </div>
                                             </div>
 
-                                            {/* NotePad */}
-                                            <div className="col-12 col-md-6 mb-4">
-                                                <div className="card shadow-lg mb-4">
-                                                    <div className="card-body">
-                                                        <h5 className="card-title text-center">NotePad</h5>
-                                                        {loading.notePad ? (
-                                                            <div className="text-center">
-                                                                <div className="spinner-border text-primary" role="status">
-                                                                    <span className="visually-hidden">Loading...</span>
-                                                                </div>
-                                                            </div>
-                                                        ) : error.notePad ? (
-                                                            <div className="alert alert-danger">{error.notePad}</div>
-                                                        ) : (
-                                                            <ReactQuill
-                                                                value={notes}
-                                                                onChange={handleNotesChange}
-                                                                style={{ height: '300px', marginBottom: '50px' }}
-                                                            />
-                                                        )}
-                                                    </div>
-                                                </div>
-
-
-                                            </div>
-                                            {/* Todo List */}
-                                            <div className="col-12 col-md-6 mb-4">
-                                                <div className="card shadow-lg">
-                                                    <div className="card-body">
-                                                        <h5 className="card-title text-center">To Do List</h5>
-                                                        {loading.todoList ? (
-                                                            <div className="text-center">
-                                                                <div className="spinner-border text-primary" role="status">
-                                                                    <span className="visually-hidden">Loading...</span>
-                                                                </div>
-                                                            </div>
-                                                        ) : error.todoList ? (
-                                                            <div className="alert alert-danger">{error.todoList}</div>
-                                                        ) : (
-                                                            <>
-                                                                <form onSubmit={addTodo} className="mb-3">
-                                                                    <div className="input-group">
-                                                                        <input
-                                                                            type="text"
-                                                                            className="form-control"
-                                                                            value={newTodo}
-                                                                            onChange={(e) => setNewTodo(e.target.value)}
-                                                                            placeholder="Add new task..."
-                                                                        />
-                                                                        <button type="submit" className="btn btn-primary">Add</button>
-                                                                    </div>
-                                                                </form>
-                                                                <ul className="list-group">
-                                                                    {todos.map((todo, index) => (
-                                                                        <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                                                                            <div className="d-flex align-items-center" style={{ width: '100%' }}>
-                                                                                <span className="me-2" style={{
-                                                                                    minWidth: '25px',
-                                                                                    color: '#666',
-                                                                                    fontWeight: '500'
-                                                                                }}>
-                                                                                    {index + 1}.
-                                                                                </span>
-                                                                                <Checkbox
-                                                                                    checked={todo.completed || false}
-                                                                                    onChange={() => toggleTodo(index)}
-                                                                                />
-                                                                                <span style={{
-                                                                                    textDecoration: todo.completed ? 'line-through' : 'none',
-                                                                                    marginLeft: '8px',
-                                                                                    flex: 1,
-                                                                                    overflow: 'hidden',
-                                                                                    color: todo.completed ? '#888' : 'inherit'
-                                                                                }}>
-                                                                                    {todo.text}
-                                                                                </span>
-                                                                                <IconButton
-                                                                                    onClick={() => deleteTodo(index)}
-                                                                                    size="small"
-                                                                                    style={{ marginLeft: '8px' }}
-                                                                                >
-                                                                                    <DeleteIcon />
-                                                                                </IconButton>
-                                                                            </div>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
 
                                         <Link to="https://pizeonfly.com/" className="text-muted">GO TO THE WEBSITE</Link>
@@ -1308,4 +1505,4 @@ const EmployeeDashboard = () => {
     )
 }
 
-export default EmployeeDashboard
+export default MemberDashboard
