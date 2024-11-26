@@ -34,6 +34,7 @@ const MemberDashboard = () => {
 
     const [totalProjects, setTotalProjects] = useState(0)
     const [totalTasks, setTotalTasks] = useState(0)
+    const [assignedProjects, setAssignedProjects] = useState([])
     const [taskStatusCount, setTaskStatusCount] = useState({
         completed: 0,
         inProgress: 0,
@@ -123,33 +124,33 @@ const MemberDashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // const token = localStorage.getItem('emp_token')
-                const token = employeeId
-                const [projectsResponse, tasksResponse, taskStatusResponse] = await Promise.all([
+                const token = employeeId;
+                const [projectsResponse, tasksResponse, taskStatusResponse, assignedProjectsResponse] = await Promise.all([
                     axios.post(`${import.meta.env.VITE_BASE_URL}api/totalAssigneeProjects`, {
-                        // headers: { Authorization: `Bearer ${token}` }
                         _id: token
                     }),
                     axios.post(`${import.meta.env.VITE_BASE_URL}api/totalAssigneeTasks`, {
-                        // headers: { Authorization: `Bearer ${token}` }
                         _id: token
                     }),
                     axios.post(`${import.meta.env.VITE_BASE_URL}api/author`, {
-                        // headers: { Authorization: token }
+                        _id: token
+                    }),
+                    axios.post(`${import.meta.env.VITE_BASE_URL}api/employee-projects`, {
                         _id: token
                     })
-                ])
-                // console.log(projectsResponse.data.totalProjects + "projectsResponse")
-                setTotalProjects(projectsResponse.data.totalProjects)
-                setTotalTasks(tasksResponse.data.totalTasks)
-                setTaskStatusCount(taskStatusResponse.data.taskStatusCount)
-            } catch (error) {
-                console.error('Error fetching data:', error)
-            }
-        }
+                ]);
 
-        fetchData()
-    }, [])
+                setTotalProjects(projectsResponse.data.totalProjects);
+                setTotalTasks(tasksResponse.data.totalTasks);
+                setTaskStatusCount(taskStatusResponse.data.taskStatusCount);
+                setAssignedProjects(assignedProjectsResponse.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     useEffect(() => {
         const user = employee
@@ -837,7 +838,7 @@ const MemberDashboard = () => {
                             <div className="col-12">
                                 <div className="card mb-3">
                                     <div className="card-body text-center p-5">
-                                        <div style={{ height: "8rem" }}>
+                                        {/* <div style={{ height: "8rem" }}>
                                             <img
                                                 src="Images/icon.png"
                                                 className="img-fluid"
@@ -849,7 +850,7 @@ const MemberDashboard = () => {
                                                 }}
                                             />
                                             <p className="fs-6" style={{ color: "#4989fd" }}>An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span></p>
-                                        </div>
+                                        </div> */}
 
                                         <div className="profile-section p-4 bg-white rounded-4 shadow-sm mb-4">
                                             <div className="d-flex align-items-start gap-4">
@@ -1166,15 +1167,55 @@ const MemberDashboard = () => {
 
                                         <div className="row justify-content-center">
                                             <div className="col-12 col-md-6 mb-4">
-                                                    <div className="card shadow-lg">
-                                                        <div className="card-body text-center">
-                                                            <h5 className="card-title">Total Projects Assigned</h5>
-                                                            <h2 className="mb-4" style={{ color: 'rgba(255, 99, 132, 1)' }}>{totalProjects}</h2>
-                                                            {/* <Bar data={projectsChartData} options={chartOptions} /> */}
-                                                            {/* Add total assigned projects details */}
-                                                           
+                                                <div className="card shadow-lg">
+                                                    <div className="card-body">
+                                                        <h5 className="card-title text-center">Total Projects Assigned</h5>
+                                                        <h2 className="mb-4 text-center" style={{ color: 'rgba(255, 99, 132, 1)' }}>{totalProjects}</h2>
+                                                        
+                                                        <div className="table-responsive">
+                                                            <table className="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Project Name</th>
+                                                                        <th>Team Size</th>
+                                                                        <th>Progress</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {assignedProjects.map((project, index) => (
+                                                                        <tr key={project._id}>
+                                                                            <td>
+                                                                                <span className="text-primary">
+                                                                                    {project.projectName}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td>{project.taskAssignPerson?.length || 0}</td>
+                                                                            <td>
+                                                                                <div className="progress" style={{ height: '5px' }}>
+                                                                                    <div
+                                                                                        className={`progress-bar ${
+                                                                                            parseFloat(project.progress) === 100 
+                                                                                                ? 'bg-success' 
+                                                                                                : parseFloat(project.progress) > 50 
+                                                                                                ? 'bg-info' 
+                                                                                                : 'bg-warning'
+                                                                                        }`}
+                                                                                        role="progressbar"
+                                                                                        style={{ width: `${project.progress}%` }}
+                                                                                        aria-valuenow={project.progress}
+                                                                                        aria-valuemin="0"
+                                                                                        aria-valuemax="100"
+                                                                                    ></div>
+                                                                                </div>
+                                                                                <small className="text-muted">{project.progress}%</small>
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
                                                         </div>
                                                     </div>
+                                                </div>
                                             </div>
                                             <div className="col-12 col-md-6 mb-4">
                                                     <div className="card shadow-lg">
@@ -1191,7 +1232,7 @@ const MemberDashboard = () => {
                                         </div>
 
                                         <div className="row justify-content-center mt-3">
-                                            <div className={`col-12 ${isSmallScreen() ? 'mb-4' : 'col-md-7'}`}>
+                                            <div className={`col-12 ${isSmallScreen() ? 'mb-4' : 'col-md-8'}`}>
                                                 <div className="card shadow-lg mb-4">
                                                     <div className="card-body">
                                                         <h5 className="card-title text-center mb-4">Overall Summary</h5>
@@ -1200,7 +1241,7 @@ const MemberDashboard = () => {
                                                 </div>
                                             </div>
                                             <div className={`col-12 ${isSmallScreen() ? '' : 'col-md-4'}`}>
-                                                <div className="card shadow-lg">
+                                                <div className="card shadow-lg" style={{ height: '95%' }}>
                                                     <div className="card-body">
                                                         <h5 className="card-title text-center">Project Status</h5>
                                                         <Doughnut data={taskStatusChartData} options={doughnutOptions} />

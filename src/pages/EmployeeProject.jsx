@@ -33,17 +33,15 @@ const Project = () => {
   const [loginUserId, setLoginUserId] = useState([]);
   // console.log(selectProject);
   useEffect(() => {
-    const Token = localStorage.getItem("emp_token");
+    const Token = localStorage.getItem('emp_user_id') ? localStorage.getItem('emp_user_id') : navigate.state.employeeId
     const UserDetails = JSON.parse(localStorage.getItem("emp_user"));
     setLoginUserId(UserDetails._id);
     // console.log(UserDetails);
 
     async function fetchData() {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/employee-projects`, {
-          headers: {
-            authorization: Token,
-          },
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/employee-projects`, {
+          _id: Token,
         });
         // console.log(response.data);
         setProjects(response.data);
