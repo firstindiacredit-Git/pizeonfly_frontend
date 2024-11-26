@@ -43,9 +43,9 @@ const MemberDashboard = () => {
     const [notes, setNotes] = useState('')
     const [tables, setTables] = useState([{
         id: 1,
-        rows: 3,
-        cols: 3,
-        data: Array(3).fill().map(() => Array(3).fill('')),
+        rows: 5,
+        cols: 5,
+        data: Array(5).fill().map(() => Array(5).fill('')),
         name: 'Table 1'
     }])
     const [todos, setTodos] = useState([])
@@ -424,9 +424,9 @@ const MemberDashboard = () => {
         try {
             const newTable = {
                 id: tables.length + 1,
-                rows: 3,
-                cols: 3,
-                data: Array(3).fill().map(() => Array(3).fill('')),
+                rows: 5,
+                cols: 5,
+                data: Array(5).fill().map(() => Array(5).fill('')),
                 name: `Table ${tables.length + 1}`
             };
             const newTables = [...tables, newTable];
@@ -546,7 +546,10 @@ const MemberDashboard = () => {
             if (dashboardIds.excelSheet) {
                 await axios.put(
                     `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-                    { tables: newTables },
+                    { 
+                        tables: newTables,
+                        employeeId: employeeCode
+                    }
                 );
             }
         } catch (error) {
@@ -776,6 +779,50 @@ const MemberDashboard = () => {
         } catch (error) {
             console.error('Error updating todo order:', error);
             setError(prev => ({ ...prev, todoList: 'Failed to update todo order' }));
+        }
+    };
+
+    // Add these new functions for Excel sheet
+    const clearTableData = async (tableIndex) => {
+        try {
+            const newTables = [...tables];
+            const rows = newTables[tableIndex].rows;
+            const cols = newTables[tableIndex].cols;
+            newTables[tableIndex].data = Array(rows).fill().map(() => Array(cols).fill(''));
+            setTables(newTables);
+
+            if (dashboardIds.excelSheet) {
+                await axios.put(
+                    `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
+                    { 
+                        tables: newTables,
+                        employeeId: employeeCode
+                    }
+                );
+            }
+        } catch (error) {
+            console.error('Error clearing table:', error);
+            setError(prev => ({ ...prev, excelSheet: 'Failed to clear table' }));
+        }
+    };
+
+    const deleteTable = async (tableIndex) => {
+        try {
+            const newTables = tables.filter((_, index) => index !== tableIndex);
+            setTables(newTables);
+
+            if (dashboardIds.excelSheet) {
+                await axios.put(
+                    `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
+                    { 
+                        tables: newTables,
+                        employeeId: employeeCode
+                    }
+                );
+            }
+        } catch (error) {
+            console.error('Error deleting table:', error);
+            setError(prev => ({ ...prev, excelSheet: 'Failed to delete table' }));
         }
     };
 
@@ -1119,26 +1166,26 @@ const MemberDashboard = () => {
 
                                         <div className="row justify-content-center">
                                             <div className="col-12 col-md-6 mb-4">
-                                                <Link to="/employee-projects">
                                                     <div className="card shadow-lg">
                                                         <div className="card-body text-center">
                                                             <h5 className="card-title">Total Projects Assigned</h5>
                                                             <h2 className="mb-4" style={{ color: 'rgba(255, 99, 132, 1)' }}>{totalProjects}</h2>
-                                                            <Bar data={projectsChartData} options={chartOptions} />
+                                                            {/* <Bar data={projectsChartData} options={chartOptions} /> */}
+                                                            {/* Add total assigned projects details */}
+                                                           
                                                         </div>
                                                     </div>
-                                                </Link>
                                             </div>
                                             <div className="col-12 col-md-6 mb-4">
-                                                <Link to="/employee-tasks">
                                                     <div className="card shadow-lg">
                                                         <div className="card-body text-center">
                                                             <h5 className="card-title">Total Tasks Assigned</h5>
                                                             <h2 className="mb-4" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalTasks}</h2>
-                                                            <Bar data={tasksChartData} options={chartOptions} />
+                                                            {/* <Bar data={tasksChartData} options={chartOptions} /> */}
+                                                            {/* Add total assigned tasks details */}
+                                                            
                                                         </div>
                                                     </div>
-                                                </Link>
                                             </div>
 
                                         </div>
@@ -1369,30 +1416,52 @@ const MemberDashboard = () => {
 
                                                             {tables.map((table, tableIndex) => (
                                                                 <div key={table.id} className="mb-4">
-                                                                    <input
-                                                                        type="text"
-                                                                        value={table.name}
-                                                                        onChange={(e) => handleTableNameChange(tableIndex, e.target.value)}
-                                                                        className="form-control text-center mb-3"
-                                                                        style={{
-                                                                            border: 'none',
-                                                                            backgroundColor: 'transparent',
-                                                                            fontSize: '1.1rem',
-                                                                            fontWeight: 'bold'
-                                                                        }}
-                                                                    />
+                                                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                                                        <input
+                                                                            type="text"
+                                                                            value={table.name}
+                                                                            onChange={(e) => handleTableNameChange(tableIndex, e.target.value)}
+                                                                            className="form-control text-center"
+                                                                            style={{
+                                                                                border: 'none',
+                                                                                backgroundColor: 'transparent',
+                                                                                fontSize: '1.1rem',
+                                                                                fontWeight: 'bold',
+                                                                                width: 'auto'
+                                                                            }}
+                                                                        />
+                                                                        <div>
+                                                                            <button
+                                                                                className="btn btn-warning btn-sm me-2"
+                                                                                onClick={() => clearTableData(tableIndex)}
+                                                                            >
+                                                                                Clear All
+                                                                            </button>
+                                                                            <button
+                                                                                className="btn btn-danger btn-sm"
+                                                                                onClick={() => deleteTable(tableIndex)}
+                                                                            >
+                                                                                Delete Table
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
                                                                     <div className="table-responsive mb-3">
                                                                         <table className="table table-bordered">
                                                                             <thead>
                                                                                 <tr>
-                                                                                    <th style={{ width: '40px', backgroundColor: '#f8f9fa' }}></th>
+                                                                                    <th style={{ width: '30px', backgroundColor: '#f8f9fa' }}></th>
                                                                                     {Array(table.cols).fill().map((_, colIndex) => (
-                                                                                        <th key={colIndex} className="text-center" style={{ backgroundColor: '#f8f9fa' }}>
+                                                                                        <th key={colIndex} className="text-center" style={{
+                                                                                            backgroundColor: '#f8f9fa',
+                                                                                            padding: '2px',
+                                                                                            fontSize: '12px',
+                                                                                            width: '80px'
+                                                                                        }}>
                                                                                             {getColumnLabel(colIndex)}
                                                                                             <button
-                                                                                                className="btn text-danger btn-sm ms-2"
+                                                                                                className="btn text-danger btn-sm ms-1"
                                                                                                 onClick={() => deleteColumn(tableIndex, colIndex)}
-                                                                                                style={{ padding: '0px 4px', fontSize: '10px' }}
+                                                                                                style={{ padding: '0px 2px', fontSize: '8px' }}
                                                                                             >
                                                                                                 ×
                                                                                             </button>
@@ -1403,29 +1472,40 @@ const MemberDashboard = () => {
                                                                             <tbody>
                                                                                 {Array(table.rows).fill().map((_, rowIndex) => (
                                                                                     <tr key={rowIndex}>
-                                                                                        <td className="text-center" style={{ backgroundColor: '#f8f9fa' }}>
+                                                                                        <td className="text-center" style={{
+                                                                                            backgroundColor: '#f8f9fa',
+                                                                                            padding: '2px',
+                                                                                            fontSize: '12px'
+                                                                                        }}>
                                                                                             {rowIndex + 1}
                                                                                             <button
-                                                                                                className="btn text-danger btn-sm ms-2"
+                                                                                                className="btn text-danger btn-sm ms-1"
                                                                                                 onClick={() => deleteRow(tableIndex, rowIndex)}
-                                                                                                style={{ padding: '0px 4px', fontSize: '10px' }}
+                                                                                                style={{ padding: '0px 2px', fontSize: '8px' }}
                                                                                             >
                                                                                                 ×
                                                                                             </button>
                                                                                         </td>
                                                                                         {Array(table.cols).fill().map((_, colIndex) => (
-                                                                                            <td key={colIndex} style={{ padding: '0px' }}>
+                                                                                            <td key={colIndex} style={{
+                                                                                                padding: '0px',
+                                                                                                width: '80px',
+                                                                                                maxWidth: '80px'
+                                                                                            }}>
                                                                                                 <textarea
                                                                                                     value={table.data[rowIndex][colIndex]}
                                                                                                     onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
                                                                                                     className="cell-input"
                                                                                                     style={{
                                                                                                         width: '100%',
-                                                                                                        padding: '2px 4px',
+                                                                                                        padding: '1px 2px',
                                                                                                         border: 'none',
                                                                                                         background: 'transparent',
-                                                                                                        resize: 'both',
-                                                                                                        overflow: 'hidden'
+                                                                                                        resize: 'none',
+                                                                                                        overflow: 'hidden',
+                                                                                                        minHeight: '22px',
+                                                                                                        maxHeight: '60px',
+                                                                                                        fontSize: '12px'
                                                                                                     }}
                                                                                                 />
                                                                                             </td>
