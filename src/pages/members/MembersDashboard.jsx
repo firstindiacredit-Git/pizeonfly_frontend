@@ -109,6 +109,8 @@ const MemberDashboard = () => {
 
     // Add employeeId from localStorage
 
+    // First, add a new state for tasks
+    const [assignedTasks, setAssignedTasks] = useState([]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -143,6 +145,7 @@ const MemberDashboard = () => {
                 setTotalProjects(projectsResponse.data.totalProjects);
                 setTotalTasks(tasksResponse.data.totalTasks);
                 setTaskStatusCount(taskStatusResponse.data.taskStatusCount);
+                setAssignedTasks(taskStatusResponse.data.tasks); // Store the tasks array
                 setAssignedProjects(assignedProjectsResponse.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -274,11 +277,14 @@ const MemberDashboard = () => {
     const tasksChartData = createChartData('Tasks', totalTasks, 'rgba(54, 162, 235, 0.6)')
 
     const overallChartData = {
-        labels: ['Projects', 'Tasks'],
+        labels: [`Projects (${totalProjects})`, `Tasks (${totalTasks})`],
         datasets: [
             {
-                label: 'Total Count',
-                data: [totalProjects, totalTasks],
+                label: 'Percentage',
+                data: [
+                    (totalProjects / (totalProjects + totalTasks) * 100).toFixed(1),
+                    (totalTasks / (totalProjects + totalTasks) * 100).toFixed(1)
+                ],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.6)',
                     'rgba(54, 162, 235, 0.6)',
@@ -293,10 +299,18 @@ const MemberDashboard = () => {
     }
 
     const taskStatusChartData = {
-        labels: ['Completed', 'In Progress', 'Not Started'],
+        labels: [
+            `${((taskStatusCount.completed / totalTasks) * 100).toFixed(1)}% Completed (${taskStatusCount.completed})`,
+            `${((taskStatusCount.inProgress / totalTasks) * 100).toFixed(1)}% In Progress (${taskStatusCount.inProgress})`,
+            `${((taskStatusCount.notStarted / totalTasks) * 100).toFixed(1)}% Not Started (${taskStatusCount.notStarted})`
+        ],
         datasets: [
             {
-                data: [taskStatusCount.completed, taskStatusCount.inProgress, taskStatusCount.notStarted],
+                data: [
+                    ((taskStatusCount.completed / totalTasks) * 100).toFixed(1),
+                    ((taskStatusCount.inProgress / totalTasks) * 100).toFixed(1),
+                    ((taskStatusCount.notStarted / totalTasks) * 100).toFixed(1)
+                ],
                 backgroundColor: [
                     'rgba(75, 192, 192, 0.6)',
                     'rgba(255, 206, 86, 0.6)',
@@ -317,6 +331,7 @@ const MemberDashboard = () => {
         plugins: {
             legend: {
                 position: 'bottom',
+
             },
             title: {
                 display: true,
@@ -547,7 +562,7 @@ const MemberDashboard = () => {
             if (dashboardIds.excelSheet) {
                 await axios.put(
                     `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-                    { 
+                    {
                         tables: newTables,
                         employeeId: employeeCode
                     }
@@ -795,7 +810,7 @@ const MemberDashboard = () => {
             if (dashboardIds.excelSheet) {
                 await axios.put(
                     `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-                    { 
+                    {
                         tables: newTables,
                         employeeId: employeeCode
                     }
@@ -815,7 +830,7 @@ const MemberDashboard = () => {
             if (dashboardIds.excelSheet) {
                 await axios.put(
                     `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-                    { 
+                    {
                         tables: newTables,
                         employeeId: employeeCode
                     }
@@ -1169,13 +1184,37 @@ const MemberDashboard = () => {
                                             <div className="col-12 col-md-6 mb-4">
                                                 <div className="card shadow-lg">
                                                     <div className="card-body">
-                                                        <h5 className="card-title text-center">Total Projects Assigned</h5>
-                                                        <h2 className="mb-4 text-center" style={{ color: 'rgba(255, 99, 132, 1)' }}>{totalProjects}</h2>
-                                                        
-                                                        <div className="table-responsive">
+                                                        {/* <div className="d-flex justify-content-between align-items-center"> */}
+                                                            {/* <div></div> */}
+                                                            <h5 className="card-title">Total Projects Assigned</h5>
+                                                            {/* <button
+                                                                type="button"
+                                                                className="btn"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#createproject"
+                                                            >
+                                                                <i className="icofont-plus-circle me-1 text-primary fs-4" />
+                                                            </button> */}
+                                                        {/* </div> */}
+                                                        <div className="d-flex justify-content-center align-items-center gap-2">
+                                                            <h2 className="mb-4 text-center" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalProjects}</h2>
+                                                            <span className="text-muted mb-4">({(totalProjects / (totalProjects + totalTasks) * 100).toFixed(1)}%)</span>
+                                                        </div>
+
+
+                                                        <div className="table-responsive" style={{
+                                                            maxHeight: '400px',
+                                                            overflowY: 'auto',
+                                                            msOverflowStyle: 'none',  /* IE and Edge */
+                                                            scrollbarWidth: 'none',   /* Firefox */
+                                                            '&::-webkit-scrollbar': {
+                                                                display: 'none'       /* Chrome, Safari and Opera */
+                                                            }
+                                                        }}>
                                                             <table className="table table-hover">
                                                                 <thead>
                                                                     <tr>
+                                                                        <th>SR.No</th>
                                                                         <th>Project Name</th>
                                                                         <th>Team Size</th>
                                                                         <th>Progress</th>
@@ -1184,6 +1223,7 @@ const MemberDashboard = () => {
                                                                 <tbody>
                                                                     {assignedProjects.map((project, index) => (
                                                                         <tr key={project._id}>
+                                                                            <td>{index + 1}</td>
                                                                             <td>
                                                                                 <span className="text-primary">
                                                                                     {project.projectName}
@@ -1193,13 +1233,12 @@ const MemberDashboard = () => {
                                                                             <td>
                                                                                 <div className="progress" style={{ height: '5px' }}>
                                                                                     <div
-                                                                                        className={`progress-bar ${
-                                                                                            parseFloat(project.progress) === 100 
-                                                                                                ? 'bg-success' 
-                                                                                                : parseFloat(project.progress) > 50 
-                                                                                                ? 'bg-info' 
+                                                                                        className={`progress-bar ${parseFloat(project.progress) === 100
+                                                                                            ? 'bg-success'
+                                                                                            : parseFloat(project.progress) > 50
+                                                                                                ? 'bg-info'
                                                                                                 : 'bg-warning'
-                                                                                        }`}
+                                                                                            }`}
                                                                                         role="progressbar"
                                                                                         style={{ width: `${project.progress}%` }}
                                                                                         aria-valuenow={project.progress}
@@ -1218,15 +1257,73 @@ const MemberDashboard = () => {
                                                 </div>
                                             </div>
                                             <div className="col-12 col-md-6 mb-4">
-                                                    <div className="card shadow-lg">
-                                                        <div className="card-body text-center">
-                                                            <h5 className="card-title">Total Tasks Assigned</h5>
-                                                            <h2 className="mb-4" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalTasks}</h2>
-                                                            {/* <Bar data={tasksChartData} options={chartOptions} /> */}
-                                                            {/* Add total assigned tasks details */}
-                                                            
+                                                <div className="card shadow-lg">
+                                                    <div className="card-body">
+                                                        <h5 className="card-title text-center">Total Tasks Assigned</h5>
+                                                        <div className="d-flex justify-content-center align-items-center gap-2">
+                                                            <h2 className="mb-4 text-center" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalTasks}</h2>
+                                                            <span className="text-muted mb-4">({(totalTasks / (totalProjects + totalTasks) * 100).toFixed(1)}%)</span>
+                                                        </div>
+
+                                                        <div className="table-responsive" style={{
+                                                            maxHeight: '400px',
+                                                            overflowY: 'auto',
+                                                            msOverflowStyle: 'none',  /* IE and Edge */
+                                                            scrollbarWidth: 'none',   /* Firefox */
+                                                            '&::-webkit-scrollbar': {
+                                                                display: 'none'       /* Chrome, Safari and Opera */
+                                                            }
+                                                        }}>
+                                                            <table className="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>SR.No</th>
+                                                                        <th>Task Name</th>
+                                                                        <th>Project</th>
+                                                                        <th>Status</th>
+                                                                        {/* <th>Priority</th> */}
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {assignedTasks.map((task, index) => (
+                                                                        <tr key={task._id}>
+                                                                            <td>{index + 1}</td>
+                                                                            <td>
+                                                                                <span className="text-primary">
+                                                                                    {task.description}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td>{task.projectName}</td>
+                                                                            <td>
+                                                                                <span className={`badge ${task.isCompleted
+                                                                                    ? 'bg-success'
+                                                                                    : task.taskStatus === 'In Progress'
+                                                                                        ? 'bg-warning'
+                                                                                        : 'bg-secondary'
+                                                                                    }`}>
+                                                                                    {task.isCompleted
+                                                                                        ? 'Completed'
+                                                                                        : task.taskStatus || 'Not Started'}
+                                                                                </span>
+                                                                            </td>
+                                                                            {/* <td>
+                                                                                <span className={`badge ${
+                                                                                    task.taskPriority === 'High' 
+                                                                                        ? 'bg-danger'
+                                                                                        : task.taskPriority === 'Medium'
+                                                                                        ? 'bg-warning'
+                                                                                        : 'bg-info'
+                                                                                }`}>
+                                                                                    {task.taskPriority}
+                                                                                </span>
+                                                                            </td> */}
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
                                                         </div>
                                                     </div>
+                                                </div>
                                             </div>
 
                                         </div>
@@ -1330,6 +1427,15 @@ const MemberDashboard = () => {
                                                                                 className="list-group"
                                                                                 {...provided.droppableProps}
                                                                                 ref={provided.innerRef}
+                                                                                style={{
+                                                                                    maxHeight: '400px',
+                                                                                    overflowY: 'auto',
+                                                                                    msOverflowStyle: 'none',
+                                                                                    scrollbarWidth: 'none',
+                                                                                    '&::-webkit-scrollbar': {
+                                                                                        display: 'none'
+                                                                                    }
+                                                                                }}
                                                                             >
                                                                                 {todos.map((todo, index) => (
                                                                                     <Draggable
@@ -1622,6 +1728,21 @@ const MemberDashboard = () => {
                     </div>
                 </div>
             )}
+
+            {/* Add this CSS to hide scrollbars globally for these elements */}
+            <style>
+                {`
+                    .table-responsive::-webkit-scrollbar,
+                    .list-group::-webkit-scrollbar {
+                        display: none;
+                    }
+                    .table-responsive,
+                    .list-group {
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
+                    }
+                `}
+            </style>
         </>
     )
 }
