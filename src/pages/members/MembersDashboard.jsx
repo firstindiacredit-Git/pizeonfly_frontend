@@ -112,6 +112,11 @@ const MemberDashboard = () => {
     // First, add a new state for tasks
     const [assignedTasks, setAssignedTasks] = useState([]);
 
+    // Add color states
+    const [notepadColor, setNotepadColor] = useState('#fff3cd');
+    const [todoColor, setTodoColor] = useState('#cfe2ff');
+    const [excelSheetColor, setExcelSheetColor] = useState('#d4edda');
+
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768);
@@ -184,6 +189,17 @@ const MemberDashboard = () => {
             if (!employeeCode) return;
 
             try {
+                // Fetch colors
+                const colorResponse = await axios.get(
+                    `${import.meta.env.VITE_BASE_URL}api/employeeColors/${employeeCode}`
+                );
+                
+                if (colorResponse.data) {
+                    setNotepadColor(colorResponse.data.notepadColor || '#fff3cd');
+                    setTodoColor(colorResponse.data.todoColor || '#cfe2ff');
+                    setExcelSheetColor(colorResponse.data.excelSheetColor || '#d4edda');
+                }
+
                 // Fetch Excel Sheet data with employeeId
                 const excelResponse = await axios.get(
                     `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${employeeCode}`
@@ -228,7 +244,8 @@ const MemberDashboard = () => {
                 setError({
                     excelSheet: 'Failed to load Excel Sheet',
                     notePad: 'Failed to load NotePad',
-                    todoList: 'Failed to load Todo List'
+                    todoList: 'Failed to load Todo List',
+                    colors: 'Failed to load color preferences'
                 });
                 setLoading({
                     excelSheet: false,
@@ -439,15 +456,19 @@ const MemberDashboard = () => {
     const addTable = async () => {
         try {
             const newTable = {
-                id: tables.length + 1,
+                id: Date.now(),
                 rows: 5,
                 cols: 5,
                 data: Array(5).fill().map(() => Array(5).fill('')),
                 name: `Table ${tables.length + 1}`
             };
+
             const newTables = [...tables, newTable];
+
+            // First update the state
             setTables(newTables);
 
+            // Then make the API call
             const payload = {
                 tables: newTables,
                 employeeId: employeeCode
@@ -468,6 +489,8 @@ const MemberDashboard = () => {
         } catch (error) {
             console.error('Error adding table:', error);
             setError(prev => ({ ...prev, excelSheet: 'Failed to add table' }));
+            // Revert the state if API call fails
+            setTables(prev => prev.slice(0, -1));
         }
     };
 
@@ -716,6 +739,50 @@ const MemberDashboard = () => {
         }
     };
 
+    const downloadNotePad = () => {
+        try {
+            // Create a temporary div to parse HTML content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = notes;
+
+            // Replace <p> and <br> tags with newlines before getting text content
+            const html = tempDiv.innerHTML;
+            const withLineBreaks = html
+                .replace(/<\/p>/gi, '\n')
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<div>/gi, '\n')
+                .replace(/<\/div>/gi, '\n');
+
+            tempDiv.innerHTML = withLineBreaks;
+
+            // Get text content and trim extra newlines
+            let plainText = tempDiv.textContent || tempDiv.innerText || '';
+            plainText = plainText.replace(/\n{3,}/g, '\n\n'); // Replace 3+ newlines with 2
+
+            // Create a blob with the cleaned text content
+            const blob = new Blob([plainText], { type: 'text/plain' });
+
+            // Create a temporary URL for the blob
+            const url = URL.createObjectURL(blob);
+
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'notepad.txt'; // Set the filename
+
+            // Append link to body, click it, and remove it
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Clean up the URL
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading notepad:', error);
+            setError(prev => ({ ...prev, notePad: 'Failed to download notepad' }));
+        }
+    };
+
     // Add this new function
     const clearAllTodos = async () => {
         try {
@@ -839,6 +906,74 @@ const MemberDashboard = () => {
         } catch (error) {
             console.error('Error deleting table:', error);
             setError(prev => ({ ...prev, excelSheet: 'Failed to delete table' }));
+        }
+    };
+
+    // Add this function to handle color updates
+    const updateColors = async (type, color) => {
+        try {
+            const colors = {
+                notepadColor: type === 'notepad' ? color : notepadColor,
+                todoColor: type === 'todo' ? color : todoColor,
+                excelSheetColor: type === 'excel' ? color : excelSheetColor
+            };
+
+            await axios.put(
+                `${import.meta.env.VITE_BASE_URL}api/employeeColors/${employeeCode}`,
+                colors
+            );
+
+            // Update local state based on type
+            switch(type) {
+                case 'notepad':
+                    setNotepadColor(color);
+                    break;
+                case 'todo':
+                    setTodoColor(color);
+                    break;
+                case 'excel':
+                    setExcelSheetColor(color);
+                    break;
+                default:
+                    break;
+            }
+        } catch (error) {
+            console.error('Error updating colors:', error);
+        }
+    };
+
+    // Add this function to download Excel sheet
+    const downloadExcelSheet = async (tableIndex) => {
+        try {
+            const table = tables[tableIndex];
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Add table name as header
+            csvContent += `${table.name}\n\n`;
+            
+            // Add column headers (A, B, C, etc.)
+            csvContent += "," + Array(table.cols).fill().map((_, i) => getColumnLabel(i)).join(",") + "\n";
+            
+            // Add data rows with row numbers
+            table.data.forEach((row, rowIndex) => {
+                csvContent += `${rowIndex + 1},${row.join(",")}\n`;
+            });
+            
+            // Create download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `${table.name.replace(/\s+/g, '_')}.csv`);
+            document.body.appendChild(link);
+            
+            // Trigger download
+            link.click();
+            
+            // Cleanup
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error downloading excel sheet:', error);
+            setError(prev => ({ ...prev, excelSheet: 'Failed to download excel sheet' }));
         }
     };
 
@@ -1185,9 +1320,9 @@ const MemberDashboard = () => {
                                                 <div className="card shadow-lg">
                                                     <div className="card-body">
                                                         {/* <div className="d-flex justify-content-between align-items-center"> */}
-                                                            {/* <div></div> */}
-                                                            <h5 className="card-title">Total Projects Assigned</h5>
-                                                            {/* <button
+                                                        {/* <div></div> */}
+                                                        <h5 className="card-title">Total Projects Assigned</h5>
+                                                        {/* <button
                                                                 type="button"
                                                                 className="btn"
                                                                 data-bs-toggle="modal"
@@ -1203,7 +1338,7 @@ const MemberDashboard = () => {
 
 
                                                         <div className="table-responsive" style={{
-                                                            maxHeight: '400px',
+                                                            height: '400px',
                                                             overflowY: 'auto',
                                                             msOverflowStyle: 'none',  /* IE and Edge */
                                                             scrollbarWidth: 'none',   /* Firefox */
@@ -1354,16 +1489,9 @@ const MemberDashboard = () => {
                                             {/* NotePad */}
                                             <div className="col-12 col-md-8 mb-4">
                                                 <div className="card shadow-lg mb-4">
-                                                    <div className="card-body">
-                                                        <div className="d-flex justify-content-between align-items-center mb-3">
-                                                            <h5 className="card-title m-0">NotePad</h5>
-                                                            <button
-                                                                className="btn btn-warning btn-sm"
-                                                                onClick={clearNotePad}
-                                                            >
-                                                                Clear All
-                                                            </button>
-                                                        </div>
+                                                    <div className="card-body" style={{ backgroundColor: notepadColor }}>
+                                                    <h5 className="card-title m-0 mb-3">NotePad</h5>
+                                                        
                                                         {loading.notePad ? (
                                                             <div className="text-center">
                                                                 <div className="spinner-border text-primary" role="status">
@@ -1373,12 +1501,71 @@ const MemberDashboard = () => {
                                                         ) : error.notePad ? (
                                                             <div className="alert alert-danger">{error.notePad}</div>
                                                         ) : (
-                                                            <ReactQuill
-                                                                value={notes}
-                                                                onChange={handleNotesChange}
-                                                                style={{ height: '310px', marginBottom: '50px' }}
-                                                            />
+                                                            <div>
+                                                                <ReactQuill
+                                                                    theme="snow"
+                                                                    value={notes}
+
+                                                                    onChange={handleNotesChange}
+                                                                    style={{ height: '315px', marginBottom: '50px' }}
+                                                                />
+
+                                                            </div>
+
                                                         )}
+                                                        <div className="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <div className="btn-group">
+                                                                    <button
+                                                                        className="btn btn-sm"
+                                                                        style={{ marginLeft: "-15px" }}
+                                                                        onClick={() => updateColors('notepad', '#ffffff')}
+                                                                        title="#ffffff"
+                                                                    >
+                                                                        <i className="bi bi-circle-fill text-white"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        className="btn btn-sm"
+                                                                        style={{ marginLeft: "-15px" }}
+                                                                        onClick={() => updateColors('notepad', '#fff3cd')}
+                                                                        title="#fff3cd"
+                                                                    >
+                                                                        <i className="bi bi-circle-fill text-warning"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        className="btn btn-sm"
+                                                                        style={{ marginLeft: "-15px" }}
+                                                                        onClick={() => updateColors('notepad', '#f8d7da')}
+                                                                        title="Red"
+                                                                    >
+                                                                        <i className="bi bi-circle-fill text-danger"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        className="btn btn-sm"
+                                                                        style={{ marginLeft: "-15px" }}
+                                                                        onClick={() => updateColors('notepad', '#cfe2ff')}
+                                                                        title="Blue"
+                                                                    >
+                                                                        <i className="bi bi-circle-fill text-primary"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div className="d-flex gap-2">
+                                                                <button
+                                                                    className="btn btn-warning btn-sm"
+                                                                    onClick={clearNotePad}
+                                                                >
+                                                                    <i className="bi bi-eraser-fill"></i>
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-dark btn-sm"
+                                                                    onClick={downloadNotePad}
+                                                                >
+                                                                    <i className="bi bi-download"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1386,18 +1573,9 @@ const MemberDashboard = () => {
                                             {/* Todo List */}
                                             <div className="col-12 col-md-4 mb-4">
                                                 <div className="card shadow-lg">
-                                                    <div className="card-body">
-                                                        <div className="d-flex justify-content-between align-items-center mb-3">
-                                                            <h5 className="card-title m-0">Todo List</h5>
-                                                            {todos.length > 0 && (
-                                                                <button
-                                                                    className="btn btn-warning btn-sm"
-                                                                    onClick={clearAllTodos}
-                                                                >
-                                                                    Clear All
-                                                                </button>
-                                                            )}
-                                                        </div>
+                                                    <div className="card-body" style={{ backgroundColor: todoColor }}>
+                                                    <h5 className="card-title m-0 mb-3">Todo List</h5>
+                                                        
                                                         {loading.todoList ? (
                                                             <div className="text-center">
                                                                 <div className="spinner-border text-primary" role="status">
@@ -1420,15 +1598,15 @@ const MemberDashboard = () => {
                                                                         <button type="submit" className="btn btn-primary">Add</button>
                                                                     </div>
                                                                 </form>
-                                                                <DragDropContext onDragEnd={handleDragEnd}>
-                                                                    <Droppable droppableId="todos">
+                                                                <DragDropContext onDragEnd={handleDragEnd} >
+                                                                    <Droppable droppableId="todos" >
                                                                         {(provided) => (
                                                                             <ul
                                                                                 className="list-group"
                                                                                 {...provided.droppableProps}
                                                                                 ref={provided.innerRef}
                                                                                 style={{
-                                                                                    maxHeight: '400px',
+                                                                                    height: '310px',
                                                                                     overflowY: 'auto',
                                                                                     msOverflowStyle: 'none',
                                                                                     scrollbarWidth: 'none',
@@ -1449,8 +1627,9 @@ const MemberDashboard = () => {
                                                                                                 {...provided.draggableProps}
                                                                                                 {...provided.dragHandleProps}
                                                                                                 className="list-group-item"
+                                                                                                style={{ backgroundColor: todoColor }}
                                                                                             >
-                                                                                                <div className="d-flex justify-content-between align-items-center">
+                                                                                                <div className="d-flex justify-content-between align-items-center" style={{ backgroundColor: todoColor }}>
                                                                                                     <div className="d-flex align-items-center" style={{ width: '100%' }}>
                                                                                                         <span className="me-2" style={{
                                                                                                             minWidth: '25px',
@@ -1535,14 +1714,102 @@ const MemberDashboard = () => {
                                                                 </DragDropContext>
                                                             </>
                                                         )}
+                                                        <div className="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <div className="btn-group">
+                                                                    <button
+                                                                        className="btn btn-sm"
+                                                                        style={{ marginLeft: "-15px" }}
+                                                                        onClick={() => updateColors('todo', '#ffffff')}
+                                                                        title="#ffffff"
+                                                                    >
+                                                                        <i className="bi bi-circle-fill text-white"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        className="btn btn-sm"
+                                                                        style={{ marginLeft: "-15px" }}
+                                                                        onClick={() => updateColors('todo', '#fff3cd')}
+                                                                        title="#fff3cd"
+                                                                    >
+                                                                        <i className="bi bi-circle-fill text-warning"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        className="btn btn-sm"
+                                                                        style={{ marginLeft: "-15px" }}
+                                                                        onClick={() => updateColors('todo', '#f8d7da')}
+                                                                        title="Red"
+                                                                    >
+                                                                        <i className="bi bi-circle-fill text-danger"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        className="btn btn-sm"
+                                                                        style={{ marginLeft: "-15px" }}
+                                                                        onClick={() => updateColors('todo', '#cfe2ff')}
+                                                                        title="Blue"
+                                                                    >
+                                                                        <i className="bi bi-circle-fill text-primary"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div>
+                                                                {todos.length > 0 && (
+                                                                    <button
+                                                                        className="btn btn-warning btn-sm "
+                                                                        onClick={clearAllTodos}
+                                                                    >
+                                                                        <i className="bi bi-eraser-fill"></i>
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {/* Excel Sheet */}
-                                            <div className="card shadow-lg mb-5">
-                                                <div className="card-body">
-                                                    <h5 className="card-title text-center">Excel Sheet</h5>
+                                            <div className="card shadow-lg mb-5" style={{ backgroundColor: excelSheetColor }}>
+                                                <div className="card-body" >
+                                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                                        <div className="btn-group">
+                                                            <button
+                                                                className="btn btn-sm"
+                                                                style={{ marginLeft: "-15px" }}
+                                                                onClick={() => updateColors('excel', '#ffffff')}
+                                                                title="#ffffff"
+                                                            >
+                                                                <i className="bi bi-circle-fill text-white"></i>
+                                                            </button>
+                                                            <button
+                                                                className="btn btn-sm"
+                                                                style={{ marginLeft: "-15px" }}
+                                                                onClick={() => updateColors('excel', '#fff3cd')}
+                                                                title="#fff3cd"
+                                                            >
+                                                                <i className="bi bi-circle-fill text-warning"></i>
+                                                            </button>
+                                                            <button
+                                                                className="btn btn-sm"
+                                                                style={{ marginLeft: "-15px" }}
+                                                                onClick={() => updateColors('excel', '#f8d7da')}
+                                                                title="Red"
+                                                            >
+                                                                <i className="bi bi-circle-fill text-danger"></i>
+                                                            </button>
+                                                            <button
+                                                                className="btn btn-sm"
+                                                                style={{ marginLeft: "-15px" }}
+                                                                onClick={() => updateColors('excel', '#cfe2ff')}
+                                                                title="Blue"
+                                                            >
+                                                                <i className="bi bi-circle-fill text-primary"></i>
+                                                            </button>
+                                                        </div>
+
+                                                        <h5 className="card-title text-center flex-grow-1">Excel Sheet</h5>
+                                                        
+                                                        <div style={{ width: '70px' }}></div> {/* Spacer for alignment */}
+                                                    </div>
                                                     {loading.excelSheet ? (
                                                         <div className="text-center">
                                                             <div className="spinner-border text-primary" role="status">
@@ -1553,17 +1820,11 @@ const MemberDashboard = () => {
                                                         <div className="alert alert-danger">{error.excelSheet}</div>
                                                     ) : (
                                                         <>
-                                                            <button
-                                                                className="btn btn-primary mb-3"
-                                                                onClick={addTable}
-                                                                style={{ marginBottom: '20px' }}
-                                                            >
-                                                                Add New Table
-                                                            </button>
+
 
                                                             {tables.map((table, tableIndex) => (
-                                                                <div key={table.id} className="mb-4">
-                                                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                                                <div key={table.id} className="mt-3">
+                                                                    <div className="d-flex justify-content-center align-items-center mb-3">
                                                                         <input
                                                                             type="text"
                                                                             value={table.name}
@@ -1577,25 +1838,12 @@ const MemberDashboard = () => {
                                                                                 width: 'auto'
                                                                             }}
                                                                         />
-                                                                        <div>
-                                                                            <button
-                                                                                className="btn btn-warning btn-sm me-2"
-                                                                                onClick={() => clearTableData(tableIndex)}
-                                                                            >
-                                                                                Clear All
-                                                                            </button>
-                                                                            <button
-                                                                                className="btn btn-danger btn-sm"
-                                                                                onClick={() => deleteTable(tableIndex)}
-                                                                            >
-                                                                                Delete Table
-                                                                            </button>
-                                                                        </div>
+
                                                                     </div>
                                                                     <div className="table-responsive mb-3">
                                                                         <table className="table table-bordered">
-                                                                            <thead>
-                                                                                <tr>
+                                                                            <thead >
+                                                                                <tr >
                                                                                     <th style={{ width: '30px', backgroundColor: '#f8f9fa' }}></th>
                                                                                     {Array(table.cols).fill().map((_, colIndex) => (
                                                                                         <th key={colIndex} className="text-center" style={{
@@ -1608,7 +1856,7 @@ const MemberDashboard = () => {
                                                                                             <button
                                                                                                 className="btn text-danger btn-sm ms-1"
                                                                                                 onClick={() => deleteColumn(tableIndex, colIndex)}
-                                                                                                style={{ padding: '0px 2px', fontSize: '8px' }}
+                                                                                                style={{ padding: '0px 2px', fontSize: '10px' }}
                                                                                             >
                                                                                                 ×
                                                                                             </button>
@@ -1628,7 +1876,7 @@ const MemberDashboard = () => {
                                                                                             <button
                                                                                                 className="btn text-danger btn-sm ms-1"
                                                                                                 onClick={() => deleteRow(tableIndex, rowIndex)}
-                                                                                                style={{ padding: '0px 2px', fontSize: '8px' }}
+                                                                                                style={{ padding: '0px 2px', fontSize: '10px' }}
                                                                                             >
                                                                                                 ×
                                                                                             </button>
@@ -1663,17 +1911,51 @@ const MemberDashboard = () => {
                                                                         </table>
                                                                     </div>
                                                                     <div className="mb-4">
+
+                                                                        <button
+                                                                            className="btn btn-warning me-2"
+                                                                            onClick={() => clearTableData(tableIndex)}
+                                                                        >
+                                                                            <i className="icofont-eraser  me-1" />
+                                                                            <span className="">Table</span>
+                                                                        </button>
+                                                                        {tables.length > 1 && (
+                                                                            <button
+                                                                                className="btn btn-danger me-2"
+                                                                                onClick={() => deleteTable(tableIndex)}
+                                                                            >
+                                                                                <i className="icofont-trash me-1 text-white" />
+                                                                                <span className="text-white">Table</span>
+                                                                            </button>
+                                                                        )}
+
+                                                                        <button
+                                                                            className="btn btn-primary me-2"
+                                                                            onClick={addTable}
+                                                                        >
+                                                                            <i className="icofont-plus me-1" />
+                                                                            <span className="">Table</span>
+                                                                        </button>
                                                                         <button
                                                                             className="btn btn-secondary me-2"
                                                                             onClick={() => addRow(tableIndex)}
                                                                         >
-                                                                            Add Row
+                                                                            <i className="icofont-plus me-1" />
+                                                                            <span className="">Row</span>
                                                                         </button>
                                                                         <button
-                                                                            className="btn btn-secondary"
+                                                                            className="btn btn-secondary me-2"
                                                                             onClick={() => addColumn(tableIndex)}
                                                                         >
-                                                                            Add Column
+                                                                            <i className="icofont-plus me-1" />
+                                                                            <span className="">Column</span>
+                                                                        </button>
+                                                                        <button
+                                                                            className="btn btn-dark btn-sm"
+                                                                            onClick={() => downloadExcelSheet(tableIndex)}
+                                                                        >
+                                                                            <i className="bi bi-download"></i>
+                                                                            <span className="ms-1">Excel</span>
                                                                         </button>
                                                                     </div>
                                                                     <hr className="my-4" />

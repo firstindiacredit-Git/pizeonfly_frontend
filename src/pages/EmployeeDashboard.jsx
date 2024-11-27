@@ -94,6 +94,11 @@ const EmployeeDashboard = () => {
   const [editingTodo, setEditingTodo] = useState(null);
   const [editText, setEditText] = useState('');
 
+  // Add these state variables at the top with other states
+  const [notepadColor, setNotepadColor] = useState('');
+  const [todoColor, setTodoColor] = useState('');
+  const [excelSheetColor, setExcelSheetColor] = useState('');
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -166,15 +171,61 @@ const EmployeeDashboard = () => {
     }
   }, []);
 
-  // Modified useEffect for fetching dashboard data
+  // Add this function to handle color updates
+  const updateColors = async (type, color) => {
+    try {
+      const employeeId = JSON.parse(localStorage.getItem("emp_user")).employeeId;
+      const colors = {
+        notepadColor: type === 'notepad' ? color : notepadColor,
+        todoColor: type === 'todo' ? color : todoColor,
+        excelSheetColor: type === 'excel' ? color : excelSheetColor
+      };
+
+      await axios.put(
+        `${import.meta.env.VITE_BASE_URL}api/employeeColors/${employeeId}`,
+        colors
+      );
+
+      // Update local state based on type
+      switch (type) {
+        case 'notepad':
+          setNotepadColor(color);
+          break;
+        case 'todo':
+          setTodoColor(color);
+          break;
+        case 'excel':
+          setExcelSheetColor(color);
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      console.error('Error updating colors:', error);
+    }
+  };
+
+  // Add this to your existing useEffect that fetches dashboard data
   useEffect(() => {
     const fetchDashboardData = async () => {
-      if (!currentEmployeeId) return;
+      const user = JSON.parse(localStorage.getItem("emp_user"));
+      if (!user || !user.employeeId) return;
 
       try {
+        // Fetch colors
+        const colorResponse = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}api/employeeColors/${user.employeeId}`
+        );
+
+        if (colorResponse.data) {
+          setNotepadColor(colorResponse.data.notepadColor);
+          setTodoColor(colorResponse.data.todoColor);
+          setExcelSheetColor(colorResponse.data.excelSheetColor);
+        }
+
         // Fetch Excel Sheet data with employeeId
         const excelResponse = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${currentEmployeeId}`
+          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${user.employeeId}`
           // {
           //   headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
           // }
@@ -187,7 +238,7 @@ const EmployeeDashboard = () => {
 
         // Fetch NotePad data with employeeId
         const noteResponse = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${currentEmployeeId}`
+          `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${user.employeeId}`
           // {
           //   headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
           // }
@@ -200,7 +251,7 @@ const EmployeeDashboard = () => {
 
         // Fetch TodoList data with employeeId
         const todoResponse = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/employeeTodoList/${currentEmployeeId}`
+          `${import.meta.env.VITE_BASE_URL}api/employeeTodoList/${user.employeeId}`
           // {
           //   headers: { Authorization: `Bearer ${localStorage.getItem('emp_token')}` }
           // }
@@ -227,7 +278,7 @@ const EmployeeDashboard = () => {
     };
 
     fetchDashboardData();
-  }, [currentEmployeeId]);
+  }, []);
 
   const createChartData = (label, value, color) => ({
     labels: [label],
@@ -964,7 +1015,7 @@ const EmployeeDashboard = () => {
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Yesterday';
     return `${diffDays} days ago`;
@@ -1384,8 +1435,42 @@ const EmployeeDashboard = () => {
                       {/* NotePad */}
                       <div className="col-12 col-md-8 mb-4">
                         <div className="card shadow-lg mb-4">
-                          <div className="card-body">
+                          <div className="card-body" style={{ backgroundColor: notepadColor }}>
                             <div className="d-flex justify-content-between align-items-center mb-3">
+                              <div className="btn-group">
+                                <button
+                                  className="btn btn-sm"
+                                  style={{ marginLeft: "-15px" }}
+                                  onClick={() => updateColors('notepad', '#ffffff')}
+                                  title="#ffffff"
+                                >
+                                  <i className="bi bi-circle-fill text-white"></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm"
+                                  style={{ marginLeft: "-15px" }}
+                                  onClick={() => updateColors('notepad', '#fff3cd')}
+                                  title="#fff3cd"
+                                >
+                                  <i className="bi bi-circle-fill text-warning"></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm"
+                                  style={{ marginLeft: "-15px" }}
+                                  onClick={() => updateColors('notepad', '#f8d7da')}
+                                  title="Red"
+                                >
+                                  <i className="bi bi-circle-fill text-danger"></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm"
+                                  style={{ marginLeft: "-15px" }}
+                                  onClick={() => updateColors('notepad', '#cfe2ff')}
+                                  title="Blue"
+                                >
+                                  <i className="bi bi-circle-fill text-primary"></i>
+                                </button>
+                              </div>
                               <h5 className="card-title m-0">NotePad</h5>
                               <button
                                 className="btn btn-warning btn-sm"
@@ -1417,8 +1502,42 @@ const EmployeeDashboard = () => {
                       {/* Todo List */}
                       <div className="col-12 col-md-4 mb-4">
                         <div className="card shadow-lg">
-                          <div className="card-body">
+                          <div className="card-body" style={{ backgroundColor: todoColor }}>
                             <div className="d-flex justify-content-between align-items-center mb-3">
+                              <div className="btn-group">
+                                <button
+                                  className="btn btn-sm"
+                                  style={{ marginLeft: "-15px" }}
+                                  onClick={() => updateColors('todo', '#ffffff')}
+                                  title="#ffffff"
+                                >
+                                  <i className="bi bi-circle-fill text-white"></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm"
+                                  style={{ marginLeft: "-15px" }}
+                                  onClick={() => updateColors('todo', '#fff3cd')}
+                                  title="#fff3cd"
+                                >
+                                  <i className="bi bi-circle-fill text-warning"></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm"
+                                  style={{ marginLeft: "-15px" }}
+                                  onClick={() => updateColors('todo', '#f8d7da')}
+                                  title="Red"
+                                >
+                                  <i className="bi bi-circle-fill text-danger"></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm"
+                                  style={{ marginLeft: "-15px" }}
+                                  onClick={() => updateColors('todo', '#cfe2ff')}
+                                  title="Blue"
+                                >
+                                  <i className="bi bi-circle-fill text-primary"></i>
+                                </button>
+                              </div>
                               <h5 className="card-title m-0">Todo List</h5>
                               {todos.length > 0 && (
                                 <button
@@ -1442,9 +1561,9 @@ const EmployeeDashboard = () => {
                                 <DragDropContext onDragEnd={handleDragEnd}>
                                   <Droppable droppableId="todos">
                                     {(provided) => (
-                                      <ul 
-                                        className="list-group" 
-                                        {...provided.droppableProps} 
+                                      <ul
+                                        className="list-group"
+                                        {...provided.droppableProps}
                                         ref={provided.innerRef}
                                         style={{
                                           maxHeight: '19.1rem',
@@ -1466,9 +1585,9 @@ const EmployeeDashboard = () => {
                                         }}
                                       >
                                         {todos.map((todo, index) => (
-                                          <Draggable 
-                                            key={todo.createdAt || index} 
-                                            draggableId={todo.createdAt || `todo-${index}`} 
+                                          <Draggable
+                                            key={todo.createdAt || index}
+                                            draggableId={todo.createdAt || `todo-${index}`}
                                             index={index}
                                           >
                                             {(provided, snapshot) => (
@@ -1581,8 +1700,45 @@ const EmployeeDashboard = () => {
 
                       {/* Excel Sheet */}
                       <div className="card shadow-lg mb-5">
-                        <div className="card-body">
-                          <h5 className="card-title text-center">Excel Sheet</h5>
+                        <div className="card-body" style={{ backgroundColor: excelSheetColor }}>
+                          <div className="d-flex justify-content-between align-items-center mb-3">
+                            <div className="btn-group">
+                              <button
+                                className="btn btn-sm"
+                                style={{ marginLeft: "-15px" }}
+                                onClick={() => updateColors('excel', '#ffffff')}
+                                title="#ffffff"
+                              >
+                                <i className="bi bi-circle-fill text-white"></i>
+                              </button>
+                              <button
+                                className="btn btn-sm"
+                                style={{ marginLeft: "-15px" }}
+                                onClick={() => updateColors('excel', '#fff3cd')}
+                                title="#fff3cd"
+                              >
+                                <i className="bi bi-circle-fill text-warning"></i>
+                              </button>
+                              <button
+                                className="btn btn-sm"
+                                style={{ marginLeft: "-15px" }}
+                                onClick={() => updateColors('excel', '#f8d7da')}
+                                title="Red"
+                              >
+                                <i className="bi bi-circle-fill text-danger"></i>
+                              </button>
+                              <button
+                                className="btn btn-sm"
+                                style={{ marginLeft: "-15px" }}
+                                onClick={() => updateColors('excel', '#cfe2ff')}
+                                title="Blue"
+                              >
+                                <i className="bi bi-circle-fill text-primary"></i>
+                              </button>
+                            </div>
+                            <h5 className="card-title text-center flex-grow-1">Excel Sheet</h5>
+                            <div style={{ width: '70px' }}></div>
+                          </div>
                           {loading.excelSheet ? (
                             <div className="text-center">
                               <div className="spinner-border text-primary" role="status">
