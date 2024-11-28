@@ -16,6 +16,17 @@ import { ChromePicker } from 'react-color';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
+// Add this debounce utility function near the top of the file
+const debounce = (func, delay) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+};
+
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const [totalProjects, setTotalProjects] = useState(0)
@@ -114,6 +125,40 @@ const EmployeeDashboard = () => {
 
   // Add state for Excel color picker
   const [showExcelPicker, setShowExcelPicker] = useState(false);
+
+  // Add new state for local notes
+  const [localNotes, setLocalNotes] = useState('');
+  
+  // Create a debounced version of the API call
+  const debouncedSaveNotes = useCallback(
+    debounce(async (value) => {
+      if (!currentEmployeeId) {
+        console.error('No employee ID found');
+        setError(prev => ({ ...prev, notePad: 'Employee ID not found' }));
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('emp_token');
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}api/employeeNotePad`,
+          {
+            notes: value,
+            employeeId: currentEmployeeId
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.data._id) {
+          setDashboardIds(prev => ({ ...prev, notePad: response.data._id }));
+        }
+      } catch (error) {
+        console.error('Error saving notepad:', error);
+        setError(prev => ({ ...prev, notePad: 'Failed to save changes' }));
+      }
+    }, 1000), // 1 second delay
+    [currentEmployeeId]
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -847,40 +892,17 @@ const EmployeeDashboard = () => {
     }
   };
 
-  // Modify handleNotesChange function
-  const handleNotesChange = async (value) => {
-    if (!currentEmployeeId) {
-      console.error('No employee ID found');
-      setError(prev => ({ ...prev, notePad: 'Employee ID not found' }));
-      return;
-    }
-
-    try {
-      setNotes(value); // Optimistic update
-      const token = localStorage.getItem('emp_token');
-
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}api/employeeNotePad`,
-        {
-          notes: value,
-          employeeId: currentEmployeeId
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (response.data._id) {
-        setDashboardIds(prev => ({ ...prev, notePad: response.data._id }));
-      }
-      if (response.data.notes) {
-        setNotes(response.data.notes);
-      }
-    } catch (error) {
-      console.error('Error saving notepad:', error);
-      setError(prev => ({ ...prev, notePad: 'Failed to save changes' }));
-      // Revert to previous value if save fails
-      setNotes(prev => prev);
-    }
+  // Update the handleNotesChange function
+  const handleNotesChange = (value) => {
+    setLocalNotes(value); // Update local state immediately
+    setNotes(value); // Update the main state for rendering
+    debouncedSaveNotes(value); // Debounced API call
   };
+
+  // Initialize localNotes when notes are fetched
+  useEffect(() => {
+    setLocalNotes(notes);
+  }, [notes]);
 
   // Add this new function inside the EmployeeDashboard component
   const deleteTable = async (tableIndex) => {
@@ -1604,7 +1626,7 @@ const EmployeeDashboard = () => {
                                   ))}
                                 </div>
                                 <textarea
-                                  value={notes}
+                                  value={localNotes}
                                   onChange={(e) => handleNotesChange(e.target.value)}
                                   className="form-control hindi-paper"
                                   style={{
