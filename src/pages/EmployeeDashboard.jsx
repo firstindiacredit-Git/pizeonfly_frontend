@@ -128,7 +128,7 @@ const EmployeeDashboard = () => {
 
   // Add new state for local notes
   const [localNotes, setLocalNotes] = useState('');
-  
+
   // Create a debounced version of the API call
   const debouncedSaveNotes = useCallback(
     debounce(async (value) => {
@@ -1224,289 +1224,257 @@ const EmployeeDashboard = () => {
                       <p className="fs-6" style={{ color: "#4989fd" }}>An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span></p>
                     </div>
 
-                    <div className="profile-section p-4 bg-white rounded-4 shadow-sm mb-4">
-                      <div className="d-flex align-items-start gap-4">
-                        {/* Profile Image Section */}
-                        <div className="profile-image-container position-relative">
-                          <img
-                            className="avatar rounded-circle border border-2 border-primary p-1"
-                            src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`}
-                            alt="profile"
-                            style={{
-                              transition: 'all 0.3s ease-in-out',
-                              cursor: 'pointer',
-                              width: '100px',
-                              height: '100px',
-                              objectFit: 'cover'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.target.style.transform = 'scale(3)';
-                              e.target.style.zIndex = '100';
-                              e.target.style.borderRadius = '8px';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.target.style.transform = 'scale(1)';
-                              e.target.style.zIndex = '1';
-                              e.target.style.borderRadius = '50%';
-                            }}
-                            onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
-                          />
-                        </div>
-
-                        {/* Profile Details Section */}
-                        <div className="flex-grow-1">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <div>
-                              <h3 className="mb-1 fw-bold text-primary">{employeeName}</h3>
-                              <p className="text-muted mb-2">
+                    <div className="profile-section p-3 bg-white rounded-4 shadow-sm mb-4">
+                      <div className="row g-3 align-items-center">
+                        {/* Profile Image & Details Column */}
+                        <div className="col-md-4">
+                          <div className="d-flex align-items-center">
+                            <div className="profile-image-container me-3">
+                              <img
+                                className="avatar rounded-circle border border-2 border-primary p-1"
+                                src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`}
+                                alt="profile"
+                                style={{
+                                  transition: 'all 0.3s ease-in-out',
+                                  cursor: 'pointer',
+                                  width: '100px', // Reduced from 150px
+                                  height: '100px', // Reduced from 150px
+                                  objectFit: 'cover'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.transform = 'scale(2.5)'; // Reduced from scale(3)
+                                  e.target.style.zIndex = '100';
+                                  e.target.style.borderRadius = '8px';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.transform = 'scale(1)';
+                                  e.target.style.zIndex = '1';
+                                  e.target.style.borderRadius = '50%';
+                                }}
+                                onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
+                              />
+                            </div>
+                            <div className="profile-details">
+                              <h5 className="mb-1 fw-bold text-primary text-start">{employeeName}</h5>
+                              <p className="text-muted mb-1 small text-start">
                                 <i className="bi bi-envelope-fill me-2"></i>
                                 {email}
                               </p>
-                            </div>
-                          </div>
-
-                          {/* Documents Section */}
-                          <div className="documents-section bg-light p-3 rounded-3 mb-3">
-                            <h5 className="mb-3 fw-bold">
-                              <i className="bi bi-file-earmark-text me-2 text-secondary"></i>
-                              Documents
-                            </h5>
-                            <div className="row g-3">
-                              {/* Aadhaar Card */}
-                              <div className="col-md-4">
-                                <div className="document-card p-2 border rounded-3 bg-white">
-                                  <strong className="d-block mb-2">
-                                    <i className="bi bi-card-text text-secondary me-2"></i>
-                                    Aadhaar Card
-                                  </strong>
-                                  {aadhaarCard ? (
-                                    <div>
-                                      {aadhaarCard.toLowerCase().endsWith('.pdf') ? (
-                                        <div className="text-center">
-                                          <i className="bi bi-file-pdf text-danger" style={{ fontSize: '2.8rem' }}></i>
-                                        </div>
-                                      ) : (
-                                        <img
-                                          src={`${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`}
-                                          alt="Aadhaar Card"
-                                          className="img-thumbnail cursor-pointer mb-2"
-                                          onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, 'image')}
-                                          style={{ height: '60px', objectFit: 'cover' }}
-                                        />
-                                      )}
-                                      <div className="d-flex gap-2 mt-2">
-                                        <a
-                                          href="#"
-                                          className="btn btn-sm btn-outline-primary flex-grow-1"
-                                          onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, aadhaarCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
-                                        >
-                                          <i className="bi bi-eye me-1"></i>View
-                                        </a>
-                                        <a
-                                          href="#"
-                                          className="btn btn-sm btn-outline-success flex-grow-1"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            handleDownload(
-                                              `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`,
-                                              `aadhaar-card${aadhaarCard.substring(aadhaarCard.lastIndexOf('.'))}`
-                                            );
-                                          }}
-                                        >
-                                          <i className="bi bi-download me-1"></i>Download
-                                        </a>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <span className="text-danger">
-                                      <i className="bi bi-x-circle me-2"></i>Not uploaded
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Pan Card */}
-                              <div className="col-md-4">
-                                <div className="document-card p-2 border rounded-3 bg-white">
-                                  <strong className="d-block mb-2">
-                                    <i className="bi bi-card-heading text-secondary me-2"></i>
-                                    Pan Card
-                                  </strong>
-                                  {panCard ? (
-                                    <div>
-                                      {panCard.toLowerCase().endsWith('.pdf') ? (
-                                        <div className="text-center">
-                                          <i className="bi bi-file-pdf text-danger" style={{ fontSize: '2.8rem' }}></i>
-                                        </div>
-                                      ) : (
-                                        <img
-                                          src={`${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`}
-                                          alt="Pan Card"
-                                          className="img-thumbnail cursor-pointer mb-2"
-                                          onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, 'image')}
-                                          style={{ height: '60px', objectFit: 'cover' }}
-                                        />
-                                      )}
-                                      <div className="d-flex gap-2 mt-2">
-                                        <a
-                                          href="#"
-                                          className="btn btn-sm btn-outline-primary flex-grow-1"
-                                          onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, panCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
-                                        >
-                                          <i className="bi bi-eye me-1"></i>View
-                                        </a>
-                                        <a
-                                          href="#"
-                                          className="btn btn-sm btn-outline-success flex-grow-1"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            handleDownload(
-                                              `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`,
-                                              `pan-card${panCard.substring(panCard.lastIndexOf('.'))}`
-                                            );
-                                          }}
-                                        >
-                                          <i className="bi bi-download me-1"></i>Download
-                                        </a>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <span className="text-danger">
-                                      <i className="bi bi-x-circle me-2"></i>Not uploaded
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Resume */}
-                              <div className="col-md-4">
-                                <div className="document-card p-2 border rounded-3 bg-white">
-                                  <strong className="d-block mb-2">
-                                    <i className="bi bi-file-person text-secondary me-2"></i>
-                                    Resume
-                                  </strong>
-                                  {resume ? (
-                                    <div>
-                                      {resume.toLowerCase().endsWith('.pdf') ? (
-                                        <div className="text-center">
-                                          <i className="bi bi-file-pdf text-danger" style={{ fontSize: '2.8rem' }}></i>
-                                        </div>
-                                      ) : (
-                                        <img
-                                          src={`${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`}
-                                          alt="Resume"
-                                          className="img-thumbnail cursor-pointer mb-2"
-                                          onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, 'image')}
-                                          style={{ height: '60px', objectFit: 'cover' }}
-                                        />
-                                      )}
-                                      <div className="d-flex gap-2 mt-2">
-                                        <a
-                                          href="#"
-                                          className="btn btn-sm btn-outline-primary flex-grow-1"
-                                          onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, resume.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
-                                        >
-                                          <i className="bi bi-eye me-1"></i>View
-                                        </a>
-                                        <a
-                                          href="#"
-                                          className="btn btn-sm btn-outline-success flex-grow-1"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            handleDownload(
-                                              `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`,
-                                              `resume${resume.substring(resume.lastIndexOf('.'))}`
-                                            );
-                                          }}
-                                        >
-                                          <i className="bi bi-download me-1"></i>Download
-                                        </a>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <span className="text-danger">
-                                      <i className="bi bi-x-circle me-2"></i>Not uploaded
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Social Links */}
-                          <div className="social-links-section">
-                            <h5 className="mb-3 fw-bold">
-                              <i className="bi bi-share me-2 text-secondary"></i>
-                              Social Links
-                            </h5>
-                            <div className="d-flex flex-wrap gap-2">
-                              {employeeData?.socialLinks?.linkedin && (
-                                <a href={employeeData.socialLinks.linkedin}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="btn btn-outline-primary btn-sm px-3 d-flex align-items-center gap-2">
-                                  <i className="bi bi-linkedin"></i>
-                                  <span>LinkedIn</span>
-                                </a>
-                              )}
-                              {employeeData?.socialLinks?.github && (
-                                <a href={employeeData.socialLinks.github}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="btn btn-outline-dark btn-sm px-3 d-flex align-items-center gap-2">
-                                  <i className="bi bi-github"></i>
-                                  <span>GitHub</span>
-                                </a>
-                              )}
-                              {employeeData?.socialLinks?.instagram && (
-                                <a href={employeeData.socialLinks.instagram}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2">
-                                  <i className="bi bi-instagram"></i>
-                                  <span>Instagram</span>
-                                </a>
-                              )}
-                              {employeeData?.socialLinks?.youtube && (
-                                <a href={employeeData.socialLinks.youtube}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2">
-                                  <i className="bi bi-youtube"></i>
-                                  <span>YouTube</span>
-                                </a>
-                              )}
-                              {employeeData?.socialLinks?.facebook && (
-                                <a href={employeeData.socialLinks.facebook}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="btn btn-outline-primary btn-sm px-3 d-flex align-items-center gap-2">
-                                  <i className="bi bi-facebook"></i>
-                                  <span>Facebook</span>
-                                </a>
-                              )}
-                              {employeeData?.socialLinks?.website && (
-                                <a href={employeeData.socialLinks.website}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="btn btn-outline-info btn-sm px-3 d-flex align-items-center gap-2">
-                                  <i className="bi bi-globe"></i>
-                                  <span>Website</span>
-                                </a>
-                              )}
-                              {employeeData?.socialLinks?.other && (
-                                <a href={employeeData.socialLinks.other}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="btn btn-outline-secondary btn-sm px-3 d-flex align-items-center gap-2">
-                                  <i className="bi bi-link-45deg"></i>
-                                  <span>Other</span>
-                                </a>
-                              )}
+                              <p className="text-muted mb-1 small text-start">
+                                <i className="bi bi-telephone-fill me-2"></i>
+                                {employeeData.phone}
+                              </p>
+                              <p className="text-muted mb-1 small text-start">
+                                <i className="bi bi-calendar-date me-2"></i>
+                                {new Date(employeeData.joiningDate).toLocaleDateString()}
+                              </p>
                             </div>
                           </div>
                         </div>
 
+                        {/* Documents and Social Links in a row */}
+                        <div className="col-md-8">
+                          <div className="row">
+                            {/* Documents Column */}
+                            <div className="col-md-6">
+                              <div className="documents-section p-2 rounded-3">
+                                <h6 className="mb-2 fw-bold">
+                                  <i className="bi bi-file-earmark-text me-2 text-secondary"></i>
+                                  Documents
+                                </h6>
+                                <div className="row g-2 mt-2">
+                                  {/* Document cards with reduced size */}
+                                  <div className="col-12">
+                                    <div className="document-card p-2 border rounded-3 bg-white">
+                                      <div className="d-flex align-items-center justify-content-between">
+                                        <strong className="small">
+                                          <i className="bi bi-card-text text-secondary me-1"></i>
+                                          Aadhaar Card
+                                        </strong>
+                                        {aadhaarCard ? (
+                                          <div className="d-flex gap-1">
+                                            <button
+                                              className="btn btn-sm btn-outline-primary py-0 px-1"
+                                              onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, aadhaarCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
+                                            >
+                                              <i className="bi bi-eye small"></i>
+                                            </button>
+                                            <button
+                                              className="btn btn-sm btn-outline-success py-0 px-1"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                handleDownload(
+                                                  `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`,
+                                                  `aadhaar-card${aadhaarCard.substring(aadhaarCard.lastIndexOf('.'))}`
+                                                );
+                                              }}
+                                            >
+                                              <i className="bi bi-download small"></i>
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <span className="text-danger small">
+                                            <i className="bi bi-x-circle"></i>
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Similar compact structure for PAN and Resume */}
+                                  <div className="col-12">
+                                    <div className="document-card p-2 border rounded-3 bg-white">
+                                      <div className="d-flex align-items-center justify-content-between">
+                                        <strong className="small">
+                                          <i className="bi bi-card-heading text-secondary me-1"></i>
+                                          PAN Card
+                                        </strong>
+                                        {panCard ? (
+                                          <div className="d-flex gap-1">
+                                            <button
+                                              className="btn btn-sm btn-outline-primary py-0 px-1"
+                                              onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, panCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
+                                            >
+                                              <i className="bi bi-eye small"></i>
+                                            </button>
+                                            <button
+                                              className="btn btn-sm btn-outline-success py-0 px-1"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                handleDownload(
+                                                  `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`,
+                                                  `pan-card${panCard.substring(panCard.lastIndexOf('.'))}`
+                                                );
+                                              }}
+                                            >
+                                              <i className="bi bi-download small"></i>
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <span className="text-danger small">
+                                            <i className="bi bi-x-circle"></i>
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="col-12">
+                                    <div className="document-card p-2 border rounded-3 bg-white">
+                                      <div className="d-flex align-items-center justify-content-between">
+                                        <strong className="small">
+                                          <i className="bi bi-file-person text-secondary me-1"></i>
+                                          Resume
+                                        </strong>
+                                        {resume ? (
+                                          <div className="d-flex gap-1">
+                                            <button
+                                              className="btn btn-sm btn-outline-primary py-0 px-1"
+                                              onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, resume.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
+                                            >
+                                              <i className="bi bi-eye small"></i>
+                                            </button>
+                                            <button
+                                              className="btn btn-sm btn-outline-success py-0 px-1"
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                handleDownload(
+                                                  `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`,
+                                                  `resume${resume.substring(resume.lastIndexOf('.'))}`
+                                                );
+                                              }}
+                                            >
+                                              <i className="bi bi-download small"></i>
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <span className="text-danger small">
+                                            <i className="bi bi-x-circle"></i>
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Social Links Column */}
+                            <div className="col-md-6">
+                              <div className="social-links-section p-2">
+                                <h6 className="mb-2 fw-bold">
+                                  <i className="bi bi-share me-2 text-secondary"></i>
+                                  Social Links
+                                </h6>
+                                <div className="d-flex flex-wrap mt-3 gap-1">
+                                  {employeeData?.socialLinks?.linkedin && (
+                                    <a href={employeeData.socialLinks.linkedin}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="btn btn-outline-primary btn-sm py-0 px-2">
+                                      <i className="bi bi-linkedin"></i>
+                                      <span className="ms-1 small">LinkedIn</span>
+                                    </a>
+                                  )}
+                                  {employeeData?.socialLinks?.github && (
+                                    <a href={employeeData.socialLinks.github}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="btn btn-outline-dark btn-sm py-0 px-2">
+                                      <i className="bi bi-github"></i>
+                                      <span className="ms-1 small">GitHub</span>
+                                    </a>
+                                  )}
+                                  {employeeData?.socialLinks?.instagram && (
+                                    <a href={employeeData.socialLinks.instagram}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="btn btn-outline-danger btn-sm py-0 px-2">
+                                      <i className="bi bi-instagram"></i>
+                                      <span className="ms-1 small">Instagram</span>
+                                    </a>
+                                  )}
+                                  {employeeData?.socialLinks?.youtube && (
+                                    <a href={employeeData.socialLinks.youtube}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="btn btn-outline-danger btn-sm py-0 px-2">
+                                      <i className="bi bi-youtube"></i>
+                                      <span className="ms-1 small">YouTube</span>
+                                    </a>
+                                  )}
+                                  {employeeData?.socialLinks?.facebook && (
+                                    <a href={employeeData.socialLinks.facebook}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="btn btn-outline-primary btn-sm py-0 px-2">
+                                      <i className="bi bi-facebook"></i>
+                                      <span className="ms-1 small">Facebook</span>
+                                    </a>
+                                  )}
+                                  {employeeData?.socialLinks?.website && (
+                                    <a href={employeeData.socialLinks.website}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="btn btn-outline-info btn-sm py-0 px-2">
+                                      <i className="bi bi-globe"></i>
+                                      <span className="ms-1 small">Website</span>
+                                    </a>
+                                  )}
+                                  {employeeData?.socialLinks?.other && (
+                                    <a href={employeeData.socialLinks.other}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="btn btn-outline-secondary btn-sm py-0 px-2">
+                                      <i className="bi bi-link-45deg"></i>
+                                      <span className="ms-1 small">Other</span>
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 

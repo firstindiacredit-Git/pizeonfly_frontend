@@ -10,7 +10,6 @@ import { Checkbox, IconButton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useLocation } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { ChromePicker } from 'react-color';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
@@ -138,6 +137,114 @@ const MemberDashboard = () => {
     const [showShareModal, setShowShareModal] = useState(false);
     const [shareEmail, setShareEmail] = useState('');
     const [shareMessage, setShareMessage] = useState('');
+
+    // Add these new color options
+    const colorOptions = {
+        standard: [
+            // Row 1
+            '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF',
+            // Row 2 
+            '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
+            // Row 3
+            '#FFB6C1', '#FFA07A', '#FFE4B5', '#FFFACD', '#98FB98', '#AFEEEE', '#87CEEB', '#E6E6FA', '#DDA0DD', '#FFC0CB',
+            // Row 4
+            '#DC143C', '#FF4500', '#FFA500', '#FFD700', '#32CD32', '#20B2AA', '#4169E1', '#8A2BE2', '#9370DB', '#FF69B4',
+            // Row 5
+            '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585'
+        ],
+        custom: ['#FFFFFF', '#000000']
+    };
+
+    // Update the color picker component
+    const CustomColorPicker = ({ color, onChange, onClose }) => {
+        return (
+            <div className="custom-color-picker" style={{
+                position: 'absolute',
+                zIndex: 1000,
+                backgroundColor: 'white',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                padding: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                width: '220px'
+            }}>
+                <div style={{ marginBottom: '10px' }}>
+                    <strong>STANDARD</strong>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '2px' }}>
+                        {colorOptions.standard.map((c, i) => (
+                            <div
+                                key={i}
+                                onClick={() => {
+                                    onChange(c);
+                                    onClose();
+                                }}
+                                style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    backgroundColor: c,
+                                    border: '1px solid #ccc',
+                                    cursor: 'pointer',
+                                    borderRadius: '2px',
+                                    position: 'relative'
+                                }}
+                            >
+                                {color === c && (
+                                    <span style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        color: isLightColor(c) ? '#000' : '#fff'
+                                    }}>✓</span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                
+                <div>
+                    <strong>CUSTOM</strong>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                        {colorOptions.custom.map((c, i) => (
+                            <div
+                                key={i}
+                                onClick={() => onChange(c)}
+                                style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    backgroundColor: c,
+                                    border: '1px solid #ccc',
+                                    cursor: 'pointer',
+                                    borderRadius: '2px'
+                                }}
+                            />
+                        ))}
+                        <input
+                            type="color"
+                            value={color}
+                            onChange={(e) => onChange(e.target.value)}
+                            style={{ width: '20px', height: '20px', padding: 0 }}
+                        />
+                    </div>
+                </div>
+                
+                <div style={{ marginTop: '8px', borderTop: '1px solid #ccc', paddingTop: '8px' }}>
+                    <div>Conditional formatting</div>
+                    <div>Alternating colors</div>
+                </div>
+            </div>
+        );
+    };
+
+    // Helper function to determine if a color is light
+    const isLightColor = (color) => {
+        const hex = color.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return brightness > 128;
+    };
 
     useEffect(() => {
         const handleResize = () => {
@@ -1131,314 +1238,307 @@ const MemberDashboard = () => {
                                             <p className="fs-6" style={{ color: "#4989fd" }}>An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span></p>
                                         </div> */}
 
-                                        <div className="profile-section p-4 bg-white rounded-4 shadow-sm mb-4">
-                                            <div className="d-flex align-items-start gap-4">
-                                                {/* Profile Image Section */}
-                                                <div className="profile-image-container position-relative">
-                                                    <img
-                                                        className="avatar rounded-circle border border-2 border-primary p-1"
-                                                        src={`${import.meta.env.VITE_BASE_URL}${image ? image.replace('uploads/', '') : ''}`}
-
-                                                        alt="profile"
-                                                        style={{
-                                                            transition: 'all 0.3s ease-in-out',
-                                                            cursor: 'pointer',
-                                                            width: '100px',
-                                                            height: '100px',
-                                                            objectFit: 'cover'
-                                                        }}
-                                                        onMouseEnter={(e) => {
-                                                            e.target.style.transform = 'scale(3)';
-                                                            e.target.style.zIndex = '100';
-                                                            e.target.style.borderRadius = '8px';
-                                                        }}
-                                                        onMouseLeave={(e) => {
-                                                            e.target.style.transform = 'scale(1)';
-                                                            e.target.style.zIndex = '1';
-                                                            e.target.style.borderRadius = '50%';
-                                                        }}
-                                                        onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
-                                                    />
-                                                </div>
-
-                                                {/* Profile Details Section */}
-                                                <div className="flex-grow-1">
-                                                    <div className="d-flex justify-content-between align-items-start mb-2">
-                                                        <div>
-                                                            <h3 className="mb-1 fw-bold text-primary">{employeeName}</h3>
-                                                            <p className="text-muted mb-2">
+                                        <div className="profile-section p-3 bg-white rounded-4 shadow-sm mb-4">
+                                            <div className="row g-3 align-items-center">
+                                                {/* Profile Image & Details Column */}
+                                                <div className="col-md-4">
+                                                    <div className="d-flex align-items-center">
+                                                        <div className="profile-image-container me-3">
+                                                            <img
+                                                                className="avatar rounded-circle border border-2 border-primary p-1"
+                                                                src={`${import.meta.env.VITE_BASE_URL}${image ? image.replace('uploads/', '') : ''}`}
+                                                                alt="profile"
+                                                                style={{
+                                                                    transition: 'all 0.3s ease-in-out',
+                                                                    cursor: 'pointer',
+                                                                    width: '100px',
+                                                                    height: '100px',
+                                                                    objectFit: 'cover'
+                                                                }}
+                                                                onMouseEnter={(e) => {
+                                                                    e.target.style.transform = 'scale(2.5)';
+                                                                    e.target.style.zIndex = '100';
+                                                                    e.target.style.borderRadius = '8px';
+                                                                }}
+                                                                onMouseLeave={(e) => {
+                                                                    e.target.style.transform = 'scale(1)';
+                                                                    e.target.style.zIndex = '1';
+                                                                    e.target.style.borderRadius = '50%';
+                                                                }}
+                                                                onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
+                                                            />
+                                                        </div>
+                                                        <div className="profile-details">
+                                                            <h5 className="mb-1 fw-bold text-primary text-nowrap text-start ">{employeeName}</h5>
+                                                            <p className="text-muted mb-1 small text-nowrap text-start">
                                                                 <i className="bi bi-envelope-fill me-2"></i>
                                                                 {email}
                                                             </p>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Documents Section */}
-                                                    <div className="documents-section bg-light p-3 rounded-3 mb-3">
-                                                        <h5 className="mb-3 fw-bold">
-                                                            <i className="bi bi-file-earmark-text me-2 text-secondary"></i>
-                                                            Documents
-                                                        </h5>
-                                                        <div className="row g-3">
-                                                            {/* Aadhaar Card */}
-                                                            <div className="col-md-4">
-                                                                <div className="document-card p-2 border rounded-3 bg-white">
-                                                                    <strong className="d-block mb-2">
-                                                                        <i className="bi bi-card-text text-secondary me-2"></i>
-                                                                        Aadhaar Card
-                                                                    </strong>
-                                                                    {aadhaarCard ? (
-                                                                        <div>
-                                                                            {aadhaarCard.toLowerCase().endsWith('.pdf') ? (
-                                                                                <div className="text-center">
-                                                                                    <i className="bi bi-file-pdf text-danger" style={{ fontSize: '2.8rem' }}></i>
-                                                                                </div>
-                                                                            ) : (
-                                                                                <img
-                                                                                    src={`${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`}
-                                                                                    alt="Aadhaar Card"
-                                                                                    className="img-thumbnail cursor-pointer mb-2"
-                                                                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, 'image')}
-                                                                                    style={{ height: '60px', objectFit: 'cover' }}
-                                                                                />
-                                                                            )}
-                                                                            <div className="d-flex gap-2 mt-2">
-                                                                                <a
-                                                                                    href="#"
-                                                                                    className="btn btn-sm btn-outline-primary flex-grow-1"
-                                                                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, aadhaarCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
-                                                                                >
-                                                                                    <i className="bi bi-eye me-1"></i>View
-                                                                                </a>
-                                                                                <a
-                                                                                    href="#"
-                                                                                    className="btn btn-sm btn-outline-success flex-grow-1"
-                                                                                    onClick={(e) => {
-                                                                                        e.preventDefault();
-                                                                                        handleDownload(
-                                                                                            `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`,
-                                                                                            `aadhaar-card${aadhaarCard.substring(aadhaarCard.lastIndexOf('.'))}`
-                                                                                        );
-                                                                                    }}
-                                                                                >
-                                                                                    <i className="bi bi-download me-1"></i>Download
-                                                                                </a>
-                                                                            </div>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <span className="text-danger">
-                                                                            <i className="bi bi-x-circle me-2"></i>Not uploaded
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Pan Card */}
-                                                            <div className="col-md-4">
-                                                                <div className="document-card p-2 border rounded-3 bg-white">
-                                                                    <strong className="d-block mb-2">
-                                                                        <i className="bi bi-card-heading text-secondary me-2"></i>
-                                                                        Pan Card
-                                                                    </strong>
-                                                                    {panCard ? (
-                                                                        <div>
-                                                                            {panCard.toLowerCase().endsWith('.pdf') ? (
-                                                                                <div className="text-center">
-                                                                                    <i className="bi bi-file-pdf text-danger" style={{ fontSize: '2.8rem' }}></i>
-                                                                                </div>
-                                                                            ) : (
-                                                                                <img
-                                                                                    src={`${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`}
-                                                                                    alt="Pan Card"
-                                                                                    className="img-thumbnail cursor-pointer mb-2"
-                                                                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, 'image')}
-                                                                                    style={{ height: '60px', objectFit: 'cover' }}
-                                                                                />
-                                                                            )}
-                                                                            <div className="d-flex gap-2 mt-2">
-                                                                                <a
-                                                                                    href="#"
-                                                                                    className="btn btn-sm btn-outline-primary flex-grow-1"
-                                                                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, panCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
-                                                                                >
-                                                                                    <i className="bi bi-eye me-1"></i>View
-                                                                                </a>
-                                                                                <a
-                                                                                    href="#"
-                                                                                    className="btn btn-sm btn-outline-success flex-grow-1"
-                                                                                    onClick={(e) => {
-                                                                                        e.preventDefault();
-                                                                                        handleDownload(
-                                                                                            `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`,
-                                                                                            `pan-card${panCard.substring(panCard.lastIndexOf('.'))}`
-                                                                                        );
-                                                                                    }}
-                                                                                >
-                                                                                    <i className="bi bi-download me-1"></i>Download
-                                                                                </a>
-                                                                            </div>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <span className="text-danger">
-                                                                            <i className="bi bi-x-circle me-2"></i>Not uploaded
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Resume */}
-                                                            <div className="col-md-4">
-                                                                <div className="document-card p-2 border rounded-3 bg-white">
-                                                                    <strong className="d-block mb-2">
-                                                                        <i className="bi bi-file-person text-secondary me-2"></i>
-                                                                        Resume
-                                                                    </strong>
-                                                                    {resume ? (
-                                                                        <div>
-                                                                            {resume.toLowerCase().endsWith('.pdf') ? (
-                                                                                <div className="text-center">
-                                                                                    <i className="bi bi-file-pdf text-danger" style={{ fontSize: '2.8rem' }}></i>
-                                                                                </div>
-                                                                            ) : (
-                                                                                <img
-                                                                                    src={`${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`}
-                                                                                    alt="Resume"
-                                                                                    className="img-thumbnail cursor-pointer mb-2"
-                                                                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, 'image')}
-                                                                                    style={{ height: '60px', objectFit: 'cover' }}
-                                                                                />
-                                                                            )}
-                                                                            <div className="d-flex gap-2 mt-2">
-                                                                                <a
-                                                                                    href="#"
-                                                                                    className="btn btn-sm btn-outline-primary flex-grow-1"
-                                                                                    onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, resume.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
-                                                                                >
-                                                                                    <i className="bi bi-eye me-1"></i>View
-                                                                                </a>
-                                                                                <a
-                                                                                    href="#"
-                                                                                    className="btn btn-sm btn-outline-success flex-grow-1"
-                                                                                    onClick={(e) => {
-                                                                                        e.preventDefault();
-                                                                                        handleDownload(
-                                                                                            `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`,
-                                                                                            `resume${resume.substring(resume.lastIndexOf('.'))}`
-                                                                                        );
-                                                                                    }}
-                                                                                >
-                                                                                    <i className="bi bi-download me-1"></i>Download
-                                                                                </a>
-                                                                            </div>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <span className="text-danger">
-                                                                            <i className="bi bi-x-circle me-2"></i>Not uploaded
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Social Links */}
-                                                    <div className="social-links-section">
-                                                        <h5 className="mb-3 fw-bold">
-                                                            <i className="bi bi-share me-2 text-secondary"></i>
-                                                            Social Links
-                                                        </h5>
-                                                        <div className="d-flex flex-wrap gap-2">
-                                                            {employeeData?.socialLinks?.linkedin && (
-                                                                <a href={employeeData.socialLinks.linkedin}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="btn btn-outline-primary btn-sm px-3 d-flex align-items-center gap-2">
-                                                                    <i className="bi bi-linkedin"></i>
-                                                                    <span>LinkedIn</span>
-                                                                </a>
-                                                            )}
-                                                            {employeeData?.socialLinks?.github && (
-                                                                <a href={employeeData.socialLinks.github}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="btn btn-outline-dark btn-sm px-3 d-flex align-items-center gap-2">
-                                                                    <i className="bi bi-github"></i>
-                                                                    <span>GitHub</span>
-                                                                </a>
-                                                            )}
-                                                            {employeeData?.socialLinks?.instagram && (
-                                                                <a href={employeeData.socialLinks.instagram}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2">
-                                                                    <i className="bi bi-instagram"></i>
-                                                                    <span>Instagram</span>
-                                                                </a>
-                                                            )}
-                                                            {employeeData?.socialLinks?.youtube && (
-                                                                <a href={employeeData.socialLinks.youtube}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2">
-                                                                    <i className="bi bi-youtube"></i>
-                                                                    <span>YouTube</span>
-                                                                </a>
-                                                            )}
-                                                            {employeeData?.socialLinks?.facebook && (
-                                                                <a href={employeeData.socialLinks.facebook}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="btn btn-outline-primary btn-sm px-3 d-flex align-items-center gap-2">
-                                                                    <i className="bi bi-facebook"></i>
-                                                                    <span>Facebook</span>
-                                                                </a>
-                                                            )}
-                                                            {employeeData?.socialLinks?.website && (
-                                                                <a href={employeeData.socialLinks.website}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="btn btn-outline-info btn-sm px-3 d-flex align-items-center gap-2">
-                                                                    <i className="bi bi-globe"></i>
-                                                                    <span>Website</span>
-                                                                </a>
-                                                            )}
-                                                            {employeeData?.socialLinks?.other && (
-                                                                <a href={employeeData.socialLinks.other}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="btn btn-outline-secondary btn-sm px-3 d-flex align-items-center gap-2">
-                                                                    <i className="bi bi-link-45deg"></i>
-                                                                    <span>Other</span>
-                                                                </a>
-                                                            )}
+                                                            <p className="text-muted mb-1 small text-nowrap text-start">
+                                                                <i className="bi bi-telephone-fill me-2"></i>
+                                                                {employeeData?.phone}
+                                                            </p>
+                                                            <p className="text-muted mb-1 small text-nowrap text-start">
+                                                                <i className="bi bi-calendar-date me-2"></i>
+                                                                {employeeData?.joiningDate && new Date(employeeData.joiningDate).toLocaleDateString()}
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 </div>
+
+                                                {/* Documents and Social Links in a row */}
+                                                <div className="col-md-8">
+                                                    <div className="row">
+                                                        {/* Documents Column */}
+                                                        <div className="col-md-6">
+                                                            <div className="documents-section p-2 rounded-3">
+                                                                <h6 className="mb-2 fw-bold">
+                                                                    <i className="bi bi-file-earmark-text me-2 text-secondary"></i>
+                                                                    Documents
+                                                                </h6>
+                                                                <div className="row g-2 mt-2">
+                                                                    {/* Aadhaar Card */}
+                                                                    <div className="col-12">
+                                                                        <div className="document-card p-2 border rounded-3 bg-white">
+                                                                            <div className="d-flex align-items-center justify-content-between">
+                                                                                <strong className="small">
+                                                                                    <i className="bi bi-card-text text-secondary me-1"></i>
+                                                                                    Aadhaar Card
+                                                                                </strong>
+                                                                                {aadhaarCard ? (
+                                                                                    <div className="d-flex gap-1">
+                                                                                        <button
+                                                                                            className="btn btn-sm btn-outline-primary py-0 px-1"
+                                                                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, aadhaarCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
+                                                                                        >
+                                                                                            <i className="bi bi-eye small"></i>
+                                                                                        </button>
+                                                                                        <button
+                                                                                            className="btn btn-sm btn-outline-success py-0 px-1"
+                                                                                            onClick={(e) => {
+                                                                                                e.preventDefault();
+                                                                                                handleDownload(
+                                                                                                    `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`,
+                                                                                                    `aadhaar-card${aadhaarCard.substring(aadhaarCard.lastIndexOf('.'))}`
+                                                                                                );
+                                                                                            }}
+                                                                                        >
+                                                                                            <i className="bi bi-download small"></i>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <span className="text-danger small">
+                                                                                        <i className="bi bi-x-circle"></i>
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Pan Card */}
+                                                                    <div className="col-12">
+                                                                        <div className="document-card p-2 border rounded-3 bg-white">
+                                                                            <div className="d-flex align-items-center justify-content-between">
+                                                                                <strong className="small">
+                                                                                    <i className="bi bi-card-heading text-secondary me-1"></i>
+                                                                                    PAN Card
+                                                                                </strong>
+                                                                                {panCard ? (
+                                                                                    <div className="d-flex gap-1">
+                                                                                        <button
+                                                                                            className="btn btn-sm btn-outline-primary py-0 px-1"
+                                                                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, panCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
+                                                                                        >
+                                                                                            <i className="bi bi-eye small"></i>
+                                                                                        </button>
+                                                                                        <button
+                                                                                            className="btn btn-sm btn-outline-success py-0 px-1"
+                                                                                            onClick={(e) => {
+                                                                                                e.preventDefault();
+                                                                                                handleDownload(
+                                                                                                    `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`,
+                                                                                                    `pan-card${panCard.substring(panCard.lastIndexOf('.'))}`
+                                                                                                );
+                                                                                            }}
+                                                                                        >
+                                                                                            <i className="bi bi-download small"></i>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <span className="text-danger small">
+                                                                                        <i className="bi bi-x-circle"></i>
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Resume */}
+                                                                    <div className="col-12">
+                                                                        <div className="document-card p-2 border rounded-3 bg-white">
+                                                                            <div className="d-flex align-items-center justify-content-between">
+                                                                                <strong className="small">
+                                                                                    <i className="bi bi-file-person text-secondary me-1"></i>
+                                                                                    Resume
+                                                                                </strong>
+                                                                                {resume ? (
+                                                                                    <div className="d-flex gap-1">
+                                                                                        <button
+                                                                                            className="btn btn-sm btn-outline-primary py-0 px-1"
+                                                                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, resume.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
+                                                                                        >
+                                                                                            <i className="bi bi-eye small"></i>
+                                                                                        </button>
+                                                                                        <button
+                                                                                            className="btn btn-sm btn-outline-success py-0 px-1"
+                                                                                            onClick={(e) => {
+                                                                                                e.preventDefault();
+                                                                                                handleDownload(
+                                                                                                    `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`,
+                                                                                                    `resume${resume.substring(resume.lastIndexOf('.'))}`
+                                                                                                );
+                                                                                            }}
+                                                                                        >
+                                                                                            <i className="bi bi-download small"></i>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <span className="text-danger small">
+                                                                                        <i className="bi bi-x-circle"></i>
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Social Links Column */}
+                                                        <div className="col-md-6">
+                                                            <div className="social-links-section p-2">
+                                                                <h6 className="mb-2 fw-bold">
+                                                                    <i className="bi bi-share me-2 text-secondary"></i>
+                                                                    Social Links
+                                                                </h6>
+                                                                <div className="row g-2 mt-2">
+                                                                    {employeeData?.socialLinks?.linkedin && (
+                                                                        <div className="col-2">
+                                                                            <a href={employeeData.socialLinks.linkedin}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="btn btn-outline-primary btn-sm">
+                                                                                <i className="bi bi-linkedin"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    )}
+                                                                    {employeeData?.socialLinks?.github && (
+                                                                        <div className="col-2">
+                                                                            <a href={employeeData.socialLinks.github}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="btn btn-outline-dark btn-sm">
+                                                                                <i className="bi bi-github"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    )}
+                                                                    {employeeData?.socialLinks?.instagram && (
+                                                                        <div className="col-2">
+                                                                            <a href={employeeData.socialLinks.instagram}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="btn btn-outline-danger btn-sm">
+                                                                                <i className="bi bi-instagram"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    )}
+                                                                    {employeeData?.socialLinks?.youtube && (
+                                                                        <div className="col-2">
+                                                                            <a href={employeeData.socialLinks.youtube}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="btn btn-outline-danger btn-sm">
+                                                                                <i className="bi bi-youtube"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    )}
+                                                                    {employeeData?.socialLinks?.facebook && (
+                                                                        <div className="col-2">
+                                                                            <a href={employeeData.socialLinks.facebook}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="btn btn-outline-primary btn-sm">
+                                                                                <i className="bi bi-facebook"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    )}
+                                                                    {employeeData?.socialLinks?.website && (
+                                                                        <div className="col-2">
+                                                                            <a href={employeeData.socialLinks.website}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="btn btn-outline-info btn-sm">
+                                                                                <i className="bi bi-globe"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    )}
+                                                                    {employeeData?.socialLinks?.other && (
+                                                                        <div className="col-2">
+                                                                            <a href={employeeData.socialLinks.other}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="btn btn-outline-secondary btn-sm">
+                                                                                <i className="bi bi-link-45deg"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Add Edit Profile Button */}
+                                            <div className="position-absolute bottom-0 end-0 m-3">
+
+                                                <i className="bi bi-pencil-square">Edit Profile</i>
+
 
                                             </div>
                                         </div>
 
+                                        {/* Keep the existing styles */}
                                         <style jsx>{`
                       .profile-section {
                         transition: all 0.3s ease;
+                        background: linear-gradient(145deg, #ffffff, #f5f7fa);
+                        position: relative;  /* Add this to enable absolute positioning of children */
+                        min-height: 160px;   /* Add minimum height to ensure space for the button */
                       }
+                      
                       .profile-section:hover {
-                        transform: translateY(-5px);
-                        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+                        transform: translateY(-3px);
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
                       }
+                      
                       .document-card {
                         transition: all 0.3s ease;
                       }
+                      
                       .document-card:hover {
                         transform: translateY(-2px);
                         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
                       }
+                      
                       .cursor-pointer {
                         cursor: pointer;
                       }
+                      
                       .btn {
                         transition: all 0.3s ease;
                       }
+                      
                       .btn:hover {
                         transform: translateY(-2px);
                       }
@@ -1699,13 +1799,11 @@ const MemberDashboard = () => {
                                                                     <i className="bi bi-palette-fill"></i>
                                                                 </button>
                                                                 {showNotePadPicker && (
-                                                                    <div className="position-absolute start-0 top-100 mt-2" style={{ zIndex: 1000 }}>
-                                                                        <div className="position-fixed w-100 h-100" style={{ top: 0, left: 0 }} onClick={() => setShowNotePadPicker(false)} />
-                                                                        <ChromePicker
-                                                                            color={notepadColor}
-                                                                            onChange={(color) => updateColors('notepad', color.hex)}
-                                                                        />
-                                                                    </div>
+                                                                    <CustomColorPicker
+                                                                        color={notepadColor}
+                                                                        onChange={(color) => updateColors('notepad', color)}
+                                                                        onClose={() => setShowNotePadPicker(false)}
+                                                                    />
                                                                 )}
                                                             </div>
                                                             <div className="d-flex gap-2">
@@ -1987,13 +2085,11 @@ const MemberDashboard = () => {
                                                                     <i className="bi bi-palette-fill" title='Color'></i>
                                                                 </button>
                                                                 {showTodoPicker && (
-                                                                    <div className="position-absolute start-0 top-100 mt-2" style={{ zIndex: 1000 }}>
-                                                                        <div className="position-fixed w-100 h-100" style={{ top: 0, left: 0 }} onClick={() => setShowTodoPicker(false)} />
-                                                                        <ChromePicker
-                                                                            color={todoColor}
-                                                                            onChange={(color) => updateColors('todo', color.hex)}
-                                                                        />
-                                                                    </div>
+                                                                    <CustomColorPicker
+                                                                        color={todoColor}
+                                                                        onChange={(color) => updateColors('todo', color)}
+                                                                        onClose={() => setShowTodoPicker(false)}
+                                                                    />
                                                                 )}
                                                             </div>
 
@@ -2141,13 +2237,11 @@ const MemberDashboard = () => {
                                                                                         <span className="ms-1">Color</span>
                                                                                     </button>
                                                                                     {showExcelPicker && (
-                                                                                        <div className="position-absolute start-0 top-100 mt-2" style={{ zIndex: 1000 }}>
-                                                                                            <div className="position-fixed w-100 h-100" style={{ top: 0, left: 0 }} onClick={() => setShowExcelPicker(false)} />
-                                                                                            <ChromePicker
-                                                                                                color={excelSheetColor}
-                                                                                                onChange={(color) => updateColors('excel', color.hex)}
-                                                                                            />
-                                                                                        </div>
+                                                                                        <CustomColorPicker
+                                                                                            color={excelSheetColor}
+                                                                                            onChange={(color) => updateColors('excel', color)}
+                                                                                            onClose={() => setShowExcelPicker(false)}
+                                                                                        />
                                                                                     )}
                                                                                 </div>
 

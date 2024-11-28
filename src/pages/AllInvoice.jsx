@@ -91,7 +91,7 @@ const AllInvoice = () => {
                       <tr key={invoice.id}>
                         <td>{invoice.invoiceNumber}</td>
                         <td>{formatDateToMonthYear(invoice.invoiceDate)}</td>
-                        <td>{invoice.clientDetail.clientName}</td>
+                        <td>{invoice.clientDetail?.clientName || 'N/A'}</td>
                         <td>{invoice.total}</td>
                         <td>
                           <Link to="/update-invoice" state={{ invoice }}>
