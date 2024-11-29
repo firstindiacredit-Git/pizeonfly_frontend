@@ -1736,7 +1736,7 @@ const MemberDashboard = () => {
 
 
                                                         <div className="table-responsive" style={{
-                                                            height: '440px',
+                                                            height: '400px',
                                                             overflowY: 'auto',
                                                             msOverflowStyle: 'none',  /* IE and Edge */
                                                             scrollbarWidth: 'none',   /* Firefox */
@@ -1804,7 +1804,7 @@ const MemberDashboard = () => {
                                                         </div>
 
                                                         <div className="table-responsive" style={{
-                                                            maxHeight: '400px',
+                                                            height: '400px',
                                                             overflowY: 'auto',
                                                             msOverflowStyle: 'none',  /* IE and Edge */
                                                             scrollbarWidth: 'none',   /* Firefox */
