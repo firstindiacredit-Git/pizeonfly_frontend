@@ -12,7 +12,6 @@ import { Checkbox, IconButton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { ChromePicker } from 'react-color';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
@@ -25,6 +24,124 @@ const debounce = (func, delay) => {
       func(...args);
     }, delay);
   };
+};
+
+// Add these new color options near the top of the file, after the imports
+const colorOptions = {
+  standard: [
+    // Row 1
+    '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF',
+    // Row 2 
+    '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
+    // Row 3
+    '#FFB6C1', '#FFA07A', '#FFE4B5', '#FFFACD', '#98FB98', '#AFEEEE', '#87CEEB', '#E6E6FA', '#DDA0DD', '#FFC0CB',
+    // Row 4
+    '#DC143C', '#FF4500', '#FFA500', '#FFD700', '#32CD32', '#20B2AA', '#4169E1', '#8A2BE2', '#9370DB', '#FF69B4',
+    // Row 5
+    '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585'
+  ],
+  custom: ['#FFFFFF', '#000000']
+};
+
+// Add the CustomColorPicker component
+const CustomColorPicker = ({ color, onChange, onClose }) => {
+  return (
+    <div className="custom-color-picker mt-2" style={{
+      position: 'absolute',
+      zIndex: 1000,
+      backgroundColor: 'white',
+      border: '1px solid #ccc',
+      borderRadius: '4px',
+      padding: '8px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+      width: '250px'
+    }}>
+      <div style={{ marginBottom: '10px' }} className='border-bottom pb-2'>
+        <strong>STANDARD</strong>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '2px' }}>
+          {colorOptions.standard.map((c, i) => (
+            <div
+              key={i}
+              onClick={() => {
+                onChange(c);
+                onClose();
+              }}
+              style={{
+                width: '20px',
+                height: '20px',
+                backgroundColor: c,
+                border: '1px solid #ccc',
+                cursor: 'pointer',
+                borderRadius: '9px',
+                position: 'relative'
+              }}
+            >
+              {color === c && (
+                <span style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  color: isLightColor(c) ? '#000' : '#fff'
+                }}>✓</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <strong>CUSTOM</strong>
+        <div style={{ display: 'flex', gap: '4px' }}>
+          {colorOptions.custom.map((c, i) => (
+            <div
+              key={i}
+              onClick={() => onChange(c)}
+              style={{
+                width: '20px',
+                height: '20px',
+                backgroundColor: c,
+                border: '1px solid #ccc',
+                cursor: 'pointer',
+                borderRadius: '9px'
+              }}
+            />
+          ))}
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => onChange(e.target.value)}
+            style={{ width: '20px', height: '20px', padding: 0, borderRadius: '9px', border: 'none' }}
+            title='Custom Color'
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Add the helper function for determining light colors
+const isLightColor = (color) => {
+  // Handle empty or invalid colors
+  if (!color) return true;
+
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  // Using YIQ formula for better contrast detection
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return yiq >= 128;
+};
+
+// Add this new helper function near the top of the file
+const isValidUrl = (string) => {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
 };
 
 const EmployeeDashboard = () => {
@@ -1199,6 +1316,56 @@ const EmployeeDashboard = () => {
     };
   }, []);
 
+  // Add this function to handle keyboard navigation
+  const handleCellKeyDown = (e, tableIndex, rowIndex, colIndex) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      // Move to next row
+      if (rowIndex < tables[tableIndex].rows - 1) {
+        const nextCell = document.querySelector(
+          `[data-cell="${tableIndex}-${rowIndex + 1}-${colIndex}"]`
+        );
+        nextCell?.focus();
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (rowIndex < tables[tableIndex].rows - 1) {
+        const nextCell = document.querySelector(
+          `[data-cell="${tableIndex}-${rowIndex + 1}-${colIndex}"]`
+        );
+        nextCell?.focus();
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (rowIndex > 0) {
+        const nextCell = document.querySelector(
+          `[data-cell="${tableIndex}-${rowIndex - 1}-${colIndex}"]`
+        );
+        nextCell?.focus();
+      }
+    } else if (e.key === 'ArrowRight') {
+      if (e.target.selectionStart === e.target.value.length) {
+        e.preventDefault();
+        if (colIndex < tables[tableIndex].cols - 1) {
+          const nextCell = document.querySelector(
+            `[data-cell="${tableIndex}-${rowIndex}-${colIndex + 1}"]`
+          );
+          nextCell?.focus();
+        }
+      }
+    } else if (e.key === 'ArrowLeft') {
+      if (e.target.selectionStart === 0) {
+        e.preventDefault();
+        if (colIndex > 0) {
+          const nextCell = document.querySelector(
+            `[data-cell="${tableIndex}-${rowIndex}-${colIndex - 1}"]`
+          );
+          nextCell?.focus();
+        }
+      }
+    }
+  };
+
   return (
     <>
       <div id="mytask-layout">
@@ -1557,7 +1724,10 @@ const EmployeeDashboard = () => {
                       <div className="col-12 col-md-8 mb-4">
                         <div className="card shadow-lg mb-4">
                           <div className="card-body" style={{ backgroundColor: notepadColor }}>
-                            <h5 className="card-title m-0 mb-3">NotePad</h5>
+                            {/* NotePad Heading */}
+                            <h5 className="card-title m-0 mb-3" style={{ color: isLightColor(notepadColor) ? '#000' : '#fff' }}>
+                              NotePad
+                            </h5>
 
                             {loading.notePad ? (
                               <div className="text-center">
@@ -1613,7 +1783,8 @@ const EmployeeDashboard = () => {
                                     transform: `scale(${zoomLevel / 100})`,
                                     transformOrigin: 'left top',
                                     fontWeight: isBold ? 'bold' : 'normal',
-                                    textDecoration: isUnderline ? 'underline' : 'none'
+                                    textDecoration: isUnderline ? 'underline' : 'none',
+                                    color: isLightColor(notepadColor) ? '#000' : '#fff'  // Add this line
                                   }}
                                   onScroll={(e) => {
                                     const lineNumbers = document.querySelector('.line-numbers');
@@ -1637,13 +1808,11 @@ const EmployeeDashboard = () => {
                                   <i className="bi bi-palette-fill"></i>
                                 </button>
                                 {showNotePadPicker && (
-                                  <div className="position-absolute start-0 top-100 mt-2" style={{ zIndex: 1000 }}>
-                                    <div className="position-fixed w-100 h-100" style={{ top: 0, left: 0 }} onClick={() => setShowNotePadPicker(false)} />
-                                    <ChromePicker
-                                      color={notepadColor}
-                                      onChange={(color) => updateColors('notepad', color.hex)}
-                                    />
-                                  </div>
+                                  <CustomColorPicker
+                                    color={notepadColor}
+                                    onChange={(color) => updateColors('notepad', color)}
+                                    onClose={() => setShowNotePadPicker(false)}
+                                  />
                                 )}
                               </div>
                               <div className="d-flex gap-2">
@@ -1776,7 +1945,10 @@ const EmployeeDashboard = () => {
                       <div className="col-12 col-md-4 mb-4">
                         <div className="card shadow-lg">
                           <div className="card-body" style={{ backgroundColor: todoColor }}>
-                            <h5 className="card-title m-0 mb-3">Todo List</h5>
+                            {/* Todo List Heading */}
+                            <h5 className="card-title m-0 mb-3" style={{ color: isLightColor(todoColor) ? '#000' : '#fff' }}>
+                              Todo List
+                            </h5>
 
                             {loading.todoList ? (
                               <div className="text-center">
@@ -1829,7 +2001,10 @@ const EmployeeDashboard = () => {
                                                 {...provided.draggableProps}
                                                 {...provided.dragHandleProps}
                                                 className="list-group-item"
-                                                style={{ backgroundColor: todoColor }}
+                                                style={{
+                                                  backgroundColor: todoColor,
+                                                  color: isLightColor(todoColor) ? '#000' : '#fff'  // Add this line
+                                                }}
                                               >
                                                 <div className="d-flex justify-content-between align-items-center" style={{ backgroundColor: todoColor }}>
                                                   <div className="d-flex align-items-center" style={{ width: '100%' }}>
@@ -1925,13 +2100,11 @@ const EmployeeDashboard = () => {
                                   <i className="bi bi-palette-fill" title='Color'></i>
                                 </button>
                                 {showTodoPicker && (
-                                  <div className="position-absolute start-0 top-100 mt-2" style={{ zIndex: 1000 }}>
-                                    <div className="position-fixed w-100 h-100" style={{ top: 0, left: 0 }} onClick={() => setShowTodoPicker(false)} />
-                                    <ChromePicker
-                                      color={todoColor}
-                                      onChange={(color) => updateColors('todo', color.hex)}
-                                    />
-                                  </div>
+                                  <CustomColorPicker
+                                    color={todoColor}
+                                    onChange={(color) => updateColors('todo', color)}
+                                    onClose={() => setShowTodoPicker(false)}
+                                  />
                                 )}
                               </div>
 
@@ -1955,7 +2128,10 @@ const EmployeeDashboard = () => {
                       <div className="card shadow-lg mb-5" style={{ backgroundColor: excelSheetColor }}>
                         <div className="card-body">
                           <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h5 className="card-title text-center flex-grow-1">Excel Sheet</h5>
+                            {/* Excel Sheet Heading */}
+                            <h5 className="card-title text-center flex-grow-1" style={{ color: isLightColor(excelSheetColor) ? '#000' : '#fff' }}>
+                              Excel Sheet
+                            </h5>
                           </div>
                           {loading.excelSheet ? (
                             <div className="text-center">
@@ -1994,7 +2170,8 @@ const EmployeeDashboard = () => {
                                             backgroundColor: 'transparent',
                                             fontSize: '1.1rem',
                                             fontWeight: 'bold',
-                                            width: 'auto'
+                                            width: 'auto',
+                                            color: isLightColor(excelSheetColor) ? '#000' : '#fff'
                                           }}
                                         />
 
@@ -2009,7 +2186,8 @@ const EmployeeDashboard = () => {
                                                   backgroundColor: '#f8f9fa',
                                                   padding: '2px',
                                                   fontSize: '12px',
-                                                  width: '80px'
+                                                  width: '80px',
+                                                  color: isLightColor(excelSheetColor) ? '#000' : '#fff'  // Add this line
                                                 }}>
                                                   {getColumnLabel(colIndex)}
                                                   <button
@@ -2046,22 +2224,45 @@ const EmployeeDashboard = () => {
                                                     width: '80px',
                                                     maxWidth: '80px'
                                                   }}>
-                                                    <textarea
-                                                      value={table.data[rowIndex][colIndex]}
-                                                      onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
-                                                      className="cell-input"
-                                                      style={{
-                                                        width: '100%',
-                                                        padding: '1px 2px',
-                                                        border: 'none',
-                                                        background: 'transparent',
-                                                        resize: 'none',
-                                                        overflow: 'hidden',
-                                                        minHeight: '22px',
-                                                        maxHeight: '60px',
-                                                        fontSize: '12px'
-                                                      }}
-                                                    />
+                                                    <div className="d-flex align-items-center" style={{ position: 'relative' }}>
+                                                        <textarea
+                                                          data-cell={`${tableIndex}-${rowIndex}-${colIndex}`}
+                                                          value={table.data[rowIndex][colIndex]}
+                                                          onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
+                                                          onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
+                                                          className="cell-input"
+                                                          style={{
+                                                            width: '100%',
+                                                            padding: '1px 2px',
+                                                            border: 'none',
+                                                            background: 'transparent',
+                                                            resize: 'none',
+                                                            overflow: 'hidden',
+                                                            minHeight: '22px',
+                                                            maxHeight: '60px',
+                                                            fontSize: '12px',
+                                                            color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColor) ? '#000' : '#fff'),
+                                                            textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
+                                                          }}
+                                                        />
+                                                        {isValidUrl(table.data[rowIndex][colIndex]) && (
+                                                          <a
+                                                            href={table.data[rowIndex][colIndex]}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            style={{
+                                                              position: 'absolute',
+                                                              right: '2px',
+                                                              top: '50%',
+                                                              color: '#0d6efd',
+                                                              fontSize: '12px'
+                                                            }}
+                                                          >
+                                                            <i className="bi bi-box-arrow-up-right"></i>
+                                                          </a>
+                                                        )}
+                                                      </div>
                                                   </td>
                                                 ))}
                                               </tr>
@@ -2080,13 +2281,11 @@ const EmployeeDashboard = () => {
                                             <span className="ms-1">Color</span>
                                           </button>
                                           {showExcelPicker && (
-                                            <div className="position-absolute start-0 top-100 mt-2" style={{ zIndex: 1000 }}>
-                                              <div className="position-fixed w-100 h-100" style={{ top: 0, left: 0 }} onClick={() => setShowExcelPicker(false)} />
-                                              <ChromePicker
-                                                color={excelSheetColor}
-                                                onChange={(color) => updateColors('excel', color.hex)}
-                                              />
-                                            </div>
+                                            <CustomColorPicker
+                                              color={excelSheetColor}
+                                              onChange={(color) => updateColors('excel', color)}
+                                              onClose={() => setShowExcelPicker(false)}
+                                            />
                                           )}
                                         </div>
 
@@ -2216,51 +2415,33 @@ const EmployeeDashboard = () => {
         {`
                     .hindi-paper {
                         background-image: 
-                            linear-gradient(#adb5bd 1px, transparent 1px),  /* Changed from #dee2e6 to #adb5bd for darker lines */
+                            linear-gradient(${isLightColor(notepadColor) ? '#adb5bd' : '#ffffff33'} 1px, transparent 1px),
                             linear-gradient(90deg, transparent 0px, transparent 1px, transparent 1px);
                         background-size: 100% 32px;
                         background-position-y: -1px;
                         line-height: 32px;
                         padding: 0 10px;
-                        -ms-overflow-style: none;  /* IE and Edge */
-                        scrollbar-width: none;   /* Firefox */
-                    }
-
-                    .hindi-paper::-webkit-scrollbar {
-                        display: none;  /* Chrome, Safari and Opera */
-                    }
-
-                    .hindi-paper::before {
-                        content: '';
-                        position: absolute;
-                        left: 30px;
-                        top: 0;
-                        bottom: 0;
-                        width: 1px;
-                        background: #ff000066;  /* Changed from #ff000033 to #ff000066 for darker red line */
-                    }
-
-                    .notepad-container {
-                        position: relative;
-                        overflow: hidden;
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
                     }
 
                     .line-numbers {
-                        color: #666;
-                        font-size: 12px;
-                        line-height: 32px;
-                        font-family: monospace;
-                        text-align: right;
-                        padding-right: 5px;
-                        user-select: none;
-                        pointer-events: none;
-                        overflow-y: hidden;
-                    }
-
-                    .line-numbers div {
-                        height: 35px;
+                        color: ${isLightColor(notepadColor) ? '#666' : '#ccc'};
                     }
                 `}
+      </style>
+
+      <style>
+        {`
+          .cell-link:hover {
+            text-decoration: underline !important;
+            background-color: rgba(13, 110, 253, 0.1);
+          }
+          
+          .cell-link:active {
+            color: #0a58ca;
+          }
+        `}
       </style>
     </>
   )

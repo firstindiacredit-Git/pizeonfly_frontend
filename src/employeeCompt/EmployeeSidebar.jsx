@@ -8,14 +8,15 @@ const EmployeeSidebar = () => {
             <div className="sidebar px-4 py-4 py-md-5 me-0">
                 <div className="d-flex flex-column h-100">
                     <div className="mb-0 brand-icon">
-                        <span className="logo-icon">
+                        {/* <span className="logo-icon">
                             <img src='../Images/picon.png' style={{ height: "4rem" }} alt="Pizeonfly Logo" />
                         </span>
                         <div className=''>
                             <span className="logo-text fs-3" style={{ color: "#4989fd" }}>pizeon</span>
                             <span className="logo-text fs-3" style={{ marginLeft: "-0.9rem", color: "#0c117b" }}>fly</span>
 
-                        </div>
+                        </div> */}
+                        <img src='../Images/icon.png' style={{ height: "2.7rem" }} alt="Pizeonfly Logo" />
                     </div>
                     {/* Menu: main ul */}
                     <ul className="menu-list flex-grow-1 mt-3">
@@ -106,7 +107,7 @@ const EmployeeSidebar = () => {
                                         <span>Card Generator</span>
                                     </Link>
                                 </li>
-                                
+
                                 <li>
                                     <Link className="ms-link" to="/employee-miscellaneous">
                                         <span>Miscellaneous</span>

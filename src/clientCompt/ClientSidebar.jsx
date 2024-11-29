@@ -8,14 +8,14 @@ const ClientSidebar = () => {
             <div className="sidebar px-4 py-4 py-md-5 me-0">
                 <div className="d-flex flex-column h-100">
                     <div className="mb-0 brand-icon">
-                        <span className="logo-icon">
+                        {/* <span className="logo-icon">
                             <img src='../Images/picon.png' style={{ height: "4rem" }} alt="Pizeonfly Logo" />
                         </span>
                         <div className=''>
                             <span className="logo-text fs-4" style={{ color: "#00f8ffdb" }}>pizeon</span>
                             <span className="logo-text fs-4" style={{ marginLeft: "-0.9rem", color: "#004eff" }}>fly</span>
-                            {/* <span className="logo-text" style={{ fontSize: "10px" }}>TECHNOLOGY NINJAS</span> */}
-                        </div>
+                        </div> */}
+                        <img src='../Images/icon.png' style={{ height: "2.7rem" }} alt="Pizeonfly Logo" />
                     </div>
                     {/* Menu: main ul */}
                     <ul className="menu-list flex-grow-1 mt-3">

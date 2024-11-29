@@ -158,7 +158,7 @@ const MemberDashboard = () => {
     // Update the color picker component
     const CustomColorPicker = ({ color, onChange, onClose }) => {
         return (
-            <div className="custom-color-picker" style={{
+            <div className="custom-color-picker mt-2" style={{
                 position: 'absolute',
                 zIndex: 1000,
                 backgroundColor: 'white',
@@ -166,9 +166,9 @@ const MemberDashboard = () => {
                 borderRadius: '4px',
                 padding: '8px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                width: '220px'
+                width: '250px'
             }}>
-                <div style={{ marginBottom: '10px' }}>
+                <div style={{ marginBottom: '10px' }} className='border-bottom pb-2'>
                     <strong>STANDARD</strong>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '2px' }}>
                         {colorOptions.standard.map((c, i) => (
@@ -184,7 +184,7 @@ const MemberDashboard = () => {
                                     backgroundColor: c,
                                     border: '1px solid #ccc',
                                     cursor: 'pointer',
-                                    borderRadius: '2px',
+                                    borderRadius: '9px',
                                     position: 'relative'
                                 }}
                             >
@@ -201,7 +201,7 @@ const MemberDashboard = () => {
                         ))}
                     </div>
                 </div>
-                
+
                 <div>
                     <strong>CUSTOM</strong>
                     <div style={{ display: 'flex', gap: '4px' }}>
@@ -215,7 +215,7 @@ const MemberDashboard = () => {
                                     backgroundColor: c,
                                     border: '1px solid #ccc',
                                     cursor: 'pointer',
-                                    borderRadius: '2px'
+                                    borderRadius: '9px'
                                 }}
                             />
                         ))}
@@ -223,27 +223,32 @@ const MemberDashboard = () => {
                             type="color"
                             value={color}
                             onChange={(e) => onChange(e.target.value)}
-                            style={{ width: '20px', height: '20px', padding: 0 }}
+                            style={{ width: '20px', height: '20px', padding: 0, borderRadius: '9px', border: 'none' }}
+                            title='Custom Color'
                         />
                     </div>
                 </div>
-                
-                <div style={{ marginTop: '8px', borderTop: '1px solid #ccc', paddingTop: '8px' }}>
+
+                {/* <div style={{ marginTop: '8px', borderTop: '1px solid #ccc', paddingTop: '8px' }}>
                     <div>Conditional formatting</div>
                     <div>Alternating colors</div>
-                </div>
+                </div> */}
             </div>
         );
     };
 
     // Helper function to determine if a color is light
     const isLightColor = (color) => {
+        // Handle empty or invalid colors
+        if (!color) return true;
+
         const hex = color.replace('#', '');
         const r = parseInt(hex.substr(0, 2), 16);
         const g = parseInt(hex.substr(2, 2), 16);
         const b = parseInt(hex.substr(4, 2), 16);
-        const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-        return brightness > 128;
+        // Using YIQ formula for better contrast detection
+        const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return yiq >= 128;
     };
 
     useEffect(() => {
@@ -1213,6 +1218,123 @@ const MemberDashboard = () => {
         }
     };
 
+
+    // Add this component before your main component
+    const EmployeeTaskProgressBar = ({ tasks }) => {
+        // Calculate totals
+        const total = tasks.length;
+        const completed = tasks.filter(task => task.isCompleted).length;
+        const inProgress = tasks.filter(task => !task.isCompleted && task.taskStatus === 'In Progress').length;
+        const notStarted = tasks.filter(task => !task.isCompleted && (!task.taskStatus || task.taskStatus === 'Not Started')).length;
+
+        // Calculate percentages
+        const completedPercent = total ? ((completed / total) * 100).toFixed(1) : 0;
+        const inProgressPercent = total ? ((inProgress / total) * 100).toFixed(1) : 0;
+        const notStartedPercent = total ? ((notStarted / total) * 100).toFixed(1) : 0;
+
+        return (
+            <div className="task-progress mb-3">
+                {/* <div className="d-flex justify-content-between mb-1">
+                    <span className="fw-bold">Task Progress</span>
+                    <span className="fw-bold">{total} Total Tasks</span>
+                </div> */}
+                <div className="progress" style={{ height: "20px" }}>
+                    <div
+                        className="progress-bar bg-success"
+                        style={{ width: `${completedPercent}%` }}
+                        title={`Completed: ${completed} (${completedPercent}%)`}
+                    >
+                        Completed: {completed}
+                    </div>
+                    <div
+                        className="progress-bar bg-warning"
+                        style={{ width: `${inProgressPercent}%` }}
+                        title={`In Progress: ${inProgress} (${inProgressPercent}%)`}
+                    >
+                        In Progress: {inProgress}
+                    </div>
+                    <div
+                        className="progress-bar bg-secondary"
+                        style={{ width: `${notStartedPercent}%` }}
+                        title={`Not Started: ${notStarted} (${notStartedPercent}%)`}
+                    >
+                        Not Started: {notStarted}
+                    </div>
+                </div>
+                {/* <div className="d-flex justify-content-between mt-2 small">
+                    <div>
+                        <span className="text-success fw-bold">Completed: {completed}({completedPercent}%)</span>
+                    </div>
+                    <div>
+                        <span className="text-warning fw-bold">In Progress: {inProgress}({inProgressPercent}%)</span>
+                    </div>
+                    <div>
+                        <span className="text-secondary fw-bold">Not Started: {notStarted}({notStartedPercent}%)</span>
+                    </div>
+                </div> */}
+            </div>
+        );
+    };
+
+    const isValidUrl = (string) => {
+        try {
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    };
+
+    const handleCellKeyDown = (e, tableIndex, rowIndex, colIndex) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            // Move to next row
+            if (rowIndex < tables[tableIndex].rows - 1) {
+                const nextCell = document.querySelector(
+                    `[data-cell="${tableIndex}-${rowIndex + 1}-${colIndex}"]`
+                );
+                nextCell?.focus();
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (rowIndex < tables[tableIndex].rows - 1) {
+                const nextCell = document.querySelector(
+                    `[data-cell="${tableIndex}-${rowIndex + 1}-${colIndex}"]`
+                );
+                nextCell?.focus();
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (rowIndex > 0) {
+                const nextCell = document.querySelector(
+                    `[data-cell="${tableIndex}-${rowIndex - 1}-${colIndex}"]`
+                );
+                nextCell?.focus();
+            }
+        } else if (e.key === 'ArrowRight') {
+            if (e.target.selectionStart === e.target.value.length) {
+                e.preventDefault();
+                if (colIndex < tables[tableIndex].cols - 1) {
+                    const nextCell = document.querySelector(
+                        `[data-cell="${tableIndex}-${rowIndex}-${colIndex + 1}"]`
+                    );
+                    nextCell?.focus();
+                }
+            }
+        } else if (e.key === 'ArrowLeft') {
+            if (e.target.selectionStart === 0) {
+                e.preventDefault();
+                if (colIndex > 0) {
+                    const nextCell = document.querySelector(
+                        `[data-cell="${tableIndex}-${rowIndex}-${colIndex - 1}"]`
+                    );
+                    nextCell?.focus();
+                }
+            }
+        }
+    };
+
+
     return (
         <>
             <div id="mytask-layout">
@@ -1562,12 +1684,12 @@ const MemberDashboard = () => {
                                                         {/* </div> */}
                                                         <div className="d-flex justify-content-center align-items-center gap-2">
                                                             <h2 className="mb-4 text-center" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalProjects}</h2>
-                                                            <span className="text-muted mb-4">({(totalProjects / (totalProjects + totalTasks) * 100).toFixed(1)}%)</span>
+                                                            {/* <span className="text-muted mb-4">({(totalProjects / (totalProjects + totalTasks) * 100).toFixed(1)}%)</span> */}
                                                         </div>
 
 
                                                         <div className="table-responsive" style={{
-                                                            height: '400px',
+                                                            height: '440px',
                                                             overflowY: 'auto',
                                                             msOverflowStyle: 'none',  /* IE and Edge */
                                                             scrollbarWidth: 'none',   /* Firefox */
@@ -1624,9 +1746,14 @@ const MemberDashboard = () => {
                                                 <div className="card shadow-lg">
                                                     <div className="card-body">
                                                         <h5 className="card-title text-center">Total Tasks Assigned</h5>
-                                                        <div className="d-flex justify-content-center align-items-center gap-2">
+
+                                                        <div className="">
                                                             <h2 className="mb-4 text-center" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalTasks}</h2>
-                                                            <span className="text-muted mb-4">({(totalTasks / (totalProjects + totalTasks) * 100).toFixed(1)}%)</span>
+                                                            {/* <span className="text-muted mb-4">({(totalTasks / (totalProjects + totalTasks) * 100).toFixed(1)}%)</span> */}
+                                                            {/* Task Progress Bar */}
+                                                            <p>
+                                                                <EmployeeTaskProgressBar tasks={assignedTasks} />
+                                                            </p>
                                                         </div>
 
                                                         <div className="table-responsive" style={{
@@ -1719,7 +1846,9 @@ const MemberDashboard = () => {
                                             <div className="col-12 col-md-8 mb-4">
                                                 <div className="card shadow-lg mb-4">
                                                     <div className="card-body" style={{ backgroundColor: notepadColor }}>
-                                                        <h5 className="card-title m-0 mb-3">NotePad</h5>
+                                                        <h5 className="card-title m-0 mb-3" style={{ color: isLightColor(notepadColor) ? '#000' : '#fff' }}>
+                                                            NotePad
+                                                        </h5>
 
                                                         {loading.notePad ? (
                                                             <div className="text-center">
@@ -1737,7 +1866,7 @@ const MemberDashboard = () => {
                                                                         position: 'absolute',
                                                                         left: '5px',
                                                                         top: '10px',
-                                                                        color: '#666',
+                                                                        color: isLightColor(notepadColor) ? '#666' : '#ccc',
                                                                         fontFamily: 'monospace',
                                                                         fontSize: '14px',
                                                                         lineHeight: '32px',
@@ -1775,7 +1904,8 @@ const MemberDashboard = () => {
                                                                         transform: `scale(${zoomLevel / 100})`,
                                                                         transformOrigin: 'left top',
                                                                         fontWeight: isBold ? 'bold' : 'normal',
-                                                                        textDecoration: isUnderline ? 'underline' : 'none'
+                                                                        textDecoration: isUnderline ? 'underline' : 'none',
+                                                                        color: isLightColor(notepadColor) ? '#000' : '#fff'
                                                                     }}
                                                                     onScroll={(e) => {
                                                                         const lineNumbers = document.querySelector('.line-numbers');
@@ -1936,7 +2066,9 @@ const MemberDashboard = () => {
                                             <div className="col-12 col-md-4 mb-4">
                                                 <div className="card shadow-lg">
                                                     <div className="card-body" style={{ backgroundColor: todoColor }}>
-                                                        <h5 className="card-title m-0 mb-3">Todo List</h5>
+                                                        <h5 className="card-title m-0 mb-3" style={{ color: isLightColor(todoColor) ? '#000' : '#fff' }}>
+                                                            Todo List
+                                                        </h5>
 
                                                         {loading.todoList ? (
                                                             <div className="text-center">
@@ -1989,7 +2121,10 @@ const MemberDashboard = () => {
                                                                                                 {...provided.draggableProps}
                                                                                                 {...provided.dragHandleProps}
                                                                                                 className="list-group-item"
-                                                                                                style={{ backgroundColor: todoColor }}
+                                                                                                style={{
+                                                                                                    backgroundColor: todoColor,
+                                                                                                    color: isLightColor(todoColor) ? '#000' : '#fff'
+                                                                                                }}
                                                                                             >
                                                                                                 <div className="d-flex justify-content-between align-items-center" style={{ backgroundColor: todoColor }}>
                                                                                                     <div className="d-flex align-items-center" style={{ width: '100%' }}>
@@ -2112,7 +2247,9 @@ const MemberDashboard = () => {
                                             <div className="card shadow-lg mb-5" style={{ backgroundColor: excelSheetColor }}>
                                                 <div className="card-body" >
                                                     <div className="d-flex justify-content-between align-items-center mb-3">
-                                                        <h5 className="card-title text-center flex-grow-1">Excel Sheet</h5>
+                                                        <h5 className="card-title text-center flex-grow-1" style={{ color: isLightColor(excelSheetColor) ? '#000' : '#fff' }}>
+                                                            Excel Sheet
+                                                        </h5>
                                                     </div>
                                                     {loading.excelSheet ? (
                                                         <div className="text-center">
@@ -2166,7 +2303,8 @@ const MemberDashboard = () => {
                                                                                                     backgroundColor: '#f8f9fa',
                                                                                                     padding: '2px',
                                                                                                     fontSize: '12px',
-                                                                                                    width: '80px'
+                                                                                                    width: '80px',
+                                                                                                    color: isLightColor(excelSheetColor) ? '#000' : '#fff'
                                                                                                 }}>
                                                                                                     {getColumnLabel(colIndex)}
                                                                                                     <button
@@ -2203,22 +2341,46 @@ const MemberDashboard = () => {
                                                                                                         width: '80px',
                                                                                                         maxWidth: '80px'
                                                                                                     }}>
-                                                                                                        <textarea
-                                                                                                            value={table.data[rowIndex][colIndex]}
-                                                                                                            onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
-                                                                                                            className="cell-input"
-                                                                                                            style={{
-                                                                                                                width: '100%',
-                                                                                                                padding: '1px 2px',
-                                                                                                                border: 'none',
-                                                                                                                background: 'transparent',
-                                                                                                                resize: 'none',
-                                                                                                                overflow: 'hidden',
-                                                                                                                minHeight: '22px',
-                                                                                                                maxHeight: '60px',
-                                                                                                                fontSize: '12px'
-                                                                                                            }}
-                                                                                                        />
+                                                                                                        <div className="d-flex align-items-center" style={{ position: 'relative' }}>
+                                                                                                            <textarea
+                                                                                                                data-cell={`${tableIndex}-${rowIndex}-${colIndex}`}
+                                                                                                                value={table.data[rowIndex][colIndex]}
+                                                                                                                onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
+                                                                                                                onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
+                                                                                                                className="cell-input"
+                                                                                                                style={{
+                                                                                                                    width: '100%',
+                                                                                                                    padding: '1px 2px',
+                                                                                                                    border: 'none',
+                                                                                                                    background: 'transparent',
+                                                                                                                    resize: 'none',
+                                                                                                                    overflow: 'hidden',
+                                                                                                                    minHeight: '22px',
+                                                                                                                    maxHeight: '60px',
+                                                                                                                    fontSize: '12px',
+                                                                                                                    color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColor) ? '#000' : '#fff'),
+                                                                                                                    textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
+                                                                                                                }}
+                                                                                                            />
+                                                                                                            {isValidUrl(table.data[rowIndex][colIndex]) && (
+                                                                                                                <a
+                                                                                                                    href={table.data[rowIndex][colIndex]}
+                                                                                                                    target="_blank"
+                                                                                                                    rel="noopener noreferrer"
+                                                                                                                    onClick={(e) => e.stopPropagation()}
+                                                                                                                    style={{
+                                                                                                                        position: 'absolute',
+                                                                                                                        right: '2px',
+                                                                                                                        top: '50%',
+                                                                                                                        color: '#0d6efd',
+                                                                                                                        fontSize: '12px',
+                                                                                                                        zIndex: '1000'
+                                                                                                                    }}
+                                                                                                                >
+                                                                                                                    <i className="bi bi-box-arrow-up-right"></i>
+                                                                                                                </a>
+                                                                                                            )}
+                                                                                                        </div>
                                                                                                     </td>
                                                                                                 ))}
                                                                                             </tr>
@@ -2371,49 +2533,18 @@ const MemberDashboard = () => {
                 {`
                     .hindi-paper {
                         background-image: 
-                            linear-gradient(#adb5bd 1px, transparent 1px),  /* Changed from #dee2e6 to #adb5bd for darker lines */
+                            linear-gradient(${isLightColor(notepadColor) ? '#adb5bd' : '#ffffff33'} 1px, transparent 1px),
                             linear-gradient(90deg, transparent 0px, transparent 1px, transparent 1px);
                         background-size: 100% 32px;
                         background-position-y: -1px;
                         line-height: 32px;
                         padding: 0 10px;
-                        -ms-overflow-style: none;  /* IE and Edge */
-                        scrollbar-width: none;   /* Firefox */
-                    }
-
-                    .hindi-paper::-webkit-scrollbar {
-                        display: none;  /* Chrome, Safari and Opera */
-                    }
-
-                    .hindi-paper::before {
-                        content: '';
-                        position: absolute;
-                        left: 30px;
-                        top: 0;
-                        bottom: 0;
-                        width: 1px;
-                        background: #ff000066;  /* Changed from #ff000033 to #ff000066 for darker red line */
-                    }
-
-                    .notepad-container {
-                        position: relative;
-                        overflow: hidden;
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
                     }
 
                     .line-numbers {
-                        color: #666;
-                        font-size: 12px;
-                        line-height: 32px;
-                        font-family: monospace;
-                        text-align: right;
-                        padding-right: 5px;
-                        user-select: none;
-                        pointer-events: none;
-                        overflow-y: hidden;
-                    }
-
-                    .line-numbers div {
-                        height: 35px;
+                        color: ${isLightColor(notepadColor) ? '#666' : '#ccc'};
                     }
                 `}
             </style>

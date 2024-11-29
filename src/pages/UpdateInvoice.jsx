@@ -9,10 +9,27 @@ import axios from 'axios';
 
 const UpdateInvoice = () => {
   const location = useLocation();
-  const { invoice } = location.state;
   const navigate = useNavigate();
+  
+  // Add check for invoice data
+  if (!location.state || !location.state.invoice) {
+    return <div>No invoice data available. Please try again.</div>;
+  }
 
-  const [updatedInvoice, setUpdatedInvoice] = useState(invoice);
+  const { invoice } = location.state;
+  
+  const initialInvoice = {
+    ...invoice,
+    clientDetail: invoice.clientDetail || {
+      businessName: '',
+      clientAddress: '',
+      clientGst: '',
+      clientPhone: '',
+      clientEmail: ''
+    }
+  };
+
+  const [updatedInvoice, setUpdatedInvoice] = useState(initialInvoice);
   const [error, setError] = useState('');
 
   const isHaryanaState = updatedInvoice.state === 'HR';
@@ -316,6 +333,7 @@ const UpdateInvoice = () => {
                         </td>
                         <td className="description border-secondary">
                           <textarea
+                            type="text"
                             rows="2"
                             style={{ border: "none" }}
                             name={`table[${index}].description`}
