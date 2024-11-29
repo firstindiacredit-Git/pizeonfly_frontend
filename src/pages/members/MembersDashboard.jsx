@@ -1244,34 +1244,77 @@ const MemberDashboard = () => {
                         style={{ width: `${completedPercent}%` }}
                         title={`Completed: ${completed} (${completedPercent}%)`}
                     >
-                        Completed: {completed}
+                        {completed}
                     </div>
                     <div
-                        className="progress-bar bg-warning"
+                        className="progress-bar bg-primary"
                         style={{ width: `${inProgressPercent}%` }}
                         title={`In Progress: ${inProgress} (${inProgressPercent}%)`}
                     >
-                        In Progress: {inProgress}
+                        {inProgress}
                     </div>
                     <div
                         className="progress-bar bg-secondary"
                         style={{ width: `${notStartedPercent}%` }}
                         title={`Not Started: ${notStarted} (${notStartedPercent}%)`}
                     >
-                        Not Started: {notStarted}
+                        {notStarted}
                     </div>
                 </div>
-                {/* <div className="d-flex justify-content-between mt-2 small">
+                <div className="d-flex justify-content-between mt-2 small">
                     <div>
                         <span className="text-success fw-bold">Completed: {completed}({completedPercent}%)</span>
                     </div>
                     <div>
-                        <span className="text-warning fw-bold">In Progress: {inProgress}({inProgressPercent}%)</span>
+                        <span className="text-primary fw-bold">In Progress: {inProgress}({inProgressPercent}%)</span>
                     </div>
                     <div>
                         <span className="text-secondary fw-bold">Not Started: {notStarted}({notStartedPercent}%)</span>
                     </div>
-                </div> */}
+                </div>
+            </div>
+        );
+    };
+
+    const EmployeeProjectProgressBar = ({ projects }) => {
+        // Calculate totals
+        const total = projects.length;
+        const completed = projects.filter(project => project.progress === "100.00").length;
+        const inProgress = projects.filter(project => project.progress !== "100.00").length;
+
+        // Calculate percentages
+        const completedPercent = total ? ((completed / total) * 100).toFixed(1) : 0;
+        const inProgressPercent = total ? ((inProgress / total) * 100).toFixed(1) : 0;
+
+        return (
+            <div className="task-progress mb-3">
+                <div className="progress" style={{ height: "20px" }}>
+                    <div
+                        className="progress-bar bg-success"
+                        style={{ width: `${completedPercent}%` }}
+                        title={`Completed: ${completed} (${completedPercent}%)`}
+                    >
+                        {completed}
+                    </div>
+                    <div
+                        className="progress-bar bg-primary"
+                        style={{ width: `${inProgressPercent}%` }}
+                        title={`In Progress: ${inProgress} (${inProgressPercent}%)`}
+                    >
+                        {inProgress}
+                    </div>
+                </div>
+                <div className="d-flex justify-content-between mt-2 small">
+                    <div>
+                        <span className="text-success fw-bold">Completed: {completed}</span>
+                    </div>
+                    <div>
+                        <span className="text-primary fw-bold">In Progress: {inProgress}</span>
+                    </div>
+                    {/* <div>
+                        <span className="text-secondary fw-bold">Total: {total}</span>
+                    </div> */}
+                </div>
             </div>
         );
     };
@@ -1682,9 +1725,13 @@ const MemberDashboard = () => {
                                                                 <i className="icofont-plus-circle me-1 text-primary fs-4" />
                                                             </button> */}
                                                         {/* </div> */}
-                                                        <div className="d-flex justify-content-center align-items-center gap-2">
+                                                        <div className="">
                                                             <h2 className="mb-4 text-center" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalProjects}</h2>
                                                             {/* <span className="text-muted mb-4">({(totalProjects / (totalProjects + totalTasks) * 100).toFixed(1)}%)</span> */}
+                                                            {/* Project Progress Bar */}
+                                                            <p>
+                                                                <EmployeeProjectProgressBar projects={assignedProjects} />
+                                                            </p>
                                                         </div>
 
 
