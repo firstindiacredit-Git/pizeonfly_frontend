@@ -13,6 +13,8 @@ const Member = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState('grid');
+  const [employeeProjects, setEmployeeProjects] = useState({});
+  const [employeeTasks, setEmployeeTasks] = useState({});
 
   //CREATE EMPLOYEE
   const [formData, setFormData] = useState({
@@ -36,7 +38,15 @@ const Member = () => {
     facebook: "",
     github: "",
     website: "",
-    other: ""
+    other: "",
+    bankName: "",
+    accountHolderName: "",
+    accountNumber: "",
+    ifscCode: "",
+    accountType: "",
+    upiId: "",
+    qrCode: null,
+    paymentApp: ""
   });
 
   const handleChange = (e) => {
@@ -62,6 +72,19 @@ const Member = () => {
         if (formData[key] !== null) {
           formDataToSend.append(key, formData[key]);
         }
+      }
+
+      // Add bank details
+      formDataToSend.append('bankName', formData.bankName);
+      formDataToSend.append('accountHolderName', formData.accountHolderName);
+      formDataToSend.append('accountNumber', formData.accountNumber);
+      formDataToSend.append('ifscCode', formData.ifscCode);
+      formDataToSend.append('accountType', formData.accountType);
+      formDataToSend.append('upiId', formData.upiId);
+      formDataToSend.append('paymentApp', formData.paymentApp);
+
+      if (formData.qrCode) {
+        formDataToSend.append('qrCode', formData.qrCode);
       }
 
       const response = await axios.post(
@@ -98,7 +121,15 @@ const Member = () => {
         facebook: "",
         github: "",
         website: "",
-        other: ""
+        other: "",
+        bankName: "",
+        accountHolderName: "",
+        accountNumber: "",
+        ifscCode: "",
+        accountType: "",
+        upiId: "",
+        qrCode: null,
+        paymentApp: ""
       });
 
       // Close the modal programmatically
@@ -124,7 +155,35 @@ const Member = () => {
     }
   };
 
-  //   GET EMPLOYEES
+  // Add this function to fetch project counts for each employee
+  const fetchEmployeeProjects = async (employeeId) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}api/totalAssigneeProjects`,
+        { _id: employeeId }
+      );
+      return response.data.totalProjects;
+    } catch (error) {
+      console.error("Error fetching project count:", error);
+      return 0;
+    }
+  };
+
+  // Add this function to fetch task counts for each employee
+  const fetchEmployeeTasks = async (employeeId) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}api/totalAssigneeTasks`,
+        { _id: employeeId }
+      );
+      return response.data.totalTasks;
+    } catch (error) {
+      console.error("Error fetching task count:", error);
+      return 0;
+    }
+  };
+
+  // Modify the useEffect to fetch both projects and tasks
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -154,6 +213,22 @@ const Member = () => {
           employeeImage: employee.employeeImage.replace('uploads/', '') // Remove 'uploads/' from the image path
         }));
 
+        // Fetch both project and task counts for each employee
+        const projectCounts = {};
+        const taskCounts = {};
+        await Promise.all(
+          modifiedEmployees.map(async (employee) => {
+            const [projectCount, taskCount] = await Promise.all([
+              fetchEmployeeProjects(employee._id),
+              fetchEmployeeTasks(employee._id)
+            ]);
+            projectCounts[employee._id] = projectCount;
+            taskCounts[employee._id] = taskCount;
+          })
+        );
+
+        setEmployeeProjects(projectCounts);
+        setEmployeeTasks(taskCounts);
         setEmployees(modifiedEmployees); // Set the modified employees
 
       } catch (error) {
@@ -223,7 +298,15 @@ const Member = () => {
     facebook: "",
     github: "",
     website: "",
-    other: ""
+    other: "",
+    bankName: "",
+    accountHolderName: "",
+    accountNumber: "",
+    ifscCode: "",
+    accountType: "",
+    upiId: "",
+    qrCode: null,
+    paymentApp: ""
   });
   const [toEdit, setToEdit] = useState("");
   // console.log(projectFormData);
@@ -270,7 +353,15 @@ const Member = () => {
           facebook: data.socialLinks?.facebook || '',
           github: data.socialLinks?.github || '',
           website: data.socialLinks?.website || '',
-          other: data.socialLinks?.other || ''
+          other: data.socialLinks?.other || '',
+          bankName: data.bankDetails?.bankName || '',
+          accountHolderName: data.bankDetails?.accountHolderName || '',
+          accountNumber: data.bankDetails?.accountNumber || '',
+          ifscCode: data.bankDetails?.ifscCode || '',
+          accountType: data.bankDetails?.accountType || '',
+          upiId: data.bankDetails?.upiId || '',
+          qrCode: data.bankDetails?.qrCode || null,
+          paymentApp: data.bankDetails?.paymentApp || ''
         });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -299,18 +390,65 @@ const Member = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const handleEditClick = (employee) => {
-    setSelectedEmployee(employee);
+    setSelectedEmployee(employee); // Add this line
+    setToEdit(employee._id);
     setEmployeeData({
       ...employee,
-      linkedin: employee.socialLinks?.linkedin || '',
       linkedin: employee.socialLinks?.linkedin || '',
       instagram: employee.socialLinks?.instagram || '',
       youtube: employee.socialLinks?.youtube || '',
       facebook: employee.socialLinks?.facebook || '',
       github: employee.socialLinks?.github || '',
       website: employee.socialLinks?.website || '',
-      other: employee.socialLinks?.other || ''
+      other: employee.socialLinks?.other || '',
+      bankName: employee.bankDetails?.bankName || '',
+      accountHolderName: employee.bankDetails?.accountHolderName || '',
+      accountNumber: employee.bankDetails?.accountNumber || '',
+      ifscCode: employee.bankDetails?.ifscCode || '',
+      accountType: employee.bankDetails?.accountType || '',
+      upiId: employee.bankDetails?.upiId || '',
+      paymentApp: employee.bankDetails?.paymentApp || ''
     });
+  };
+
+  // Add this function before the updateSubmit function
+  const fetchEmployees = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}api/employees`
+      );
+
+      // Save the fetched employees
+      const modifiedEmployees = response.data.map(employee => ({
+        ...employee,
+        employeeImage: employee.employeeImage.replace('uploads/', '') // Remove 'uploads/' from the image path
+      }));
+
+      // Fetch both project and task counts for each employee
+      const projectCounts = {};
+      const taskCounts = {};
+      await Promise.all(
+        modifiedEmployees.map(async (employee) => {
+          const [projectCount, taskCount] = await Promise.all([
+            fetchEmployeeProjects(employee._id),
+            fetchEmployeeTasks(employee._id)
+          ]);
+          projectCounts[employee._id] = projectCount;
+          taskCounts[employee._id] = taskCount;
+        })
+      );
+
+      setEmployeeProjects(projectCounts);
+      setEmployeeTasks(taskCounts);
+      setEmployees(modifiedEmployees);
+
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error('Failed to fetch employees');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateSubmit = async () => {
@@ -355,8 +493,21 @@ const Member = () => {
         formData.append('panCard', employeeData.panCard);
       }
 
+      // Add bank details
+      formData.append('bankName', employeeData.bankName || '');
+      formData.append('accountHolderName', employeeData.accountHolderName || '');
+      formData.append('accountNumber', employeeData.accountNumber || '');
+      formData.append('ifscCode', employeeData.ifscCode || '');
+      formData.append('accountType', employeeData.accountType || '');
+      formData.append('upiId', employeeData.upiId || '');
+      formData.append('paymentApp', employeeData.paymentApp || '');
+
+      if (employeeData.qrCode instanceof File) {
+        formData.append('qrCode', employeeData.qrCode);
+      }
+
       const response = await axios.put(
-        `${import.meta.env.VITE_BASE_URL}api/employees/${selectedEmployee._id}`,
+        `${import.meta.env.VITE_BASE_URL}api/employees/${toEdit}`, // Use toEdit instead of selectedEmployee._id
         formData,
         {
           headers: {
@@ -366,13 +517,24 @@ const Member = () => {
       );
 
       if (response.status === 200) {
-        toast.success('Employee updated successfully!');
-        // Close modal and refresh data
+        toast.success('Employee updated successfully!', {
+          style: {
+            backgroundColor: "#4c3575",
+            color: "white",
+          },
+        });
+        // Close modal
         const modal = document.getElementById('editemp');
         const bootstrapModal = bootstrap.Modal.getInstance(modal);
         bootstrapModal.hide();
-        // Refresh your employee list
-        fetchEmployees();
+
+        // Refresh employee list
+        await fetchEmployees();
+
+        // Optional: Reload page after 5 seconds (keeping your existing pattern)
+        setTimeout(() => {
+          window.location.reload();
+        }, 5000);
       }
     } catch (error) {
       console.error('Error updating employee:', error);
@@ -409,27 +571,27 @@ const Member = () => {
     }
   };
 
-  const handleImageClick = useCallback((imageUrl) => {
-    window.open(imageUrl, '_blank');
+  const [selectedImageDetails, setSelectedImageDetails] = useState({ url: null, name: null });
+
+  const handleImageClick = useCallback((imageUrl, employeeName) => {
+    setSelectedImageDetails({ url: imageUrl, name: employeeName });
   }, []);
 
-  const [selectedImage, setSelectedImage] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
 
 
-  const handleFileClick = useCallback((e, fileUrl, fileType) => {
-    e.preventDefault(); // Prevent default link behavior
-    e.stopPropagation(); // Stop event propagation
+  const handleFileClick = useCallback((e, fileUrl, fileType, employeeName) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (fileType === 'pdf') {
-      // For PDFs, open in an iframe within the modal
       setPdfUrl(fileUrl);
+      setSelectedImageDetails(prev => ({ ...prev, name: employeeName }));
     } else {
-      // For images, open in the modal as before
-      setSelectedImage(fileUrl);
+      setSelectedImageDetails({ url: fileUrl, name: employeeName });
     }
   }, []);
   const closeImageModal = () => {
-    setSelectedImage(null);
+    setSelectedImageDetails({ url: null, name: null });
   };
   const closePdfViewer = () => {
     setPdfUrl(null);
@@ -437,13 +599,101 @@ const Member = () => {
 
   const handleEmployeeClick = (employee) => {
     console.log(employee.employeeId)
-    navigate('/members/MembersDashboard', { 
-      state: { 
-        employeeId: employee._id ,
+    navigate('/members/MembersDashboard', {
+      state: {
+        employeeId: employee._id,
         employeeCode: employee.employeeId,
         employee
       }
     });
+  };
+
+  // Add useEffect for handling ESC key
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        if (pdfUrl) {
+          closePdfViewer();
+        }
+        if (selectedImageDetails.url) {
+          closeImageModal();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleEsc);
+
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [pdfUrl, selectedImageDetails.url]);
+
+  // Add click handler functions for modal backdrop
+  const handlePdfModalBackdropClick = (e) => {
+    if (e.target.classList.contains('modal')) {
+      closePdfViewer();
+    }
+  };
+
+  const handleImageModalBackdropClick = (e) => {
+    if (e.target.classList.contains('modal')) {
+      closeImageModal();
+    }
+  };
+
+  // Add this function near your other handler functions
+  const handleDownload = async (fileUrl, fileName) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}${fileUrl.replace('uploads/', '')}`);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast.error('Download failed');
+    }
+  };
+
+  // Add this new function to handle document deletion
+  const handleDocumentDelete = async (employeeId, documentType) => {
+    try {
+      const response = await axios.patch(
+        `${import.meta.env.VITE_BASE_URL}api/employees/${employeeId}/document`,
+        { documentType }
+      );
+
+      if (response.status === 200) {
+        // Update the local state to reflect the change
+        setEmployees(employees.map(emp => {
+          if (emp._id === employeeId) {
+            return {
+              ...emp,
+              [documentType]: null
+            };
+          }
+          return emp;
+        }));
+
+        toast.success('Document deleted successfully!', {
+          style: {
+            backgroundColor: "#4c3575",
+            color: "white",
+          },
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 5000);
+      }
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      toast.error('Failed to delete document');
+    }
   };
 
   return (
@@ -532,7 +782,8 @@ const Member = () => {
                           <div className="col" key={employee.employeeId}>
                             <div className="card teacher-card">
                               <div className="card-body d-flex">
-                                <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w220">
+
+                                <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w-75">
                                   <div className="position-relative d-inline-block">
                                     <img
                                       src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
@@ -541,34 +792,306 @@ const Member = () => {
                                       style={{
                                         transition: 'transform 0.3s ease-in-out',
                                         cursor: 'pointer',
+                                        objectFit: 'cover',
                                       }}
-                                      onMouseEnter={(e) => {
-                                        e.target.style.transform = 'scale(2.5)';
-                                        e.target.style.zIndex = '100';
-                                      }}
-                                      onMouseLeave={(e) => {
-                                        e.target.style.transform = 'scale(1)';
-                                        e.target.style.zIndex = '1';
-                                      }}
-                                      onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`)}
+                                      // onMouseEnter={(e) => {
+                                      //   e.target.style.transform = 'scale(2.5)';
+                                      //   e.target.style.zIndex = '100';
+                                      // }}
+                                      // onMouseLeave={(e) => {
+                                      //   e.target.style.transform = 'scale(1)';
+                                      //   e.target.style.zIndex = '1';
+                                      // }}
+                                      onClick={() => handleImageClick(
+                                        `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
+                                        employee.employeeName
+                                      )}
                                     />
                                   </div>
+
                                   <div className="about-info mt-3">
-                                    <div className="followers me-2">
-                                      <i className="bi bi-person-vcard-fill text-danger fs-6 me-2" />
-                                      <span>{employee.employeeId}</span>
-                                    </div>
                                     <div className="followers me-2">
                                     </div>
                                     <div className="own-video">
                                       <i className="bi bi-telephone-fill text-success fs-6 me-2" />
                                       <span>{employee.phone}</span>
                                     </div>
-                                    <p className="rounded-1 d-inline-block fw-bold small-11 mb-1 d-flex">
+                                    <p className="rounded-1 d-inline-block fw-bold small-11 mb-1 d-flex justify-content-center">
                                       <i className="bi bi-envelope-at-fill text-primary fs-6 me-1" />
                                       {employee.emailid}
                                     </p>
                                   </div>
+
+                                  <div className="mt-2 text-start border-top pt-2">
+                                    {/* Aadhaar Card Row */}
+                                    <div className="row border-bottom pb-2 mb-2">
+                                      <div className="col-md-6 d-flex align-items-center">
+                                        <strong>Aadhaar -</strong>
+                                      </div>
+                                      <div className="col-md-6">
+                                        {employee.aadhaarCard ? (
+                                          <div className="row align-items-center g-2">
+                                            <div className="col-6">
+                                              {employee.aadhaarCard.toLowerCase().endsWith('.pdf') ? (
+                                                <a href="#" onClick={(e) => handleFileClick(
+                                                  e,
+                                                  `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`,
+                                                  'pdf',
+                                                  employee.employeeName
+                                                )}>View</a>
+                                              ) : (
+                                                <img
+                                                  src={`${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`}
+                                                  alt=""
+                                                  className="avatar sm img-thumbnail shadow-sm"
+                                                  onClick={(e) => handleFileClick(
+                                                    e,
+                                                    `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`,
+                                                    'image',
+                                                    employee.employeeName
+                                                  )}
+                                                  style={{ cursor: 'pointer' }}
+                                                />
+                                              )}
+                                            </div>
+                                            <div className="col-3 text-center">
+                                              <i
+                                                className="bi bi-download text-primary"
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => handleDownload(employee.aadhaarCard, `${employee.employeeName}_aadhaar${employee.aadhaarCard.substr(employee.aadhaarCard.lastIndexOf('.'))}`)}
+                                                title="Download Aadhaar Card"
+                                              ></i>
+                                            </div>
+                                            <div className="col-3 text-center">
+                                              <i
+                                                className="bi bi-trash text-danger"
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => handleDocumentDelete(employee._id, 'aadhaarCard')}
+                                                title="Delete Aadhaar Card"
+                                              ></i>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          <i className="bi bi-x-lg text-danger"></i>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* PAN Card Row */}
+                                    <div className="row border-bottom pb-2 mb-2">
+                                      <div className="col-md-6 d-flex align-items-center">
+                                        <strong>Pan -</strong>
+                                      </div>
+                                      <div className="col-md-6">
+                                        {employee.panCard ? (
+                                          <div className="row align-items-center g-2">
+                                            <div className="col-6">
+                                              {employee.panCard.toLowerCase().endsWith('.pdf') ? (
+                                                <a href="#" onClick={(e) => handleFileClick(
+                                                  e,
+                                                  `${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`,
+                                                  'pdf',
+                                                  employee.employeeName
+                                                )}>View</a>
+                                              ) : (
+                                                <img
+                                                  src={`${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`}
+                                                  alt=""
+                                                  className="avatar sm img-thumbnail shadow-sm"
+                                                  onClick={(e) => handleFileClick(
+                                                    e,
+                                                    `${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`,
+                                                    'image',
+                                                    employee.employeeName
+                                                  )}
+                                                  style={{ cursor: 'pointer' }}
+                                                />
+                                              )}
+                                            </div>
+                                            <div className="col-3 text-center">
+                                              <i
+                                                className="bi bi-download text-primary"
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => handleDownload(employee.panCard, `${employee.employeeName}_pan${employee.panCard.substr(employee.panCard.lastIndexOf('.'))}`)}
+                                                title="Download Pan Card"
+                                              ></i>
+                                            </div>
+                                            <div className="col-3 text-center">
+                                              <i
+                                                className="bi bi-trash text-danger"
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => handleDocumentDelete(employee._id, 'panCard')}
+                                                title="Delete Pan Card"
+                                              ></i>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          <i className="bi bi-x-lg text-danger"></i>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Resume Row */}
+                                    <div className="row border-bottom pb-2 mb-2">
+                                      <div className="col-md-6 d-flex align-items-center">
+                                        <strong>Resume -</strong>
+                                      </div>
+                                      <div className="col-md-6">
+                                        {employee.resume ? (
+                                          <div className="row align-items-center g-2">
+                                            <div className="col-6">
+                                              {employee.resume.toLowerCase().endsWith('.pdf') ? (
+                                                <a href="#" onClick={(e) => handleFileClick(
+                                                  e,
+                                                  `${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`,
+                                                  'pdf',
+                                                  employee.employeeName
+                                                )}><i className="bi bi-filetype-pdf"></i></a>
+                                              ) : (
+                                                <img
+                                                  src={`${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`}
+                                                  alt=""
+                                                  className="avatar sm img-thumbnail shadow-sm"
+                                                  onClick={(e) => handleFileClick(
+                                                    e,
+                                                    `${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`,
+                                                    'image',
+                                                    employee.employeeName
+                                                  )}
+                                                  style={{ cursor: 'pointer' }}
+                                                />
+                                              )}
+                                            </div>
+                                            <div className="col-3 text-center">
+                                              <i
+                                                className="bi bi-download text-primary"
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => handleDownload(employee.resume, `${employee.employeeName}_resume${employee.resume.substr(employee.resume.lastIndexOf('.'))}`)}
+                                                title="Download Resume"
+                                              ></i>
+                                            </div>
+                                            <div className="col-3 text-center">
+                                              <i
+                                                className="bi bi-trash text-danger"
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => handleDocumentDelete(employee._id, 'resume')}
+                                                title="Delete Resume"
+                                              ></i>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          <i className="bi bi-x-lg text-danger"></i>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                  </div>
+
+                                </div>
+
+                                <div className="teacher-info border-start ps-xl-4 ps-md-3 ps-sm-4 ps-4 w-100">
+                                  <div>
+                                    <div className="d-flex justify-content-between">
+
+                                      <div>
+                                        <h6
+                                          className="mb-0 mt-2 fw-bold d-block fs-6"
+                                          onClick={() => handleEmployeeClick(employee)}
+                                          style={{ cursor: 'pointer' }}
+                                          title="Click to View Employee Dashboard"
+                                        >
+                                          {employee.employeeName}
+                                        </h6>
+                                        <div className="followers me-2">
+                                          <i className="bi bi-person-vcard-fill text-danger fs-6 me-2" />
+                                          <span>{employee.employeeId}</span>
+                                        </div>
+                                      </div>
+
+                                      <div>
+                                        <div
+                                          className="btn-group"
+                                          role="group"
+                                          aria-label="Basic outlined example"
+                                        >
+                                          <button
+                                            type="button"
+                                            className="btn btn-outline-secondary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editemp"
+                                            onClick={() => handleEditClick(employee)}
+                                          >
+                                            <i className="icofont-edit text-success" />
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn btn-outline-secondary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteproject"
+                                            onClick={() => {
+                                              setDeletableId(employee._id);
+                                            }}
+                                          >
+                                            <i className="icofont-ui-delete text-danger" />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="d-flex justify-content-between">
+                                      <span className="light-info-bg py-1 px-2 rounded-1 d-inline-block fw-bold small-11 mb-0 mt-1">
+                                        <i className="bi bi-calendar-check-fill text-primary fs-6 me-2" />
+                                        {date}/{month}/{year}
+                                      </span>
+                                      <span className="light-info-bg p-2 rounded-1 d-inline-block fw-bold small-11 mb-0 mt-1">
+                                        {employee.designation}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="video-setting-icon mt-2 pt-2 border-top">
+                                    <p>{employee.description}</p>
+                                  </div>
+                                  <div className="mt-2">
+                                    <div className="d-flex gap-2 fw-bold">
+                                      Projects :
+                                      <span className="text-primary">
+                                        {employeeProjects[employee._id] || 0}
+                                      </span>
+                                      <Link
+                                        to="/projects"
+                                        state={{ employeeName: employee.employeeName }}
+                                        className="arrow-link"
+                                        title={`Click to View Projects of ${employee.employeeName}`}
+                                      >
+                                        <i className="bi bi-arrow-right" />
+                                      </Link>
+                                    </div>
+                                    <div className="d-flex gap-2 fw-bold">
+                                      Tasks :
+                                      <span className="text-success">
+                                        {employeeTasks[employee._id] || 0}
+                                      </span>
+                                      <Link
+                                        to="/tasks"
+                                        state={{ employeeName: employee.employeeName }}
+                                        className="arrow-link"
+                                        title={`Click to View Tasks of ${employee.employeeName}`}
+                                      >
+                                        <i className="bi bi-arrow-right" />
+                                      </Link>
+                                    </div>
+                                  </div>
+
+                                  {/* bank details */}
+                                  <button
+                                    className="btn btn-sm btn-outline-primary mt-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#bankDetailsModal"
+                                    onClick={() => setSelectedEmployee(employee)}
+                                  >
+                                    <i className="bi bi-bank me-2"></i>
+                                    View Bank Details
+                                  </button>
+
                                   {/* social links */}
                                   <div className="social-links mt-3">
                                     <div className="d-flex flex-wrap gap-2">
@@ -616,133 +1139,22 @@ const Member = () => {
                                       )}
                                     </div>
                                   </div>
-                                </div>
-                                <div className="teacher-info border-start ps-xl-4 ps-md-3 ps-sm-4 ps-4 w-100">
-                                  <div>
-                                    <div className="d-flex justify-content-between">
-                                      
-                                      <h6 
-                                        className="mb-0 mt-2 fw-bold d-block fs-6"
-                                        onClick={() => handleEmployeeClick(employee)}
-                                        style={{ cursor: 'pointer' }}
-                                      >
-                                        {employee.employeeName}
-                                      </h6>
-                                      <div
-                                        className="btn-group"
-                                        role="group"
-                                        aria-label="Basic outlined example"
-                                      >
-                                        <button
-                                          type="button"
-                                          className="btn btn-outline-secondary"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#editemp"
-                                          onClick={() => handleEditClick(employee)}
-                                        >
-                                          <i className="icofont-edit text-success" />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="btn btn-outline-secondary"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#deleteproject"
-                                          onClick={() => {
-                                            setDeletableId(employee._id);
-                                          }}
-                                        >
-                                          <i className="icofont-ui-delete text-danger" />
-                                        </button>
-                                      </div>
-                                    </div>
-                                    <div className="d-flex justify-content-between">
-                                      <span className="light-info-bg py-1 px-2 rounded-1 d-inline-block fw-bold small-11 mb-0 mt-1">
-                                        <i className="bi bi-calendar-check-fill text-primary fs-6 me-2" />
-                                        {date}/{month}/{year}
-                                      </span>
-                                      <span className="light-info-bg p-2 rounded-1 d-inline-block fw-bold small-11 mb-0 mt-1">
-                                        {employee.designation}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="video-setting-icon mt-2 pt-2 border-top">
-                                    <p>{employee.description}</p>
-                                  </div>
-                                  <div>
-                                    <Link
-                                      to="/projects"
-                                      state={{ employeeName: employee.employeeName }}
-                                      className="btn btn-sm btn-outline-secondary me-2"
-                                    >
-                                      View Projects
-                                    </Link>
-                                    <Link
-                                      to="/tasks"
-                                      state={{ employeeName: employee.employeeName }}
-                                      className="btn btn-sm btn-outline-secondary"
-                                    >
-                                      View Tasks
-                                    </Link>
-                                  </div>
 
-                                  <div className="mt-2">
-                                    <div>
-                                      <strong>Aadhaar Card - </strong>
-                                      {employee.aadhaarCard ? (
-                                        employee.aadhaarCard.toLowerCase().endsWith('.pdf') ? (
-                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
-                                        ) : (
-                                          <img
-                                            src={`${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`}
-                                            alt="Aadhaar Card"
-                                            className="avatar sm img-thumbnail shadow-sm"
-                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`)}
-                                            style={{ cursor: 'pointer' }}
-                                          />
-                                        )
-                                      ) : (
-                                        <i className="bi bi-x-lg text-danger"></i>
-                                      )}
-                                    </div>
 
-                                    <div>
-                                      <strong>Pan Card - </strong>
-                                      {employee.panCard ? (
-                                        employee.panCard.toLowerCase().endsWith('.pdf') ? (
-                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
-                                        ) : (
-                                          <img
-                                            src={`${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`}
-                                            alt="Pan Card"
-                                            className="avatar sm img-thumbnail shadow-sm"
-                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`)}
-                                            style={{ cursor: 'pointer' }}
-                                          />
-                                        )
-                                      ) : (
-                                        <i className="bi bi-x-lg text-danger"></i>
-                                      )}
-                                    </div>
 
-                                    <div>
-                                      <strong>Resume - </strong>
-                                      {employee.resume ? (
-                                        employee.resume.toLowerCase().endsWith('.pdf') ? (
-                                          <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
-                                        ) : (
-                                          <img
-                                            src={`${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`}
-                                            alt="Resume"
-                                            className="avatar sm img-thumbnail shadow-sm"
-                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`)}
-                                            style={{ cursor: 'pointer' }}
-                                          />
-                                        )
-                                      ) : (
-                                        <i className="bi bi-x-lg text-danger"></i>
-                                      )}
-                                    </div>
-                                  </div>
+                                  {/* <button
+                                    className="btn btn-sm btn-outline-secondary mt-2 ms-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#viewDocumentsModal"
+                                    onClick={() => setSelectedEmployee(employee)}
+                                  >
+                                    <i className="bi bi-file-earmark-text me-2"></i>
+                                    View Documents
+                                  </button> */}
+
+
+
+
 
                                 </div>
                               </div>
@@ -763,6 +1175,7 @@ const Member = () => {
                                     <th>Employee</th>
                                     <th>Contact</th>
                                     <th>Department</th>
+                                    <th>Projects</th>
                                     <th>Actions</th>
                                   </tr>
                                 </thead>
@@ -786,7 +1199,10 @@ const Member = () => {
                                                 objectFit: 'cover',
                                                 cursor: 'pointer'
                                               }}
-                                              onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`)}
+                                              onClick={() => handleImageClick(
+                                                `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
+                                                employee.employeeName
+                                              )}
                                             />
                                             <div>
                                               <h6 className="mb-0">{employee.employeeName}</h6>
@@ -803,6 +1219,16 @@ const Member = () => {
                                         <td>
                                           <div>{employee.department}</div>
                                           <small>{employee.designation}</small>
+                                        </td>
+                                        <td>
+                                          <div className="d-flex flex-column gap-1">
+                                            <span className="badge bg-primary">
+                                              Projects: {employeeProjects[employee._id] || 0}
+                                            </span>
+                                            <span className="badge bg-success">
+                                              Tasks: {employeeTasks[employee._id] || 0}
+                                            </span>
+                                          </div>
                                         </td>
                                         <td>
                                           <div className="btn-group" role="group">
@@ -854,264 +1280,7 @@ const Member = () => {
                 )}
               </div>
             </div>
-            {/* Modal Members*/}
-            <div
-              className="modal fade"
-              id="addUser"
-              tabIndex={-1}
-              aria-labelledby="addUserLabel"
-              aria-hidden="true"
-            >
-              <div className="modal-dialog modal-dialog-centered modal-lg">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title  fw-bold" id="addUserLabel">
-                      Employee Invitation
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    />
-                  </div>
-                  <div className="modal-body">
-                    <div className="inviteby_email">
-                      <div className="input-group mb-3">
-                        <input
-                          type="email"
-                          className="form-control"
-                          placeholder="Email address"
-                          id="exampleInputEmail1"
-                          aria-describedby="exampleInputEmail1"
-                        />
-                        <button
-                          className="btn btn-dark"
-                          type="button"
-                          id="button-addon2"
-                        >
-                          Sent
-                        </button>
-                      </div>
-                    </div>
-                    <div className="members_list">
-                      <h6 className="fw-bold ">Employee </h6>
-                      <ul className="list-unstyled list-group list-group-custom list-group-flush mb-0">
-                        <li className="list-group-item py-3 text-center text-md-start">
-                          <div className="d-flex align-items-center flex-column flex-sm-column flex-md-row">
-                            <div className="no-thumbnail mb-2 mb-md-0">
-                              <img
-                                className="avatar lg rounded-circle"
-                                src="assets/images/xs/avatar2.jpg"
-                                alt=""
-                              />
-                            </div>
-                            <div className="flex-fill ms-3 text-truncate">
-                              <h6 className="mb-0  fw-bold">
-                                Rachel Carr(you)
-                              </h6>
-                              <span className="text-muted">
-                                rachel.carr@gmail.com
-                              </span>
-                            </div>
-                            <div className="members-action">
-                              <span className="members-role ">Admin</span>
-                              <div className="btn-group">
-                                <button
-                                  type="button"
-                                  className="btn bg-transparent dropdown-toggle"
-                                  data-bs-toggle="dropdown"
-                                  aria-expanded="false"
-                                >
-                                  <i className="icofont-ui-settings  fs-6" />
-                                </button>
-                                <ul className="dropdown-menu dropdown-menu-end">
-                                  <li>
-                                    <a className="dropdown-item" href="#">
-                                      <i className="icofont-ui-password fs-6 me-2" />
-                                      ResetPassword
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a className="dropdown-item" href="#">
-                                      <i className="icofont-chart-line fs-6 me-2" />
-                                      ActivityReport
-                                    </a>
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li className="list-group-item py-3 text-center text-md-start">
-                          <div className="d-flex align-items-center flex-column flex-sm-column flex-md-row">
-                            <div className="no-thumbnail mb-2 mb-md-0">
-                              <img
-                                className="avatar lg rounded-circle"
-                                src="assets/images/xs/avatar3.jpg"
-                                alt=""
-                              />
-                            </div>
-                            <div className="flex-fill ms-3 text-truncate">
-                              <h6 className="mb-0  fw-bold">
-                                Lucas Baker
-                                <a href="#" className="link-secondary ms-2">
-                                  (Resend invitation)
-                                </a>
-                              </h6>
-                              <span className="text-muted">
-                                lucas.baker@gmail.com
-                              </span>
-                            </div>
-                            <div className="members-action">
-                              <div className="btn-group">
-                                <button
-                                  type="button"
-                                  className="btn bg-transparent dropdown-toggle"
-                                  data-bs-toggle="dropdown"
-                                  aria-expanded="false"
-                                >
-                                  Members
-                                </button>
-                                <ul className="dropdown-menu dropdown-menu-end">
-                                  <li>
-                                    <a className="dropdown-item" href="#">
-                                      <i className="icofont-check-circled" />
-                                      Member
-                                      <span>
-                                        Can view, edit, delete, comment on and
-                                        save files
-                                      </span>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a className="dropdown-item" href="#">
-                                      <i className="fs-6 p-2 me-1" />
-                                      Admin
-                                      <span>
-                                        Member, but can invite and manage team
-                                        members
-                                      </span>
-                                    </a>
-                                  </li>
-                                </ul>
-                              </div>
-                              <div className="btn-group">
-                                <button
-                                  type="button"
-                                  className="btn bg-transparent dropdown-toggle"
-                                  data-bs-toggle="dropdown"
-                                  aria-expanded="false"
-                                >
-                                  <i className="icofont-ui-settings  fs-6" />
-                                </button>
-                                <ul className="dropdown-menu dropdown-menu-end">
-                                  <li>
-                                    <a className="dropdown-item" href="#">
-                                      <i className="icofont-delete-alt fs-6 me-2" />
-                                      Delete Member
-                                    </a>
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li className="list-group-item py-3 text-center text-md-start">
-                          <div className="d-flex align-items-center flex-column flex-sm-column flex-md-row">
-                            <div className="no-thumbnail mb-2 mb-md-0">
-                              <img
-                                className="avatar lg rounded-circle"
-                                src="assets/images/xs/avatar8.jpg"
-                                alt=""
-                              />
-                            </div>
-                            <div className="flex-fill ms-3 text-truncate">
-                              <h6 className="mb-0  fw-bold">Una Coleman</h6>
-                              <span className="text-muted">
-                                una.coleman@gmail.com
-                              </span>
-                            </div>
-                            <div className="members-action">
-                              <div className="btn-group">
-                                <button
-                                  type="button"
-                                  className="btn bg-transparent dropdown-toggle"
-                                  data-bs-toggle="dropdown"
-                                  aria-expanded="false"
-                                >
-                                  Members
-                                </button>
-                                <ul className="dropdown-menu dropdown-menu-end">
-                                  <li>
-                                    <a className="dropdown-item" href="#">
-                                      <i className="icofont-check-circled" />
-                                      Member
-                                      <span>
-                                        Can view, edit, delete, comment on and
-                                        save files
-                                      </span>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a className="dropdown-item" href="#">
-                                      <i className="fs-6 p-2 me-1" />
-                                      Admin
-                                      <span>
-                                        Member, but can invite and manage team
-                                        members
-                                      </span>
-                                    </a>
-                                  </li>
-                                </ul>
-                              </div>
-                              <div className="btn-group">
-                                <div className="btn-group">
-                                  <button
-                                    type="button"
-                                    className="btn bg-transparent dropdown-toggle"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                  >
-                                    <i className="icofont-ui-settings  fs-6" />
-                                  </button>
-                                  <ul className="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                      <a className="dropdown-item" href="#">
-                                        <i className="icofont-ui-password fs-6 me-2" />
-                                        ResetPassword
-                                      </a>
-                                    </li>
-                                    <li>
-                                      <a className="dropdown-item" href="#">
-                                        <i className="icofont-chart-line fs-6 me-2" />
-                                        ActivityReport
-                                      </a>
-                                    </li>
-                                    <li>
-                                      <a className="dropdown-item" href="#">
-                                        <i className="icofont-delete-alt fs-6 me-2" />
-                                        Suspend member
-                                      </a>
-                                    </li>
-                                    <li>
-                                      <a className="dropdown-item" href="#">
-                                        <i className="icofont-not-allowed fs-6 me-2" />
-                                        Delete Member
-                                      </a>
-                                    </li>
-                                  </ul>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+
             {/* Update Employee*/}
             <div
               className="modal fade"
@@ -1460,6 +1629,117 @@ const Member = () => {
                                   name="other"
                                   value={employeeData.other || employeeData.socialLinks?.other || ''}
                                   onChange={updateChange}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Bank Details</label>
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-bank"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Bank Name"
+                                  name="bankName"
+                                  value={employeeData.bankName || ''} // Use employeeData for edit form
+                                  onChange={updateChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-person"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Account Holder Name"
+                                  name="accountHolderName"
+                                  value={employeeData.accountHolderName || ''} // Use employeeData for edit form
+                                  onChange={updateChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-credit-card"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Account Number"
+                                  name="accountNumber"
+                                  value={employeeData.accountNumber || ''} // Use employeeData for edit form
+                                  onChange={updateChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-building"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="IFSC Code"
+                                  name="ifscCode"
+                                  value={employeeData.ifscCode || ''} // Use employeeData for edit form
+                                  onChange={updateChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-wallet2"></i></span>
+                                <select
+                                  className="form-select"
+                                  name="accountType"
+                                  value={employeeData.accountType || ''} // Use employeeData for edit form
+                                  onChange={updateChange} // Use updateChange for edit form
+                                >
+                                  <option value="">Select Account Type</option>
+                                  <option value="Savings">Savings</option>
+                                  <option value="Current">Current</option>
+                                  <option value="Salary">Salary</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-phone"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="UPI ID"
+                                  name="upiId"
+                                  value={employeeData.upiId || ''} // Use employeeData for edit form
+                                  onChange={updateChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-qr-code"></i></span>
+                                <input
+                                  type="file"
+                                  className="form-control"
+                                  name="qrCode"
+                                  onChange={updateChange} // Use updateChange for edit form
+                                  accept="image/*"
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-app"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Payment App (e.g., PayTM, PhonePe)"
+                                  name="paymentApp"
+                                  value={employeeData.paymentApp || ''} // Use employeeData for edit form
+                                  onChange={updateChange} // Use updateChange for edit form
                                 />
                               </div>
                             </div>
@@ -1868,6 +2148,119 @@ const Member = () => {
                             </div>
                           </div>
                         </div>
+
+                        <div className="mb-3">
+                          <label className="form-label">Bank Details</label>
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-bank"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Bank Name"
+                                  name="bankName"
+                                  value={formData.bankName || ''} // Use employeeData for edit form
+                                  onChange={handleChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-person"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Account Holder Name"
+                                  name="accountHolderName"
+                                  value={formData.accountHolderName || ''} // Use employeeData for edit form
+                                  onChange={handleChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-credit-card"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Account Number"
+                                  name="accountNumber"
+                                  value={formData.accountNumber || ''} // Use employeeData for edit form
+                                  onChange={handleChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-building"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="IFSC Code"
+                                  name="ifscCode"
+                                  value={formData.ifscCode || ''} // Use employeeData for edit form
+                                  onChange={handleChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-wallet2"></i></span>
+                                <select
+                                  className="form-select"
+                                  name="accountType"
+                                  value={formData.accountType || ''} // Use employeeData for edit form
+                                  onChange={handleChange} // Use updateChange for edit form
+                                >
+                                  <option value="">Select Account Type</option>
+                                  <option value="Savings">Savings</option>
+                                  <option value="Current">Current</option>
+                                  <option value="Salary">Salary</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-phone"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="UPI ID"
+                                  name="upiId"
+                                  value={formData.upiId || ''} // Use employeeData for edit form
+                                  onChange={handleChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-qr-code"></i></span>
+                                <input
+                                  type="file"
+                                  className="form-control"
+                                  name="qrCode"
+                                  onChange={handleFileChange} // Use updateChange for edit form
+                                  accept="image/*"
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="input-group mb-3">
+                                <span className="input-group-text"><i className="bi bi-app"></i></span>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Payment App (e.g., PayTM, PhonePe)"
+                                  name="paymentApp"
+                                  value={formData.paymentApp || ''} // Use employeeData for edit form
+                                  onChange={handleChange} // Use updateChange for edit form
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
                       </form>
                     </div>
                     <div className="mb-3">
@@ -1959,11 +2352,15 @@ const Member = () => {
             </div>
             {/* PDF Viewer Modal */}
             {pdfUrl && (
-              <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+              <div
+                className="modal"
+                style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}
+                onClick={handlePdfModalBackdropClick}
+              >
                 <div className="modal-dialog modal-dialog-centered modal-lg">
                   <div className="modal-content">
                     <div className="modal-header">
-                      <h5 className="modal-title">PDF Viewer</h5>
+                      <h5 className="modal-title">{selectedImageDetails.name}</h5>
                       <button type="button" className="btn-close" onClick={closePdfViewer}></button>
                     </div>
                     <div className="modal-body">
@@ -1975,25 +2372,431 @@ const Member = () => {
             )}
 
             {/* Image Viewer Modal */}
-            {selectedImage && !pdfUrl && (
-              <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            {selectedImageDetails.url && !pdfUrl && (
+              <div
+                className="modal"
+                style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999 }}
+                onClick={handleImageModalBackdropClick}
+              >
                 <div className="modal-dialog modal-dialog-centered modal-lg">
-                  <div className="modal-content">
+                  <div className="modal-content" style={{ marginLeft: '5rem' }}>
                     <div className="modal-header">
-                      <h5 className="modal-title">Image Viewer</h5>
+                      <h5 className="modal-title">{selectedImageDetails.name}</h5>
                       <button type="button" className="btn-close" onClick={closeImageModal}></button>
                     </div>
                     <div className="modal-body">
-                      <img src={selectedImage} alt="Enlarged view" style={{ width: '100%', height: 'auto' }} />
+                      <img src={selectedImageDetails.url} alt="Enlarged view" style={{ width: '100%', height: '500px', objectFit: 'contain' }} />
                     </div>
                   </div>
                 </div>
               </div>
             )}
+
+            {/* Bank Details Modal */}
+            <div
+              className="modal fade"
+              id="bankDetailsModal"
+              tabIndex={-1}
+              aria-hidden="true"
+              style={{ zIndex: 9998 }}
+            >
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title fw-bold">
+                      {selectedEmployee?.employeeName || 'Employee'}'s Bank Details
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    />
+                  </div>
+                  <div className="modal-body">
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <div className="bank-info-item p-3 border rounded h-100">
+                          <i className="bi bi-bank fs-4 text-primary me-2"></i>
+                          <div className="flex-grow-1">
+                            <div className="fw-bold">Bank Name</div>
+                            <div className="d-flex align-items-center">
+                              <span className="me-2">{selectedEmployee?.bankDetails?.bankName || 'Not provided'}</span>
+                              {selectedEmployee?.bankDetails?.bankName && (
+                                <i
+                                  className="bi bi-clipboard cursor-pointer"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.bankName);
+                                    toast.success('Bank Name copied!');
+                                  }}
+                                  title="Copy Bank Name"
+                                ></i>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <div className="bank-info-item p-3 border rounded h-100">
+                          <i className="bi bi-person fs-4 text-success me-2"></i>
+                          <div className="flex-grow-1">
+                            <div className="fw-bold">Account Holder</div>
+                            <div className="d-flex align-items-center">
+                              <span className="me-2">{selectedEmployee?.bankDetails?.accountHolderName || 'Not provided'}</span>
+                              {selectedEmployee?.bankDetails?.accountHolderName && (
+                                <i
+                                  className="bi bi-clipboard cursor-pointer"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.accountHolderName);
+                                    toast.success('Account Holder Name copied!');
+                                  }}
+                                  title="Copy Account Holder Name"
+                                ></i>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <div className="bank-info-item p-3 border rounded h-100">
+                          <i className="bi bi-credit-card fs-4 text-info me-2"></i>
+                          <div className="flex-grow-1">
+                            <div className="fw-bold">Account Number</div>
+                            <div className="d-flex align-items-center">
+                              <span className="me-2">{selectedEmployee?.bankDetails?.accountNumber || 'Not provided'}</span>
+                              {selectedEmployee?.bankDetails?.accountNumber && (
+                                <i
+                                  className="bi bi-clipboard cursor-pointer"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.accountNumber);
+                                    toast.success('Account Number copied!');
+                                  }}
+                                  title="Copy Account Number"
+                                ></i>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <div className="bank-info-item p-3 border rounded h-100">
+                          <i className="bi bi-building fs-4 text-warning me-2"></i>
+                          <div className="flex-grow-1">
+                            <div className="fw-bold">IFSC Code</div>
+                            <div className="d-flex align-items-center">
+                              <span className="me-2">{selectedEmployee?.bankDetails?.ifscCode || 'Not provided'}</span>
+                              {selectedEmployee?.bankDetails?.ifscCode && (
+                                <i
+                                  className="bi bi-clipboard cursor-pointer"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.ifscCode);
+                                    toast.success('IFSC Code copied!');
+                                  }}
+                                  title="Copy IFSC Code"
+                                ></i>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <div className="bank-info-item p-3 border rounded h-100">
+                          <i className="bi bi-wallet2 fs-4 text-danger me-2"></i>
+                          <div className="flex-grow-1">
+                            <div className="fw-bold">Account Type</div>
+                            <div className="d-flex align-items-center">
+                              <span className="me-2">{selectedEmployee?.bankDetails?.accountType || 'Not provided'}</span>
+                              {selectedEmployee?.bankDetails?.accountType && (
+                                <i
+                                  className="bi bi-clipboard cursor-pointer"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.accountType);
+                                    toast.success('Account Type copied!');
+                                  }}
+                                  title="Copy Account Type"
+                                ></i>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <div className="bank-info-item p-3 border rounded h-100">
+                          <i className="bi bi-phone fs-4 text-success me-2"></i>
+                          <div className="flex-grow-1">
+                            <div className="fw-bold">UPI ID</div>
+                            <div className="d-flex align-items-center">
+                              <span className="me-2">{selectedEmployee?.bankDetails?.upiId || 'Not provided'}</span>
+                              {selectedEmployee?.bankDetails?.upiId && (
+                                <i
+                                  className="bi bi-clipboard cursor-pointer"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.upiId);
+                                    toast.success('UPI ID copied!');
+                                  }}
+                                  title="Copy UPI ID"
+                                ></i>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <div className="bank-info-item p-3 border rounded h-100">
+                          <i className="bi bi-app fs-4 text-primary me-2"></i>
+                          <div className="flex-grow-1">
+                            <div className="fw-bold">Payment App</div>
+                            <div className="d-flex align-items-center">
+                              <span className="me-2">{selectedEmployee?.bankDetails?.paymentApp || 'Not provided'}</span>
+                              {selectedEmployee?.bankDetails?.paymentApp && (
+                                <i
+                                  className="bi bi-clipboard cursor-pointer"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.paymentApp);
+                                    toast.success('Payment App copied!');
+                                  }}
+                                  title="Copy Payment App"
+                                ></i>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {selectedEmployee?.bankDetails?.qrCode && (
+                        <div className="col-md-6">
+                          <div className="bank-info-item p-3 border rounded h-100">
+                            <i className="bi bi-qr-code fs-4 text-dark me-2"></i>
+                            <div>
+                              <div className="fw-bold">QR Code</div>
+                              <div className="d-flex align-items-center gap-2 mt-2">
+                                <img
+                                  src={`${import.meta.env.VITE_BASE_URL}${selectedEmployee.bankDetails.qrCode.replace('uploads/', '')}`}
+                                  alt="QR Code"
+                                  style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
+                                  onClick={(e) => handleFileClick(
+                                    e,
+                                    `${import.meta.env.VITE_BASE_URL}${selectedEmployee.bankDetails.qrCode.replace('uploads/', '')}`,
+                                    'image',
+                                    `${selectedEmployee.employeeName} - QR Code`
+                                  )}
+
+                                />
+                                <i
+                                  className="bi bi-download fs-4 text-primary"
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => handleDownload(
+                                    selectedEmployee.bankDetails.qrCode,
+                                    `${selectedEmployee.employeeName}_qr_code${selectedEmployee.bankDetails.qrCode.substr(selectedEmployee.bankDetails.qrCode.lastIndexOf('.'))}`
+                                  )}
+                                  title="Download QR Code"
+                                ></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* View Documents Modal */}
+            <div className="modal fade" id="viewDocumentsModal" tabIndex={-1} aria-hidden="true">
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title fw-bold">Employee Documents</h5>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                  </div>
+                  <div className="modal-body">
+                    {selectedEmployee && (
+                      <div className="row g-3">
+                        <div className="col-12">
+                          <h6 className="border-bottom pb-2">Resume</h6>
+                          {selectedEmployee.resume ? (
+                            <div className="d-flex align-items-center gap-3">
+                              {selectedEmployee.resume.toLowerCase().endsWith('.pdf') ? (
+                                <a href="#" onClick={(e) => handleFileClick(
+                                  e,
+                                  `${import.meta.env.VITE_BASE_URL}${selectedEmployee.resume}`,
+                                  'pdf',
+                                  selectedEmployee.employeeName
+                                )}>View PDF</a>
+                              ) : (
+                                <img
+                                  src={`${import.meta.env.VITE_BASE_URL}${selectedEmployee.resume}`}
+                                  alt="Resume"
+                                  className="img-thumbnail"
+                                  style={{ maxWidth: '100px', cursor: 'pointer' }}
+                                  onClick={(e) => handleFileClick(
+                                    e,
+                                    `${import.meta.env.VITE_BASE_URL}${selectedEmployee.resume}`,
+                                    'image',
+                                    selectedEmployee.employeeName
+                                  )}
+                                />
+                              )}
+                              <div className="d-flex gap-2">
+                                <button
+                                  className="btn btn-sm btn-primary"
+                                  onClick={() => handleDownload(selectedEmployee.resume, `${selectedEmployee.employeeName}_resume${selectedEmployee.resume.substr(selectedEmployee.resume.lastIndexOf('.'))}`)}
+                                >
+                                  <i className="bi bi-download"></i> Download
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-danger"
+                                  onClick={() => handleDocumentDelete(selectedEmployee._id, 'resume')}
+                                >
+                                  <i className="bi bi-trash"></i> Delete
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-muted">No resume uploaded</p>
+                          )}
+                        </div>
+
+                        <div className="col-12">
+                          <h6 className="border-bottom pb-2">Aadhaar Card</h6>
+                          {selectedEmployee.aadhaarCard ? (
+                            <div className="row align-items-center g-2">
+                              <div className="col-6">
+                                {selectedEmployee.aadhaarCard.toLowerCase().endsWith('.pdf') ? (
+                                  <a href="#" onClick={(e) => handleFileClick(
+                                    e,
+                                    `${import.meta.env.VITE_BASE_URL}${selectedEmployee.aadhaarCard.replace('uploads/', '')}`,
+                                    'pdf',
+                                    selectedEmployee.employeeName
+                                  )}>View</a>
+                                ) : (
+                                  <img
+                                    src={`${import.meta.env.VITE_BASE_URL}${selectedEmployee.aadhaarCard.replace('uploads/', '')}`}
+                                    alt=""
+                                    className="avatar sm img-thumbnail shadow-sm"
+                                    onClick={(e) => handleFileClick(
+                                      e,
+                                      `${import.meta.env.VITE_BASE_URL}${selectedEmployee.aadhaarCard.replace('uploads/', '')}`,
+                                      'image',
+                                      selectedEmployee.employeeName
+                                    )}
+                                    style={{ cursor: 'pointer' }}
+                                  />
+                                )}
+                              </div>
+                              <div className="col-3 text-center">
+                                <i
+                                  className="bi bi-download text-primary"
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => handleDownload(selectedEmployee.aadhaarCard, `${selectedEmployee.employeeName}_aadhaar${selectedEmployee.aadhaarCard.substr(selectedEmployee.aadhaarCard.lastIndexOf('.'))}`)}
+                                  title="Download Aadhaar Card"
+                                ></i>
+                              </div>
+                              <div className="col-3 text-center">
+                                <i
+                                  className="bi bi-trash text-danger"
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => handleDocumentDelete(selectedEmployee._id, 'aadhaarCard')}
+                                  title="Delete Aadhaar Card"
+                                ></i>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-muted">No Aadhaar card uploaded</p>
+                          )}
+                        </div>
+
+                        <div className="col-12">
+                          <h6 className="border-bottom pb-2">PAN Card</h6>
+                          {selectedEmployee.panCard ? (
+                            <div className="row align-items-center g-2">
+                              <div className="col-6">
+                                {selectedEmployee.panCard.toLowerCase().endsWith('.pdf') ? (
+                                  <a href="#" onClick={(e) => handleFileClick(
+                                    e,
+                                    `${import.meta.env.VITE_BASE_URL}${selectedEmployee.panCard.replace('uploads/', '')}`,
+                                    'pdf',
+                                    selectedEmployee.employeeName
+                                  )}>View</a>
+                                ) : (
+                                  <img
+                                    src={`${import.meta.env.VITE_BASE_URL}${selectedEmployee.panCard.replace('uploads/', '')}`}
+                                    alt=""
+                                    className="avatar sm img-thumbnail shadow-sm"
+                                    onClick={(e) => handleFileClick(
+                                      e,
+                                      `${import.meta.env.VITE_BASE_URL}${selectedEmployee.panCard.replace('uploads/', '')}`,
+                                      'image',
+                                      selectedEmployee.employeeName
+                                    )}
+                                    style={{ cursor: 'pointer' }}
+                                  />
+                                )}
+                              </div>
+                              <div className="col-3 text-center">
+                                <i
+                                  className="bi bi-download text-primary"
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => handleDownload(selectedEmployee.panCard, `${selectedEmployee.employeeName}_pan${selectedEmployee.panCard.substr(selectedEmployee.panCard.lastIndexOf('.'))}`)}
+                                  title="Download Pan Card"
+                                ></i>
+                              </div>
+                              <div className="col-3 text-center">
+                                <i
+                                  className="bi bi-trash text-danger"
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => handleDocumentDelete(selectedEmployee._id, 'panCard')}
+                                  title="Delete Pan Card"
+                                ></i>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-muted">No PAN card uploaded</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="modal-footer">
+                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </>
         </div>
         <ToastContainer />
       </div>
+      <style>
+        {`
+          .arrow-link {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.arrow-link:hover {
+  transform: translateX(5px);
+}
+
+.bank-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.bank-info-item:hover {
+  background-color: #f8f9fa;
+}
+        `}
+      </style>
     </>
   );
 };
