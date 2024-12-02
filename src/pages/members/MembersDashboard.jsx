@@ -79,6 +79,16 @@ const MemberDashboard = () => {
             github: "",
             website: "",
             other: ""
+        },
+        bankDetails: {
+            bankName: "",
+            accountHolderName: "",
+            accountNumber: "",
+            ifscCode: "",
+            accountType: "",
+            upiId: "",
+            paymentApp: "",
+            qrCode: ""
         }
     });
     const [selectedImage, setSelectedImage] = useState(null);
@@ -306,7 +316,8 @@ const MemberDashboard = () => {
                 password: user.password || "",
                 phone: user.phone || "",
                 description: user.description || "",
-                socialLinks: user.socialLinks || {}
+                socialLinks: user.socialLinks || {},
+                bankDetails: user.bankDetails || {}
             });
             setEmployeeName(user.employeeName);
             setEmail(user.emailid);
@@ -1415,26 +1426,26 @@ const MemberDashboard = () => {
                                                                 alt="profile"
                                                                 style={{
                                                                     transition: 'all 0.3s ease-in-out',
-                                                                    cursor: 'pointer',
+                                                                    // cursor: 'pointer',
                                                                     width: '100px',
                                                                     height: '100px',
                                                                     objectFit: 'cover'
                                                                 }}
-                                                                onMouseEnter={(e) => {
-                                                                    e.target.style.transform = 'scale(2.5)';
-                                                                    e.target.style.zIndex = '100';
-                                                                    e.target.style.borderRadius = '8px';
-                                                                }}
-                                                                onMouseLeave={(e) => {
-                                                                    e.target.style.transform = 'scale(1)';
-                                                                    e.target.style.zIndex = '1';
-                                                                    e.target.style.borderRadius = '50%';
-                                                                }}
-                                                                onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
+                                                            // onMouseEnter={(e) => {
+                                                            //     e.target.style.transform = 'scale(2.5)';
+                                                            //     e.target.style.zIndex = '100';
+                                                            //     e.target.style.borderRadius = '8px';
+                                                            // }}
+                                                            // onMouseLeave={(e) => {
+                                                            //     e.target.style.transform = 'scale(1)';
+                                                            //     e.target.style.zIndex = '1';
+                                                            //     e.target.style.borderRadius = '50%';
+                                                            // }}
+                                                            // onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
                                                             />
                                                         </div>
                                                         <div className="profile-details">
-                                                            <h5 className="mb-1 fw-bold text-primary text-nowrap text-start ">{employeeName}</h5>
+                                                            <h5 className="mb-1 fw-bold text-primary text-start">{employeeName}</h5>
                                                             <p className="text-muted mb-1 small text-nowrap text-start">
                                                                 <i className="bi bi-envelope-fill me-2"></i>
                                                                 {email}
@@ -1449,6 +1460,14 @@ const MemberDashboard = () => {
                                                             </p>
                                                         </div>
                                                     </div>
+                                                    <button
+                                                        className="btn btn-sm btn-outline-primary mt-2"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#bankDetailsModal"
+                                                    >
+                                                        <i className="bi bi-bank me-2"></i>
+                                                        View Bank Details
+                                                    </button>
                                                 </div>
 
                                                 {/* Documents and Social Links in a row */}
@@ -1473,7 +1492,7 @@ const MemberDashboard = () => {
                                                                                 {aadhaarCard ? (
                                                                                     <div className="d-flex gap-1">
                                                                                         <button
-                                                                                            className="btn btn-sm btn-outline-primary py-0 px-1"
+                                                                                            className="btn btn-sm btn-outline-primary"
                                                                                             onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, aadhaarCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
                                                                                         >
                                                                                             <i className="bi bi-eye small"></i>
@@ -1665,12 +1684,12 @@ const MemberDashboard = () => {
                                             </div>
 
                                             {/* Add Edit Profile Button */}
-                                            <div className="position-absolute bottom-0 end-0 m-3">
+                                            {/* <div className="position-absolute bottom-0 end-0 m-3">
 
                                                 <i className="bi bi-pencil-square">Edit Profile</i>
 
 
-                                            </div>
+                                            </div> */}
                                         </div>
 
                                         {/* Keep the existing styles */}
@@ -2559,6 +2578,224 @@ const MemberDashboard = () => {
                     </div>
                 </div>
             )}
+
+// ... existing code ...
+
+            {/* Add Bank Details Modal */}
+            <div className="modal fade" id="bankDetailsModal" tabIndex="-1" aria-hidden="true" style={{ zIndex: 9998 }}>
+                <div className="modal-dialog modal-dialog-centered modal-lg">
+                    <div className="modal-content" style={{ marginLeft: "100px" }}>
+                        <div className="modal-header">
+                            <h5 className="modal-title fw-bold">
+                                {employeeName}'s Bank Details
+                            </h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            />
+                        </div>
+                        <div className="modal-body">
+                            <div className="row g-3">
+                                {/* Bank Name */}
+                                <div className="col-md-6">
+                                    <div className="bank-info-item p-3 border rounded h-100">
+                                        <i className="bi bi-bank fs-4 text-primary me-2"></i>
+                                        <div className="flex-grow-1">
+                                            <div className="fw-bold">Bank Name</div>
+                                            <div className="d-flex align-items-center">
+                                                <span className="me-2">{employeeData?.bankDetails?.bankName || 'Not provided'}</span>
+                                                {employeeData?.bankDetails?.bankName && (
+                                                    <i
+                                                        className="bi bi-clipboard cursor-pointer"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(employeeData.bankDetails?.bankName || '');
+                                                        }}
+                                                        title="Copy Bank Name"
+                                                    ></i>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Account Holder */}
+                                <div className="col-md-6">
+                                    <div className="bank-info-item p-3 border rounded h-100">
+                                        <i className="bi bi-person fs-4 text-success me-2"></i>
+                                        <div className="flex-grow-1">
+                                            <div className="fw-bold">Account Holder</div>
+                                            <div className="d-flex align-items-center">
+                                                <span className="me-2">{employeeData?.bankDetails?.accountHolderName || 'Not provided'}</span>
+                                                {employeeData?.bankDetails?.accountHolderName && (
+                                                    <i
+                                                        className="bi bi-clipboard cursor-pointer"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(employeeData.bankDetails?.accountHolderName || '');
+                                                        }}
+                                                        title="Copy Account Holder Name"
+                                                    ></i>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Account Number */}
+                                <div className="col-md-6">
+                                    <div className="bank-info-item p-3 border rounded h-100">
+                                        <i className="bi bi-credit-card fs-4 text-info me-2"></i>
+                                        <div className="flex-grow-1">
+                                            <div className="fw-bold">Account Number</div>
+                                            <div className="d-flex align-items-center">
+                                                <span className="me-2">{employeeData?.bankDetails?.accountNumber || 'Not provided'}</span>
+                                                {employeeData?.bankDetails?.accountNumber && (
+                                                    <i
+                                                        className="bi bi-clipboard cursor-pointer"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(employeeData.bankDetails?.accountNumber || '');
+                                                        }}
+                                                        title="Copy Account Number"
+                                                    ></i>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* IFSC Code */}
+                                <div className="col-md-6">
+                                    <div className="bank-info-item p-3 border rounded h-100">
+                                        <i className="bi bi-building fs-4 text-warning me-2"></i>
+                                        <div className="flex-grow-1">
+                                            <div className="fw-bold">IFSC Code</div>
+                                            <div className="d-flex align-items-center">
+                                                <span className="me-2">{employeeData?.bankDetails?.ifscCode || 'Not provided'}</span>
+                                                {employeeData?.bankDetails?.ifscCode && (
+                                                    <i
+                                                        className="bi bi-clipboard cursor-pointer"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(employeeData.bankDetails?.ifscCode || '');
+                                                        }}
+                                                        title="Copy IFSC Code"
+                                                    ></i>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Account Type */}
+                                <div className="col-md-6">
+                                    <div className="bank-info-item p-3 border rounded h-100">
+                                        <i className="bi bi-wallet2 fs-4 text-danger me-2"></i>
+                                        <div className="flex-grow-1">
+                                            <div className="fw-bold">Account Type</div>
+                                            <div className="d-flex align-items-center">
+                                                <span className="me-2">{employeeData?.bankDetails?.accountType || 'Not provided'}</span>
+                                                {employeeData?.bankDetails?.accountType && (
+                                                    <i
+                                                        className="bi bi-clipboard cursor-pointer"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(employeeData.bankDetails?.accountType || '');
+                                                        }}
+                                                        title="Copy Account Type"
+                                                    ></i>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* UPI ID */}
+                                <div className="col-md-6">
+                                    <div className="bank-info-item p-3 border rounded h-100">
+                                        <i className="bi bi-phone fs-4 text-success me-2"></i>
+                                        <div className="flex-grow-1">
+                                            <div className="fw-bold">UPI ID</div>
+                                            <div className="d-flex align-items-center">
+                                                <span className="me-2">{employeeData?.bankDetails?.upiId || 'Not provided'}</span>
+                                                {employeeData?.bankDetails?.upiId && (
+                                                    <i
+                                                        className="bi bi-clipboard cursor-pointer"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(employeeData.bankDetails?.upiId || '');
+                                                        }}
+                                                        title="Copy UPI ID"
+                                                    ></i>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Payment App */}
+                                <div className="col-md-6">
+                                    <div className="bank-info-item p-3 border rounded h-100">
+                                        <i className="bi bi-app fs-4 text-primary me-2"></i>
+                                        <div className="flex-grow-1">
+                                            <div className="fw-bold">Payment App</div>
+                                            <div className="d-flex align-items-center">
+                                                <span className="me-2">{employeeData?.bankDetails?.paymentApp || 'Not provided'}</span>
+                                                {employeeData?.bankDetails?.paymentApp && (
+                                                    <i
+                                                        className="bi bi-clipboard cursor-pointer"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(employeeData.bankDetails?.paymentApp || '');
+                                                        }}
+                                                        title="Copy Payment App"
+                                                    ></i>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* QR Code */}
+                                <div className="col-md-6">
+                                    <div className="bank-info-item p-3 border rounded h-100">
+                                        <i className="bi bi-qr-code fs-4 text-dark me-2"></i>
+                                        <div>
+                                            <div className="fw-bold">QR Code</div>
+                                            <div className="d-flex align-items-center gap-2 mt-2">
+                                                {employeeData?.bankDetails?.qrCode && (
+                                                    <>
+                                                        <img
+                                                            src={`${import.meta.env.VITE_BASE_URL}${employeeData.bankDetails.qrCode}`}
+                                                            alt="QR Code"
+                                                            style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
+                                                            onClick={(e) => handleFileClick(
+                                                                e,
+                                                                `${import.meta.env.VITE_BASE_URL}${employeeData.bankDetails.qrCode}`,
+                                                                'image'
+                                                            )}
+                                                        />
+                                                        <i
+                                                            className="bi bi-download fs-4 text-primary"
+                                                            style={{ cursor: 'pointer' }}
+                                                            onClick={() => handleDownload(
+                                                                `${import.meta.env.VITE_BASE_URL}${employeeData.bankDetails.qrCode}`,
+                                                                `qr_code${employeeData.bankDetails.qrCode.substring(employeeData.bankDetails.qrCode.lastIndexOf('.'))}`
+                                                            )}
+                                                            title="Download QR Code"
+                                                        ></i>
+                                                    </>
+                                                )}
+                                                {!employeeData?.bankDetails?.qrCode && (
+                                                    <span>Not provided</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+// ... rest of the code ...
 
             {/* Add this CSS to hide scrollbars globally for these elements */}
             <style>

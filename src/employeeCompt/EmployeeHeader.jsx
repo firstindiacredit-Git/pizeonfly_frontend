@@ -37,6 +37,16 @@ const Header = () => {
       github: "",
       website: "",
       other: ""
+    },
+    bankDetails: {
+      bankName: "",
+      accountHolderName: "",
+      accountNumber: "",
+      ifscCode: "",
+      accountType: "",
+      upiId: "",
+      qrCode: null,
+      paymentApp: ""
     }
   });
   const [selectedFile, setSelectedFile] = useState(null);
@@ -67,6 +77,15 @@ const Header = () => {
           github: user.socialLinks?.github || "",
           website: user.socialLinks?.website || "",
           other: user.socialLinks?.other || ""
+        },
+        bankDetails: {
+          bankName: user.bankDetails?.bankName || "",
+          accountHolderName: user.bankDetails?.accountHolderName || "",
+          accountNumber: user.bankDetails?.accountNumber || "",
+          ifscCode: user.bankDetails?.ifscCode || "",
+          accountType: user.bankDetails?.accountType || "",
+          upiId: user.bankDetails?.upiId || "",
+          paymentApp: user.bankDetails?.paymentApp || ""
         }
       });
       setEmployeeName(user.employeeName);
@@ -147,6 +166,11 @@ const Header = () => {
       formData.append(key, value || '');
     });
 
+    // Add bank details
+    Object.entries(employeeData.bankDetails || {}).forEach(([key, value]) => {
+      formData.append(key, value || '');
+    });
+
     if (selectedFile) {
       formData.append("employeeImage", selectedFile);
     }
@@ -160,6 +184,9 @@ const Header = () => {
     }
     if (employeeData.resume instanceof File) {
       formData.append("resume", employeeData.resume);
+    }
+    if (employeeData.qrCode instanceof File) {
+      formData.append("qrCode", employeeData.qrCode);
     }
 
     try {
@@ -832,6 +859,164 @@ const Header = () => {
                             })}
                             placeholder="https://other-link.com"
                           />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="border-top pt-3 mt-3">
+                      <h6 className="mb-3">Bank Details</h6>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-bank"></i></span>
+                            <input type="text"
+                              className="form-control"
+                              id="bankName"
+                              name="bankName"
+                              value={employeeData.bankDetails?.bankName || ""}
+                              onChange={(e) => setEmployeeData({
+                                ...employeeData,
+                                bankDetails: {
+                                  ...employeeData.bankDetails,
+                                  bankName: e.target.value
+                                }
+                              })}
+                              placeholder="Bank Name" />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-person"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Account Holder Name"
+                              name="accountHolderName"
+                              value={employeeData.bankDetails?.accountHolderName || ''}
+                              onChange={(e) => setEmployeeData({
+                                ...employeeData,
+                                bankDetails: {
+                                  ...employeeData.bankDetails,
+                                  accountHolderName: e.target.value
+                                }
+                              })}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-credit-card"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Account Number"
+                              name="accountNumber"
+                              value={employeeData.bankDetails?.accountNumber || ''}
+                              onChange={(e) => setEmployeeData({
+                                ...employeeData,
+                                bankDetails: {
+                                  ...employeeData.bankDetails,
+                                  accountNumber: e.target.value
+                                }
+                              })}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-building"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="IFSC Code"
+                              name="ifscCode"
+                              value={employeeData.bankDetails?.ifscCode || ''}
+                              onChange={(e) => setEmployeeData({
+                                ...employeeData,
+                                bankDetails: {
+                                  ...employeeData.bankDetails,
+                                  ifscCode: e.target.value
+                                }
+                              })}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-wallet2"></i></span>
+                            <select
+                              className="form-select"
+                              name="accountType"
+                              value={employeeData.bankDetails?.accountType || ''}
+                              onChange={(e) => setEmployeeData({
+                                ...employeeData,
+                                bankDetails: {
+                                  ...employeeData.bankDetails,
+                                  accountType: e.target.value
+                                }
+                              })}
+                            >
+                              <option value="">Select Account Type</option>
+                              <option value="Savings">Savings</option>
+                              <option value="Current">Current</option>
+                              <option value="Salary">Salary</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-phone"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="UPI ID"
+                              name="upiId"
+                              value={employeeData.bankDetails?.upiId || ''}
+                              onChange={(e) => setEmployeeData({
+                                ...employeeData,
+                                bankDetails: {
+                                  ...employeeData.bankDetails,
+                                  upiId: e.target.value
+                                }
+                              })}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-qr-code"></i></span>
+                            <input
+                              type="file"
+                              className="form-control"
+                              name="qrCode"
+                              onChange={(e) => setEmployeeData({
+                                ...employeeData,
+                                bankDetails: {
+                                  ...employeeData.bankDetails,
+                                  qrCode: e.target.value
+                                }
+                              })} // Use updateChange for edit form
+                              accept="image/*"
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-app"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Payment App (e.g., PayTM, PhonePe)"
+                              name="paymentApp"
+                              value={employeeData.bankDetails?.paymentApp || ''}
+                              onChange={(e) => setEmployeeData({
+                                ...employeeData,
+                                bankDetails: {
+                                  ...employeeData.bankDetails,
+                                  paymentApp: e.target.value
+                                }
+                              })}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>

@@ -65,93 +65,119 @@ const Member = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const formDataToSend = new FormData();
+    
+    // Add basic fields
+    formDataToSend.append('employeeName', formData.employeeName);
+    formDataToSend.append('employeeId', formData.employeeId);
+    formDataToSend.append('emailid', formData.emailid);
+    formDataToSend.append('password', formData.password);
+    formDataToSend.append('phone', formData.phone);
+    formDataToSend.append('department', formData.department);
+    formDataToSend.append('designation', formData.designation);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('joiningDate', formData.joiningDate);
+    
+    // Add file fields - make sure these match exactly with Multer config
+    if (formData.employeeImage) {
+        formDataToSend.append('employeeImage', formData.employeeImage);
+    }
+    if (formData.resume) {
+        formDataToSend.append('resume', formData.resume);
+    }
+    if (formData.aadhaarCard) {
+        formDataToSend.append('aadhaarCard', formData.aadhaarCard);
+    }
+    if (formData.panCard) {
+        formDataToSend.append('panCard', formData.panCard);
+    }
+    if (formData.qrCode) {
+        formDataToSend.append('qrCode', formData.qrCode);
+    }
+    
+    // Add social links
+    formDataToSend.append('linkedin', formData.linkedin || '');
+    formDataToSend.append('instagram', formData.instagram || '');
+    formDataToSend.append('youtube', formData.youtube || '');
+    formDataToSend.append('facebook', formData.facebook || '');
+    formDataToSend.append('github', formData.github || '');
+    formDataToSend.append('website', formData.website || '');
+    formDataToSend.append('other', formData.other || '');
+    
+    // Add bank details
+    formDataToSend.append('bankName', formData.bankName || '');
+    formDataToSend.append('accountHolderName', formData.accountHolderName || '');
+    formDataToSend.append('accountNumber', formData.accountNumber || '');
+    formDataToSend.append('ifscCode', formData.ifscCode || '');
+    formDataToSend.append('accountType', formData.accountType || '');
+    formDataToSend.append('upiId', formData.upiId || '');
+    formDataToSend.append('paymentApp', formData.paymentApp || '');
 
     try {
-      const formDataToSend = new FormData();
-      for (let key in formData) {
-        if (formData[key] !== null) {
-          formDataToSend.append(key, formData[key]);
-        }
-      }
+        const response = await axios.post(
+            `${import.meta.env.VITE_BASE_URL}api/employees`,
+            formDataToSend,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        const newEmployee = response.data;
+        setEmployees((prevEmployee) => [newEmployee, ...prevEmployee]);
+        // Clear the form
+        setFormData({
+            employeeName: "",
+            employeeCompany: "",
+            employeeImage: null,
+            resume: null,
+            aadhaarCard: null,
+            panCard: null,
+            employeeId: "",
+            joiningDate: "",
+            password: "",
+            emailid: "",
+            phone: "+91 ",
+            department: "",
+            designation: "",
+            description: "",
+            linkedin: "",
+            instagram: "",
+            youtube: "",
+            facebook: "",
+            github: "",
+            website: "",
+            other: "",
+            bankName: "",
+            accountHolderName: "",
+            accountNumber: "",
+            ifscCode: "",
+            accountType: "",
+            upiId: "",
+            qrCode: null,
+            paymentApp: ""
+        });
 
-      // Add bank details
-      formDataToSend.append('bankName', formData.bankName);
-      formDataToSend.append('accountHolderName', formData.accountHolderName);
-      formDataToSend.append('accountNumber', formData.accountNumber);
-      formDataToSend.append('ifscCode', formData.ifscCode);
-      formDataToSend.append('accountType', formData.accountType);
-      formDataToSend.append('upiId', formData.upiId);
-      formDataToSend.append('paymentApp', formData.paymentApp);
+        // Close the modal programmatically
+        const modalElement = document.getElementById("createemp");
+        const modal = window.bootstrap.Modal.getInstance(modalElement);
+        modal.hide();
 
-      if (formData.qrCode) {
-        formDataToSend.append('qrCode', formData.qrCode);
-      }
-
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}api/employees`,
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      const newEmployee = response.data;
-      setEmployees((prevEmployee) => [newEmployee, ...prevEmployee]);
-      // Clear the form
-      setFormData({
-        employeeName: "",
-        employeeCompany: "",
-        employeeImage: null,
-        resume: null,
-        aadhaarCard: null,
-        panCard: null,
-        employeeId: "",
-        joiningDate: "",
-        password: "",
-        emailid: "",
-        phone: "+91 ",
-        department: "",
-        designation: "",
-        description: "",
-        linkedin: "",
-        instagram: "",
-        youtube: "",
-        facebook: "",
-        github: "",
-        website: "",
-        other: "",
-        bankName: "",
-        accountHolderName: "",
-        accountNumber: "",
-        ifscCode: "",
-        accountType: "",
-        upiId: "",
-        qrCode: null,
-        paymentApp: ""
-      });
-
-      // Close the modal programmatically
-      const modalElement = document.getElementById("createemp");
-      const modal = window.bootstrap.Modal.getInstance(modalElement);
-      modal.hide();
-
-      toast.success("Employee Added Successfully!", {
-        style: {
-          backgroundColor: "#4c3575",
-          color: "white",
-        },
-      });
-      // Reload the page after 5 seconds
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000);
-      // Handle successful response
-
+        toast.success("Employee Added Successfully!", {
+            style: {
+                backgroundColor: "#4c3575",
+                color: "white",
+            },
+        });
+        // Reload the page after 5 seconds
+        setTimeout(() => {
+            window.location.reload();
+        }, 5000);
+        // Handle successful response
     } catch (error) {
-      console.error("Error:", error);
-      // Handle error
+        console.error("Error:", error);
+        // Handle error
     }
   };
 

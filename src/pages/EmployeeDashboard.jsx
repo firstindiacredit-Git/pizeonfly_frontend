@@ -194,6 +194,14 @@ const EmployeeDashboard = () => {
       github: "",
       website: "",
       other: ""
+    },
+    bankDetails: {
+      accountNumber: "",
+      ifscCode: "",
+      accountType: "",
+      upiId: "",
+      paymentApp: "",
+      qrCode: null
     }
   });
   const [selectedImage, setSelectedImage] = useState(null);
@@ -245,6 +253,29 @@ const EmployeeDashboard = () => {
 
   // Add new state for local notes
   const [localNotes, setLocalNotes] = useState('');
+
+  // Add this new state for bank details
+  const [bankDetails, setBankDetails] = useState(null);
+
+  // Add this useEffect to fetch bank details
+  useEffect(() => {
+    const fetchBankDetails = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("emp_user"));
+        if (!user || !user.employeeId) return;
+
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}api/employeeBankDetails/${user.employeeId}`
+        );
+
+        setBankDetails(response.data);
+      } catch (error) {
+        console.error('Error fetching bank details:', error);
+      }
+    };
+
+    fetchBankDetails();
+  }, []);
 
   // Create a debounced version of the API call
   const debouncedSaveNotes = useCallback(
@@ -338,7 +369,8 @@ const EmployeeDashboard = () => {
         password: user.password || "",
         phone: user.phone || "",
         description: user.description || "",
-        socialLinks: user.socialLinks || {}
+        socialLinks: user.socialLinks || {},
+        bankDetails: user.bankDetails || {}
       });
       setEmployeeName(user.employeeName);
       setEmail(user.emailid);
@@ -1408,16 +1440,16 @@ const EmployeeDashboard = () => {
                                   height: '100px', // Reduced from 150px
                                   objectFit: 'cover'
                                 }}
-                                onMouseEnter={(e) => {
-                                  e.target.style.transform = 'scale(2.5)'; // Reduced from scale(3)
-                                  e.target.style.zIndex = '100';
-                                  e.target.style.borderRadius = '8px';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.target.style.transform = 'scale(1)';
-                                  e.target.style.zIndex = '1';
-                                  e.target.style.borderRadius = '50%';
-                                }}
+                                // onMouseEnter={(e) => {
+                                //   e.target.style.transform = 'scale(2.5)'; // Reduced from scale(3)
+                                //   e.target.style.zIndex = '100';
+                                //   e.target.style.borderRadius = '8px';
+                                // }}
+                                // onMouseLeave={(e) => {
+                                //   e.target.style.transform = 'scale(1)';
+                                //   e.target.style.zIndex = '1';
+                                //   e.target.style.borderRadius = '50%';
+                                // }}
                                 onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
                               />
                             </div>
@@ -1437,6 +1469,15 @@ const EmployeeDashboard = () => {
                               </p>
                             </div>
                           </div>
+                          <button
+                            className="btn btn-sm btn-outline-primary mt-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#bankDetailsModal"
+                          // onClick={() => setSelectedEmployee(employee)}
+                          >
+                            <i className="bi bi-bank me-2"></i>
+                            View Bank Details
+                          </button>
                         </div>
 
                         {/* Documents and Social Links in a row */}
@@ -1573,69 +1614,76 @@ const EmployeeDashboard = () => {
                                   <i className="bi bi-share me-2 text-secondary"></i>
                                   Social Links
                                 </h6>
-                                <div className="d-flex flex-wrap mt-3 gap-1">
+                                <div className="row d-flex flex-wrap mt-3 gap-1">
                                   {employeeData?.socialLinks?.linkedin && (
-                                    <a href={employeeData.socialLinks.linkedin}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="btn btn-outline-primary btn-sm py-0 px-2">
-                                      <i className="bi bi-linkedin"></i>
-                                      <span className="ms-1 small">LinkedIn</span>
-                                    </a>
+                                    <div className="col-2">
+                                      <a href={employeeData.socialLinks.linkedin}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-outline-primary btn-sm">
+                                        <i className="bi bi-linkedin"></i>
+                                      </a>
+                                    </div>
                                   )}
                                   {employeeData?.socialLinks?.github && (
-                                    <a href={employeeData.socialLinks.github}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="btn btn-outline-dark btn-sm py-0 px-2">
-                                      <i className="bi bi-github"></i>
-                                      <span className="ms-1 small">GitHub</span>
-                                    </a>
+                                    <div className='col-2'>
+                                      <a href={employeeData.socialLinks.github}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-outline-dark btn-sm">
+                                        <i className="bi bi-github"></i>
+                                      </a>
+                                    </div>
                                   )}
                                   {employeeData?.socialLinks?.instagram && (
-                                    <a href={employeeData.socialLinks.instagram}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="btn btn-outline-danger btn-sm py-0 px-2">
-                                      <i className="bi bi-instagram"></i>
-                                      <span className="ms-1 small">Instagram</span>
-                                    </a>
+                                    <div className='col-2'>
+                                      <a href={employeeData.socialLinks.instagram}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-outline-danger btn-sm">
+                                        <i className="bi bi-instagram"></i>
+                                      </a>
+                                    </div>
                                   )}
                                   {employeeData?.socialLinks?.youtube && (
-                                    <a href={employeeData.socialLinks.youtube}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="btn btn-outline-danger btn-sm py-0 px-2">
-                                      <i className="bi bi-youtube"></i>
-                                      <span className="ms-1 small">YouTube</span>
-                                    </a>
+                                    <div className='col-2'>
+                                      <a href={employeeData.socialLinks.youtube}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-outline-danger btn-sm">
+                                        <i className="bi bi-youtube"></i>
+                                      </a>
+                                    </div>
                                   )}
                                   {employeeData?.socialLinks?.facebook && (
-                                    <a href={employeeData.socialLinks.facebook}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="btn btn-outline-primary btn-sm py-0 px-2">
-                                      <i className="bi bi-facebook"></i>
-                                      <span className="ms-1 small">Facebook</span>
-                                    </a>
+                                    <div className='col-2'>
+                                      <a href={employeeData.socialLinks.facebook}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-outline-primary btn-sm">
+                                        <i className="bi bi-facebook"></i>
+                                      </a>
+                                    </div>
                                   )}
                                   {employeeData?.socialLinks?.website && (
-                                    <a href={employeeData.socialLinks.website}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="btn btn-outline-info btn-sm py-0 px-2">
-                                      <i className="bi bi-globe"></i>
-                                      <span className="ms-1 small">Website</span>
-                                    </a>
+                                    <div className='col-2'>
+                                      <a href={employeeData.socialLinks.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-outline-info btn-sm">
+                                        <i className="bi bi-globe"></i>
+                                      </a>
+                                    </div>
                                   )}
                                   {employeeData?.socialLinks?.other && (
-                                    <a href={employeeData.socialLinks.other}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="btn btn-outline-secondary btn-sm py-0 px-2">
-                                      <i className="bi bi-link-45deg"></i>
-                                      <span className="ms-1 small">Other</span>
-                                    </a>
+                                    <div className='col-2'>
+                                      <a href={employeeData.socialLinks.other}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-outline-secondary btn-sm">
+                                        <i className="bi bi-link-45deg"></i>
+                                      </a>
+                                    </div>
                                   )}
                                 </div>
                               </div>
@@ -2225,44 +2273,44 @@ const EmployeeDashboard = () => {
                                                     maxWidth: '80px'
                                                   }}>
                                                     <div className="d-flex align-items-center" style={{ position: 'relative' }}>
-                                                        <textarea
-                                                          data-cell={`${tableIndex}-${rowIndex}-${colIndex}`}
-                                                          value={table.data[rowIndex][colIndex]}
-                                                          onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
-                                                          onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
-                                                          className="cell-input"
+                                                      <textarea
+                                                        data-cell={`${tableIndex}-${rowIndex}-${colIndex}`}
+                                                        value={table.data[rowIndex][colIndex]}
+                                                        onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
+                                                        onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
+                                                        className="cell-input"
+                                                        style={{
+                                                          width: '100%',
+                                                          padding: '1px 2px',
+                                                          border: 'none',
+                                                          background: 'transparent',
+                                                          resize: 'none',
+                                                          overflow: 'hidden',
+                                                          minHeight: '22px',
+                                                          maxHeight: '60px',
+                                                          fontSize: '12px',
+                                                          color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColor) ? '#000' : '#fff'),
+                                                          textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
+                                                        }}
+                                                      />
+                                                      {isValidUrl(table.data[rowIndex][colIndex]) && (
+                                                        <a
+                                                          href={table.data[rowIndex][colIndex]}
+                                                          target="_blank"
+                                                          rel="noopener noreferrer"
+                                                          onClick={(e) => e.stopPropagation()}
                                                           style={{
-                                                            width: '100%',
-                                                            padding: '1px 2px',
-                                                            border: 'none',
-                                                            background: 'transparent',
-                                                            resize: 'none',
-                                                            overflow: 'hidden',
-                                                            minHeight: '22px',
-                                                            maxHeight: '60px',
-                                                            fontSize: '12px',
-                                                            color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColor) ? '#000' : '#fff'),
-                                                            textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
+                                                            position: 'absolute',
+                                                            right: '2px',
+                                                            top: '50%',
+                                                            color: '#0d6efd',
+                                                            fontSize: '12px'
                                                           }}
-                                                        />
-                                                        {isValidUrl(table.data[rowIndex][colIndex]) && (
-                                                          <a
-                                                            href={table.data[rowIndex][colIndex]}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                            style={{
-                                                              position: 'absolute',
-                                                              right: '2px',
-                                                              top: '50%',
-                                                              color: '#0d6efd',
-                                                              fontSize: '12px'
-                                                            }}
-                                                          >
-                                                            <i className="bi bi-box-arrow-up-right"></i>
-                                                          </a>
-                                                        )}
-                                                      </div>
+                                                        >
+                                                          <i className="bi bi-box-arrow-up-right"></i>
+                                                        </a>
+                                                      )}
+                                                    </div>
                                                   </td>
                                                 ))}
                                               </tr>
@@ -2394,6 +2442,218 @@ const EmployeeDashboard = () => {
           </div>
         </div>
       )}
+
+
+      {/* Bank Details Modal */}
+      <div
+        className="modal fade"
+        id="bankDetailsModal"
+        tabIndex={-1}
+        aria-hidden="true"
+        style={{ zIndex: 9998 }}
+      >
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title fw-bold">
+                {employeeName}'s Bank Details
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              />
+            </div>
+            <div className="modal-body">
+
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100">
+                    <i className="bi bi-bank fs-4 text-primary me-2"></i>
+                    <div className="flex-grow-1">
+                      <div className="fw-bold">Bank Name</div>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">{employeeData.bankDetails?.bankName || 'Not provided'}</span>
+                        {employeeData.bankDetails?.bankName && (
+                          <i
+                            className="bi bi-clipboard cursor-pointer"
+                            onClick={() => {
+                              navigator.clipboard.writeText(employeeData.bankDetails?.bankName || '');
+                            }}
+                            title="Copy Bank Name"
+                          ></i>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100">
+                    <i className="bi bi-person fs-4 text-success me-2"></i>
+                    <div className="flex-grow-1">
+                      <div className="fw-bold">Account Holder</div>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">{employeeData.bankDetails?.accountHolderName || 'Not provided'}</span>
+                        {employeeData.bankDetails?.accountHolderName && (
+                          <i
+                            className="bi bi-clipboard cursor-pointer"
+                            onClick={() => {
+                              navigator.clipboard.writeText(employeeData.bankDetails?.accountHolderName || '');
+                            }}
+                            title="Copy Account Holder Name"
+                          ></i>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100">
+                    <i className="bi bi-credit-card fs-4 text-info me-2"></i>
+                    <div className="flex-grow-1">
+                      <div className="fw-bold">Account Number</div>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">{employeeData.bankDetails?.accountNumber || 'Not provided'}</span>
+                        {employeeData.bankDetails?.accountNumber && (
+                          <i
+                            className="bi bi-clipboard cursor-pointer"
+                            onClick={() => {
+                              navigator.clipboard.writeText(employeeData.bankDetails?.accountNumber || '');
+                              // toast.success('Account Number copied!');
+                            }}
+                            title="Copy Account Number"
+                          ></i>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100">
+                    <i className="bi bi-building fs-4 text-warning me-2"></i>
+                    <div className="flex-grow-1">
+                      <div className="fw-bold">IFSC Code</div>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">{employeeData.bankDetails?.ifscCode || 'Not provided'}</span>
+                        {employeeData.bankDetails?.ifscCode && (
+                          <i
+                            className="bi bi-clipboard cursor-pointer"
+                            onClick={() => {
+                              navigator.clipboard.writeText(employeeData.bankDetails?.ifscCode || '');
+                              // toast.success('IFSC Code copied!');
+                            }}
+                            title="Copy IFSC Code"
+                          ></i>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100">
+                    <i className="bi bi-wallet2 fs-4 text-danger me-2"></i>
+                    <div className="flex-grow-1">
+                      <div className="fw-bold">Account Type</div>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">{employeeData.bankDetails?.accountType || 'Not provided'}</span>
+                        {employeeData.bankDetails?.accountType && (
+                          <i
+                            className="bi bi-clipboard cursor-pointer"
+                            onClick={() => {
+                              navigator.clipboard.writeText(employeeData.bankDetails?.accountType || '');
+                              // toast.success('Account Type copied!');
+                            }}
+                            title="Copy Account Type"
+                          ></i>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100">
+                    <i className="bi bi-phone fs-4 text-success me-2"></i>
+                    <div className="flex-grow-1">
+                      <div className="fw-bold">UPI ID</div>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">{employeeData.bankDetails?.upiId || 'Not provided'}</span>
+                        {employeeData.bankDetails?.upiId && (
+                          <i
+                            className="bi bi-clipboard cursor-pointer"
+                            onClick={() => {
+                              navigator.clipboard.writeText(employeeData.bankDetails?.upiId || '');
+                              // toast.success('UPI ID copied!');
+                            }}
+                            title="Copy UPI ID"
+                          ></i>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100">
+                    <i className="bi bi-app fs-4 text-primary me-2"></i>
+                    <div className="flex-grow-1">
+                      <div className="fw-bold">Payment App</div>
+                      <div className="d-flex align-items-center">
+                        <span className="me-2">{employeeData.bankDetails?.paymentApp || 'Not provided'}</span>
+                        {employeeData.bankDetails?.paymentApp && (
+                          <i
+                            className="bi bi-clipboard cursor-pointer"
+                            onClick={() => {
+                              navigator.clipboard.writeText(employeeData.bankDetails?.paymentApp || '');
+                              // toast.success('Payment App copied!');
+                            }}
+                            title="Copy Payment App"
+                          ></i>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100">
+                    <i className="bi bi-qr-code fs-4 text-dark me-2"></i>
+                    <div>
+                      <div className="fw-bold">QR Code</div>
+                      <div className="d-flex align-items-center gap-2 mt-2">
+                        <img
+                          src={`${import.meta.env.VITE_BASE_URL}${employeeData.bankDetails.qrCode}`}
+                          alt="QR Code"
+                          style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
+                          onClick={(e) => handleFileClick(
+                            e,
+                            `${import.meta.env.VITE_BASE_URL}${employeeData.bankDetails.qrCode}`,
+                            'image'
+                          )}
+                        />
+                        <i
+                          className="bi bi-download fs-4 text-primary"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => handleDownload(
+                            `${import.meta.env.VITE_BASE_URL}${employeeData.bankDetails.qrCode}`,
+                            `qr_code${bankDetails.qrCode.substring(bankDetails.qrCode.lastIndexOf('.'))}`
+                          )}
+                          title="Download QR Code"
+                        ></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Add this CSS to hide scrollbars globally for these elements */}
       <style>
