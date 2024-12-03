@@ -425,7 +425,7 @@ const ProjectDashboard = () => {
   const colorOptions = {
     standard: [
       // Row 1
-      '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF', '#fdf8c8',
+      '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF',
       // Row 2 
       '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
       // Row 3
@@ -433,13 +433,43 @@ const ProjectDashboard = () => {
       // Row 4
       '#DC143C', '#FF4500', '#FFA500', '#FFD700', '#32CD32', '#20B2AA', '#4169E1', '#8A2BE2', '#9370DB', '#FF69B4',
       // Row 5
-      '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585'
+      '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585', '#fdf8c8'
     ],
-    custom: ['#FFFFFF', '#000000']
+    custom: []
   };
 
   // Add CustomColorPicker component
   const CustomColorPicker = ({ color, onChange, onClose }) => {
+    const [hexInput, setHexInput] = useState('');
+
+    const handleHexInput = (e) => {
+      const value = e.target.value;
+      setHexInput(value);
+
+      // Validate and apply hex color when it's a valid 6-digit hex
+      if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+        onChange(value);
+        setHexInput('');
+        onClose();
+      }
+    };
+
+    const handleHexKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        let value = hexInput;
+        // Add # if missing
+        if (value.charAt(0) !== '#') {
+          value = '#' + value;
+        }
+        // Validate hex color
+        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+          onChange(value);
+          setHexInput('');
+          onClose();
+        }
+      }
+    };
+
     return (
       <div className="custom-color-picker mt-2" style={{
         position: 'absolute',
@@ -486,7 +516,7 @@ const ProjectDashboard = () => {
         </div>
 
         <div>
-          <strong>CUSTOM</strong>
+          <strong>ADD CUSTOM</strong>
           <div style={{ display: 'flex', gap: '4px' }}>
             {colorOptions.custom.map((c, i) => (
               <div
@@ -506,8 +536,17 @@ const ProjectDashboard = () => {
               type="color"
               value={color}
               onChange={(e) => onChange(e.target.value)}
-              style={{ width: '20px', height: '20px', padding: 0, borderRadius: '9px', border: 'none' }}
+              style={{ width: '8rem' }}
               title='Custom Color'
+            />
+            <input 
+              type="text" 
+              placeholder="Add Hex Color" 
+              value={hexInput}
+              onChange={handleHexInput}
+              onKeyDown={handleHexKeyDown}
+              style={{ width: '100px' }}
+              title='Enter hex color (e.g., #FF0000)'
             />
           </div>
         </div>

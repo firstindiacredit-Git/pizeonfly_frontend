@@ -202,7 +202,7 @@ const Sidebar = () => {
                   data-bs-target="#accounts-Components"
                   href="#"
                 >
-                  <i className="icofont-document-folder" /> <span>Accounts</span>{" "}
+                  <i className="icofont-document-folder" /> <span>Accounts & Billing</span>{" "}
                   <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
                 </a>
                 <ul className="sub-menu collapse" id="accounts-Components">
