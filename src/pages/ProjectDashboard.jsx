@@ -47,6 +47,7 @@ const ProjectDashboard = () => {
   const [deleteAction, setDeleteAction] = useState({ type: '', index: null });
 
   const notePadRef = useRef(null);
+  const colorPickerRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -202,6 +203,30 @@ const ProjectDashboard = () => {
     };
 
     fetchExcelSheet();
+  }, []);
+
+  useEffect(() => {
+    const fetchColors = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const email = userData.email;
+
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/adminColors/${email}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        setNotepadColor(data.notepadColor || '#fff3cd');
+        setTodoColor(data.todoColor || '#cfe2ff');
+        setExcelSheetColor(data.excelSheetColor || '#d4edda');
+      } catch (error) {
+        console.error("Error fetching colors:", error);
+        toast.error("Failed to fetch colors");
+      }
+    };
+
+    fetchColors();
   }, []);
 
   const handleNotesChange = async (e) => {
@@ -421,32 +446,25 @@ const ProjectDashboard = () => {
     }
   };
 
-  // Add color options
   const colorOptions = {
     standard: [
-      // Row 1
       '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF',
-      // Row 2 
       '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
-      // Row 3
       '#FFB6C1', '#FFA07A', '#FFE4B5', '#FFFACD', '#98FB98', '#AFEEEE', '#87CEEB', '#E6E6FA', '#DDA0DD', '#FFC0CB',
-      // Row 4
       '#DC143C', '#FF4500', '#FFA500', '#FFD700', '#32CD32', '#20B2AA', '#4169E1', '#8A2BE2', '#9370DB', '#FF69B4',
-      // Row 5
-      '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585', '#fdf8c8'
+      '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585', '#fffacd'
     ],
     custom: []
   };
 
-  // Add CustomColorPicker component
   const CustomColorPicker = ({ color, onChange, onClose }) => {
     const [hexInput, setHexInput] = useState('');
+    const pickerRef = useRef(null);
 
     const handleHexInput = (e) => {
       const value = e.target.value;
       setHexInput(value);
 
-      // Validate and apply hex color when it's a valid 6-digit hex
       if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
         onChange(value);
         setHexInput('');
@@ -457,11 +475,9 @@ const ProjectDashboard = () => {
     const handleHexKeyDown = (e) => {
       if (e.key === 'Enter') {
         let value = hexInput;
-        // Add # if missing
         if (value.charAt(0) !== '#') {
           value = '#' + value;
         }
-        // Validate hex color
         if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
           onChange(value);
           setHexInput('');
@@ -470,8 +486,21 @@ const ProjectDashboard = () => {
       }
     };
 
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (pickerRef.current && !pickerRef.current.contains(event.target)) {
+          onClose();
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [onClose]);
+
     return (
-      <div className="custom-color-picker mt-2" style={{
+      <div ref={pickerRef} className="custom-color-picker mt-2" style={{
         position: 'absolute',
         zIndex: 1000,
         backgroundColor: 'white',
@@ -500,6 +529,7 @@ const ProjectDashboard = () => {
                   borderRadius: '9px',
                   position: 'relative'
                 }}
+                title={c}
               >
                 {color === c && (
                   <span style={{
@@ -530,6 +560,7 @@ const ProjectDashboard = () => {
                   cursor: 'pointer',
                   borderRadius: '9px'
                 }}
+                title={c}
               />
             ))}
             <input
@@ -539,9 +570,9 @@ const ProjectDashboard = () => {
               style={{ width: '8rem' }}
               title='Custom Color'
             />
-            <input 
-              type="text" 
-              placeholder="Add Hex Color" 
+            <input
+              type="text"
+              placeholder="Add Hex Color"
               value={hexInput}
               onChange={handleHexInput}
               onKeyDown={handleHexKeyDown}
@@ -554,7 +585,6 @@ const ProjectDashboard = () => {
     );
   };
 
-  // Add color update function
   const updateColors = async (type, color) => {
     try {
       const userData = JSON.parse(localStorage.getItem('user'));
@@ -564,6 +594,8 @@ const ProjectDashboard = () => {
         setNotepadColor(color);
       } else if (type === 'todo') {
         setTodoColor(color);
+      } else if (type === 'excel') {
+        setExcelSheetColor(color);
       }
 
       await fetch(`${import.meta.env.VITE_BASE_URL}api/adminColors/${email}`, {
@@ -573,7 +605,8 @@ const ProjectDashboard = () => {
         },
         body: JSON.stringify({
           notepadColor: type === 'notepad' ? color : notepadColor,
-          todoColor: type === 'todo' ? color : todoColor
+          todoColor: type === 'todo' ? color : todoColor,
+          excelSheetColor: type === 'excel' ? color : excelSheetColor
         }),
       });
     } catch (error) {
