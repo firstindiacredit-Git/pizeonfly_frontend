@@ -218,7 +218,7 @@ const ProjectDashboard = () => {
         const data = await response.json();
 
         setNotepadColor(data.notepadColor || '#fff3cd');
-        setTodoColor(data.todoColor || '#cfe2ff');
+        setTodoColor(data.todoColor || '#fff3cd');
         setExcelSheetColor(data.excelSheetColor || '#d4edda');
       } catch (error) {
         console.error("Error fetching colors:", error);
@@ -920,7 +920,33 @@ const ProjectDashboard = () => {
   };
 
   const handleCellKeyDown = (e, tableIndex, rowIndex, colIndex) => {
-    // Handle key down events if needed
+    if (e.key === 'Enter' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      // Move to next row
+      if (rowIndex < tables[tableIndex].rows - 1) {
+        const nextCell = document.querySelector(`[data-cell="${tableIndex}-${rowIndex + 1}-${colIndex}"]`);
+        nextCell?.focus();
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      // Move to previous row
+      if (rowIndex > 0) {
+        const prevCell = document.querySelector(`[data-cell="${tableIndex}-${rowIndex - 1}-${colIndex}"]`);
+        prevCell?.focus();
+      }
+    } else if (e.key === 'ArrowRight') {
+      // Move to next column
+      if (colIndex < tables[tableIndex].cols - 1) {
+        const nextCell = document.querySelector(`[data-cell="${tableIndex}-${rowIndex}-${colIndex + 1}"]`);
+        nextCell?.focus();
+      }
+    } else if (e.key === 'ArrowLeft') {
+      // Move to previous column
+      if (colIndex > 0) {
+        const prevCell = document.querySelector(`[data-cell="${tableIndex}-${rowIndex}-${colIndex - 1}"]`);
+        prevCell?.focus();
+      }
+    }
   };
 
   const getColumnLabel = (colIndex) => {
@@ -1428,11 +1454,11 @@ const ProjectDashboard = () => {
                 {/* Excel Sheet */}
                 <div className="card shadow-lg mb-5" style={{ backgroundColor: excelSheetColor }}>
                   <div className="card-body">
-                    <div className="d-flex justify-content-between align-items-center mb-3">
+                    {/* <div className="d-flex justify-content-between align-items-center mb-3">
                       <h5 className="card-title text-center flex-grow-1" style={{ color: isLightColor(excelSheetColor) ? '#000' : '#fff' }}>
                         Excel Sheet
                       </h5>
-                    </div>
+                    </div> */}
                     {loading.excelSheet ? (
                       <div className="text-center">
                         <div className="spinner-border text-primary" role="status">
@@ -1454,7 +1480,7 @@ const ProjectDashboard = () => {
                         ) : (
                           <>
                             {tables.map((table, tableIndex) => (
-                              <div key={table.id} className="mt-3">
+                              <div key={table.id} className="">
                                 <div className="d-flex justify-content-center align-items-center mb-3">
                                   <input
                                     type="text"
@@ -1525,6 +1551,7 @@ const ProjectDashboard = () => {
                                                   onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
                                                   onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
                                                   className="cell-input"
+                                                  tabIndex={0}
                                                   style={{
                                                     width: '100%',
                                                     padding: '1px 2px',
@@ -1656,6 +1683,7 @@ const ProjectDashboard = () => {
                     GO TO THE WEBSITE
                   </Link>
                 </div>
+                
               </div>
             </div>
           </div>

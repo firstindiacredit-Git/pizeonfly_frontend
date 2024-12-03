@@ -152,7 +152,7 @@ const MemberDashboard = () => {
     const colorOptions = {
         standard: [
             // Row 1
-            '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF','#fdf8c8',
+            '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF', '#fdf8c8',
             // Row 2 
             '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
             // Row 3
@@ -1388,6 +1388,43 @@ const MemberDashboard = () => {
         }
     };
 
+    // Add these state variables at the top with other states
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteAction, setDeleteAction] = useState({ type: '', payload: null });
+
+    // Add these handler functions before the return statement
+    const handleShowDeleteModal = (type, payload = null) => {
+        setDeleteAction({ type, payload });
+        setShowDeleteModal(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+            switch (deleteAction.type) {
+                case 'notepad':
+                    await clearNotePad();
+                    break;
+                case 'todo':
+                    if (deleteAction.payload === 'all') {
+                        await clearAllTodos();
+                    } else {
+                        await deleteTodo(deleteAction.payload);
+                    }
+                    break;
+                case 'excel-table':
+                    await deleteTable(deleteAction.payload);
+                    break;
+                case 'excel-clear':
+                    await clearTableData(deleteAction.payload);
+                    break;
+                default:
+                    break;
+            }
+        } catch (error) {
+            console.error('Error handling delete:', error);
+        }
+        setShowDeleteModal(false);
+    };
 
     return (
         <>
@@ -2109,7 +2146,7 @@ const MemberDashboard = () => {
                                                             <div className="d-flex gap-2">
                                                                 <button
                                                                     className="btn btn-warning btn-sm"
-                                                                    onClick={clearNotePad}
+                                                                    onClick={() => handleShowDeleteModal('notepad')}
                                                                     title="Clear notepad"
                                                                 >
                                                                     <i className="bi bi-eraser-fill"></i>
@@ -2249,7 +2286,7 @@ const MemberDashboard = () => {
                                                                                                                     style={{ height: '10px', width: '10px' }}
                                                                                                                 />
                                                                                                                 <IconButton
-                                                                                                                    onClick={() => deleteTodo(index)}
+                                                                                                                    onClick={() => handleShowDeleteModal('todo', index)}
                                                                                                                     size="small"
                                                                                                                     style={{ marginLeft: '8px' }}
                                                                                                                 >
@@ -2297,8 +2334,8 @@ const MemberDashboard = () => {
                                                             <div>
                                                                 {todos.length > 0 && (
                                                                     <button
-                                                                        className="btn btn-warning btn-sm "
-                                                                        onClick={clearAllTodos}
+                                                                        className="btn btn-warning btn-sm"
+                                                                        onClick={() => handleShowDeleteModal('todo', 'all')}
                                                                     >
                                                                         <i className="bi bi-eraser-fill" title='Clear all'></i>
                                                                     </button>
@@ -2312,11 +2349,11 @@ const MemberDashboard = () => {
                                             {/* Excel Sheet */}
                                             <div className="card shadow-lg mb-5" style={{ backgroundColor: excelSheetColor }}>
                                                 <div className="card-body" >
-                                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                                    {/* <div className="d-flex justify-content-between align-items-center mb-3">
                                                         <h5 className="card-title text-center flex-grow-1" style={{ color: isLightColor(excelSheetColor) ? '#000' : '#fff' }}>
                                                             Excel Sheet
                                                         </h5>
-                                                    </div>
+                                                    </div> */}
                                                     {loading.excelSheet ? (
                                                         <div className="text-center">
                                                             <div className="spinner-border text-primary" role="status">
@@ -2342,7 +2379,7 @@ const MemberDashboard = () => {
                                                             ) : (
                                                                 <>
                                                                     {tables.map((table, tableIndex) => (
-                                                                        <div key={table.id} className="mt-3">
+                                                                        <div key={table.id} className="">
                                                                             <div className="d-flex justify-content-center align-items-center mb-3">
                                                                                 <input
                                                                                     type="text"
@@ -2375,7 +2412,7 @@ const MemberDashboard = () => {
                                                                                                     {getColumnLabel(colIndex)}
                                                                                                     <button
                                                                                                         className="btn text-danger btn-sm ms-1"
-                                                                                                        onClick={() => deleteColumn(tableIndex, colIndex)}
+                                                                                                        onClick={() => handleShowDeleteModal('excel-table', tableIndex)}
                                                                                                         style={{ padding: '0px 2px', fontSize: '10px' }}
                                                                                                     >
                                                                                                         ×
@@ -2395,7 +2432,7 @@ const MemberDashboard = () => {
                                                                                                     {rowIndex + 1}
                                                                                                     <button
                                                                                                         className="btn text-danger btn-sm ms-1"
-                                                                                                        onClick={() => deleteRow(tableIndex, rowIndex)}
+                                                                                                        onClick={() => handleShowDeleteModal('excel-table', tableIndex)}
                                                                                                         style={{ padding: '0px 2px', fontSize: '10px' }}
                                                                                                     >
                                                                                                         ×
@@ -2475,16 +2512,16 @@ const MemberDashboard = () => {
 
                                                                                 <button
                                                                                     className="btn btn-warning me-2"
-                                                                                    onClick={() => clearTableData(tableIndex)}
+                                                                                    onClick={() => handleShowDeleteModal('excel-clear', tableIndex)}
                                                                                     title='Clear All Table Value'
                                                                                 >
-                                                                                    <i className="icofont-eraser  me-1" />
+                                                                                    <i className="icofont-eraser me-1" />
                                                                                     <span className="">Table</span>
                                                                                 </button>
                                                                                 {tables.length > 1 && (
                                                                                     <button
                                                                                         className="btn btn-danger me-2"
-                                                                                        onClick={() => deleteTable(tableIndex)}
+                                                                                        onClick={() => handleShowDeleteModal('excel-table', tableIndex)}
                                                                                     >
                                                                                         <i className="icofont-trash me-1 text-white" />
                                                                                         <span className="text-white">Table</span>
@@ -2832,6 +2869,67 @@ const MemberDashboard = () => {
                     }
                 `}
             </style>
+
+            {/* Delete Confirmation Modal */}
+            <div
+                className={`modal fade ${showDeleteModal ? 'show' : ''}`}
+                id="deleteConfirmationModal"
+                tabIndex={-1}
+                aria-hidden="true"
+                style={{ display: showDeleteModal ? 'block' : 'none' }}
+            >
+                <div className="modal-dialog modal-dialog-centered modal-md modal-dialog-scrollable">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title fw-bold">
+                                Delete Confirmation
+                            </h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={() => setShowDeleteModal(false)}
+                            />
+                        </div>
+                        <div className="modal-body justify-content-center flex-column d-flex">
+                            <i className="icofont-ui-delete text-danger display-2 text-center mt-2" />
+                            <p className="mt-4 fs-5 text-center">
+                                {deleteAction.type === 'notepad' && 'Are you sure you want to clear the notepad?'}
+                                {deleteAction.type === 'todo' && deleteAction.payload === 'all'
+                                    ? 'Are you sure you want to clear all todos?'
+                                    : deleteAction.type === 'todo'
+                                        ? 'Are you sure you want to delete this todo item?'
+                                        : ''}
+                                {deleteAction.type === 'excel-table' && 'Are you sure you want to delete this table?'}
+                                {deleteAction.type === 'excel-clear' && 'Are you sure you want to clear all data from this table?'}
+                            </p>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setShowDeleteModal(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-danger color-fff"
+                                onClick={handleConfirmDelete}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Modal backdrop */}
+            {showDeleteModal && (
+                <div
+                    className="modal-backdrop fade show"
+                    onClick={() => setShowDeleteModal(false)}
+                ></div>
+            )}
         </>
     )
 }
