@@ -671,15 +671,15 @@ const Project = () => {
         <div className="d-flex justify-content-between mt-2 small">
           <div>
             <span className="text-success fw-bold">Completed:{completed} </span>
-            <span className="d-flex justify-content-center"> ({completedPercent}%)</span>
+            {/* <span className="d-flex justify-content-center"> ({completedPercent}%)</span> */}
           </div>
           <div>
             <span className="text-primary fw-bold">In Progress: {inProgress}</span>
-            <span className="d-flex justify-content-center"> ({inProgressPercent}%)</span>
+            {/* <span className="d-flex justify-content-center"> ({inProgressPercent}%)</span> */}
           </div>
           <div>
             <span className="text-danger fw-bold">Not Started: {notStarted}</span>
-            <span className="d-flex justify-content-center"> ({notStartedPercent}%)</span>
+            {/* <span className="d-flex justify-content-center"> ({notStartedPercent}%)</span> */}
           </div>
         </div>
       </div>
@@ -698,11 +698,11 @@ const Project = () => {
     const notStartedPercent = total ? ((notStarted / total) * 100).toFixed(1) : 0;
 
     return (
-      <div className="employee-progress mb-3">
-        <div className="d-flex justify-content-between align-items-center mb-2">
+      <div className="employee-progress">
+        {/* <div className="d-flex justify-content-between align-items-center mb-2">
           <span className="fw-bold">{employee.employeeName}</span>
           <span className="small text-muted">{total} Tasks</span>
-        </div>
+        </div> */}
         <div className="progress" style={{ height: "15px" }}>
           {completed > 0 && (
             <div
@@ -715,7 +715,7 @@ const Project = () => {
           )}
           {inProgress > 0 && (
             <div
-              className="progress-bar bg-warning"
+              className="progress-bar bg-primary"
               style={{ width: `${inProgressPercent}%` }}
               title={`In Progress: ${inProgress} (${inProgressPercent}%)`}
             >
@@ -732,11 +732,11 @@ const Project = () => {
             </div>
           )}
         </div>
-        <div className="d-flex justify-content-between mt-1 small">
+        {/* <div className="d-flex justify-content-between mt-1 small">
           <span className="text-success">Done: {completed} ({completedPercent}%)</span>
-          <span className="text-warning">In Progress: {inProgress} ({inProgressPercent}%)</span>
+          <span className="text-primary">In Progress: {inProgress} ({inProgressPercent}%)</span>
           <span className="text-secondary">Not Started: {notStarted} ({notStartedPercent}%)</span>
-        </div>
+        </div> */}
       </div>
     );
   };
@@ -1238,12 +1238,13 @@ const Project = () => {
                                   className="card mt-4 task-card"
                                   style={{
                                     backgroundColor: project.backgroundColor || '#ffffff',
-                                    color: project.backgroundColor ? getContrastColor(project.backgroundColor) : 'inherit'
+                                    color: project.backgroundColor ? getContrastColor(project.backgroundColor) : 'inherit',
+                                    height: '450px' // Fixed height for the card
                                   }}
                                 >
-                                  <div className="card-body">
+                                  <div className="card-body d-flex flex-column">
                                     <div className="d-flex justify-content-between">
-                                      <span className="fw-bold fs-5" >{index + 1}. </span>
+                                      <span className="fw-bold fs-5">{index + 1}. </span>
 
                                       <div className="d-flex">
                                         {project.projectIcon && (
@@ -1281,7 +1282,8 @@ const Project = () => {
                                         </button>
                                       )}
                                     </div>
-                                    <p className="card-text">
+
+                                    <div className="">
                                       <div className="d-flex justify-content-between">
                                         <span className="text-muted fw-bold">Start: {getFormattedDate(project.projectStartDate)}</span>
                                         <span className="text-muted fw-bold">End: {getFormattedDate(project.projectEndDate)}</span>
@@ -1289,20 +1291,33 @@ const Project = () => {
 
                                       <div className="mt-1">
                                         <strong>Members:</strong>
-                                        <div className="ms-2">
+                                        <div
+                                          className="ms-2 members-list"
+                                          style={{
+                                            height: '110px',
+                                            overflowY: 'auto',
+                                            scrollbarWidth: 'none',  // Hide scrollbar in Firefox
+                                            msOverflowStyle: 'none',  // Hide scrollbar in IE/Edge
+                                            '&::-webkit-scrollbar': {  // Hide scrollbar in Chrome/Safari
+                                              display: 'none'
+                                            }
+                                          }}
+                                        >
                                           {project.taskAssignPerson.map((member, idx) => (
-                                            <div key={idx} className="mb-2">
-                                              <div className="d-flex align-items-center">
-                                                <span className="me-1 fw-bold">
-                                                  <i className="bi bi-dot" />
+                                            <div key={idx} className="mb-2 text-dark">
+                                              <div className="d-flex gap-2" style={{ width: '20rem' }}>
+                                                <span className="">
+                                                  <i className=" bi bi-dot" />
+                                                  {member.employeeName}
                                                 </span>
-                                                <span className="fw-bold">{member.employeeName}</span>
+                                                <span className="" style={{ width: '13rem' }}>
+                                                  {project.memberStats?.find(stat => stat._id === member._id) && (
+                                                    <EmployeeTaskProgress
+                                                      employee={project.memberStats.find(stat => stat._id === member._id)}
+                                                    />
+                                                  )}
+                                                </span>
                                               </div>
-                                              {project.memberStats?.find(stat => stat._id === member._id) && (
-                                                <EmployeeTaskProgress 
-                                                  employee={project.memberStats.find(stat => stat._id === member._id)} 
-                                                />
-                                              )}
                                             </div>
                                           ))}
                                         </div>
@@ -1310,46 +1325,60 @@ const Project = () => {
 
                                       <div className="mt-1">
                                         <strong>Clients:</strong>
-                                        <div className="ms-2">
+                                        <div
+                                          className=" clients-list"
+                                          style={{
+                                            height: '50px',
+                                            overflowY: 'auto',
+                                            scrollbarWidth: 'none',  // Hide scrollbar in Firefox
+                                            msOverflowStyle: 'none',  // Hide scrollbar in IE/Edge
+                                            '&::-webkit-scrollbar': {  // Hide scrollbar in Chrome/Safari
+                                              display: 'none'
+                                            }
+                                          }}
+                                        >
                                           {project.clientAssignPerson?.map((client, idx) => (
-                                            <div key={idx}>
+                                            <div key={idx} className="fw-bold text-primary">
                                               <span className="me-1 fw-bold"><i className="bi bi-dot"></i></span> {client.clientName}
                                             </div>
                                           ))}
                                         </div>
                                       </div>
-                                    </p>
-                                    <ProjectProgressBar project={project} />
-                                    <div className="d-flex justify-content-between">
-                                      <button
-                                        onClick={() => setToEdit(project._id)}
-                                        className="btn icofont-edit text-success"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editproject"
-                                      >
-                                        Edit
-                                      </button>
-                                      <button
-                                        className="btn icofont-ui-delete text-danger"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteproject"
-                                        onClick={() => setDeletableId(project._id)}
-                                      >
-                                        Delete
-                                      </button>
-                                      <button
-                                        className="btn bi bi-chat-left-dots text-primary position-relative"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#addUser"
-                                        onClick={() => handleOpenMessages(project)}
-                                      >
-                                        Message
-                                        {notifications[project._id] > 0 && (
-                                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                            {notifications[project._id]}
-                                          </span>
-                                        )}
-                                      </button>
+                                    </div>
+
+                                    <div className="mt-2">
+                                      <ProjectProgressBar project={project} />
+                                      <div className="d-flex justify-content-between">
+                                        <button
+                                          onClick={() => setToEdit(project._id)}
+                                          className="btn icofont-edit text-success"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#editproject"
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          className="btn icofont-ui-delete text-danger"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#deleteproject"
+                                          onClick={() => setDeletableId(project._id)}
+                                        >
+                                          Delete
+                                        </button>
+                                        <button
+                                          className="btn bi bi-chat-left-dots text-primary position-relative"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#addUser"
+                                          onClick={() => handleOpenMessages(project)}
+                                        >
+                                          Message
+                                          {notifications[project._id] > 0 && (
+                                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                              {notifications[project._id]}
+                                            </span>
+                                          )}
+                                        </button>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>

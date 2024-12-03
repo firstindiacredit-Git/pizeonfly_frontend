@@ -44,6 +44,7 @@ const ProjectDashboard = () => {
   const [excelSheetId, setExcelSheetId] = useState(null);
   const [excelSheetColor, setExcelSheetColor] = useState('#d4edda');
   const [showExcelPicker, setShowExcelPicker] = useState(false);
+  const [deleteAction, setDeleteAction] = useState({ type: '', index: null });
 
   const notePadRef = useRef(null);
 
@@ -357,10 +358,8 @@ const ProjectDashboard = () => {
   };
 
   const clearNotePad = () => {
-    if (window.confirm('Are you sure you want to clear the notepad?')) {
-      setNotes('');
-      handleNotesChange({ target: { value: '' } });
-    }
+    setDeleteAction({ type: 'notepad' });
+    $('#deleteproject').modal('show');
   };
 
   const downloadNotePad = () => {
@@ -602,25 +601,9 @@ const ProjectDashboard = () => {
     setTodos(items);
   };
 
-  const clearAllTodos = async () => {
-    if (window.confirm('Are you sure you want to clear all todos?')) {
-      setTodos([]);
-      try {
-        const userData = JSON.parse(localStorage.getItem('user'));
-        const email = userData.email;
-
-        await fetch(`${import.meta.env.VITE_BASE_URL}api/adminTodoList/${todoId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ todos: [], email }),
-        });
-      } catch (error) {
-        console.error("Error clearing todos:", error);
-        toast.error("Failed to clear todos");
-      }
-    }
+  const clearAllTodos = () => {
+    setDeleteAction({ type: 'todos' });
+    $('#deleteproject').modal('show');
   };
 
   const addTodo = async (e) => {
@@ -670,27 +653,9 @@ const ProjectDashboard = () => {
     }
   };
 
-  const deleteTodo = async (index) => {
-    if (window.confirm('Are you sure you want to delete this todo?')) {
-      const updatedTodos = todos.filter((_, i) => i !== index);
-      setTodos(updatedTodos);
-
-      try {
-        const userData = JSON.parse(localStorage.getItem('user'));
-        const email = userData.email;
-
-        await fetch(`${import.meta.env.VITE_BASE_URL}api/adminTodoList/${todoId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ todos: updatedTodos, email }),
-        });
-      } catch (error) {
-        console.error("Error deleting todo:", error);
-        toast.error("Failed to delete todo");
-      }
-    }
+  const deleteTodo = (index) => {
+    setDeleteAction({ type: 'todo', index });
+    $('#deleteproject').modal('show');
   };
 
   const toggleTodo = async (index) => {
@@ -817,57 +782,14 @@ const ProjectDashboard = () => {
     }
   };
 
-  const clearTableData = async (tableIndex) => {
-    if (window.confirm('Are you sure you want to clear this table?')) {
-      try {
-        const newTables = [...tables];
-        const rows = newTables[tableIndex].rows;
-        const cols = newTables[tableIndex].cols;
-        newTables[tableIndex].data = Array(rows).fill().map(() => Array(cols).fill(''));
-        setTables(newTables);
-
-        const userData = JSON.parse(localStorage.getItem('user'));
-        const email = userData.email;
-
-        if (excelSheetId) {
-          await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ tables: newTables, email }),
-          });
-        }
-      } catch (error) {
-        console.error("Error clearing table:", error);
-        toast.error("Failed to clear table");
-      }
-    }
+  const clearTableData = (tableIndex) => {
+    setDeleteAction({ type: 'table', index: tableIndex });
+    $('#deleteproject').modal('show');
   };
 
-  const deleteTable = async (tableIndex) => {
-    if (window.confirm('Are you sure you want to delete this table?')) {
-      try {
-        const newTables = tables.filter((_, index) => index !== tableIndex);
-        setTables(newTables);
-
-        const userData = JSON.parse(localStorage.getItem('user'));
-        const email = userData.email;
-
-        if (excelSheetId) {
-          await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ tables: newTables, email }),
-          });
-        }
-      } catch (error) {
-        console.error("Error deleting table:", error);
-        toast.error("Failed to delete table");
-      }
-    }
+  const deleteTable = (tableIndex) => {
+    setDeleteAction({ type: 'deleteTable', index: tableIndex });
+    $('#deleteproject').modal('show');
   };
 
   const downloadExcelSheet = (tableIndex) => {
@@ -931,6 +853,64 @@ const ProjectDashboard = () => {
 
   const getColumnLabel = (colIndex) => {
     return String.fromCharCode(65 + colIndex);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      switch (deleteAction.type) {
+        case 'notepad':
+          setNotes('');
+          handleNotesChange({ target: { value: '' } });
+          break;
+
+        case 'todos':
+          setTodos([]);
+          await fetch(`${import.meta.env.VITE_BASE_URL}api/adminTodoList/${todoId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ todos: [], email }),
+          });
+          break;
+
+        case 'todo':
+          const updatedTodos = todos.filter((_, i) => i !== deleteAction.index);
+          setTodos(updatedTodos);
+          await fetch(`${import.meta.env.VITE_BASE_URL}api/adminTodoList/${todoId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ todos: updatedTodos, email }),
+          });
+          break;
+
+        case 'table':
+          const newTables = [...tables];
+          newTables[deleteAction.index].data = Array(newTables[deleteAction.index].rows)
+            .fill()
+            .map(() => Array(newTables[deleteAction.index].cols).fill(''));
+          setTables(newTables);
+          break;
+
+        case 'deleteTable':
+          const updatedTables = tables.filter((_, index) => index !== deleteAction.index);
+          setTables(updatedTables);
+          if (excelSheetId) {
+            await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ tables: updatedTables, email }),
+            });
+          }
+          break;
+      }
+
+      $('#deleteproject').modal('hide');
+    } catch (error) {
+      console.error("Error handling delete:", error);
+      toast.error("Failed to delete item");
+    }
   };
 
   return (
@@ -1090,13 +1070,19 @@ const ProjectDashboard = () => {
 
                         <div className="d-flex justify-content-between align-items-center mt-3">
                           {/* Color Picker */}
-                          <div className="position-relative">
+                          <div className="position-relative btn-group">
                             <button
-                              className="btn btn-secondary btn-sm"
+                              className="btn btn-secondary btn-sm me-1"
                               onClick={() => setShowNotePadPicker(!showNotePadPicker)}
                               title="Change background color"
                             >
                               <i className="bi bi-palette-fill"></i>
+                            </button>
+                            <button
+                              className="btn btn-sm btn-dark"
+                              onClick={downloadNotePad}
+                            >
+                              <i className="bi bi-download"></i>
                             </button>
                             {showNotePadPicker && (
                               <CustomColorPicker
@@ -1107,68 +1093,70 @@ const ProjectDashboard = () => {
                             )}
                           </div>
 
-                          <div className="btn-group">
-                            <button
-                              className={`btn btn-sm ${isBold ? 'btn-primary' : 'btn-outline-primary'}`}
-                              onClick={toggleBold}
-                              title="Toggle Bold"
-                            >
-                              <i className="bi bi-type-bold"></i>
-                            </button>
-                            <button
-                              className={`btn btn-sm ${isUnderline ? 'btn-primary' : 'btn-outline-primary'}`}
-                              onClick={toggleUnderline}
-                              title="Toggle Underline"
-                            >
-                              <i className="bi bi-type-underline"></i>
-                            </button>
+                          <div className="">
+                            <div className="btn-group">
+                              <button
+                                className={`btn btn-sm ${isBold ? 'btn-secondary' : 'btn-outline-dark'}`}
+                                onClick={toggleBold}
+                                title="Toggle Bold"
+                              >
+                                <i className="bi bi-type-bold"></i>
+                              </button>
+                              <button
+                                className={`btn btn-sm ${isUnderline ? 'btn-secondary' : 'btn-outline-dark'}`}
+                                onClick={toggleUnderline}
+                                title="Toggle Underline"
+                              >
+                                <i className="bi bi-type-underline"></i>
+                              </button>
+                            </div>
+
+                            <div className="btn-group">
+                              <button
+                                className="btn btn-sm btn-outline-secondary"
+                                onClick={() => handleFontSizeChange(fontSize - 1)}
+                                disabled={fontSize <= 8}
+                              >
+                                <i className="bi bi-dash"></i>
+                              </button>
+                              <button className="btn btn-sm btn-outline-secondary" disabled>
+                                {fontSize}
+                              </button>
+                              <button
+                                className="btn btn-sm btn-outline-secondary"
+                                onClick={() => handleFontSizeChange(fontSize + 1)}
+                                disabled={fontSize >= 32}
+                              >
+                                <i className="bi bi-plus"></i>
+                              </button>
+                            </div>
                           </div>
 
                           <div className="btn-group">
                             <button
-                              className="btn btn-sm btn-outline-secondary"
-                              onClick={() => handleFontSizeChange(fontSize - 1)}
-                              disabled={fontSize <= 8}
-                            >
-                              <i className="bi bi-dash"></i>
-                            </button>
-                            <button className="btn btn-sm btn-outline-secondary" disabled>
-                              {fontSize}
-                            </button>
-                            <button
-                              className="btn btn-sm btn-outline-secondary"
-                              onClick={() => handleFontSizeChange(fontSize + 1)}
-                              disabled={fontSize >= 32}
-                            >
-                              <i className="bi bi-plus"></i>
-                            </button>
-                          </div>
-
-                          <div className="btn-group">
-                            <button
-                              className={`btn btn-sm ${isListening ? 'btn-danger' : 'btn-primary'}`}
+                              className={`btn btn-sm me-1 ${isListening ? 'btn-danger' : 'btn-secondary'}`}
                               onClick={toggleSpeechToText}
                             >
                               <i className={`bi ${isListening ? 'bi-mic-fill' : 'bi-mic'}`}></i>
                             </button>
                             <button
-                              className={`btn btn-sm ${isSpeaking ? 'btn-danger' : 'btn-primary'}`}
+                              className={`btn btn-sm me-1 ${isSpeaking ? 'btn-danger' : 'btn-secondary'}`}
                               onClick={speakText}
                             >
                               <i className={`bi ${isSpeaking ? 'bi-volume-up-fill' : 'bi-volume-up'}`}></i>
                             </button>
-                          </div>
 
-                          <div className="btn-group">
+
+
                             <button
-                              className="btn btn-sm btn-info"
+                              className="btn btn-sm btn-secondary me-1"
                               onClick={handleZoomIn}
                               disabled={zoomLevel >= 200}
                             >
                               <i className="bi bi-zoom-in"></i>
                             </button>
                             <button
-                              className="btn btn-sm btn-info"
+                              className="btn btn-sm btn-secondary"
                               onClick={handleZoomOut}
                               disabled={zoomLevel <= 50}
                             >
@@ -1177,29 +1165,25 @@ const ProjectDashboard = () => {
                           </div>
 
                           <div className="btn-group">
-                            <button
-                              className="btn btn-sm btn-secondary"
+                            {/* <button
+                              className="btn btn-sm btn-secondary me-1"
                               onClick={toggleFullscreen}
                             >
                               <i className={`bi bi-${isFullscreen ? 'fullscreen-exit' : 'fullscreen'}`}></i>
-                            </button>
+                            </button> */}
                             <button
-                              className="btn btn-sm btn-warning"
+                              className="btn btn-sm btn-danger text-white"
                               onClick={clearNotePad}
                             >
-                              <i className="bi bi-eraser-fill"></i>
+                              <i className="bi bi-trash"></i>
                             </button>
-                            <button
-                              className="btn btn-sm btn-dark"
-                              onClick={downloadNotePad}
-                            >
-                              <i className="bi bi-download"></i>
-                            </button>
+
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
+
                   {/* Todo List */}
                   <div className="col-12 col-md-4 mb-4">
                     <div className="card shadow-lg">
@@ -1313,7 +1297,7 @@ const ProjectDashboard = () => {
                                                   size="small"
                                                   style={{ marginLeft: '8px' }}
                                                 >
-                                                  <DeleteIcon style={{ height: '20px', width: '20px' }} />
+                                                  <DeleteIcon className='text-secondary' style={{ height: '20px', width: '20px' }} />
                                                 </IconButton>
                                               </>
                                             )}
@@ -1356,10 +1340,10 @@ const ProjectDashboard = () => {
                           <div>
                             {todos.length > 0 && (
                               <button
-                                className="btn btn-warning btn-sm"
+                                className="btn btn-danger text-white btn-sm"
                                 onClick={clearAllTodos}
                               >
-                                <i className="bi bi-eraser-fill" title='Clear all'></i>
+                                <i className="bi bi-trash" title='Clear all'></i>
                               </button>
                             )}
                           </div>
@@ -1509,15 +1493,24 @@ const ProjectDashboard = () => {
                                     </tbody>
                                   </table>
                                 </div>
-                                <div className="mb-4 d-flex justify-content-center">
-                                  <div className="position-relative">
+                                <div className="mb-4 d-flex justify-content-between">
+
+                                  <div className="position-relative btn-group">
                                     <button
-                                      className="btn btn-secondary me-2"
+                                      className="btn btn-secondary me-1"
                                       onClick={() => setShowExcelPicker(!showExcelPicker)}
                                       title='Color The Sheet'
                                     >
                                       <i className="bi bi-palette-fill"></i>
                                       <span className="ms-1">Color</span>
+                                    </button>
+                                    <button
+                                      className="btn btn-dark btn-sm"
+                                      onClick={() => downloadExcelSheet(tableIndex)}
+                                      title='Download The Excel Sheet'
+                                    >
+                                      <i className="bi bi-download"></i>
+                                      <span className="ms-1">Excel</span>
                                     </button>
                                     {showExcelPicker && (
                                       <CustomColorPicker
@@ -1528,56 +1521,53 @@ const ProjectDashboard = () => {
                                     )}
                                   </div>
 
-                                  <button
-                                    className="btn btn-warning me-2"
-                                    onClick={() => clearTableData(tableIndex)}
-                                    title='Clear All Table Value'
-                                  >
-                                    <i className="icofont-eraser  me-1" />
-                                    <span className="">Table</span>
-                                  </button>
-                                  {tables.length > 1 && (
+                                  <div className="btn-group">
                                     <button
-                                      className="btn btn-danger me-2"
-                                      onClick={() => deleteTable(tableIndex)}
+                                      className="btn btn-primary me-1"
+                                      onClick={addTable}
+                                      title='Add New Table'
                                     >
-                                      <i className="icofont-trash me-1 text-white" />
-                                      <span className="text-white">Table</span>
+                                      <i className="icofont-plus me-1" />
+                                      <span className="">Table</span>
                                     </button>
-                                  )}
+                                    <button
+                                      className="btn btn-secondary me-1"
+                                      onClick={() => addRow(tableIndex)}
+                                      title='Add New Row In Table'
+                                    >
+                                      <i className="icofont-plus me-1" />
+                                      <span className="">Row</span>
+                                    </button>
+                                    <button
+                                      className="btn btn-secondary"
+                                      onClick={() => addColumn(tableIndex)}
+                                      title='Add New Column In Table'
+                                    >
+                                      <i className="icofont-plus me-1" />
+                                      <span className="">Column</span>
+                                    </button>
+                                  </div>
 
-                                  <button
-                                    className="btn btn-primary me-2"
-                                    onClick={addTable}
-                                    title='Add New Table'
-                                  >
-                                    <i className="icofont-plus me-1" />
-                                    <span className="">Table</span>
-                                  </button>
-                                  <button
-                                    className="btn btn-secondary me-2"
-                                    onClick={() => addRow(tableIndex)}
-                                    title='Add New Row In Table'
-                                  >
-                                    <i className="icofont-plus me-1" />
-                                    <span className="">Row</span>
-                                  </button>
-                                  <button
-                                    className="btn btn-secondary me-2"
-                                    onClick={() => addColumn(tableIndex)}
-                                    title='Add New Column In Table'
-                                  >
-                                    <i className="icofont-plus me-1" />
-                                    <span className="">Column</span>
-                                  </button>
-                                  <button
-                                    className="btn btn-dark btn-sm"
-                                    onClick={() => downloadExcelSheet(tableIndex)}
-                                    title='Download The Excel Sheet'
-                                  >
-                                    <i className="bi bi-download"></i>
-                                    <span className="ms-1">Excel</span>
-                                  </button>
+
+                                  <div className="btn-group">
+                                    <button
+                                      className="btn btn-danger text-white me-1"
+                                      onClick={() => clearTableData(tableIndex)}
+                                      title='Clear All Table Value'
+                                    >
+                                      <i className="icofont-eraser  me-1" />
+                                      <span className="">Erase</span>
+                                    </button>
+                                    {tables.length > 1 && (
+                                      <button
+                                        className="btn btn-danger me-2"
+                                        onClick={() => deleteTable(tableIndex)}
+                                      >
+                                        <i className="icofont-trash me-1 text-white" />
+                                        <span className="text-white">Table</span>
+                                      </button>
+                                    )}
+                                  </div>
                                 </div>
                                 <hr className="my-4" />
                               </div>
@@ -1601,21 +1591,49 @@ const ProjectDashboard = () => {
         <ToastContainer />
         <FloatingMenu isMobile={isMobile} />
       </div>
+
+      {/* Modal Delete Confirmation */}
+      <div className="modal fade" id="deleteproject" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered modal-md modal-dialog-scrollable">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title fw-bold" id="deleteprojectLabel">
+                Delete item Permanently?
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              />
+            </div>
+            <div className="modal-body justify-content-center flex-column d-flex">
+              <i className="icofont-ui-delete text-danger display-2 text-center mt-2" />
+              <p className="mt-4 fs-5 text-center">
+                You can only delete this item Permanently
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger color-fff"
+                onClick={handleDeleteConfirm}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
 
 export default ProjectDashboard;
-
-
-
-
-
-
-
-
-
-
-
-
-
