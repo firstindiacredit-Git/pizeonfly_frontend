@@ -962,7 +962,7 @@ const Project = () => {
                                           <div className="d-flex justify-content-between">
                                             {project.projectIcon && (
                                               <img
-                                                src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon}`}
+                                                src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon.replace('uploads/', '')}`}
                                                 alt="Project Icon"
                                                 className="me-2 rounded-circle"
                                                 style={{
@@ -1249,7 +1249,7 @@ const Project = () => {
                                       <div className="d-flex">
                                         {project.projectIcon && (
                                           <img
-                                            src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon}`}
+                                            src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon.replace('uploads/', '')}`}
                                             alt="Project Icon"
                                             className="me-2 rounded-circle"
                                             style={{
