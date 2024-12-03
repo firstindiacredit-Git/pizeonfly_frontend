@@ -27,6 +27,8 @@ const Project = () => {
     taskAssignPerson: "",
     description: "",
     clientAssignPerson: "",
+    backgroundColor: "#ffffff",
+    projectIcon: null,
   });
   const [error, setError] = useState("");
   const handleChange = (e) => {
@@ -36,21 +38,42 @@ const Project = () => {
     });
   };
   const handleFileChange = (e) => {
-    console.log(e.target.files);
-    setFormData({
-      ...formData,
-      projectImage: e.target.files,
-    });
+    const { name, files } = e.target;
+    if (name === 'projectIcon') {
+      setFormData({
+        ...formData,
+        projectIcon: files[0],
+      });
+    } else if (name === 'projectImage') {
+      setFormData({
+        ...formData,
+        projectImage: files,
+      });
+    }
   };
   const handleSubmit = async () => {
     try {
       const formDataToSend = new FormData();
-      for (let i = 0; i < formData.projectImage?.length; i++) {
-        formDataToSend.append("projectImage", formData.projectImage[i]);
+
+      // Append all the basic fields
+      Object.keys(formData).forEach(key => {
+        if (key !== 'projectImage' && key !== 'projectIcon') {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+
+      // Append project icon if exists
+      if (formData.projectIcon) {
+        formDataToSend.append('projectIcon', formData.projectIcon);
       }
-      for (let key in formData) {
-        formDataToSend.append(key, formData[key]);
+
+      // Append project images if they exist
+      if (formData.projectImage) {
+        Array.from(formData.projectImage).forEach(file => {
+          formDataToSend.append('projectImage', file);
+        });
       }
+
       for (let obj of selectedEmployees) {
         formDataToSend.append("taskAssignPerson", obj.value);
       }
@@ -86,6 +109,8 @@ const Project = () => {
         taskAssignPerson: "",
         description: "",
         clientAssignPerson: "",
+        backgroundColor: "#ffffff",
+        projectIcon: null,
       });
 
       // Close the modal programmatically
@@ -249,6 +274,8 @@ const Project = () => {
     taskAssignPerson: "",
     clientAssignPerson: "", // Add this line
     description: "",
+    backgroundColor: "#ffffff",
+    projectIcon: null,
   });
   const [toEdit, setToEdit] = useState("");
 
@@ -283,6 +310,8 @@ const Project = () => {
           taskAssignPerson: data.taskAssignPerson,
           clientAssignPerson: data.clientAssignPerson, // Add this line
           description: data.description,
+          backgroundColor: data.backgroundColor,
+          projectIcon: data.projectIcon,
         });
 
         // console.log();
@@ -712,6 +741,30 @@ const Project = () => {
     );
   };
 
+  const getContrastColor = (hexcolor) => {
+    const r = parseInt(hexcolor.slice(1, 3), 16);
+    const g = parseInt(hexcolor.slice(3, 5), 16);
+    const b = parseInt(hexcolor.slice(5, 7), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.5 ? '#000000' : '#ffffff';
+  };
+
+  // Add these state declarations for the image modal
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [selectedImageTitle, setSelectedImageTitle] = useState('');
+
+  // Add these state declarations near your other state declarations
+  const [selectedProjectImages, setSelectedProjectImages] = useState([]);
+  const [selectedProjectName, setSelectedProjectName] = useState('');
+
+  // Add this function to handle opening the project images modal
+  const handleOpenProjectImages = (project) => {
+    setSelectedProjectImages(project.projectImage);
+    setSelectedProjectName(project.projectName);
+    const modal = new bootstrap.Modal(document.getElementById('projectImagesModal'));
+    modal.show();
+  };
+
   return (
     <>
       <div id="mytask-layout">
@@ -906,21 +959,36 @@ const Project = () => {
                                       <td><span className="fw-bold fs-6">{index + 1}.</span></td>
                                       <td>
                                         <div className="d-flex gap-2">
-                                          <div className="d-flex justify-content-around">
+                                          <div className="d-flex justify-content-between">
+                                            {project.projectIcon && (
+                                              <img
+                                                src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon}`}
+                                                alt="Project Icon"
+                                                className="me-2 rounded-circle"
+                                                style={{
+                                                  width: '30px',
+                                                  height: '30px',
+                                                  objectFit: 'cover',
+                                                  cursor: 'pointer'
+                                                }}
+                                                onClick={() => {
+                                                  setSelectedImages([project.projectIcon]);
+                                                  setSelectedImageTitle(`${project.projectName} Icon`);
+                                                  const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+                                                  modal.show();
+                                                }}
+                                              />
+                                            )}
                                             <Link to="/tasks" className="text-capitalize fw-bold" state={{ projectName: project.projectName }}>
                                               {project.projectName}
                                             </Link>
 
-                                            <Link
-                                              to="/images"
-                                              state={{
-                                                images: project.projectImage.map(image => `${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`), // Add base URL
-                                                projectName: project.projectName,
-                                              }}
-                                              style={{ marginLeft: "33px" }}
+                                            <button
+                                              className="btn btn-link"
+                                              onClick={() => handleOpenProjectImages(project)}
                                             >
                                               <i className="bi-paperclip fs-6" />
-                                            </Link>
+                                            </button>
                                           </div>
                                         </div>
                                         <div className="text-muted">
@@ -1166,45 +1234,90 @@ const Project = () => {
                             return (
 
                               <div className="col-md-4" key={project.id}>
-                                <div className="card mt-4 task-card">
+                                <div
+                                  className="card mt-4 task-card"
+                                  style={{
+                                    backgroundColor: project.backgroundColor || '#ffffff',
+                                    color: project.backgroundColor ? getContrastColor(project.backgroundColor) : 'inherit'
+                                  }}
+                                >
                                   <div className="card-body">
                                     <div className="d-flex justify-content-between">
                                       <span className="fw-bold fs-5" >{index + 1}. </span>
-                                      <Link to="/tasks" state={{ projectName: project.projectName }}>
+
+                                      <div className="d-flex">
+                                        {project.projectIcon && (
+                                          <img
+                                            src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon}`}
+                                            alt="Project Icon"
+                                            className="me-2 rounded-circle"
+                                            style={{
+                                              width: '30px',
+                                              height: '30px',
+                                              objectFit: 'cover',
+                                              cursor: 'pointer'
+                                            }}
+                                            onClick={() => {
+                                              setSelectedImages([project.projectIcon]);
+                                              setSelectedImageTitle(`${project.projectName} Icon`);
+                                              const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+                                              modal.show();
+                                            }}
+                                          />
+                                        )}
                                         <h5 className="card-title text-capitalize fw-bold">
-                                          {project.projectName}
+                                          <Link to="/tasks" state={{ projectName: project.projectName }}>
+                                            {project.projectName}
+                                          </Link>
                                         </h5>
-                                      </Link>
-                                      <Link
-                                        to="/images"
-                                        state={{
-                                          images: project.projectImage,
-                                          projectName: project.projectName,
-                                        }}
-                                        style={{ marginLeft: "33px" }}
-                                      // 
-                                      >
-                                        <i className="bi-paperclip fs-6" />
-                                      </Link>
+                                      </div>
+
+                                      {project.projectImage && project.projectImage.length > 0 && (
+                                        <button
+                                          className="btn btn-link"
+                                          onClick={() => handleOpenProjectImages(project)}
+                                        >
+                                          <i className="bi-paperclip fs-6" />
+                                        </button>
+                                      )}
                                     </div>
                                     <p className="card-text">
                                       <div className="d-flex justify-content-between">
                                         <span className="text-muted fw-bold">Start: {getFormattedDate(project.projectStartDate)}</span>
                                         <span className="text-muted fw-bold">End: {getFormattedDate(project.projectEndDate)}</span>
                                       </div>
-                                      <br />
-                                      <br />
-                                      Members:{" "}
-                                      {project.taskAssignPerson.map(
-                                        (name) => name.employeeName + ", "
-                                      )}
-                                      <br />
-                                      <br />
-                                      Clients: {project.clientAssignPerson?.map(client => client.clientName + ", ")}
-                                      <br />
-                                      {/* Total Tasks: {project.totalTasks}
-                                      <br /> */}
-                                      {/* Progress: {project.progress}% */}
+
+                                      <div className="mt-1">
+                                        <strong>Members:</strong>
+                                        <div className="ms-2">
+                                          {project.taskAssignPerson.map((member, idx) => (
+                                            <div key={idx} className="mb-2">
+                                              <div className="d-flex align-items-center">
+                                                <span className="me-1 fw-bold">
+                                                  <i className="bi bi-dot" />
+                                                </span>
+                                                <span className="fw-bold">{member.employeeName}</span>
+                                              </div>
+                                              {project.memberStats?.find(stat => stat._id === member._id) && (
+                                                <EmployeeTaskProgress 
+                                                  employee={project.memberStats.find(stat => stat._id === member._id)} 
+                                                />
+                                              )}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+
+                                      <div className="mt-1">
+                                        <strong>Clients:</strong>
+                                        <div className="ms-2">
+                                          {project.clientAssignPerson?.map((client, idx) => (
+                                            <div key={idx}>
+                                              <span className="me-1 fw-bold"><i className="bi bi-dot"></i></span> {client.clientName}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
                                     </p>
                                     <ProjectProgressBar project={project} />
                                     <div className="d-flex justify-content-between">
@@ -1340,6 +1453,20 @@ const Project = () => {
                         onChange={handleFileChange}
                       />
                     </div>
+                    <div className="mb-3">
+                      <label htmlFor="projectIcon" className="form-label">
+                        Project Icon
+                      </label>
+                      <input
+                        type="file"
+                        className="form-control"
+                        id="projectIcon"
+                        name="projectIcon"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
+                      <small className="text-muted">Upload an icon for your project (optional)</small>
+                    </div>
                     <div className="deadline-form">
                       <form>
                         <div className="row g-3 mb-3">
@@ -1430,6 +1557,29 @@ const Project = () => {
                         onChange={handleChange}
                       />
                     </div>
+                    <div className="mb-3">
+                      <label htmlFor="backgroundColor" className="form-label">
+                        Card Color
+                      </label>
+                      <div className="d-flex align-items-center gap-2">
+                        <input
+                          type="color"
+                          className="form-control form-control-color"
+                          id="backgroundColor"
+                          name="backgroundColor"
+                          value={formData.backgroundColor}
+                          onChange={handleChange}
+                          title="Choose card color"
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary btn-sm"
+                          onClick={() => setFormData({ ...formData, backgroundColor: '#ffffff' })}
+                        >
+                          Reset Color
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   <div className="modal-footer">
                     <button
@@ -1509,26 +1659,12 @@ const Project = () => {
                         <option value={"App Development"}>
                           App Development
                         </option>
-                        {/* <option value={"Quality Assurance"}>
-                          Quality Assurance
-                        </option>
-                        <option value={"Development"}>Development</option>
-                        <option value={"Backend Development"}>
-                          Backend Development
-                        </option>
-                        <option value={"Software Testing"}>
-                          Software Testing
-                        </option>
-                        <option value={"Website Design"}>Website Design</option> */}
                         <option value={"Digital Marketing"}>
                           Digital Marketing
                         </option>
-                        {/* <option value={"SEO"}>SEO</option> */}
-                        {/* <option value={"Other"}>Other</option> */}
                       </select>
                     </div>
                     <div className="mb-3">
-                      {/* {projectFormData.projectImage && <img src={projectFormData.projectImage} alt="Project" />} */}
                       <label
                         htmlFor="formFileMultiple456"
                         className="form-label"
@@ -1580,19 +1716,6 @@ const Project = () => {
                           </div>
                         </div>
                         <div className="row g-3 mb-3">
-                          {/* <div className="col-sm-12">
-                            <label className="form-label">
-                              Notifation Sent
-                            </label>
-                            <select
-                              className="form-select"
-                              aria-label="Default select example"
-                            >
-                              <option selected="">All</option>
-                              <option value={1}>Team Leader Only</option>
-                              <option value={2}>Team Member Only</option>
-                            </select>
-                          </div> */}
                           <div className="col-sm-12">
                             <label
                               htmlFor="formFileMultipleone"
@@ -1610,7 +1733,6 @@ const Project = () => {
                             </div>
                           </div>
                         </div>
-                        {/* Add this new block for Project Assign Client */}
                         <div className="row g-3 mb-3">
                           <div className="col-sm-12">
                             <label className="form-label">
@@ -1628,25 +1750,6 @@ const Project = () => {
                         </div>
                       </form>
                     </div>
-                    {/* <div className="row g-3 mb-3">
-                      <div className="col-sm">
-                        <label
-                          htmlFor="formFileMultipleone"
-                          className="form-label"
-                        >
-                          Priority
-                        </label>
-                        <select
-                          className="form-select"
-                          aria-label="Default select Priority"
-                        >
-                          <option selected="">Medium</option>
-                          <option value={1}>Highest</option>
-                          <option value={2}>Low</option>
-                          <option value={3}>Lowest</option>
-                        </select>
-                      </div>
-                    </div> */}
                     <div className="mb-3">
                       <label
                         htmlFor="exampleFormControlTextarea786"
@@ -1663,6 +1766,57 @@ const Project = () => {
                         value={projectFormData.description}
                         onChange={projectHandleChange}
                       />
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="editBackgroundColor" className="form-label">
+                        Card Color
+                      </label>
+                      <div className="d-flex align-items-center gap-2">
+                        <input
+                          type="color"
+                          className="form-control form-control-color"
+                          id="editBackgroundColor"
+                          name="backgroundColor"
+                          value={projectFormData.backgroundColor || '#ffffff'}
+                          onChange={projectHandleChange}
+                          title="Choose card color"
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary btn-sm"
+                          onClick={() => setProjectFormData({ ...projectFormData, backgroundColor: '#ffffff' })}
+                        >
+                          Reset Color
+                        </button>
+                      </div>
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="editProjectIcon" className="form-label">
+                        Project Icon
+                      </label>
+                      {projectFormData.projectIcon && (
+                        <div className="mb-2">
+                          <img
+                            src={`${import.meta.env.VITE_BASE_URL}${projectFormData.projectIcon}`}
+                            alt="Current Icon"
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              objectFit: 'cover',
+                              borderRadius: '8px'
+                            }}
+                          />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        className="form-control"
+                        id="editProjectIcon"
+                        name="projectIcon"
+                        accept="image/*"
+                        onChange={projectHandleChange}
+                      />
+                      <small className="text-muted">Upload a new icon to replace the current one (optional)</small>
                     </div>
                   </div>
                   <div className="modal-footer">
@@ -1820,6 +1974,84 @@ const Project = () => {
                       </div>
                       <button type="submit" className="btn btn-dark">Submit</button>
                     </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Image Preview Modal */}
+            <div className="modal fade" id="imagePreviewModal" tabIndex={-1} aria-hidden="true">
+              <div className="modal-dialog modal-dialog-centered modal-sm">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">{selectedImageTitle}</h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    />
+                  </div>
+                  <div className="modal-body">
+                    <div className="">
+                      {selectedImages.map((image, index) => (
+                        <div key={index} className=" mb-3">
+                          <img
+                            src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`}
+                            alt={`Preview ${index + 1}`}
+                            className="img-fluid rounded"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`, '_blank')}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Project Images Modal */}
+            <div className="modal fade" id="projectImagesModal" tabIndex={-1} aria-hidden="true">
+              <div className="modal-dialog modal-dialog-centered modal-lg">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">{selectedProjectName} - Project Images</h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    />
+                  </div>
+                  <div className="modal-body">
+                    <div className="row g-3">
+                      {selectedProjectImages.map((image, index) => (
+                        <div key={index} className="col-md-4">
+                          <div className="card">
+                            <img
+                              src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`}
+                              alt={`Project Image ${index + 1}`}
+                              className="card-img-top"
+                              style={{
+                                height: '200px',
+                                objectFit: 'cover',
+                                cursor: 'pointer'
+                              }}
+                              onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`, '_blank')}
+                            />
+                            <div className="card-body">
+                              <p className="card-text text-center mb-0">Image {index + 1}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                      Close
+                    </button>
                   </div>
                 </div>
               </div>

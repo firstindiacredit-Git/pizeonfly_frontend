@@ -121,7 +121,7 @@ const MemberDashboard = () => {
     const [assignedTasks, setAssignedTasks] = useState([]);
 
     // Add color states
-    const [notepadColor, setNotepadColor] = useState('#fff3cd');
+    const [notepadColor, setNotepadColor] = useState('#fdf8c8');
     const [todoColor, setTodoColor] = useState('#cfe2ff');
     const [excelSheetColor, setExcelSheetColor] = useState('#d4edda');
 
@@ -152,7 +152,7 @@ const MemberDashboard = () => {
     const colorOptions = {
         standard: [
             // Row 1
-            '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF',
+            '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF','#fdf8c8',
             // Row 2 
             '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
             // Row 3

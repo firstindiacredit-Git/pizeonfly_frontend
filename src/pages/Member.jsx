@@ -65,9 +65,9 @@ const Member = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const formDataToSend = new FormData();
-    
+
     // Add basic fields
     formDataToSend.append('employeeName', formData.employeeName);
     formDataToSend.append('employeeId', formData.employeeId);
@@ -78,24 +78,24 @@ const Member = () => {
     formDataToSend.append('designation', formData.designation);
     formDataToSend.append('description', formData.description);
     formDataToSend.append('joiningDate', formData.joiningDate);
-    
+
     // Add file fields - make sure these match exactly with Multer config
     if (formData.employeeImage) {
-        formDataToSend.append('employeeImage', formData.employeeImage);
+      formDataToSend.append('employeeImage', formData.employeeImage);
     }
     if (formData.resume) {
-        formDataToSend.append('resume', formData.resume);
+      formDataToSend.append('resume', formData.resume);
     }
     if (formData.aadhaarCard) {
-        formDataToSend.append('aadhaarCard', formData.aadhaarCard);
+      formDataToSend.append('aadhaarCard', formData.aadhaarCard);
     }
     if (formData.panCard) {
-        formDataToSend.append('panCard', formData.panCard);
+      formDataToSend.append('panCard', formData.panCard);
     }
     if (formData.qrCode) {
-        formDataToSend.append('qrCode', formData.qrCode);
+      formDataToSend.append('qrCode', formData.qrCode);
     }
-    
+
     // Add social links
     formDataToSend.append('linkedin', formData.linkedin || '');
     formDataToSend.append('instagram', formData.instagram || '');
@@ -104,7 +104,7 @@ const Member = () => {
     formDataToSend.append('github', formData.github || '');
     formDataToSend.append('website', formData.website || '');
     formDataToSend.append('other', formData.other || '');
-    
+
     // Add bank details
     formDataToSend.append('bankName', formData.bankName || '');
     formDataToSend.append('accountHolderName', formData.accountHolderName || '');
@@ -115,69 +115,69 @@ const Member = () => {
     formDataToSend.append('paymentApp', formData.paymentApp || '');
 
     try {
-        const response = await axios.post(
-            `${import.meta.env.VITE_BASE_URL}api/employees`,
-            formDataToSend,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
-        );
-        const newEmployee = response.data;
-        setEmployees((prevEmployee) => [newEmployee, ...prevEmployee]);
-        // Clear the form
-        setFormData({
-            employeeName: "",
-            employeeCompany: "",
-            employeeImage: null,
-            resume: null,
-            aadhaarCard: null,
-            panCard: null,
-            employeeId: "",
-            joiningDate: "",
-            password: "",
-            emailid: "",
-            phone: "+91 ",
-            department: "",
-            designation: "",
-            description: "",
-            linkedin: "",
-            instagram: "",
-            youtube: "",
-            facebook: "",
-            github: "",
-            website: "",
-            other: "",
-            bankName: "",
-            accountHolderName: "",
-            accountNumber: "",
-            ifscCode: "",
-            accountType: "",
-            upiId: "",
-            qrCode: null,
-            paymentApp: ""
-        });
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}api/employees`,
+        formDataToSend,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      const newEmployee = response.data;
+      setEmployees((prevEmployee) => [newEmployee, ...prevEmployee]);
+      // Clear the form
+      setFormData({
+        employeeName: "",
+        employeeCompany: "",
+        employeeImage: null,
+        resume: null,
+        aadhaarCard: null,
+        panCard: null,
+        employeeId: "",
+        joiningDate: "",
+        password: "",
+        emailid: "",
+        phone: "+91 ",
+        department: "",
+        designation: "",
+        description: "",
+        linkedin: "",
+        instagram: "",
+        youtube: "",
+        facebook: "",
+        github: "",
+        website: "",
+        other: "",
+        bankName: "",
+        accountHolderName: "",
+        accountNumber: "",
+        ifscCode: "",
+        accountType: "",
+        upiId: "",
+        qrCode: null,
+        paymentApp: ""
+      });
 
-        // Close the modal programmatically
-        const modalElement = document.getElementById("createemp");
-        const modal = window.bootstrap.Modal.getInstance(modalElement);
-        modal.hide();
+      // Close the modal programmatically
+      const modalElement = document.getElementById("createemp");
+      const modal = window.bootstrap.Modal.getInstance(modalElement);
+      modal.hide();
 
-        toast.success("Employee Added Successfully!", {
-            style: {
-                backgroundColor: "#4c3575",
-                color: "white",
-            },
-        });
-        // Reload the page after 5 seconds
-        setTimeout(() => {
-            window.location.reload();
-        }, 5000);
-        // Handle successful response
+      toast.success("Employee Added Successfully!", {
+        style: {
+          backgroundColor: "#4c3575",
+          color: "white",
+        },
+      });
+      // Reload the page after 5 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
+      // Handle successful response
     } catch (error) {
-        console.error("Error:", error);
-        // Handle error
+      console.error("Error:", error);
+      // Handle error
     }
   };
 
@@ -1248,12 +1248,24 @@ const Member = () => {
                                         </td>
                                         <td>
                                           <div className="d-flex flex-column gap-1">
-                                            <span className="badge bg-primary">
-                                              Projects: {employeeProjects[employee._id] || 0}
-                                            </span>
-                                            <span className="badge bg-success">
-                                              Tasks: {employeeTasks[employee._id] || 0}
-                                            </span>
+                                            <Link
+                                              to="/projects"
+                                              state={{ employeeName: employee.employeeName }}
+                                              title={`Click to View Projects of ${employee.employeeName}`}
+                                            >
+                                              <span className="badge bg-primary px-3">
+                                                Projects: {employeeProjects[employee._id] || 0}
+                                              </span>
+                                            </Link>
+                                            <Link
+                                              to="/tasks"
+                                              state={{ employeeName: employee.employeeName }}
+                                              title={`Click to View Tasks of ${employee.employeeName}`}
+                                            >
+                                              <span className="badge bg-success px-3">
+                                                Tasks: {employeeTasks[employee._id] || 0}
+                                              </span>
+                                            </Link>
                                           </div>
                                         </td>
                                         <td>
@@ -1276,20 +1288,29 @@ const Member = () => {
                                             </button>
                                           </div>
                                           <div className="mt-2">
-                                            <Link
-                                              to="/projects"
-                                              state={{ employeeName: employee.employeeName }}
-                                              className="btn btn-sm btn-outline-secondary me-1"
-                                            >
-                                              Projects
-                                            </Link>
-                                            <Link
-                                              to="/tasks"
-                                              state={{ employeeName: employee.employeeName }}
-                                              className="btn btn-sm btn-outline-secondary"
-                                            >
-                                              Tasks
-                                            </Link>
+                                            <div className="btn-group" role="group">
+                                              {/* DOCUMENTS */}
+                                              <button
+                                                className="btn btn-sm btn-outline-secondary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewDocumentsModal"
+                                                onClick={() => setSelectedEmployee(employee)}
+                                                title="Click to View Documents of Employee"
+                                              >
+                                                <i className="bi bi-file-earmark-text"></i>
+
+                                              </button>
+                                              {/* BANK DETAILS */}
+                                              <button
+                                                className="btn btn-sm btn-outline-secondary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#bankDetailsModal"
+                                                onClick={() => setSelectedEmployee(employee)}
+                                                title="Click to View Bank Details of Employee"
+                                              >
+                                                <i className="bi bi-bank"></i>
+                                              </button>
+                                            </div>
                                           </div>
                                         </td>
                                       </tr>
@@ -2635,7 +2656,7 @@ const Member = () => {
             </div>
 
             {/* View Documents Modal */}
-            <div className="modal fade" id="viewDocumentsModal" tabIndex={-1} aria-hidden="true">
+            <div className="modal fade" id="viewDocumentsModal" tabIndex={-1} aria-hidden="true" style={{ zIndex: 9998 }}>
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                   <div className="modal-header">

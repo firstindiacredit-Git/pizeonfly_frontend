@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import { toast, ToastContainer } from 'react-toastify';
@@ -8,6 +8,9 @@ import { Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import Chat from "../components/Chat";
 import FloatingMenu from '../components/FloatingMenu';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Checkbox, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -17,6 +20,32 @@ const ProjectDashboard = () => {
   const [totalEmployees, setTotalEmployees] = useState(0);
   const [projectStatusCounts, setProjectStatusCounts] = useState({ completed: 0, inProgress: 0 });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [notes, setNotes] = useState('');
+  const [notepadId, setNotepadId] = useState(null);
+  const [notepadColor, setNotepadColor] = useState('#fff3cd');
+  const [loading, setLoading] = useState({ notePad: false });
+  const [error, setError] = useState({ notePad: null });
+  const [showNotePadPicker, setShowNotePadPicker] = useState(false);
+  const [isBold, setIsBold] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
+  const [fontSize, setFontSize] = useState(14);
+  const [zoomLevel, setZoomLevel] = useState(100);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [todos, setTodos] = useState([]);
+  const [newTodo, setNewTodo] = useState('');
+  const [todoId, setTodoId] = useState(null);
+  const [todoColor, setTodoColor] = useState('#cfe2ff');
+  const [showTodoPicker, setShowTodoPicker] = useState(false);
+  const [editingTodo, setEditingTodo] = useState(null);
+  const [editedTodoText, setEditedTodoText] = useState('');
+  const [tables, setTables] = useState([]);
+  const [excelSheetId, setExcelSheetId] = useState(null);
+  const [excelSheetColor, setExcelSheetColor] = useState('#d4edda');
+  const [showExcelPicker, setShowExcelPicker] = useState(false);
+
+  const notePadRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -91,6 +120,124 @@ const ProjectDashboard = () => {
     };
     fetchProjectStatusCounts();
   }, []);
+
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const email = userData.email;
+        console.log("Email:", email);
+
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/adminNotePad/${email}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (data.notes !== undefined) {
+          setNotes(data.notes);
+        }
+        if (data._id) {
+          setNotepadId(data._id);
+        }
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+        toast.error("Failed to fetch notes");
+      }
+    };
+
+    fetchNotes();
+  }, []);
+
+  useEffect(() => {
+    const fetchTodos = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const email = userData.email;
+
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/adminTodoList/${email}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (data.todos) {
+          setTodos(data.todos);
+        }
+        if (data._id) {
+          setTodoId(data._id);
+        }
+      } catch (error) {
+        console.error("Error fetching todos:", error);
+        toast.error("Failed to fetch todos");
+      }
+    };
+
+    fetchTodos();
+  }, []);
+
+  useEffect(() => {
+    const fetchExcelSheet = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const email = userData.email;
+
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${email}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (data.tables) {
+          setTables(data.tables);
+        }
+        if (data._id) {
+          setExcelSheetId(data._id);
+        }
+      } catch (error) {
+        console.error("Error fetching excel sheet:", error);
+        toast.error("Failed to fetch excel sheet");
+      }
+    };
+
+    fetchExcelSheet();
+  }, []);
+
+  const handleNotesChange = async (e) => {
+    const newNotes = e.target.value;
+    setNotes(newNotes);
+
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      const url = notepadId
+        ? `${import.meta.env.VITE_BASE_URL}api/adminNotePad/${notepadId}`
+        : `${import.meta.env.VITE_BASE_URL}api/adminNotePad`;
+
+      const method = notepadId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ notes: newNotes, email }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data._id) {
+        setNotepadId(data._id);
+      }
+    } catch (error) {
+      console.error("Error saving notes:", error);
+      toast.error("Failed to save notes");
+    }
+  };
 
   const createChartData = (label, value, color) => ({
     labels: [label],
@@ -173,6 +320,619 @@ const ProjectDashboard = () => {
     },
   };
 
+  const isLightColor = (color) => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return brightness > 128;
+  };
+
+  const toggleBold = () => setIsBold(!isBold);
+  const toggleUnderline = () => setIsUnderline(!isUnderline);
+
+  const handleFontSizeChange = (newSize) => {
+    if (newSize >= 8 && newSize <= 32) {
+      setFontSize(newSize);
+    }
+  };
+
+  const handleZoomIn = () => setZoomLevel(Math.min(zoomLevel + 10, 200));
+  const handleZoomOut = () => setZoomLevel(Math.max(zoomLevel - 10, 50));
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      notePadRef.current.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  const handleSelectAll = () => {
+    const textarea = notePadRef.current.querySelector('textarea');
+    textarea.select();
+  };
+
+  const clearNotePad = () => {
+    if (window.confirm('Are you sure you want to clear the notepad?')) {
+      setNotes('');
+      handleNotesChange({ target: { value: '' } });
+    }
+  };
+
+  const downloadNotePad = () => {
+    const element = document.createElement('a');
+    const file = new Blob([notes], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'notepad.txt';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const toggleSpeechToText = () => {
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new window.webkitSpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      if (!isListening) {
+        recognition.start();
+        setIsListening(true);
+
+        recognition.onresult = (event) => {
+          const transcript = Array.from(event.results)
+            .map(result => result[0])
+            .map(result => result.transcript)
+            .join('');
+
+          setNotes(prev => prev + ' ' + transcript);
+          handleNotesChange({ target: { value: notes + ' ' + transcript } });
+        };
+
+        recognition.onerror = (event) => {
+          console.error(event.error);
+          setIsListening(false);
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+      } else {
+        recognition.stop();
+        setIsListening(false);
+      }
+    } else {
+      alert('Speech recognition is not supported in your browser.');
+    }
+  };
+
+  const speakText = () => {
+    if (!isSpeaking) {
+      const utterance = new SpeechSynthesisUtterance(notes);
+      utterance.onend = () => setIsSpeaking(false);
+      speechSynthesis.speak(utterance);
+      setIsSpeaking(true);
+    } else {
+      speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  };
+
+  // Add color options
+  const colorOptions = {
+    standard: [
+      // Row 1
+      '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF', '#fdf8c8',
+      // Row 2 
+      '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
+      // Row 3
+      '#FFB6C1', '#FFA07A', '#FFE4B5', '#FFFACD', '#98FB98', '#AFEEEE', '#87CEEB', '#E6E6FA', '#DDA0DD', '#FFC0CB',
+      // Row 4
+      '#DC143C', '#FF4500', '#FFA500', '#FFD700', '#32CD32', '#20B2AA', '#4169E1', '#8A2BE2', '#9370DB', '#FF69B4',
+      // Row 5
+      '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585'
+    ],
+    custom: ['#FFFFFF', '#000000']
+  };
+
+  // Add CustomColorPicker component
+  const CustomColorPicker = ({ color, onChange, onClose }) => {
+    return (
+      <div className="custom-color-picker mt-2" style={{
+        position: 'absolute',
+        zIndex: 1000,
+        backgroundColor: 'white',
+        border: '1px solid #ccc',
+        borderRadius: '4px',
+        padding: '8px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        width: '250px'
+      }}>
+        <div style={{ marginBottom: '10px' }} className='border-bottom pb-2'>
+          <strong>STANDARD</strong>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '2px' }}>
+            {colorOptions.standard.map((c, i) => (
+              <div
+                key={i}
+                onClick={() => {
+                  onChange(c);
+                  onClose();
+                }}
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  backgroundColor: c,
+                  border: '1px solid #ccc',
+                  cursor: 'pointer',
+                  borderRadius: '9px',
+                  position: 'relative'
+                }}
+              >
+                {color === c && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    color: isLightColor(c) ? '#000' : '#fff'
+                  }}>✓</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <strong>CUSTOM</strong>
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {colorOptions.custom.map((c, i) => (
+              <div
+                key={i}
+                onClick={() => onChange(c)}
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  backgroundColor: c,
+                  border: '1px solid #ccc',
+                  cursor: 'pointer',
+                  borderRadius: '9px'
+                }}
+              />
+            ))}
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => onChange(e.target.value)}
+              style={{ width: '20px', height: '20px', padding: 0, borderRadius: '9px', border: 'none' }}
+              title='Custom Color'
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Add color update function
+  const updateColors = async (type, color) => {
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      if (type === 'notepad') {
+        setNotepadColor(color);
+      } else if (type === 'todo') {
+        setTodoColor(color);
+      }
+
+      await fetch(`${import.meta.env.VITE_BASE_URL}api/adminColors/${email}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          notepadColor: type === 'notepad' ? color : notepadColor,
+          todoColor: type === 'todo' ? color : todoColor
+        }),
+      });
+    } catch (error) {
+      console.error('Error updating colors:', error);
+      toast.error('Failed to update colors');
+    }
+  };
+
+  const getTimeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " years ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " months ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " minutes ago";
+    return Math.floor(seconds) + " seconds ago";
+  };
+
+  const startEditing = (index, text) => {
+    setEditingTodo(index);
+    setEditedTodoText(text);
+  };
+
+  const handleEditTodo = async (index) => {
+    if (!editedTodoText.trim()) return;
+
+    const updatedTodos = [...todos];
+    updatedTodos[index] = {
+      ...updatedTodos[index],
+      text: editedTodoText
+    };
+    setTodos(updatedTodos);
+    setEditingTodo(null);
+
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      await fetch(`${import.meta.env.VITE_BASE_URL}api/adminTodoList/${todoId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ todos: updatedTodos, email }),
+      });
+    } catch (error) {
+      console.error("Error updating todo:", error);
+      toast.error("Failed to update todo");
+    }
+  };
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const items = Array.from(todos);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setTodos(items);
+  };
+
+  const clearAllTodos = async () => {
+    if (window.confirm('Are you sure you want to clear all todos?')) {
+      setTodos([]);
+      try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const email = userData.email;
+
+        await fetch(`${import.meta.env.VITE_BASE_URL}api/adminTodoList/${todoId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ todos: [], email }),
+        });
+      } catch (error) {
+        console.error("Error clearing todos:", error);
+        toast.error("Failed to clear todos");
+      }
+    }
+  };
+
+  const addTodo = async (e) => {
+    e.preventDefault();
+    if (!newTodo.trim()) return;
+
+    const newTodoItem = {
+      id: Date.now(),
+      text: newTodo,
+      completed: false,
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedTodos = [...todos, newTodoItem];
+    setTodos(updatedTodos);
+    setNewTodo('');
+
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      const url = todoId
+        ? `${import.meta.env.VITE_BASE_URL}api/adminTodoList/${todoId}`
+        : `${import.meta.env.VITE_BASE_URL}api/adminTodoList`;
+
+      const method = todoId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ todos: updatedTodos, email }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data._id) {
+        setTodoId(data._id);
+      }
+    } catch (error) {
+      console.error("Error saving todo:", error);
+      toast.error("Failed to save todo");
+    }
+  };
+
+  const deleteTodo = async (index) => {
+    if (window.confirm('Are you sure you want to delete this todo?')) {
+      const updatedTodos = todos.filter((_, i) => i !== index);
+      setTodos(updatedTodos);
+
+      try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const email = userData.email;
+
+        await fetch(`${import.meta.env.VITE_BASE_URL}api/adminTodoList/${todoId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ todos: updatedTodos, email }),
+        });
+      } catch (error) {
+        console.error("Error deleting todo:", error);
+        toast.error("Failed to delete todo");
+      }
+    }
+  };
+
+  const toggleTodo = async (index) => {
+    const updatedTodos = todos.map((todo, i) => {
+      if (i === index) {
+        return { ...todo, completed: !todo.completed };
+      }
+      return todo;
+    });
+    setTodos(updatedTodos);
+
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      await fetch(`${import.meta.env.VITE_BASE_URL}api/adminTodoList/${todoId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ todos: updatedTodos, email }),
+      });
+    } catch (error) {
+      console.error("Error updating todo:", error);
+      toast.error("Failed to update todo");
+    }
+  };
+
+  const handleCellChange = async (tableIndex, rowIndex, colIndex, value) => {
+    try {
+      const newTables = [...tables];
+      newTables[tableIndex].data[rowIndex][colIndex] = value;
+      setTables(newTables);
+
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      const url = excelSheetId
+        ? `${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`
+        : `${import.meta.env.VITE_BASE_URL}api/adminExcelSheet`;
+
+      const method = excelSheetId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tables: newTables, email }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data._id) {
+        setExcelSheetId(data._id);
+      }
+    } catch (error) {
+      console.error("Error saving cell:", error);
+      toast.error("Failed to save changes");
+    }
+  };
+
+  const addTable = () => {
+    const newTable = {
+      id: Date.now(),
+      rows: 5,
+      cols: 5,
+      data: Array(5).fill().map(() => Array(5).fill(''))
+    };
+    setTables([...tables, newTable]);
+  };
+
+  const addRow = async (tableIndex) => {
+    try {
+      const newTables = [...tables];
+      const cols = newTables[tableIndex].cols;
+      newTables[tableIndex].rows++;
+      newTables[tableIndex].data.push(Array(cols).fill(''));
+      setTables(newTables);
+
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      if (excelSheetId) {
+        await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ tables: newTables, email }),
+        });
+      }
+    } catch (error) {
+      console.error("Error adding row:", error);
+      toast.error("Failed to add row");
+    }
+  };
+
+  const addColumn = async (tableIndex) => {
+    try {
+      const newTables = [...tables];
+      newTables[tableIndex].cols++;
+      newTables[tableIndex].data = newTables[tableIndex].data.map(row => [...row, '']);
+      setTables(newTables);
+
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      if (excelSheetId) {
+        await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ tables: newTables, email }),
+        });
+      }
+    } catch (error) {
+      console.error("Error adding column:", error);
+      toast.error("Failed to add column");
+    }
+  };
+
+  const clearTableData = async (tableIndex) => {
+    if (window.confirm('Are you sure you want to clear this table?')) {
+      try {
+        const newTables = [...tables];
+        const rows = newTables[tableIndex].rows;
+        const cols = newTables[tableIndex].cols;
+        newTables[tableIndex].data = Array(rows).fill().map(() => Array(cols).fill(''));
+        setTables(newTables);
+
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const email = userData.email;
+
+        if (excelSheetId) {
+          await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ tables: newTables, email }),
+          });
+        }
+      } catch (error) {
+        console.error("Error clearing table:", error);
+        toast.error("Failed to clear table");
+      }
+    }
+  };
+
+  const deleteTable = async (tableIndex) => {
+    if (window.confirm('Are you sure you want to delete this table?')) {
+      try {
+        const newTables = tables.filter((_, index) => index !== tableIndex);
+        setTables(newTables);
+
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const email = userData.email;
+
+        if (excelSheetId) {
+          await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ tables: newTables, email }),
+          });
+        }
+      } catch (error) {
+        console.error("Error deleting table:", error);
+        toast.error("Failed to delete table");
+      }
+    }
+  };
+
+  const downloadExcelSheet = (tableIndex) => {
+    const table = tables[tableIndex];
+    let csv = '';
+
+    // Add headers (A, B, C, etc.)
+    for (let i = 0; i < table.cols; i++) {
+      csv += String.fromCharCode(65 + i) + ',';
+    }
+    csv = csv.slice(0, -1) + '\n';
+
+    // Add data
+    table.data.forEach(row => {
+      csv += row.join(',') + '\n';
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `excel_sheet_${tableIndex + 1}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleTableNameChange = (tableIndex, newName) => {
+    const updatedTables = [...tables];
+    updatedTables[tableIndex].name = newName;
+    setTables(updatedTables);
+  };
+
+  const deleteColumn = (tableIndex, colIndex) => {
+    const updatedTables = [...tables];
+    updatedTables[tableIndex].cols--;
+    updatedTables[tableIndex].data = updatedTables[tableIndex].data.map(row => row.filter((_, index) => index !== colIndex));
+    setTables(updatedTables);
+  };
+
+  const deleteRow = (tableIndex, rowIndex) => {
+    const updatedTables = [...tables];
+    updatedTables[tableIndex].rows--;
+    updatedTables[tableIndex].data = updatedTables[tableIndex].data.filter((_, index) => index !== rowIndex);
+    setTables(updatedTables);
+  };
+
+  const isValidUrl = (string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const handleCellKeyDown = (e, tableIndex, rowIndex, colIndex) => {
+    // Handle key down events if needed
+  };
+
+  const getColumnLabel = (colIndex) => {
+    return String.fromCharCode(65 + colIndex);
+  };
+
   return (
     <>
       <div id="mytask-layout">
@@ -234,7 +994,7 @@ const ProjectDashboard = () => {
                   </div>
 
                 </div>
-                
+
                 <div className="row justify-content-center">
                   <div className="col-12 col-md-8 mb-4">
                     <div className="card shadow-lg">
@@ -254,7 +1014,580 @@ const ProjectDashboard = () => {
                   </div>
                 </div>
 
-               
+                {/* NotePad */}
+                <div className="row justify-content-center">
+                  <div className="col-12 col-md-8 mb-4">
+                    <div className="card shadow-lg">
+                      <div className="card-body" style={{ backgroundColor: notepadColor }}>
+                        <h5 className="card-title text-center mb-3" style={{ color: isLightColor(notepadColor) ? '#000' : '#fff' }}>
+                          NotePad
+                        </h5>
+
+                        {loading.notePad ? (
+                          <div className="text-center">
+                            <div className="spinner-border text-primary" role="status">
+                              <span className="visually-hidden">Loading...</span>
+                            </div>
+                          </div>
+                        ) : error.notePad ? (
+                          <div className="alert alert-danger">{error.notePad}</div>
+                        ) : (
+                          <div className="notepad-container" ref={notePadRef} style={{ position: 'relative', overflow: 'hidden' }}>
+                            <div
+                              className="line-numbers"
+                              style={{
+                                position: 'absolute',
+                                left: '5px',
+                                top: '10px',
+                                color: isLightColor(notepadColor) ? '#666' : '#ccc',
+                                fontFamily: 'monospace',
+                                fontSize: '14px',
+                                lineHeight: '24px',
+                                textAlign: 'right',
+                                paddingRight: '5px',
+                                userSelect: 'none',
+                                pointerEvents: 'none',
+                                height: '315px',
+                                overflowY: 'hidden',
+                                transform: `scale(${zoomLevel / 100})`,
+                                transformOrigin: 'left top'
+                              }}
+                            >
+                              {notes.split('\n').map((_, i) => (
+                                <div key={i} style={{ height: '24px' }}>{i + 1}</div>
+                              ))}
+                            </div>
+                            <textarea
+                              value={notes}
+                              onChange={handleNotesChange}
+                              className="form-control hindi-paper"
+                              style={{
+                                height: '345px',
+                                marginBottom: '20px',
+                                resize: 'none',
+                                backgroundColor: 'transparent',
+                                border: '1px solid #6c757d',
+                                padding: '5px 10px 10px 40px',
+                                fontSize: `${fontSize * (zoomLevel / 100)}px`,
+                                lineHeight: '24px',
+                                fontFamily: 'Arial, sans-serif',
+                                position: 'relative',
+                                backgroundAttachment: 'local',
+                                width: '100%',
+                                transform: `scale(${zoomLevel / 100})`,
+                                transformOrigin: 'left top',
+                                fontWeight: isBold ? 'bold' : 'normal',
+                                textDecoration: isUnderline ? 'underline' : 'none',
+                                color: isLightColor(notepadColor) ? '#000' : '#fff',
+                                backgroundImage: `linear-gradient(${isLightColor(notepadColor) ? '#adb5bd' : '#ffffff33'} 1px, transparent 1px), linear-gradient(90deg, transparent 0px, transparent 1px, transparent 1px)`,
+                                backgroundSize: '100% 24px',
+                                backgroundPositionY: '-1px'
+                              }}
+                              placeholder="Start typing your notes here..."
+                            />
+                          </div>
+                        )}
+
+                        <div className="d-flex justify-content-between align-items-center mt-3">
+                          {/* Color Picker */}
+                          <div className="position-relative">
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              onClick={() => setShowNotePadPicker(!showNotePadPicker)}
+                              title="Change background color"
+                            >
+                              <i className="bi bi-palette-fill"></i>
+                            </button>
+                            {showNotePadPicker && (
+                              <CustomColorPicker
+                                color={notepadColor}
+                                onChange={(color) => updateColors('notepad', color)}
+                                onClose={() => setShowNotePadPicker(false)}
+                              />
+                            )}
+                          </div>
+
+                          <div className="btn-group">
+                            <button
+                              className={`btn btn-sm ${isBold ? 'btn-primary' : 'btn-outline-primary'}`}
+                              onClick={toggleBold}
+                              title="Toggle Bold"
+                            >
+                              <i className="bi bi-type-bold"></i>
+                            </button>
+                            <button
+                              className={`btn btn-sm ${isUnderline ? 'btn-primary' : 'btn-outline-primary'}`}
+                              onClick={toggleUnderline}
+                              title="Toggle Underline"
+                            >
+                              <i className="bi bi-type-underline"></i>
+                            </button>
+                          </div>
+
+                          <div className="btn-group">
+                            <button
+                              className="btn btn-sm btn-outline-secondary"
+                              onClick={() => handleFontSizeChange(fontSize - 1)}
+                              disabled={fontSize <= 8}
+                            >
+                              <i className="bi bi-dash"></i>
+                            </button>
+                            <button className="btn btn-sm btn-outline-secondary" disabled>
+                              {fontSize}
+                            </button>
+                            <button
+                              className="btn btn-sm btn-outline-secondary"
+                              onClick={() => handleFontSizeChange(fontSize + 1)}
+                              disabled={fontSize >= 32}
+                            >
+                              <i className="bi bi-plus"></i>
+                            </button>
+                          </div>
+
+                          <div className="btn-group">
+                            <button
+                              className={`btn btn-sm ${isListening ? 'btn-danger' : 'btn-primary'}`}
+                              onClick={toggleSpeechToText}
+                            >
+                              <i className={`bi ${isListening ? 'bi-mic-fill' : 'bi-mic'}`}></i>
+                            </button>
+                            <button
+                              className={`btn btn-sm ${isSpeaking ? 'btn-danger' : 'btn-primary'}`}
+                              onClick={speakText}
+                            >
+                              <i className={`bi ${isSpeaking ? 'bi-volume-up-fill' : 'bi-volume-up'}`}></i>
+                            </button>
+                          </div>
+
+                          <div className="btn-group">
+                            <button
+                              className="btn btn-sm btn-info"
+                              onClick={handleZoomIn}
+                              disabled={zoomLevel >= 200}
+                            >
+                              <i className="bi bi-zoom-in"></i>
+                            </button>
+                            <button
+                              className="btn btn-sm btn-info"
+                              onClick={handleZoomOut}
+                              disabled={zoomLevel <= 50}
+                            >
+                              <i className="bi bi-zoom-out"></i>
+                            </button>
+                          </div>
+
+                          <div className="btn-group">
+                            <button
+                              className="btn btn-sm btn-secondary"
+                              onClick={toggleFullscreen}
+                            >
+                              <i className={`bi bi-${isFullscreen ? 'fullscreen-exit' : 'fullscreen'}`}></i>
+                            </button>
+                            <button
+                              className="btn btn-sm btn-warning"
+                              onClick={clearNotePad}
+                            >
+                              <i className="bi bi-eraser-fill"></i>
+                            </button>
+                            <button
+                              className="btn btn-sm btn-dark"
+                              onClick={downloadNotePad}
+                            >
+                              <i className="bi bi-download"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Todo List */}
+                  <div className="col-12 col-md-4 mb-4">
+                    <div className="card shadow-lg">
+                      <div className="card-body" style={{ backgroundColor: todoColor }}>
+                        <h5 className="card-title text-center mb-3">Todo List</h5>
+
+                        <form onSubmit={addTodo} className="mb-3">
+                          <div className="input-group">
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={newTodo}
+                              onChange={(e) => setNewTodo(e.target.value)}
+                              placeholder="Add new task..."
+                            />
+                            <button type="submit" className="btn btn-primary">Add</button>
+                          </div>
+                        </form>
+                        <DragDropContext onDragEnd={handleDragEnd}>
+                          <Droppable droppableId="todos">
+                            {(provided) => (
+                              <ul
+                                className="list-group"
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                                style={{
+                                  height: '310px',
+                                  overflowY: 'auto',
+                                  msOverflowStyle: 'none',
+                                  scrollbarWidth: 'none',
+                                  '&::-webkit-scrollbar': {
+                                    display: 'none'
+                                  }
+                                }}
+                              >
+                                {todos.map((todo, index) => (
+                                  <Draggable
+                                    key={todo.createdAt || index}
+                                    draggableId={todo.createdAt || `todo-${index}`}
+                                    index={index}
+                                  >
+                                    {(provided) => (
+                                      <li
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className="list-group-item"
+                                        style={{
+                                          backgroundColor: todoColor,
+                                          color: isLightColor(todoColor) ? '#000' : '#fff'
+                                        }}
+                                      >
+                                        <div className="d-flex justify-content-between align-items-center" style={{ backgroundColor: todoColor }}>
+                                          <div className="d-flex align-items-center" style={{ width: '100%' }}>
+                                            <span className="me-2" style={{
+                                              minWidth: '25px',
+                                              color: '#666',
+                                              fontWeight: '500'
+                                            }}>
+                                              {index + 1}.
+                                            </span>
+                                            {editingTodo === index ? (
+                                              <div className="d-flex align-items-center flex-grow-1">
+                                                <input
+                                                  type="text"
+                                                  className="form-control form-control-sm me-2"
+                                                  value={editedTodoText}
+                                                  onChange={(e) => setEditedTodoText(e.target.value)}
+                                                  onKeyPress={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                      handleEditTodo(index);
+                                                    }
+                                                  }}
+                                                  autoFocus
+                                                />
+                                                <button
+                                                  className="btn btn-sm btn-success me-2"
+                                                  onClick={() => handleEditTodo(index)}
+                                                >
+                                                  Save
+                                                </button>
+                                                <button
+                                                  className="btn btn-sm btn-secondary"
+                                                  onClick={() => setEditingTodo(null)}
+                                                >
+                                                  Cancel
+                                                </button>
+                                              </div>
+                                            ) : (
+                                              <>
+                                                <span className='text-start'
+                                                  style={{
+                                                    textDecoration: todo.completed ? 'line-through' : 'none',
+                                                    marginLeft: '8px',
+                                                    flex: 1,
+                                                    overflow: 'hidden',
+                                                    color: todo.completed ? '#888' : 'inherit',
+                                                    cursor: 'pointer'
+                                                  }}
+                                                  onClick={() => startEditing(index, todo.text)}
+                                                >
+                                                  {todo.text}
+                                                </span>
+                                                <Checkbox
+                                                  checked={todo.completed || false}
+                                                  onChange={() => toggleTodo(index)}
+                                                  style={{ height: '10px', width: '10px' }}
+                                                />
+                                                <IconButton
+                                                  onClick={() => deleteTodo(index)}
+                                                  size="small"
+                                                  style={{ marginLeft: '8px' }}
+                                                >
+                                                  <DeleteIcon style={{ height: '20px', width: '20px' }} />
+                                                </IconButton>
+                                              </>
+                                            )}
+                                          </div>
+                                        </div>
+                                        <span className='text-muted' style={{ fontSize: '0.7rem', marginRight: '10px' }}>
+                                          {todo.createdAt ? (
+                                            <>
+                                              {new Date(todo.createdAt).toLocaleString()} ({getTimeAgo(todo.createdAt)})
+                                            </>
+                                          ) : 'No date'}
+                                        </span>
+                                      </li>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
+                              </ul>
+                            )}
+                          </Droppable>
+                        </DragDropContext>
+                        <div className="d-flex justify-content-between align-items-center mt-3">
+                          <div className="position-relative">
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              onClick={() => setShowTodoPicker(!showTodoPicker)}
+                              title="Change background color"
+                            >
+                              <i className="bi bi-palette-fill"></i>
+                            </button>
+                            {showTodoPicker && (
+                              <CustomColorPicker
+                                color={todoColor}
+                                onChange={(color) => updateColors('todo', color)}
+                                onClose={() => setShowTodoPicker(false)}
+                              />
+                            )}
+                          </div>
+
+                          <div>
+                            {todos.length > 0 && (
+                              <button
+                                className="btn btn-warning btn-sm"
+                                onClick={clearAllTodos}
+                              >
+                                <i className="bi bi-eraser-fill" title='Clear all'></i>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Excel Sheet */}
+                <div className="card shadow-lg mb-5" style={{ backgroundColor: excelSheetColor }}>
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h5 className="card-title text-center flex-grow-1" style={{ color: isLightColor(excelSheetColor) ? '#000' : '#fff' }}>
+                        Excel Sheet
+                      </h5>
+                    </div>
+                    {loading.excelSheet ? (
+                      <div className="text-center">
+                        <div className="spinner-border text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    ) : error.excelSheet ? (
+                      <div className="alert alert-danger">{error.excelSheet}</div>
+                    ) : (
+                      <>
+                        {tables.length === 0 ? (
+                          <div className="text-center">
+                            <p className="text-muted mb-3">No excel sheets available</p>
+                            <button className="btn btn-primary" onClick={addTable} title='Add New Table'>
+                              <i className="icofont-plus me-1" />
+                              <span className="">Add Excel Sheet</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            {tables.map((table, tableIndex) => (
+                              <div key={table.id} className="mt-3">
+                                <div className="d-flex justify-content-center align-items-center mb-3">
+                                  <input
+                                    type="text"
+                                    value={table.name || `Table ${tableIndex + 1}`}
+                                    onChange={(e) => handleTableNameChange(tableIndex, e.target.value)}
+                                    className="form-control text-center"
+                                    style={{
+                                      border: 'none',
+                                      backgroundColor: 'transparent',
+                                      fontSize: '1.1rem',
+                                      fontWeight: 'bold',
+                                      width: 'auto'
+                                    }}
+                                  />
+                                </div>
+                                <div className="table-responsive mb-3">
+                                  <table className="table table-bordered">
+                                    <thead>
+                                      <tr>
+                                        <th style={{ width: '30px', backgroundColor: '#f8f9fa' }}></th>
+                                        {Array(table.cols).fill().map((_, colIndex) => (
+                                          <th key={colIndex} className="text-center" style={{
+                                            backgroundColor: '#f8f9fa',
+                                            padding: '2px',
+                                            fontSize: '12px',
+                                            width: '80px',
+                                            color: isLightColor(excelSheetColor) ? '#000' : '#fff'
+                                          }}>
+                                            {getColumnLabel(colIndex)}
+                                            <button
+                                              className="btn text-danger btn-sm ms-1"
+                                              onClick={() => deleteColumn(tableIndex, colIndex)}
+                                              style={{ padding: '0px 2px', fontSize: '10px' }}
+                                            >
+                                              ×
+                                            </button>
+                                          </th>
+                                        ))}
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {Array(table.rows).fill().map((_, rowIndex) => (
+                                        <tr key={rowIndex}>
+                                          <td className="text-center" style={{
+                                            backgroundColor: '#f8f9fa',
+                                            padding: '2px',
+                                            fontSize: '12px'
+                                          }}>
+                                            {rowIndex + 1}
+                                            <button
+                                              className="btn text-danger btn-sm ms-1"
+                                              onClick={() => deleteRow(tableIndex, rowIndex)}
+                                              style={{ padding: '0px 2px', fontSize: '10px' }}
+                                            >
+                                              ×
+                                            </button>
+                                          </td>
+                                          {Array(table.cols).fill().map((_, colIndex) => (
+                                            <td key={colIndex} style={{
+                                              padding: '0px',
+                                              width: '80px',
+                                              maxWidth: '80px'
+                                            }}>
+                                              <div className="d-flex align-items-center" style={{ position: 'relative' }}>
+                                                <textarea
+                                                  data-cell={`${tableIndex}-${rowIndex}-${colIndex}`}
+                                                  value={table.data[rowIndex][colIndex]}
+                                                  onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
+                                                  onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
+                                                  className="cell-input"
+                                                  style={{
+                                                    width: '100%',
+                                                    padding: '1px 2px',
+                                                    border: 'none',
+                                                    background: 'transparent',
+                                                    resize: 'none',
+                                                    overflow: 'hidden',
+                                                    minHeight: '22px',
+                                                    maxHeight: '60px',
+                                                    fontSize: '12px',
+                                                    color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColor) ? '#000' : '#fff'),
+                                                    textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
+                                                  }}
+                                                />
+                                                {isValidUrl(table.data[rowIndex][colIndex]) && (
+                                                  <a
+                                                    href={table.data[rowIndex][colIndex]}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    style={{
+                                                      position: 'absolute',
+                                                      right: '2px',
+                                                      top: '50%',
+                                                      color: '#0d6efd',
+                                                      fontSize: '12px',
+                                                      zIndex: '1000'
+                                                    }}
+                                                  >
+                                                    <i className="bi bi-box-arrow-up-right"></i>
+                                                  </a>
+                                                )}
+                                              </div>
+                                            </td>
+                                          ))}
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <div className="mb-4 d-flex justify-content-center">
+                                  <div className="position-relative">
+                                    <button
+                                      className="btn btn-secondary me-2"
+                                      onClick={() => setShowExcelPicker(!showExcelPicker)}
+                                      title='Color The Sheet'
+                                    >
+                                      <i className="bi bi-palette-fill"></i>
+                                      <span className="ms-1">Color</span>
+                                    </button>
+                                    {showExcelPicker && (
+                                      <CustomColorPicker
+                                        color={excelSheetColor}
+                                        onChange={(color) => updateColors('excel', color)}
+                                        onClose={() => setShowExcelPicker(false)}
+                                      />
+                                    )}
+                                  </div>
+
+                                  <button
+                                    className="btn btn-warning me-2"
+                                    onClick={() => clearTableData(tableIndex)}
+                                    title='Clear All Table Value'
+                                  >
+                                    <i className="icofont-eraser  me-1" />
+                                    <span className="">Table</span>
+                                  </button>
+                                  {tables.length > 1 && (
+                                    <button
+                                      className="btn btn-danger me-2"
+                                      onClick={() => deleteTable(tableIndex)}
+                                    >
+                                      <i className="icofont-trash me-1 text-white" />
+                                      <span className="text-white">Table</span>
+                                    </button>
+                                  )}
+
+                                  <button
+                                    className="btn btn-primary me-2"
+                                    onClick={addTable}
+                                    title='Add New Table'
+                                  >
+                                    <i className="icofont-plus me-1" />
+                                    <span className="">Table</span>
+                                  </button>
+                                  <button
+                                    className="btn btn-secondary me-2"
+                                    onClick={() => addRow(tableIndex)}
+                                    title='Add New Row In Table'
+                                  >
+                                    <i className="icofont-plus me-1" />
+                                    <span className="">Row</span>
+                                  </button>
+                                  <button
+                                    className="btn btn-secondary me-2"
+                                    onClick={() => addColumn(tableIndex)}
+                                    title='Add New Column In Table'
+                                  >
+                                    <i className="icofont-plus me-1" />
+                                    <span className="">Column</span>
+                                  </button>
+                                  <button
+                                    className="btn btn-dark btn-sm"
+                                    onClick={() => downloadExcelSheet(tableIndex)}
+                                    title='Download The Excel Sheet'
+                                  >
+                                    <i className="bi bi-download"></i>
+                                    <span className="ms-1">Excel</span>
+                                  </button>
+                                </div>
+                                <hr className="my-4" />
+                              </div>
+                            ))}
+                          </>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
 
                 <div className="mt-4 mb-2">
                   <Link to="https://pizeonfly.com/" className="text-muted">
