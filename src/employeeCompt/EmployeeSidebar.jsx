@@ -20,7 +20,12 @@ const EmployeeSidebar = () => {
                     </div>
                     {/* Menu: main ul */}
                     <ul className="menu-list flex-grow-1 mt-3">
-                        <li className="collapsed">
+                        <li>
+                            <Link className="ms-link" to="/employee-dashboard">
+                                <i className="icofont-home fs-5" /> <span className='fs-6'>Employee Dashboard</span>
+                            </Link>
+                        </li>
+                        {/* <li className="collapsed">
                             <Link className="ms-link" to="/employee-dashboard">
                                 <a
                                     className="m-link"
@@ -29,19 +34,18 @@ const EmployeeSidebar = () => {
                                     href="#"
                                 >
                                     <i className="icofont-home fs-5" /> <span className='fs-6'>Employee Dashboard</span>{" "}
-                                    {/* <span className="arrow icofont-dotted-down ms-auto text-end fs-5" /> */}
-                                </a>
-                            </Link>
-                            {/* Menu: Sub menu ul */}
-                            {/* <ul className="sub-menu collapse show" id="dashboard-Components">
-                                <li>
-                                    <Link className="ms-link " to="/employee-dashboard">
-                                        {" "}
-                                        <span>Employee Dashboard</span>
-                                    </Link>
-                                </li>
-                            </ul> */}
-                        </li>
+                                    <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+                    </a>
+                </Link>
+                <ul className="sub-menu collapse show" id="dashboard-Components">
+                    <li>
+                        <Link className="ms-link " to="/employee-dashboard">
+                            {" "}
+                            <span>Employee Dashboard</span>
+                        </Link>
+                    </li>
+                </ul>
+            </li> */}
                         <li className="collapsed">
                             <a
                                 className="m-link"
@@ -117,18 +121,18 @@ const EmployeeSidebar = () => {
                                 </li>
                             </ul>
                         </li>
-                    </ul>
+                    </ul >
                     {/* Menu: menu collepce btn */}
-                    <button
+                    < button
                         type="button"
                         className="btn btn-link sidebar-mini-btn text-light"
                     >
                         <span className="ms-2">
                             <i className="icofont-bubble-right" />
                         </span>
-                    </button>
-                </div>
-            </div>
+                    </button >
+                </div >
+            </div >
         </>
 
     )

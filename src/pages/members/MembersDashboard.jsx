@@ -10,6 +10,8 @@ import { Checkbox, IconButton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useLocation } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import CustomColorPicker, { isLightColor } from "../colorpicker/CustomColorPicker";
+
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
@@ -148,118 +150,118 @@ const MemberDashboard = () => {
     const [shareEmail, setShareEmail] = useState('');
     const [shareMessage, setShareMessage] = useState('');
 
-    // Add these new color options
-    const colorOptions = {
-        standard: [
-            // Row 1
-            '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF', '#fdf8c8',
-            // Row 2 
-            '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
-            // Row 3
-            '#FFB6C1', '#FFA07A', '#FFE4B5', '#FFFACD', '#98FB98', '#AFEEEE', '#87CEEB', '#E6E6FA', '#DDA0DD', '#FFC0CB',
-            // Row 4
-            '#DC143C', '#FF4500', '#FFA500', '#FFD700', '#32CD32', '#20B2AA', '#4169E1', '#8A2BE2', '#9370DB', '#FF69B4',
-            // Row 5
-            '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585'
-        ],
-        custom: ['#FFFFFF', '#000000']
-    };
+    // // Add these new color options
+    // const colorOptions = {
+    //     standard: [
+    //         // Row 1
+    //         '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF', '#fdf8c8',
+    //         // Row 2 
+    //         '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
+    //         // Row 3
+    //         '#FFB6C1', '#FFA07A', '#FFE4B5', '#FFFACD', '#98FB98', '#AFEEEE', '#87CEEB', '#E6E6FA', '#DDA0DD', '#FFC0CB',
+    //         // Row 4
+    //         '#DC143C', '#FF4500', '#FFA500', '#FFD700', '#32CD32', '#20B2AA', '#4169E1', '#8A2BE2', '#9370DB', '#FF69B4',
+    //         // Row 5
+    //         '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585'
+    //     ],
+    //     custom: ['#FFFFFF', '#000000']
+    // };
 
-    // Update the color picker component
-    const CustomColorPicker = ({ color, onChange, onClose }) => {
-        return (
-            <div className="custom-color-picker mt-2" style={{
-                position: 'absolute',
-                zIndex: 1000,
-                backgroundColor: 'white',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                padding: '8px',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                width: '250px'
-            }}>
-                <div style={{ marginBottom: '10px' }} className='border-bottom pb-2'>
-                    <strong>STANDARD</strong>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '2px' }}>
-                        {colorOptions.standard.map((c, i) => (
-                            <div
-                                key={i}
-                                onClick={() => {
-                                    onChange(c);
-                                    onClose();
-                                }}
-                                style={{
-                                    width: '20px',
-                                    height: '20px',
-                                    backgroundColor: c,
-                                    border: '1px solid #ccc',
-                                    cursor: 'pointer',
-                                    borderRadius: '9px',
-                                    position: 'relative'
-                                }}
-                            >
-                                {color === c && (
-                                    <span style={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        color: isLightColor(c) ? '#000' : '#fff'
-                                    }}>✓</span>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+    // // Update the color picker component
+    // const CustomColorPicker = ({ color, onChange, onClose }) => {
+    //     return (
+    //         <div className="custom-color-picker mt-2" style={{
+    //             position: 'absolute',
+    //             zIndex: 1000,
+    //             backgroundColor: 'white',
+    //             border: '1px solid #ccc',
+    //             borderRadius: '4px',
+    //             padding: '8px',
+    //             boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+    //             width: '250px'
+    //         }}>
+    //             <div style={{ marginBottom: '10px' }} className='border-bottom pb-2'>
+    //                 <strong>STANDARD</strong>
+    //                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '2px' }}>
+    //                     {colorOptions.standard.map((c, i) => (
+    //                         <div
+    //                             key={i}
+    //                             onClick={() => {
+    //                                 onChange(c);
+    //                                 onClose();
+    //                             }}
+    //                             style={{
+    //                                 width: '20px',
+    //                                 height: '20px',
+    //                                 backgroundColor: c,
+    //                                 border: '1px solid #ccc',
+    //                                 cursor: 'pointer',
+    //                                 borderRadius: '9px',
+    //                                 position: 'relative'
+    //                             }}
+    //                         >
+    //                             {color === c && (
+    //                                 <span style={{
+    //                                     position: 'absolute',
+    //                                     top: '50%',
+    //                                     left: '50%',
+    //                                     transform: 'translate(-50%, -50%)',
+    //                                     color: isLightColor(c) ? '#000' : '#fff'
+    //                                 }}>✓</span>
+    //                             )}
+    //                         </div>
+    //                     ))}
+    //                 </div>
+    //             </div>
 
-                <div>
-                    <strong>CUSTOM</strong>
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                        {colorOptions.custom.map((c, i) => (
-                            <div
-                                key={i}
-                                onClick={() => onChange(c)}
-                                style={{
-                                    width: '20px',
-                                    height: '20px',
-                                    backgroundColor: c,
-                                    border: '1px solid #ccc',
-                                    cursor: 'pointer',
-                                    borderRadius: '9px'
-                                }}
-                            />
-                        ))}
-                        <input
-                            type="color"
-                            value={color}
-                            onChange={(e) => onChange(e.target.value)}
-                            style={{ width: '20px', height: '20px', padding: 0, borderRadius: '9px', border: 'none' }}
-                            title='Custom Color'
-                        />
-                    </div>
-                </div>
+    //             <div>
+    //                 <strong>CUSTOM</strong>
+    //                 <div style={{ display: 'flex', gap: '4px' }}>
+    //                     {colorOptions.custom.map((c, i) => (
+    //                         <div
+    //                             key={i}
+    //                             onClick={() => onChange(c)}
+    //                             style={{
+    //                                 width: '20px',
+    //                                 height: '20px',
+    //                                 backgroundColor: c,
+    //                                 border: '1px solid #ccc',
+    //                                 cursor: 'pointer',
+    //                                 borderRadius: '9px'
+    //                             }}
+    //                         />
+    //                     ))}
+    //                     <input
+    //                         type="color"
+    //                         value={color}
+    //                         onChange={(e) => onChange(e.target.value)}
+    //                         style={{ width: '20px', height: '20px', padding: 0, borderRadius: '9px', border: 'none' }}
+    //                         title='Custom Color'
+    //                     />
+    //                 </div>
+    //             </div>
 
-                {/* <div style={{ marginTop: '8px', borderTop: '1px solid #ccc', paddingTop: '8px' }}>
-                    <div>Conditional formatting</div>
-                    <div>Alternating colors</div>
-                </div> */}
-            </div>
-        );
-    };
+    //             {/* <div style={{ marginTop: '8px', borderTop: '1px solid #ccc', paddingTop: '8px' }}>
+    //                 <div>Conditional formatting</div>
+    //                 <div>Alternating colors</div>
+    //             </div> */}
+    //         </div>
+    //     );
+    // };
 
-    // Helper function to determine if a color is light
-    const isLightColor = (color) => {
-        // Handle empty or invalid colors
-        if (!color) return true;
+    // // Helper function to determine if a color is light
+    // const isLightColor = (color) => {
+    //     // Handle empty or invalid colors
+    //     if (!color) return true;
 
-        const hex = color.replace('#', '');
-        const r = parseInt(hex.substr(0, 2), 16);
-        const g = parseInt(hex.substr(2, 2), 16);
-        const b = parseInt(hex.substr(4, 2), 16);
-        // Using YIQ formula for better contrast detection
-        const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-        return yiq >= 128;
-    };
+    //     const hex = color.replace('#', '');
+    //     const r = parseInt(hex.substr(0, 2), 16);
+    //     const g = parseInt(hex.substr(2, 2), 16);
+    //     const b = parseInt(hex.substr(4, 2), 16);
+    //     // Using YIQ formula for better contrast detection
+    //     const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    //     return yiq >= 128;
+    // };
 
     useEffect(() => {
         const handleResize = () => {
