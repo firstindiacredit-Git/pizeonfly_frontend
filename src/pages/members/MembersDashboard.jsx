@@ -875,19 +875,22 @@ const MemberDashboard = () => {
     // Add these new functions
     const clearNotePad = async () => {
         try {
-            setNotes('');
             if (dashboardIds.notePad) {
-                await axios.put(
-                    `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${dashboardIds.notePad}`,
-                    {
-                        notes: '',
-                        employeeId: employeeCode
-                    }
+                // Delete the notepad document entirely instead of just clearing it
+                await axios.delete(
+                    `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${dashboardIds.notePad}`
                 );
+                
+                // Clear local state
+                setNotes('');
+                // Reset the dashboard ID for notepad
+                setDashboardIds(prev => ({ ...prev, notePad: null }));
             }
         } catch (error) {
             console.error('Error clearing notepad:', error);
             setError(prev => ({ ...prev, notePad: 'Failed to clear notepad' }));
+            // Revert the state if API call fails
+            setNotes(notes);
         }
     };
 

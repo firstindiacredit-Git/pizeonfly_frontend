@@ -1122,18 +1122,20 @@ const EmployeeDashboard = () => {
     }
 
     try {
-      setNotes(''); // Clear the notes in frontend
-
       const token = localStorage.getItem('emp_token');
+      
       if (dashboardIds.notePad) {
-        await axios.put(
+        // Use DELETE request instead of PUT
+        await axios.delete(
           `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${dashboardIds.notePad}`,
-          {
-            notes: '',
-            employeeId: currentEmployeeId
-          },
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        
+        // Clear local states
+        setLocalNotes('');
+        setNotes('');
+        // Reset the dashboard ID for notepad
+        setDashboardIds(prev => ({ ...prev, notePad: null }));
       }
     } catch (error) {
       console.error('Error clearing notepad:', error);
