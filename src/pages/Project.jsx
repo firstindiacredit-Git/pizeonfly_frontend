@@ -13,7 +13,7 @@ const Project = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currProj, setCurrProj] = useState({});
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState('row');
   const [searchTerm, setSearchTerm] = useState("");
   const [notifications, setNotifications] = useState({});
 
@@ -834,18 +834,26 @@ const Project = () => {
                         </ul>
                       </div>
                     </div>
-                    <div className="d-flex justify-content-between mb-4">
+                    <div className="d-flex justify-content-between mt-3 mb-3">
                       <div>
-                        <h6>Change View</h6>
-                        <div className="d-flex justify-content-around">
-                          <button
-                            className="bi bi-list-task bg-primary text-white border-0 rounded"
-                            onClick={() => setViewMode("list")} // Set to list view
-                          ></button>
-                          <button
-                            className="bi bi-grid-3x3-gap-fill bg-primary text-white border-0 rounded"
-                            onClick={() => setViewMode("grid")} // Set to grid view
-                          ></button>
+                        <div className="d-flex">
+                          {viewMode === 'row' ? (
+                            <button
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewMode('list')}
+                              title="Switch to List View"
+                            >
+                              <i className="bi bi-list-task"></i>
+                            </button>
+                          ) : (
+                            <button
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewMode('row')}
+                              title="Switch to Grid View"
+                            >
+                              <i className="bi bi-grid-3x3-gap-fill"></i>
+                            </button>
+                          )}
                         </div>
                       </div>
 
@@ -1351,27 +1359,30 @@ const Project = () => {
                                       <div className="d-flex justify-content-between">
                                         <button
                                           onClick={() => setToEdit(project._id)}
-                                          className="btn icofont-edit text-success"
+                                          className="btn icofont-edit text-success fs-5"
                                           data-bs-toggle="modal"
                                           data-bs-target="#editproject"
+                                          title="Edit"
                                         >
-                                          Edit
+
                                         </button>
                                         <button
-                                          className="btn icofont-ui-delete text-danger"
+                                          className="btn icofont-ui-delete text-danger fs-5"
                                           data-bs-toggle="modal"
                                           data-bs-target="#deleteproject"
                                           onClick={() => setDeletableId(project._id)}
+                                          title="Delete"
                                         >
-                                          Delete
+
                                         </button>
                                         <button
-                                          className="btn bi bi-chat-left-dots text-primary position-relative"
+                                          className="btn bi bi-chat-left-dots text-primary position-relative fs-5"
                                           data-bs-toggle="modal"
                                           data-bs-target="#addUser"
                                           onClick={() => handleOpenMessages(project)}
+                                          title="Message"
                                         >
-                                          Message
+
                                           {notifications[project._id] > 0 && (
                                             <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                               {notifications[project._id]}

@@ -20,24 +20,26 @@ const ClientSidebar = () => {
                     {/* Menu: main ul */}
                     <ul className="menu-list flex-grow-1 mt-3">
                         <li className="collapsed">
-                            <a
-                                className="m-link"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#dashboard-Components"
-                                href="#"
-                            >
-                                <i className="icofont-home fs-5" /> <span>Dashboard</span>{" "}
-                                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
-                            </a>
+                            <Link className="ms-link" to="/client-dashboard">
+                                <a
+                                    className="m-link"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#dashboard-Components"
+                                    href="#"
+                                >
+                                    <i className="icofont-home fs-5" /> <span className='fs-6'>Client Dashboard</span>{" "}
+                                    {/* <span className="arrow icofont-dotted-down ms-auto text-end fs-5" /> */}
+                                </a>
+                            </Link>
                             {/* Menu: Sub menu ul */}
-                            <ul className="sub-menu collapse show" id="dashboard-Components">
+                            {/* <ul className="sub-menu collapse show" id="dashboard-Components">
                                 <li>
                                     <Link className="ms-link " to="/client-dashboard">
                                         {" "}
                                         <span>Client Dashboard</span>
                                     </Link>
                                 </li>
-                            </ul>
+                            </ul> */}
                         </li>
                         <li className="collapsed">
                             <a

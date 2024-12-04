@@ -191,16 +191,24 @@ const Project = () => {
                       <h3 className="fw-bold py-3 mb-0">Projects</h3>
                       <div className="d-flex me-2">
                         <div>
-                          <h6>Change View</h6>
-                          <div className="d-flex justify-content-around">
-                            <button
-                              className="bi bi-list-task bg-primary text-white border-0 rounded"
-                              onClick={() => setViewMode("list")} // Set to list view
-                            ></button>
-                            <button
-                              className="bi bi-grid-3x3-gap-fill bg-primary text-white border-0 rounded"
-                              onClick={() => setViewMode("grid")} // Set to grid view
-                            ></button>
+                          <div className="d-flex">
+                            {viewMode === 'grid' ? (
+                              <button
+                                className="btn btn-outline-primary"
+                                onClick={() => setViewMode('list')}
+                                title="Switch to List View"
+                              >
+                                <i className="bi bi-list-task"></i>
+                              </button>
+                            ) : (
+                              <button
+                                className="btn btn-outline-primary"
+                                onClick={() => setViewMode('grid')}
+                                title="Switch to Grid View"
+                              >
+                                <i className="bi bi-grid-3x3-gap-fill"></i>
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>

@@ -45,28 +45,77 @@ const Sidebar = () => {
             <span className="logo-text fs-3" style={{ color: "#4989fd" }}>pizeon</span>
             <span className="logo-text fs-3" style={{ marginLeft: "-0.9rem", color: "#0c117b" }}>fly</span>
           </div> */}
-          <img src='../Images/icon.png'style={{ height: "2.7rem" }} alt="Pizeonfly Logo"/>
+          <img src='../Images/icon.png' style={{ height: "2.7rem" }} alt="Pizeonfly Logo" />
         </div>
 
         {/* Menu: main ul */}
         {/* {role === 'superadmin' && (
           )} */}
-          <ul className="menu-list flex-grow-1 mt-3">
-            <li className="collapsed">
+        <ul className="menu-list flex-grow-1 mt-3">
+          <li className="collapsed">
+            <Link className="ms-link" to="/project-dashboard">
               <a
                 className="m-link"
                 data-bs-toggle="collapse"
                 data-bs-target="#dashboard-Components"
                 href="#"
               >
-                <i className="icofont-home fs-5" /> <span>Dashboard</span>{" "}
-                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+
+                <i className="icofont-home fs-5" />
+                <span className='fs-6'>Admin Dashboard</span>{" "}
+                {/* <span className="arrow icofont-dotted-down ms-auto text-end fs-5" /> */}
               </a>
-              {/* Menu: Sub menu ul */}
-              <ul className="sub-menu collapse show" id="dashboard-Components">
+            </Link>
+            {/* Menu: Sub menu ul */}
+            {/* <ul className="sub-menu collapse show" id="dashboard-Components">
                 <li>
                   <Link className="ms-link" to="/project-dashboard">
                     <span>Admin Dashboard</span>
+                  </Link>
+                </li>
+              </ul> */}
+          </li>
+          <li className="collapsed">
+            <a
+              className="m-link"
+              data-bs-toggle="collapse"
+              data-bs-target="#project-Components"
+              href="#"
+            >
+              <i className="icofont-briefcase" />
+              <span>Projects</span>{" "}
+              <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+            </a>
+            {/* Menu: Sub menu ul */}
+            <ul className="sub-menu collapse" id="project-Components">
+              <li>
+                <Link className="ms-link" to="/projects">
+                  <span>Projects</span>
+                </Link>
+              </li>
+              <li>
+                <Link className="ms-link" to="/tasks">
+                  <span>Tasks</span>
+                </Link>
+              </li>
+            </ul>
+          </li>
+
+          <>
+            <li className="collapsed">
+              <a
+                className="m-link"
+                data-bs-toggle="collapse"
+                data-bs-target="#client-Components"
+                href="#"
+              >
+                <i className="icofont-user-male" /> <span>Our Clients</span>{" "}
+                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+              </a>
+              <ul className="sub-menu collapse" id="client-Components">
+                <li>
+                  <Link className="ms-link" to="/clients">
+                    <span>Clients</span>
                   </Link>
                 </li>
               </ul>
@@ -75,100 +124,55 @@ const Sidebar = () => {
               <a
                 className="m-link"
                 data-bs-toggle="collapse"
-                data-bs-target="#project-Components"
+                data-bs-target="#emp-Components"
                 href="#"
               >
-                <i className="icofont-briefcase" />
-                <span>Projects</span>{" "}
+                <i className="icofont-users-alt-5" /> <span>Employees</span>{" "}
                 <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
               </a>
-              {/* Menu: Sub menu ul */}
-              <ul className="sub-menu collapse" id="project-Components">
+              <ul className="sub-menu collapse" id="emp-Components">
                 <li>
-                  <Link className="ms-link" to="/projects">
-                    <span>Projects</span>
+                  <Link className="ms-link" to="/members">
+                    <span>Members</span>
                   </Link>
                 </li>
                 <li>
-                  <Link className="ms-link" to="/tasks">
-                    <span>Tasks</span>
-                  </Link>
+
                 </li>
               </ul>
             </li>
 
-            <>
-              <li className="collapsed">
-                <a
-                  className="m-link"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#client-Components"
-                  href="#"
-                >
-                  <i className="icofont-user-male" /> <span>Our Clients</span>{" "}
-                  <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
-                </a>
-                <ul className="sub-menu collapse" id="client-Components">
-                  <li>
-                    <Link className="ms-link" to="/clients">
-                      <span>Clients</span>
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-              <li className="collapsed">
-                <a
-                  className="m-link"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#emp-Components"
-                  href="#"
-                >
-                  <i className="icofont-users-alt-5" /> <span>Employees</span>{" "}
-                  <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
-                </a>
-                <ul className="sub-menu collapse" id="emp-Components">
-                  <li>
-                    <Link className="ms-link" to="/members">
-                      <span>Members</span>
-                    </Link>
-                  </li>
-                  <li>
+            <li className="collapsed">
+              <a
+                className="m-link"
+                data-bs-toggle="collapse"
+                data-bs-target="#tools-Components"
+                href="#"
+              >
+                <i className="icofont-tools-alt-2" /> <span>Tools</span>{" "}
+                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+              </a>
+              <ul className="sub-menu collapse" id="tools-Components">
+                <li>
+                  <Link className="ms-link"
+                    // to="https://pizeonflyurl.vercel.app/"
+                    to="/urlShortner"
+                  >
+                    <span>URL Shortner</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link className="ms-link" to="/qrCodeGenerate">
+                    <span>QR Code Generator</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link className="ms-link" to="/saasManager">
+                    <span>Saas Manager</span>
+                  </Link>
+                </li>
 
-                  </li>
-                </ul>
-              </li>
-
-              <li className="collapsed">
-                <a
-                  className="m-link"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#tools-Components"
-                  href="#"
-                >
-                  <i className="icofont-tools-alt-2" /> <span>Tools</span>{" "}
-                  <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
-                </a>
-                <ul className="sub-menu collapse" id="tools-Components">
-                  <li>
-                    <Link className="ms-link"
-                      // to="https://pizeonflyurl.vercel.app/"
-                      to="/urlShortner"
-                    >
-                      <span>URL Shortner</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="ms-link" to="/qrCodeGenerate">
-                      <span>QR Code Generator</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="ms-link" to="/saasManager">
-                      <span>Saas Manager</span>
-                    </Link>
-                  </li>
-
-                  {/* <li>
+                {/* <li>
                     <Link className="ms-link" to="/htmlTemplateGenerator">
                       <span>HTML Template Generator</span>
                     </Link>
@@ -183,43 +187,43 @@ const Sidebar = () => {
                       <span>Card Generator</span>
                     </Link>
                   </li> */}
-                  <li>
-                    <Link className="ms-link" to="/miscellaneous">
-                      <span>Miscellaneous</span>
-                    </Link>
-                  </li>
-                  {/* <li>
+                <li>
+                  <Link className="ms-link" to="/miscellaneous">
+                    <span>Miscellaneous</span>
+                  </Link>
+                </li>
+                {/* <li>
                     <Link className="ms-link" to="/miscellaneous1">
                       <span>Miscellaneous1</span>
                     </Link>
                   </li> */}
-                </ul>
-              </li>
-              <li className="collapsed">
-                <a
-                  className="m-link"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#accounts-Components"
-                  href="#"
-                >
-                  <i className="icofont-document-folder" /> <span>Accounts & Billing</span>{" "}
-                  <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
-                </a>
-                <ul className="sub-menu collapse" id="accounts-Components">
-                  <li>
-                    <Link className="ms-link" to="/create-invoice">
-                      <span>Create Invoice</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="ms-link" to="/all-invoice">
-                      <span>All Invoice</span>
-                    </Link>
-                  </li>
-                </ul>
-              </li>
+              </ul>
+            </li>
+            <li className="collapsed">
+              <a
+                className="m-link"
+                data-bs-toggle="collapse"
+                data-bs-target="#accounts-Components"
+                href="#"
+              >
+                <i className="icofont-document-folder" /> <span>Accounts & Billing</span>{" "}
+                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+              </a>
+              <ul className="sub-menu collapse" id="accounts-Components">
+                <li>
+                  <Link className="ms-link" to="/create-invoice">
+                    <span>Create Invoice</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link className="ms-link" to="/all-invoice">
+                    <span>All Invoice</span>
+                  </Link>
+                </li>
+              </ul>
+            </li>
 
-              {/* <li className="collapsed">
+            {/* <li className="collapsed">
                 <a
                   className="m-link"
                   data-bs-toggle="collapse"
@@ -252,9 +256,9 @@ const Sidebar = () => {
                   </li>
                 </ul>
               </li> */}
-            </>
-          </ul>
-        
+          </>
+        </ul>
+
         {/* <button
           type="button"
           className="btn btn-link sidebar-mini-btn text-light"

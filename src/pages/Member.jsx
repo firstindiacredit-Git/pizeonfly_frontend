@@ -778,15 +778,24 @@ const Member = () => {
 
                       <div className="d-flex justify-content-between">
                         <div></div>
-                        <div className="d-flex gap-2">
-                          <button
-                            className={`bi bi-list-task ${viewMode === 'list' ? 'bg-primary' : 'bg-secondary'} text-white border-0 rounded`}
-                            onClick={() => setViewMode('list')}
-                          ></button>
-                          <button
-                            className={`bi bi-grid-3x3-gap-fill ${viewMode === 'grid' ? 'bg-primary' : 'bg-secondary'} text-white border-0 rounded`}
-                            onClick={() => setViewMode('grid')}
-                          ></button>
+                        <div className="d-flex">
+                          {viewMode === 'grid' ? (
+                            <button
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewMode('list')}
+                              title="Switch to List View"
+                            >
+                              <i className="bi bi-list-task"></i>
+                            </button>
+                          ) : (
+                            <button
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewMode('grid')}
+                              title="Switch to Grid View"
+                            >
+                              <i className="bi bi-grid-3x3-gap-fill"></i>
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

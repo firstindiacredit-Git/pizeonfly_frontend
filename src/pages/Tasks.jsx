@@ -632,14 +632,24 @@ const Tasks = () => {
                 </div>{" "}
                 <div className="row g-3 mb-3">
                   <div className="col-12 col-md-4">
-                    <h6>Change View</h6>
                     <div className="d-flex">
-                      <button className="btn btn-outline-primary me-2" onClick={() => setViewMode('list')}>
-                        <i className="bi bi-list-task"></i>
-                      </button>
-                      <button className="btn btn-outline-primary" onClick={() => setViewMode('row')}>
-                        <i className="bi bi-grid-3x3-gap-fill"></i>
-                      </button>
+                      {viewMode === 'row' ? (
+                        <button 
+                          className="btn btn-outline-primary" 
+                          onClick={() => setViewMode('list')}
+                          title="Switch to List View"
+                        >
+                          <i className="bi bi-list-task"></i>
+                        </button>
+                      ) : (
+                        <button 
+                          className="btn btn-outline-primary" 
+                          onClick={() => setViewMode('row')}
+                          title="Switch to Grid View"
+                        >
+                          <i className="bi bi-grid-3x3-gap-fill"></i>
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -669,14 +679,15 @@ const Tasks = () => {
                   </div>
 
                   <div className="col-12 col-md-4">
-                    <div className="text-md-end">
-                      <p className="mb-2 fw-bold">Filter by Date</p>
+                    <div className="input-group d-flex gap-2 align-items-center" style={{width:"20rem"}}>
+                    <span className="fw-bold">Filter by Date - </span>
                       <input
                         className="form-control"
                         type="date"
                         value={filterDate}
                         onChange={(e) => setFilterDate(e.target.value)}
                       />
+                      
                     </div>
                   </div>
                 </div>

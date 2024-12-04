@@ -44,7 +44,7 @@ const ClientDashboard = () => {
         const projects = statusResponse.data;
         const completed = projects.filter(project => project.progress === "100.00").length;
         const inProgress = projects.length - completed;
-        
+
         setProjectStatus({
           completed,
           inProgress
@@ -163,7 +163,36 @@ const ClientDashboard = () => {
                           </div>
                         </div>
                       </div>
-                      <Link to="https://pizeonfly.com/" className="text-muted">GO TO THE WEBSITE</Link>
+                      <div className="mt-5 mb-4 text-center">
+                        <Link
+                          to="https://pizeonfly.com/"
+                          className="btn btn-outline-primary btn-lg position-relative"
+                          style={{
+                            borderRadius: '30px',
+                            padding: '12px 35px',
+                            transition: 'all 0.3s ease',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            fontWeight: '600',
+                            fontSize: '0.9rem'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-3px)';
+                            e.currentTarget.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          <i className="bi bi-globe me-2"></i>
+                          Visit Our Website
+                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style={{ fontSize: '0.7rem' }}>
+                            New
+                          </span>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>

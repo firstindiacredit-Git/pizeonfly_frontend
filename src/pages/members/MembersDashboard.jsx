@@ -880,7 +880,7 @@ const MemberDashboard = () => {
                 await axios.delete(
                     `${import.meta.env.VITE_BASE_URL}api/employeeNotePad/${dashboardIds.notePad}`
                 );
-                
+
                 // Clear local state
                 setNotes('');
                 // Reset the dashboard ID for notepad
@@ -1277,13 +1277,13 @@ const MemberDashboard = () => {
                 </div>
                 <div className="d-flex justify-content-between mt-2 small">
                     <div>
-                        <span className="text-success fw-bold">Completed: {completed}({completedPercent}%)</span>
+                        <span className="text-success fw-bold">Completed: {completed}</span>
                     </div>
                     <div>
-                        <span className="text-primary fw-bold">In Progress: {inProgress}({inProgressPercent}%)</span>
+                        <span className="text-primary fw-bold">In Progress: {inProgress}</span>
                     </div>
                     <div>
-                        <span className="text-secondary fw-bold">Not Started: {notStarted}({notStartedPercent}%)</span>
+                        <span className="text-secondary fw-bold">Not Started: {notStarted}</span>
                     </div>
                 </div>
             </div>
@@ -2576,7 +2576,36 @@ const MemberDashboard = () => {
 
                                         </div>
 
-                                        <Link to="https://pizeonfly.com/" className="text-muted">GO TO THE WEBSITE</Link>
+                                        <div className="mt-5 mb-4 text-center">
+                                            <Link
+                                                to="https://pizeonfly.com/"
+                                                className="btn btn-outline-primary btn-lg position-relative"
+                                                style={{
+                                                    borderRadius: '30px',
+                                                    padding: '12px 35px',
+                                                    transition: 'all 0.3s ease',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '1px',
+                                                    fontWeight: '600',
+                                                    fontSize: '0.9rem'
+                                                }}
+                                                onMouseOver={(e) => {
+                                                    e.currentTarget.style.transform = 'translateY(-3px)';
+                                                    e.currentTarget.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                                                }}
+                                                onMouseOut={(e) => {
+                                                    e.currentTarget.style.transform = 'translateY(0)';
+                                                    e.currentTarget.style.boxShadow = 'none';
+                                                }}
+                                            >
+                                                <i className="bi bi-globe me-2"></i>
+                                                Visit Our Website
+                                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                                    style={{ fontSize: '0.7rem' }}>
+                                                    New
+                                                </span>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2619,7 +2648,6 @@ const MemberDashboard = () => {
                 </div>
             )}
 
-// ... existing code ...
 
             {/* Add Bank Details Modal */}
             <div className="modal fade" id="bankDetailsModal" tabIndex="-1" aria-hidden="true" style={{ zIndex: 9998 }}>
@@ -2835,7 +2863,7 @@ const MemberDashboard = () => {
                 </div>
             </div>
 
-// ... rest of the code ...
+
 
             {/* Add this CSS to hide scrollbars globally for these elements */}
             <style>

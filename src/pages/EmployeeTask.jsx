@@ -7,7 +7,7 @@ import "./Loading.css";
 import io from 'socket.io-client';
 
 const Tasks = () => {
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState("row");
   const [employees, setEmployees] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [taskStatuses, setTaskStatuses] = useState({});
@@ -274,16 +274,24 @@ const Tasks = () => {
                     <div className="card-header py-3 no-bg bg-transparent d-flex align-items-center px-0 justify-content-between border-bottom flex-wrap mb-3">
                       <h3 className="fw-bold mb-0">Task Management</h3>
                       <div>
-                        <h6>Change View</h6>
-                        <div className="d-flex justify-content-around">
-                          <button
-                            className="bi bi-list-task bg-primary text-white border-0 rounded"
-                            onClick={() => setViewMode("list")} // Set to list view
-                          ></button>
-                          <button
-                            className="bi bi-grid-3x3-gap-fill bg-primary text-white border-0 rounded"
-                            onClick={() => setViewMode("grid")} // Set to grid view
-                          ></button>
+                        <div className="d-flex">
+                          {viewMode === 'row' ? (
+                            <button
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewMode('list')}
+                              title="Switch to List View"
+                            >
+                              <i className="bi bi-list-task"></i>
+                            </button>
+                          ) : (
+                            <button
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewMode('row')}
+                              title="Switch to Grid View"
+                            >
+                              <i className="bi bi-grid-3x3-gap-fill"></i>
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -320,9 +328,9 @@ const Tasks = () => {
                       </div>
 
                       <div className="filter-container">
-                        <select 
-                          className="form-select d-md-none" 
-                          value={filterStatus} 
+                        <select
+                          className="form-select d-md-none"
+                          value={filterStatus}
                           onChange={(e) => setFilterStatus(e.target.value)}
                           style={{ width: 'auto' }}
                         >
@@ -331,7 +339,7 @@ const Tasks = () => {
                           <option value="In Progress">In Progress</option>
                           <option value="Completed">Completed</option>
                         </select>
-                        
+
                         <ul className="nav nav-tabs tab-body-header rounded prtab-set d-none d-md-flex" style={{ cursor: 'pointer', height: "fit-content" }} role="tablist">
                           <li className="nav-item">
                             <a
@@ -372,7 +380,7 @@ const Tasks = () => {
                         </ul>
                       </div>
                     </div>
-                                      
+
                   </div>
                 </div>{" "}
                 {/* Row end  */}
@@ -380,126 +388,126 @@ const Tasks = () => {
                   {viewMode === "list" ? (
                     // List View Rendering
                     <div className="table-responsive">
-                    <table className="table table-hover align-middle mb-0" style={{ width: "100%" }}>
-                      <thead>
-                        <tr>
-                          <th>Sr.No</th>
-                          <th>Project Name</th>
-                          <th>Description</th>
-                          <th>Status</th>
-                          <th>Due Date</th>
-                          <th>Assigned To</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {currentTasks.map((task, index) => {
-                          const getFormattedDate = (date) => {
-                            const newDate = new Date(date);
-                            return `${newDate.getDate()}/${newDate.getMonth() + 1}/${newDate.getFullYear()}`;
-                          };
-                          return (
-                            <tr key={task._id}>
-                              <td><span className="fw-bold fs-6">{index + 1}.</span></td>
-                              <td>
-                                {task.projectName}
-                                <br />
-                                <span
-                                  className={`badge ${taskStatuses[task._id] === "Not Started"
-                                    ? "bg-warning text-dark"
-                                    : taskStatuses[task._id] === "In Progress"
-                                      ? "bg-info text-dark"
-                                      : "bg-success"
-                                    }`}
-                                >
-                                  {taskStatuses[task._id]}
-                                </span>
-                              </td>
-                              <td>
-                                <p
-                                  className="py-2 mb-0 task-description"
-                                  style={{
-                                    maxHeight: "5em",
-                                    overflowY: "auto",
-                                    width: "200px",  // Adjust this value as needed
-                                  }}
-                                >
-                                  {task.description}
-                                </p>
-                              </td>
-                              <td>
-                                <select
-                                  className="form-select"
-                                  aria-label="Default select Status"
-                                  name="taskStatus"
-                                  onChange={(e) => handleTaskUpdate(e, task._id)}
-                                  value={taskStatuses[task._id]}
-                                >
-                                  <option value="Not Started">Not Started</option>
-                                  <option value="In Progress">In Progress</option>
-                                  <option value="Completed">Completed</option>
-                                </select>
-                              </td>
-                              <td>{getFormattedDate(task.taskEndDate)}</td>
-                              <td className="">
-                                <img
-                                  src={`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage.replace('uploads/', '')}`}
-                                  alt=""
-                                  className="avatar rounded-circle"
-                                  style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    transition: 'transform 0.3s ease-in-out',
-                                    cursor: 'pointer',
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.target.style.transform = 'scale(4)';
-                                    e.target.style.zIndex = '100';
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.target.style.transform = 'scale(1)';
-                                    e.target.style.zIndex = '1';
-                                  }}
-                                  onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage.replace('uploads/', '')}`)}
-                                />
-                                <br />
-                                {task.taskAssignPerson.employeeName}
-                              </td>
-                              <td>
-                                <div className="d-flex align-items-center">
-                                  <button
-                                    className="btn btn-outline-secondary btn-sm me-2 position-relative"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#taskMessages"
-                                    onClick={() => {
-                                      setSelectedTask(task);
-                                      fetchMessages(task._id);
+                      <table className="table table-hover align-middle mb-0" style={{ width: "100%" }}>
+                        <thead>
+                          <tr>
+                            <th>Sr.No</th>
+                            <th>Project Name</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                            <th>Assigned To</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {currentTasks.map((task, index) => {
+                            const getFormattedDate = (date) => {
+                              const newDate = new Date(date);
+                              return `${newDate.getDate()}/${newDate.getMonth() + 1}/${newDate.getFullYear()}`;
+                            };
+                            return (
+                              <tr key={task._id}>
+                                <td><span className="fw-bold fs-6">{index + 1}.</span></td>
+                                <td>
+                                  {task.projectName}
+                                  <br />
+                                  <span
+                                    className={`badge ${taskStatuses[task._id] === "Not Started"
+                                      ? "bg-warning text-dark"
+                                      : taskStatuses[task._id] === "In Progress"
+                                        ? "bg-info text-dark"
+                                        : "bg-success"
+                                      }`}
+                                  >
+                                    {taskStatuses[task._id]}
+                                  </span>
+                                </td>
+                                <td>
+                                  <p
+                                    className="py-2 mb-0 task-description"
+                                    style={{
+                                      maxHeight: "5em",
+                                      overflowY: "auto",
+                                      width: "200px",  // Adjust this value as needed
                                     }}
                                   >
-                                    <i className="bi bi-chat-left-dots"></i>
-                                    {notifications[task._id] > 0 && (
-                                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                        {notifications[task._id]}
-                                      </span>
-                                    )}
-                                  </button>
-                                  <Link
-                                    to="/images"
-                                    className="btn btn-outline-secondary btn-sm"
-                                    state={{
-                                      images: task.taskImages,
-                                      projectName: task.projectName,
-                                    }}
+                                    {task.description}
+                                  </p>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    aria-label="Default select Status"
+                                    name="taskStatus"
+                                    onChange={(e) => handleTaskUpdate(e, task._id)}
+                                    value={taskStatuses[task._id]}
                                   >
-                                    <i className="bi-paperclip"></i>
-                                  </Link>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                                    <option value="Not Started">Not Started</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                  </select>
+                                </td>
+                                <td>{getFormattedDate(task.taskEndDate)}</td>
+                                <td className="">
+                                  <img
+                                    src={`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage.replace('uploads/', '')}`}
+                                    alt=""
+                                    className="avatar rounded-circle"
+                                    style={{
+                                      width: '40px',
+                                      height: '40px',
+                                      transition: 'transform 0.3s ease-in-out',
+                                      cursor: 'pointer',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.target.style.transform = 'scale(4)';
+                                      e.target.style.zIndex = '100';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.target.style.transform = 'scale(1)';
+                                      e.target.style.zIndex = '1';
+                                    }}
+                                    onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${task.taskAssignPerson.employeeImage.replace('uploads/', '')}`)}
+                                  />
+                                  <br />
+                                  {task.taskAssignPerson.employeeName}
+                                </td>
+                                <td>
+                                  <div className="d-flex align-items-center">
+                                    <button
+                                      className="btn btn-outline-secondary btn-sm me-2 position-relative"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#taskMessages"
+                                      onClick={() => {
+                                        setSelectedTask(task);
+                                        fetchMessages(task._id);
+                                      }}
+                                    >
+                                      <i className="bi bi-chat-left-dots"></i>
+                                      {notifications[task._id] > 0 && (
+                                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                          {notifications[task._id]}
+                                        </span>
+                                      )}
+                                    </button>
+                                    <Link
+                                      to="/images"
+                                      className="btn btn-outline-secondary btn-sm"
+                                      state={{
+                                        images: task.taskImages,
+                                        projectName: task.projectName,
+                                      }}
+                                    >
+                                      <i className="bi-paperclip"></i>
+                                    </Link>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
                     </div>
                   ) : (
                     // Grid View Rendering

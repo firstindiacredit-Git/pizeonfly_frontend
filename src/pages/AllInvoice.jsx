@@ -78,6 +78,7 @@ const AllInvoice = () => {
                 >
                   <thead>
                     <tr>
+                      <th>S.No.</th>
                       <th>Invoice No.</th>
                       <th>Invoice Date</th>
                       <th>Client Name</th>
@@ -87,8 +88,9 @@ const AllInvoice = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {invoices.map((invoice) => (
+                    {invoices.map((invoice, index) => (
                       <tr key={invoice.id}>
+                        <td>{index + 1}</td>
                         <td>{invoice.invoiceNumber}</td>
                         <td>{formatDateToMonthYear(invoice.invoiceDate)}</td>
                         <td>{invoice.clientDetail?.clientName || 'N/A'}</td>
