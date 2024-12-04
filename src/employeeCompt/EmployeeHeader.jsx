@@ -3,8 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTheme } from '../context/ThemeContext';
+
 
 const Header = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [employeeName, setEmployeeName] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState("");
@@ -278,7 +281,10 @@ const Header = () => {
         <nav className="navbar py-4">
           <div className="container-xxl">
             {/* header rightbar icon */}
-            <div className="h-right d-flex align-items-center mr-5 mr-lg-0 order-1">
+            <div className="h-right d-flex gap-3 align-items-center mr-5 mr-lg-0 order-1">
+              <button onClick={toggleTheme} className="border-0 bg-transparent">
+                {isDarkMode ? <i className="bi bi-brightness-high text-light fs-5" /> : <i className="bi bi-moon-fill fs-5" />}
+              </button>
               <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center zindex-popover">
                 <div className="u-info me-2">
                   <p className="mb-0 text-end line-height-sm ">

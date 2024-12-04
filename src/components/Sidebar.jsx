@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';  // Import axios
 import './Sidebar.css';
+import CustomColorPicker, { isLightColor } from '../pages/colorpicker/CustomColorPicker';
 
 const Sidebar = () => {
   const [role, setRole] = useState('');
   const [isHolidayTomorrow, setIsHolidayTomorrow] = useState(false); // State to check if tomorrow is a holiday
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [sidebarColor, setSidebarColor] = useState(localStorage.getItem('sidebarColor') || '#485563');
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -33,9 +36,18 @@ const Sidebar = () => {
     checkHolidayTomorrow(); // Fetch holiday data on component mount
   }, []);
 
+  const handleColorChange = (color) => {
+    setSidebarColor(color);
+    localStorage.setItem('sidebarColor', color);
+  };
+
+  // Determine text color based on sidebar background color
+  const textColorClass = isLightColor(sidebarColor) ? 'text-dark' : 'text-light';
+
   return (
-    <div className="sidebar px-4 py-4 py-md-5 me-0">
-      <div className="d-flex flex-column h-100">
+    <div className={`sidebar px-4 py-4 py-md-5 me-0 ${textColorClass}`} style={{ background: sidebarColor }}>
+      <div className="d-flex flex-column"style={{ height: '34rem' }}>
+
 
         <div className="mb-0 brand-icon">
           {/* <span className="logo-icon">
@@ -53,20 +65,20 @@ const Sidebar = () => {
           )} */}
         <ul className="menu-list flex-grow-1 mt-3">
           <li>
-            <Link className="ms-link" to="/project-dashboard">
-              <i className="icofont-home fs-5" /> <span className='fs-6'>Admin Dashboard</span>
+            <Link className={`ms-link ${textColorClass}`} to="/project-dashboard">
+              <i className={`icofont-home fs-5 ${textColorClass}`} /> <span className={`fs-6 ${textColorClass}`}>Admin Dashboard</span>
             </Link>
           </li>
           <li className="collapsed">
             <a
-              className="m-link"
+              className={`m-link ${textColorClass}`}
               data-bs-toggle="collapse"
               data-bs-target="#project-Components"
               href="#"
             >
-              <i className="icofont-briefcase" />
+              <i className={`icofont-briefcase ${textColorClass}`} />
               <span>Projects</span>{" "}
-              <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+              <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
             </a>
             {/* Menu: Sub menu ul */}
             <ul className="sub-menu collapse" id="project-Components">
@@ -86,13 +98,13 @@ const Sidebar = () => {
           <>
             <li className="collapsed">
               <a
-                className="m-link"
+                className={`m-link ${textColorClass}`}
                 data-bs-toggle="collapse"
                 data-bs-target="#client-Components"
                 href="#"
               >
-                <i className="icofont-user-male" /> <span>Our Clients</span>{" "}
-                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+                <i className={`icofont-user-male ${textColorClass}`} /> <span>Our Clients</span>{" "}
+                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
               </a>
               <ul className="sub-menu collapse" id="client-Components">
                 <li>
@@ -104,13 +116,13 @@ const Sidebar = () => {
             </li>
             <li className="collapsed">
               <a
-                className="m-link"
+                className={`m-link ${textColorClass}`}
                 data-bs-toggle="collapse"
                 data-bs-target="#emp-Components"
                 href="#"
               >
-                <i className="icofont-users-alt-5" /> <span>Employees</span>{" "}
-                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+                <i className={`icofont-users-alt-5 ${textColorClass}`} /> <span>Employees</span>{" "}
+                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
               </a>
               <ul className="sub-menu collapse" id="emp-Components">
                 <li>
@@ -126,13 +138,13 @@ const Sidebar = () => {
 
             <li className="collapsed">
               <a
-                className="m-link"
+                className={`m-link ${textColorClass}`}
                 data-bs-toggle="collapse"
                 data-bs-target="#tools-Components"
                 href="#"
               >
-                <i className="icofont-tools-alt-2" /> <span>Tools</span>{" "}
-                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+                <i className={`icofont-tools-alt-2 ${textColorClass}`} /> <span>Tools</span>{" "}
+                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
               </a>
               <ul className="sub-menu collapse" id="tools-Components">
                 <li>
@@ -183,13 +195,13 @@ const Sidebar = () => {
             </li>
             <li className="collapsed">
               <a
-                className="m-link"
+                className={`m-link ${textColorClass}`}
                 data-bs-toggle="collapse"
                 data-bs-target="#accounts-Components"
                 href="#"
               >
-                <i className="icofont-document-folder" /> <span>Accounts & Billing</span>{" "}
-                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+                <i className={`icofont-document-folder ${textColorClass}`} /> <span>Accounts & Billing</span>{" "}
+                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
               </a>
               <ul className="sub-menu collapse" id="accounts-Components">
                 <li>
@@ -249,6 +261,24 @@ const Sidebar = () => {
             <i className="icofont-bubble-right" />
           </span>
         </button> */}
+        <div className="d-flex justify-content-end mb-2">
+          <button
+            className={`btn btn-sm btn-outline-${isLightColor(sidebarColor) ? 'dark' : 'light'}`}
+            onClick={() => setShowColorPicker(!showColorPicker)}
+            title="Customize Sidebar Color"
+          >
+            <i className={`icofont-color-bucket ${textColorClass}`}></i>
+          </button>
+          {showColorPicker && (
+            <div className='position-absolute' style={{ top: '25rem', right: '67rem' }}>
+              <CustomColorPicker
+                color={sidebarColor}
+                onChange={handleColorChange}
+                onClose={() => setShowColorPicker(false)}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

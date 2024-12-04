@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import { useTheme } from '../context/ThemeContext';
 
 const Header = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
@@ -18,13 +20,13 @@ const Header = () => {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "Images/superadminimg.jpg";
-    
+
     // Remove any backslashes and replace with forward slashes
     const cleanPath = imagePath.replace(/\\/g, '/');
-    
+
     // Remove 'uploads/' from the path if it exists
     const pathWithoutUploads = cleanPath.replace('uploads/', '');
-    
+
     // Combine with the backend URL
     const imageUrl = `${import.meta.env.VITE_BASE_URL}${pathWithoutUploads}`;
     // console.log("imageUrl", imageUrl);
@@ -34,15 +36,15 @@ const Header = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userData = JSON.parse(localStorage.getItem("user"));
-    
+
     // console.log("Token:", token);
     // console.log("User Data from localStorage:", userData);
-    
+
     if (token) {
       setUserName(userData.username);
       setEmail(userData.email);
       setUser(userData);
-      
+
       // console.log("State after setting user data:");
       // console.log("Username:", userData.username);
       // console.log("Email:", userData.email);
@@ -88,7 +90,7 @@ const Header = () => {
           color: "white",
         },
       });
-      
+
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       navigation("/");
@@ -103,11 +105,11 @@ const Header = () => {
     e.preventDefault();
     const rect = e.target.getBoundingClientRect();
     const isRightAligned = window.innerWidth - rect.right < rect.left;
-    
+
     setDropdownPosition({
       position: 'fixed',
       top: `${rect.bottom}px`,
-      [isRightAligned ? 'right' : 'left']: isRightAligned 
+      [isRightAligned ? 'right' : 'left']: isRightAligned
         ? `${window.innerWidth - rect.right}px`
         : `${rect.left}px`,
     });
@@ -119,7 +121,7 @@ const Header = () => {
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    
+
     try {
       const formData = new FormData();
       formData.append('username', username);
@@ -161,7 +163,7 @@ const Header = () => {
         },
       });
       setSelectedImage(null);
-      
+
       //reload after 5 sec
       setTimeout(() => {
         window.location.reload();
@@ -178,7 +180,10 @@ const Header = () => {
         <nav className="navbar py-4">
           <div className="container-xxl">
             {/* header rightbar icon */}
-            <div className="h-right d-flex align-items-center mr-5 mr-lg-0 order-1">
+            <div className="h-right d-flex gap-3 align-items-center mr-5 mr-lg-0 order-1">
+              <button onClick={toggleTheme} className="border-0 bg-transparent">
+                {isDarkMode ? <i className="bi bi-brightness-high text-light fs-5"/> : <i className="bi bi-moon-fill fs-5"/>}
+              </button>
               <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center zindex-popover">
                 <div className="u-info me-2">
                   <p className="mb-0 text-end line-height-sm ">
@@ -198,7 +203,7 @@ const Header = () => {
                     alt="profile"
                   />
                 </a>
-                <div 
+                <div
                   ref={dropdownRef}
                   className="dropdown-menu rounded-lg shadow border-0 dropdown-animation p-0 m-0"
                   style={dropdownPosition}
@@ -353,8 +358,8 @@ const Header = () => {
                         <label className="fw-bold fs-5">Edit Profile</label>
                         <div className="mb-3 mt-3 text-center">
                           <img
-                            src={selectedImage 
-                              ? URL.createObjectURL(selectedImage) 
+                            src={selectedImage
+                              ? URL.createObjectURL(selectedImage)
                               : getImageUrl(user?.profileImage)}
                             alt="Profile"
                             className="rounded-circle"

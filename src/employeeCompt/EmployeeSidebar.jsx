@@ -1,11 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'
+import CustomColorPicker, { isLightColor } from '../pages/colorpicker/CustomColorPicker';
+
 
 const EmployeeSidebar = () => {
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const [sidebarColor, setSidebarColor] = useState(localStorage.getItem('sidebarColor') || '#485563');
+
+    const handleColorChange = (color) => {
+        setSidebarColor(color);
+        localStorage.setItem('sidebarColor', color);
+    };
+
+    // Determine text color based on sidebar background color
+    const textColorClass = isLightColor(sidebarColor) ? 'text-dark' : 'text-light';
     return (
 
         <>
-            <div className="sidebar px-4 py-4 py-md-5 me-0">
+            <div className={`sidebar px-4 py-4 py-md-5 me-0 ${textColorClass}`} style={{ background: sidebarColor }}>
                 <div className="d-flex flex-column h-100">
                     <div className="mb-0 brand-icon">
                         {/* <span className="logo-icon">
@@ -123,14 +135,32 @@ const EmployeeSidebar = () => {
                         </li>
                     </ul >
                     {/* Menu: menu collepce btn */}
-                    < button
+                    {/* < button
                         type="button"
                         className="btn btn-link sidebar-mini-btn text-light"
                     >
                         <span className="ms-2">
                             <i className="icofont-bubble-right" />
                         </span>
-                    </button >
+                    </button > */}
+                    <div className="d-flex justify-content-end mb-2">
+                        <button
+                            className={`btn btn-sm btn-outline-${isLightColor(sidebarColor) ? 'dark' : 'light'}`}
+                            onClick={() => setShowColorPicker(!showColorPicker)}
+                            title="Customize Sidebar Color"
+                        >
+                            <i className={`icofont-color-bucket ${textColorClass}`}></i>
+                        </button>
+                        {showColorPicker && (
+                            <div className='position-absolute' style={{ top: '25rem', right: '67rem' }}>
+                                <CustomColorPicker
+                                    color={sidebarColor}
+                                    onChange={handleColorChange}
+                                    onClose={() => setShowColorPicker(false)}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div >
             </div >
         </>

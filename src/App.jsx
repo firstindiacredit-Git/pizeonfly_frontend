@@ -57,75 +57,88 @@ import ClientCardGenerator from './pages/clients-tools/CardGenerator'
 
 // import Test from './pages/test'
 
+import { ThemeProvider } from './context/ThemeContext'
+import { useTheme } from './context/ThemeContext'
+
+function AppContent() {
+  const { isDarkMode } = useTheme();
+  
+  return (
+    <div className={`app ${isDarkMode ? 'dark' : 'light'}`}>
+      <HashRouter>
+        <Routes>
+          <Route path='/signup' element={<Signup />}></Route>
+          <Route path='/employeesignup' element={<EmployeeSinup />}></Route>
+          <Route path='/' element={<Signin />}></Route>
+          <Route path='/employeesignin' element={<EmployeeSinin />}></Route>
+          <Route path='/clientsignin' element={<ClientSignin />}></Route>
+
+          <Route path='/project-dashboard' element={<ProjectDashboard />}></Route>
+          <Route path='/employee-dashboard' element={<EmployeeDashboard />}></Route>
+          <Route path='/members/MembersDashboard' element={<MembersDashboard />}></Route>
+          <Route path='/client-dashboard' element={<ClientDashboard />}></Route>
+          <Route path='/members' element={<Member />}></Route>
+          <Route path='/projects' element={<Project />}></Route>
+          <Route path='/employee-projects' element={<EmployeeProject />}></Route>
+          <Route path='/client-projects' element={<ClientProject />}></Route>
+          <Route path='/tasks' element={<Tasks />}></Route>
+          <Route path='/employee-tasks' element={<EmployeeTasks />}></Route>
+          <Route path='/images' element={<Images />}></Route>
+          <Route path='/clients' element={<Client />}></Route>
+          <Route path='/calander' element={<Calander />}></Route>
+          <Route path='/create-invoice' element={<CreateInvoice />}></Route>
+          <Route path='/all-invoice' element={<AllInvoice />}></Route>
+          <Route path='/update-invoice' element={<UpdateInvoice />}></Route>
+
+
+          <Route path='/urlShortner' element={<UrlShortner />}></Route>
+          <Route path='/qrCodeGenerate' element={<QrCodeGenerate />}></Route>
+          <Route path='/saasManager' element={<SaasManager />}></Route>
+          <Route path='/htmlTemplateGenerator' element={<HtmlTemplateGenerator />}></Route>
+          <Route path='/cardValidator' element={<CardValidator />}></Route>
+          <Route path='/cardGenerator' element={<CardGenerator />}></Route>
+
+          <Route path='/miscellaneous' element={<Miscellaneous />}></Route>
+          <Route path='/online-screenrecorder' element={<OnlineScreenrecorder />}></Route>
+          <Route path='/online-screenshot' element={<OnlineScreenshot />}></Route>
+          <Route path='/speech-to-text' element={<SpeechToText />}></Route>
+          <Route path='/text-to-speech' element={<TextToSpeech />}></Route>
+          <Route path='/online-voice-recorder' element={<OnlineVoiceRecorder />}></Route>
+          <Route path='/online-webcam-test' element={<OnlineWebcamTest />}></Route>
+
+          <Route path='/employee-htmlTemplateGenerator' element={<EmployeeHtmlTemplateGenerator />}></Route>
+          <Route path='/employee-cardValidator' element={<EmployeeCardValidator />}></Route>
+          <Route path='/employee-miscellaneous' element={<EmployeeMiscellaneous />}></Route>
+          <Route path='/employee-saasManager' element={<EmployeeSaasManager />}></Route>
+          <Route path='/employee-qrCodeGenerate' element={<EmployeeQrCodeGenerate />}></Route>
+          <Route path='/employee-urlShortner' element={<EmployeeUrlShortner />}></Route>
+          <Route path='/employee-cardGenerator' element={<EmployeeCardGenerator />}></Route>
+
+          <Route path='/clients-cardValidator' element={<ClientCardValidator />}></Route>
+          <Route path='/clients-htmlTemplateGenerator' element={<ClientHtmlTemplateGenerator />}></Route>
+          <Route path='/clients-miscellaneous' element={<ClientMiscellaneous />}></Route>
+          <Route path='/clients-saasManager' element={<ClientSaasManager />}></Route>
+          <Route path='/clients-qrCodeGenerate' element={<ClientQrCodeGenerate />}></Route>
+          <Route path='/clients-urlShortner' element={<ClientUrlShortner />}></Route>
+          <Route path='/clients-cardGenerator' element={<ClientCardGenerator />}></Route>
+
+
+
+
+
+
+        </Routes>
+      </HashRouter>
+    </div>
+  );
+}
 
 function App() {
-
   return (
-    <HashRouter >
-      <Routes >
-        <Route path='/signup' element={<Signup />}></Route>
-        <Route path='/employeesignup' element={<EmployeeSinup />}></Route>
-        <Route path='/' element={<Signin />}></Route>
-        <Route path='/employeesignin' element={<EmployeeSinin />}></Route>
-        <Route path='/clientsignin' element={<ClientSignin />}></Route>
-
-        <Route path='/project-dashboard' element={<ProjectDashboard />}></Route>
-        <Route path='/employee-dashboard' element={<EmployeeDashboard />}></Route>
-        <Route path='/members/MembersDashboard' element={<MembersDashboard />}></Route>
-        <Route path='/client-dashboard' element={<ClientDashboard />}></Route>
-        <Route path='/members' element={<Member />}></Route>
-        <Route path='/projects' element={<Project />}></Route>
-        <Route path='/employee-projects' element={<EmployeeProject />}></Route>
-        <Route path='/client-projects' element={<ClientProject />}></Route>
-        <Route path='/tasks' element={<Tasks />}></Route>
-        <Route path='/employee-tasks' element={<EmployeeTasks />}></Route>
-        <Route path='/images' element={<Images />}></Route>
-        <Route path='/clients' element={<Client />}></Route>
-        <Route path='/calander' element={<Calander />}></Route>
-        <Route path='/create-invoice' element={<CreateInvoice />}></Route>
-        <Route path='/all-invoice' element={<AllInvoice />}></Route>
-        <Route path='/update-invoice' element={<UpdateInvoice />}></Route>
-
-
-        <Route path='/urlShortner' element={<UrlShortner />}></Route>
-        <Route path='/qrCodeGenerate' element={<QrCodeGenerate />}></Route>
-        <Route path='/saasManager' element={<SaasManager />}></Route>
-        <Route path='/htmlTemplateGenerator' element={<HtmlTemplateGenerator />}></Route>
-        <Route path='/cardValidator' element={<CardValidator />}></Route>
-        <Route path='/cardGenerator' element={<CardGenerator />}></Route>
-
-        <Route path='/miscellaneous' element={<Miscellaneous />}></Route>
-        <Route path='/online-screenrecorder' element={<OnlineScreenrecorder/>}></Route>
-        <Route path='/online-screenshot' element={<OnlineScreenshot/>}></Route>
-        <Route path='/speech-to-text' element={<SpeechToText/>}></Route>
-        <Route path='/text-to-speech' element={<TextToSpeech/>}></Route>
-        <Route path='/online-voice-recorder' element={<OnlineVoiceRecorder/>}></Route>
-        <Route path='/online-webcam-test' element={<OnlineWebcamTest/>}></Route>
-
-        <Route path='/employee-htmlTemplateGenerator' element={<EmployeeHtmlTemplateGenerator />}></Route>
-        <Route path='/employee-cardValidator' element={<EmployeeCardValidator />}></Route>
-        <Route path='/employee-miscellaneous' element={<EmployeeMiscellaneous />}></Route>
-        <Route path='/employee-saasManager' element={<EmployeeSaasManager />}></Route>
-        <Route path='/employee-qrCodeGenerate' element={<EmployeeQrCodeGenerate />}></Route>
-        <Route path='/employee-urlShortner' element={<EmployeeUrlShortner />}></Route>
-        <Route path='/employee-cardGenerator' element={<EmployeeCardGenerator />}></Route>
-
-        <Route path='/clients-cardValidator' element={<ClientCardValidator />}></Route>
-        <Route path='/clients-htmlTemplateGenerator' element={<ClientHtmlTemplateGenerator />}></Route>
-        <Route path='/clients-miscellaneous' element={<ClientMiscellaneous />}></Route>
-        <Route path='/clients-saasManager' element={<ClientSaasManager />}></Route>
-        <Route path='/clients-qrCodeGenerate' element={<ClientQrCodeGenerate />}></Route>
-        <Route path='/clients-urlShortner' element={<ClientUrlShortner />}></Route>
-        <Route path='/clients-cardGenerator' element={<ClientCardGenerator />}></Route>
-
-
-
-
-
-
-      </Routes>
-    </HashRouter>
-  )
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
 }
 
 export default App
