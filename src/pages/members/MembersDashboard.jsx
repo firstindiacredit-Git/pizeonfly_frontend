@@ -782,22 +782,17 @@ const MemberDashboard = () => {
     const deleteColumn = async (tableIndex, colIndex) => {
         try {
             const newTables = [...tables];
-            newTables[tableIndex].data = newTables[tableIndex].data.map(row => {
-                row.splice(colIndex, 1);
-                return row;
-            });
+            newTables[tableIndex].data.forEach(row => row.splice(colIndex, 1));
             newTables[tableIndex].cols--;
             setTables(newTables);
-
-            const payload = {
-                tables: newTables,
-                employeeId: employeeCode
-            };
 
             if (dashboardIds.excelSheet) {
                 await axios.put(
                     `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-                    payload
+                    {
+                        tables: newTables,
+                        employeeId: employeeCode
+                    }
                 );
             }
         } catch (error) {
@@ -1395,11 +1390,15 @@ const MemberDashboard = () => {
 
     // Add these state variables at the top with other states
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deleteAction, setDeleteAction] = useState({ type: '', payload: null });
+    const [deleteAction, setDeleteAction] = useState({
+        type: null, // 'notepad', 'todo', 'excel-table', 'excel-clear', 'excel-row', 'excel-column'
+        payload: null,
+        tableIndex: null
+    });
 
     // Add these handler functions before the return statement
-    const handleShowDeleteModal = (type, payload = null) => {
-        setDeleteAction({ type, payload });
+    const handleShowDeleteModal = (type, payload = null, tableIndex = null) => {
+        setDeleteAction({ type, payload, tableIndex });
         setShowDeleteModal(true);
     };
 
@@ -1422,13 +1421,19 @@ const MemberDashboard = () => {
                 case 'excel-clear':
                     await clearTableData(deleteAction.payload);
                     break;
+                case 'excel-row':
+                    await deleteRow(deleteAction.tableIndex, deleteAction.payload);
+                    break;
+                case 'excel-column':
+                    await deleteColumn(deleteAction.tableIndex, deleteAction.payload);
+                    break;
                 default:
                     break;
             }
+            setShowDeleteModal(false);
         } catch (error) {
-            console.error('Error handling delete:', error);
+            console.error('Delete operation failed:', error);
         }
-        setShowDeleteModal(false);
     };
 
     return (
@@ -2401,11 +2406,29 @@ const MemberDashboard = () => {
                                                                                 />
 
                                                                             </div>
-                                                                            <div className="table-responsive mb-3">
-                                                                                <table className="table table-bordered">
-                                                                                    <thead >
-                                                                                        <tr >
-                                                                                            <th style={{ width: '30px', backgroundColor: '#f8f9fa' }}></th>
+                                                                            <div className="table-responsive mb-3" style={{
+                                                                                maxHeight: table.rows > 10 ? '400px' : 'auto',
+                                                                                overflowY: table.rows > 10 ? 'auto' : 'visible',
+                                                                                overflowX: 'auto',
+                                                                                msOverflowStyle: 'none',  // Hide scrollbar in IE/Edge
+                                                                                scrollbarWidth: 'none',   // Hide scrollbar in Firefox
+                                                                                '&::-webkit-scrollbar': { // Hide scrollbar in Chrome/Safari/Newer Edge
+                                                                                    display: 'none'
+                                                                                }
+                                                                            }}>
+                                                                                <table className="table table-bordered" style={{
+                                                                                    minWidth: '100%',
+                                                                                    width: 'max-content'
+                                                                                }}>
+                                                                                    <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
+                                                                                        <tr>
+                                                                                            <th style={{
+                                                                                                width: '30px',
+                                                                                                backgroundColor: '#f8f9fa',
+                                                                                                position: 'sticky',
+                                                                                                left: 0,
+                                                                                                zIndex: 2
+                                                                                            }}></th>
                                                                                             {Array(table.cols).fill().map((_, colIndex) => (
                                                                                                 <th key={colIndex} className="text-center" style={{
                                                                                                     backgroundColor: '#f8f9fa',
@@ -2417,8 +2440,9 @@ const MemberDashboard = () => {
                                                                                                     {getColumnLabel(colIndex)}
                                                                                                     <button
                                                                                                         className="btn text-danger btn-sm ms-1"
-                                                                                                        onClick={() => handleShowDeleteModal('excel-table', tableIndex)}
+                                                                                                        onClick={() => handleShowDeleteModal('excel-column', colIndex, tableIndex)}
                                                                                                         style={{ padding: '0px 2px', fontSize: '10px' }}
+                                                                                                        title="Delete column"
                                                                                                     >
                                                                                                         ×
                                                                                                     </button>
@@ -2432,13 +2456,17 @@ const MemberDashboard = () => {
                                                                                                 <td className="text-center" style={{
                                                                                                     backgroundColor: '#f8f9fa',
                                                                                                     padding: '2px',
-                                                                                                    fontSize: '12px'
+                                                                                                    fontSize: '12px',
+                                                                                                    position: 'sticky',
+                                                                                                    left: 0,
+                                                                                                    zIndex: 1
                                                                                                 }}>
                                                                                                     {rowIndex + 1}
                                                                                                     <button
                                                                                                         className="btn text-danger btn-sm ms-1"
-                                                                                                        onClick={() => handleShowDeleteModal('excel-table', tableIndex)}
+                                                                                                        onClick={() => handleShowDeleteModal('excel-row', rowIndex, tableIndex)}
                                                                                                         style={{ padding: '0px 2px', fontSize: '10px' }}
+                                                                                                        title="Delete row"
                                                                                                     >
                                                                                                         ×
                                                                                                     </button>
@@ -2934,6 +2962,8 @@ const MemberDashboard = () => {
                                         : ''}
                                 {deleteAction.type === 'excel-table' && 'Are you sure you want to delete this table?'}
                                 {deleteAction.type === 'excel-clear' && 'Are you sure you want to clear all data from this table?'}
+                                {deleteAction.type === 'excel-row' && `Are you sure you want to delete row ${deleteAction.payload + 1}?`}
+                                {deleteAction.type === 'excel-column' && `Are you sure you want to delete column ${getColumnLabel(deleteAction.payload)}?`}
                             </p>
                         </div>
                         <div className="modal-footer">

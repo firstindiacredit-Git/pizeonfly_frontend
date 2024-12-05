@@ -151,6 +151,10 @@ const EmployeeDashboard = () => {
   // Add this new state for bank details
   const [bankDetails, setBankDetails] = useState(null);
 
+  // Add these new state variables near the top of your component
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteAction, setDeleteAction] = useState({ type: '', payload: null });
+
   // Add this useEffect to fetch bank details
   useEffect(() => {
     const fetchBankDetails = async () => {
@@ -837,23 +841,16 @@ const EmployeeDashboard = () => {
       newTables[tableIndex].rows--;
       setTables(newTables);
 
+      const token = localStorage.getItem('emp_token');
       if (dashboardIds.excelSheet) {
         await axios.put(
           `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
           {
             tables: newTables,
             employeeId: currentEmployeeId
-          }
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-      } else {
-        const response = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
-          {
-            tables: newTables,
-            employeeId: currentEmployeeId
-          }
-        );
-        setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
       }
     } catch (error) {
       console.error('Error deleting row:', error);
@@ -887,16 +884,6 @@ const EmployeeDashboard = () => {
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-      } else {
-        const response = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
-          {
-            tables: newTables,
-            employeeId: currentEmployeeId
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
       }
     } catch (error) {
       console.error('Error deleting column:', error);
@@ -1292,6 +1279,47 @@ const EmployeeDashboard = () => {
         }
       }
     }
+  };
+
+  // Add this new function to handle delete confirmations
+  const handleDeleteAction = (type, payload = null) => {
+    setDeleteAction({ type, payload });
+    setShowDeleteModal(true);
+  };
+
+  // Add this function to handle confirmed deletions
+  const handleConfirmDelete = async () => {
+    try {
+      switch (deleteAction.type) {
+        case 'notepad':
+          await clearNotePad();
+          break;
+        case 'todo':
+          if (deleteAction.payload === 'all') {
+            await clearAllTodos();
+          } else {
+            await deleteTodo(deleteAction.payload);
+          }
+          break;
+        case 'excel-table':
+          await deleteTable(deleteAction.payload);
+          break;
+        case 'excel-clear':
+          await clearTableData(deleteAction.payload);
+          break;
+        case 'excel-row':
+          const { tableIndex: rowTableIndex, rowIndex } = deleteAction.payload;
+          await deleteRow(rowTableIndex, rowIndex);
+          break;
+        case 'excel-column':
+          const { tableIndex: colTableIndex, colIndex } = deleteAction.payload;
+          await deleteColumn(colTableIndex, colIndex);
+          break;
+      }
+    } catch (error) {
+      console.error('Error handling delete action:', error);
+    }
+    setShowDeleteModal(false);
   };
 
   return (
@@ -1866,7 +1894,7 @@ const EmployeeDashboard = () => {
                               <div className="d-flex gap-2">
                                 <button
                                   className="btn btn-warning btn-sm"
-                                  onClick={clearNotePad}
+                                  onClick={() => handleDeleteAction('notepad')}
                                   title="Clear notepad"
                                 >
                                   <i className="bi bi-eraser-fill"></i>
@@ -2007,7 +2035,7 @@ const EmployeeDashboard = () => {
                                                           style={{ height: '10px', width: '10px' }}
                                                         />
                                                         <IconButton
-                                                          onClick={() => deleteTodo(index)}
+                                                          onClick={() => handleDeleteAction('todo', index)}
                                                           size="small"
                                                           style={{ marginLeft: '8px' }}
                                                         >
@@ -2055,8 +2083,8 @@ const EmployeeDashboard = () => {
                               <div>
                                 {todos.length > 0 && (
                                   <button
-                                    className="btn btn-warning btn-sm "
-                                    onClick={clearAllTodos}
+                                    className="btn btn-warning btn-sm"
+                                    onClick={() => handleDeleteAction('todo', 'all')}
                                   >
                                     <i className="bi bi-eraser-fill" title='Clear all'></i>
                                   </button>
@@ -2120,9 +2148,21 @@ const EmployeeDashboard = () => {
                                         />
 
                                       </div>
-                                      <div className="table-responsive mb-3">
-                                        <table className="table table-bordered">
-                                          <thead >
+                                      <div className="table-responsive mb-3" style={{
+                                        maxHeight: table.rows > 10 ? '400px' : 'auto',
+                                        overflowY: table.rows > 10 ? 'auto' : 'visible',
+                                        overflowX: 'auto',
+                                        msOverflowStyle: 'none',  // Hide scrollbar in IE/Edge
+                                        scrollbarWidth: 'none',   // Hide scrollbar in Firefox
+                                        '&::-webkit-scrollbar': { // Hide scrollbar in Chrome/Safari/Newer Edge
+                                          display: 'none'
+                                        }
+                                      }}>
+                                        <table className="table table-bordered" style={{
+                                          minWidth: '100%',
+                                          width: 'max-content'
+                                        }}>
+                                          <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
                                             <tr >
                                               <th style={{ width: '30px', backgroundColor: '#f8f9fa' }}></th>
                                               {Array(table.cols).fill().map((_, colIndex) => (
@@ -2136,7 +2176,7 @@ const EmployeeDashboard = () => {
                                                   {getColumnLabel(colIndex)}
                                                   <button
                                                     className="btn text-danger btn-sm ms-1"
-                                                    onClick={() => deleteColumn(tableIndex, colIndex)}
+                                                    onClick={() => handleDeleteAction('excel-column', { tableIndex, colIndex })}
                                                     style={{ padding: '0px 2px', fontSize: '10px' }}
                                                   >
                                                     ×
@@ -2156,7 +2196,7 @@ const EmployeeDashboard = () => {
                                                   {rowIndex + 1}
                                                   <button
                                                     className="btn text-danger btn-sm ms-1"
-                                                    onClick={() => deleteRow(tableIndex, rowIndex)}
+                                                    onClick={() => handleDeleteAction('excel-row', { tableIndex, rowIndex })}
                                                     style={{ padding: '0px 2px', fontSize: '10px' }}
                                                   >
                                                     ×
@@ -2235,16 +2275,16 @@ const EmployeeDashboard = () => {
 
                                         <button
                                           className="btn btn-warning me-2"
-                                          onClick={() => clearTableData(tableIndex)}
+                                          onClick={() => handleDeleteAction('excel-clear', tableIndex)}
                                           title='Clear All Table Value'
                                         >
-                                          <i className="icofont-eraser  me-1" />
+                                          <i className="icofont-eraser me-1" />
                                           <span className="">Table</span>
                                         </button>
                                         {tables.length > 1 && (
                                           <button
                                             className="btn btn-danger me-2"
-                                            onClick={() => deleteTable(tableIndex)}
+                                            onClick={() => handleDeleteAction('excel-table', tableIndex)}
                                           >
                                             <i className="icofont-trash me-1 text-white" />
                                             <span className="text-white">Table</span>
@@ -2628,6 +2668,67 @@ const EmployeeDashboard = () => {
           }
         `}
       </style>
+
+      {/* Delete Confirmation Modal */}
+      <div
+        className={`modal fade ${showDeleteModal ? 'show' : ''}`}
+        id="deleteConfirmationModal"
+        tabIndex={-1}
+        aria-hidden="true"
+        style={{ display: showDeleteModal ? 'block' : 'none' }}
+      >
+        <div className="modal-dialog modal-dialog-centered modal-md modal-dialog-scrollable">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title fw-bold">Delete Confirmation</h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setShowDeleteModal(false)}
+              />
+            </div>
+            <div className="modal-body justify-content-center flex-column d-flex">
+              <i className="icofont-ui-delete text-danger display-2 text-center mt-2" />
+              <p className="mt-4 fs-5 text-center">
+                {deleteAction.type === 'notepad' && 'Are you sure you want to clear the notepad?'}
+                {deleteAction.type === 'todo' && deleteAction.payload === 'all'
+                  ? 'Are you sure you want to clear all todos?'
+                  : deleteAction.type === 'todo'
+                    ? 'Are you sure you want to delete this todo item?'
+                    : ''}
+                {deleteAction.type === 'excel-table' && 'Are you sure you want to delete this table?'}
+                {deleteAction.type === 'excel-clear' && 'Are you sure you want to clear all data from this table?'}
+                {deleteAction.type === 'excel-row' && `Are you sure you want to delete row ${deleteAction.payload.rowIndex + 1}?`}
+                {deleteAction.type === 'excel-column' && `Are you sure you want to delete column ${getColumnLabel(deleteAction.payload.colIndex)}?`}
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger color-fff"
+                onClick={handleConfirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal backdrop */}
+      {showDeleteModal && (
+        <div
+          className="modal-backdrop fade show"
+          onClick={() => setShowDeleteModal(false)}
+        ></div>
+      )}
     </>
   )
 }

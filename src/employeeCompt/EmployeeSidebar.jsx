@@ -17,9 +17,9 @@ const EmployeeSidebar = () => {
     return (
 
         <>
-            <div className={`sidebar px-4 py-4 py-md-5 me-0 ${textColorClass}`} style={{ background: sidebarColor }}>
+            <div className={`sidebar px-3 py-3 me-0 ${textColorClass}`} style={{ background: sidebarColor }}>
                 <div className="d-flex flex-column h-100">
-                    <div className="mb-0 brand-icon">
+                    <div className="mb-0 brand-icon mt-5">
                         {/* <span className="logo-icon">
                             <img src='../Images/picon.png' style={{ height: "4rem" }} alt="Pizeonfly Logo" />
                         </span>
@@ -145,11 +145,12 @@ const EmployeeSidebar = () => {
                     </button > */}
                     <div className="d-flex justify-content-end mb-2">
                         <button
-                            className={`btn btn-sm btn-outline-${isLightColor(sidebarColor) ? 'dark' : 'light'}`}
+                            // className={`btn btn-sm btn-outline-${isLightColor(sidebarColor) ? 'dark' : 'light'}`}
+                            className='border-0 bg-transparent'
                             onClick={() => setShowColorPicker(!showColorPicker)}
                             title="Customize Sidebar Color"
                         >
-                            <i className={`icofont-color-bucket ${textColorClass}`}></i>
+                            <i className={`bi bi-palette-fill ${textColorClass}`}></i>
                         </button>
                         {showColorPicker && (
                             <div className='position-absolute' style={{ top: '25rem', right: '67rem' }}>

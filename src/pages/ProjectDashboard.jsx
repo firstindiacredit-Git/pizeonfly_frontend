@@ -752,18 +752,58 @@ const ProjectDashboard = () => {
     setTables(updatedTables);
   };
 
-  const deleteColumn = (tableIndex, colIndex) => {
-    const updatedTables = [...tables];
-    updatedTables[tableIndex].cols--;
-    updatedTables[tableIndex].data = updatedTables[tableIndex].data.map(row => row.filter((_, index) => index !== colIndex));
-    setTables(updatedTables);
+  const deleteColumn = async (tableIndex, colIndex) => {
+    try {
+      const updatedTables = [...tables];
+      // Remove the column from each row
+      updatedTables[tableIndex].data = updatedTables[tableIndex].data.map(row =>
+        row.filter((_, index) => index !== colIndex)
+      );
+      // Update the column count
+      updatedTables[tableIndex].cols--;
+      setTables(updatedTables);
+
+      // Save to backend
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tables: updatedTables, email }),
+      });
+    } catch (error) {
+      console.error("Error deleting column:", error);
+      toast.error("Failed to delete column");
+    }
   };
 
-  const deleteRow = (tableIndex, rowIndex) => {
-    const updatedTables = [...tables];
-    updatedTables[tableIndex].rows--;
-    updatedTables[tableIndex].data = updatedTables[tableIndex].data.filter((_, index) => index !== rowIndex);
-    setTables(updatedTables);
+  const deleteRow = async (tableIndex, rowIndex) => {
+    try {
+      const updatedTables = [...tables];
+      // Remove the row
+      updatedTables[tableIndex].data = updatedTables[tableIndex].data.filter((_, index) => index !== rowIndex);
+      // Update the row count
+      updatedTables[tableIndex].rows--;
+      setTables(updatedTables);
+
+      // Save to backend
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tables: updatedTables, email }),
+      });
+    } catch (error) {
+      console.error("Error deleting row:", error);
+      toast.error("Failed to delete row");
+    }
   };
 
   const isValidUrl = (string) => {
@@ -1352,11 +1392,29 @@ const ProjectDashboard = () => {
                                     }}
                                   />
                                 </div>
-                                <div className="table-responsive mb-3">
-                                  <table className="table table-bordered">
-                                    <thead>
+                                <div className="table-responsive mb-3" style={{ 
+                                  maxHeight: table.rows > 10 ? '400px' : 'auto',
+                                  overflowY: table.rows > 10 ? 'auto' : 'visible',
+                                  overflowX: 'auto',
+                                  msOverflowStyle: 'none',  // Hide scrollbar in IE/Edge
+                                  scrollbarWidth: 'none',   // Hide scrollbar in Firefox
+                                  '&::-webkit-scrollbar': { // Hide scrollbar in Chrome/Safari/Newer Edge
+                                    display: 'none'
+                                  }
+                                }}>
+                                  <table className="table table-bordered" style={{
+                                    minWidth: '100%',
+                                    width: 'max-content'
+                                  }}>
+                                    <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
                                       <tr>
-                                        <th style={{ width: '30px', backgroundColor: '#f8f9fa' }}></th>
+                                        <th style={{
+                                          width: '30px',
+                                          backgroundColor: '#f8f9fa',
+                                          position: 'sticky',
+                                          left: 0,
+                                          zIndex: 2
+                                        }}></th>
                                         {Array(table.cols).fill().map((_, colIndex) => (
                                           <th key={colIndex} className="text-center" style={{
                                             backgroundColor: '#f8f9fa',
@@ -1383,7 +1441,10 @@ const ProjectDashboard = () => {
                                           <td className="text-center" style={{
                                             backgroundColor: '#f8f9fa',
                                             padding: '2px',
-                                            fontSize: '12px'
+                                            fontSize: '12px',
+                                            position: 'sticky',
+                                            left: 0,
+                                            zIndex: 1
                                           }}>
                                             {rowIndex + 1}
                                             <button
@@ -1535,8 +1596,8 @@ const ProjectDashboard = () => {
                 </div>
 
                 <div className="mt-5 mb-4 text-center">
-                  <Link 
-                    to="https://pizeonfly.com/" 
+                  <Link
+                    to="https://pizeonfly.com/"
                     className="btn btn-outline-primary btn-lg position-relative"
                     style={{
                       borderRadius: '30px',
@@ -1558,13 +1619,13 @@ const ProjectDashboard = () => {
                   >
                     <i className="bi bi-globe me-2"></i>
                     Visit Our Website
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
-                          style={{ fontSize: '0.7rem' }}>
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      style={{ fontSize: '0.7rem' }}>
                       New
                     </span>
                   </Link>
                 </div>
-                
+
               </div>
             </div>
           </div>

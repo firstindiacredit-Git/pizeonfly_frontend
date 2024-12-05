@@ -397,7 +397,7 @@ const Client = () => {
                                                                         style={{
                                                                             transition: 'transform 0.3s ease-in-out',
                                                                             cursor: 'pointer',
-                                                                            // objectFit: 'cover'
+                                                                            objectFit: 'contain'
                                                                         }}
                                                                         onMouseEnter={(e) => {
                                                                             e.target.style.transform = 'scale(2.5)';

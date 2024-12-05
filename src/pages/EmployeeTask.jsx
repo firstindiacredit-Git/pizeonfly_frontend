@@ -424,6 +424,7 @@ const Tasks = () => {
                                   </span>
                                 </td>
                                 <td>
+                                  <span className="fw-bold text-uppercase ">{task.taskTitle}</span>
                                   <p
                                     className="py-2 mb-0 task-description"
                                     style={{
@@ -432,6 +433,7 @@ const Tasks = () => {
                                       width: "200px",  // Adjust this value as needed
                                     }}
                                   >
+                                    
                                     {task.description}
                                   </p>
                                 </td>
@@ -534,6 +536,7 @@ const Tasks = () => {
                                   <h6 className="py-1 px-2 rounded-1 d-inline-block fw-bold small-14 mb-0">
                                     <span className={`badge ${taskStatuses[task._id] === "Not Started" ? "bg-warning text-dark" : taskStatuses[task._id] === "In Progress" ? "bg-info text-dark" : "bg-success"}`}>
                                       {taskStatuses[task._id]}
+                                      
                                     </span>
                                   </h6>
                                   <div className="task-priority d-flex flex-column align-items-center justify-content-center">
@@ -563,6 +566,7 @@ const Tasks = () => {
                                     </span>
                                   </div>
                                 </div>
+                                <span className="fw-bold text-uppercase ">{task.taskTitle}</span>
                                 <p
                                   className="py-2 mb-0 task-description"
                                   style={{

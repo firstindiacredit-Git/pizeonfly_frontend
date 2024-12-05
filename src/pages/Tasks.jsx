@@ -30,6 +30,7 @@ const Tasks = () => {
   const [formData, setFormData] = useState({
     assignedBy: User.username || "",
     projectName: "",
+    taskTitle: "",
     taskEndDate: "",
     taskAssignPerson: "",
     taskPriority: "",
@@ -85,6 +86,7 @@ const Tasks = () => {
       setFormData({
         assignedBy: User.username || "",
         projectName: "",
+        taskTitle: "",
         taskEndDate: "",
         taskAssignPerson: "",
         taskPriority: "",
@@ -117,6 +119,7 @@ const Tasks = () => {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [taskFormData, setTaskFormData] = useState({
     projectName: "",
+    taskTitle: "",
     taskEndDate: "",
     taskAssignPerson: "",
     taskPriority: "",
@@ -634,16 +637,16 @@ const Tasks = () => {
                   <div className="col-12 col-md-4">
                     <div className="d-flex">
                       {viewMode === 'row' ? (
-                        <button 
-                          className="btn btn-outline-primary" 
+                        <button
+                          className="btn btn-outline-primary"
                           onClick={() => setViewMode('list')}
                           title="Switch to List View"
                         >
                           <i className="bi bi-list-task"></i>
                         </button>
                       ) : (
-                        <button 
-                          className="btn btn-outline-primary" 
+                        <button
+                          className="btn btn-outline-primary"
                           onClick={() => setViewMode('row')}
                           title="Switch to Grid View"
                         >
@@ -679,15 +682,15 @@ const Tasks = () => {
                   </div>
 
                   <div className="col-12 col-md-4">
-                    <div className="input-group d-flex gap-2 align-items-center" style={{width:"20rem"}}>
-                    <span className="fw-bold">Filter by Date - </span>
+                    <div className="input-group d-flex gap-2 align-items-center" style={{ width: "20rem" }}>
+                      <span className="fw-bold">Filter by Date - </span>
                       <input
                         className="form-control"
                         type="date"
                         value={filterDate}
                         onChange={(e) => setFilterDate(e.target.value)}
                       />
-                      
+
                     </div>
                   </div>
                 </div>
@@ -748,6 +751,15 @@ const Tasks = () => {
                                   </Link>
                                 </td>
                                 <td className="" style={{ backgroundColor }}>
+                                  <input
+                                    className="form-control fw-bold"
+                                    type="text"
+                                    name="taskTitle"
+                                    placeholder="Task Title"
+                                    value={task.taskTitle}
+                                    onChange={(e) => taskHandleChange(e, task._id)}
+                                    style={{ backgroundColor: 'transparent', border: 'none' }}
+                                  />
                                   <textarea
                                     className="w-100 form-control"
                                     type="text"
@@ -855,6 +867,7 @@ const Tasks = () => {
                               <div className="d-flex justify-content-between align-items-center mb-2">
                                 <span className="fw-bold fs-6">{index + 1}. </span>
                                 <h5 className="fw-bold mb-0">{task.projectName}</h5>
+                                
                                 <Link
                                   to="/images"
                                   state={{
@@ -865,6 +878,20 @@ const Tasks = () => {
                                   <i className="bi-paperclip fs-6" />
                                 </Link>
                               </div>
+                              <input
+                                  className="form-control"
+                                  type="text"
+                                  name="taskTitle"
+                                  placeholder="Task Title"
+                                  value={task.taskTitle}
+                                  onChange={(e) => taskHandleChange(e, task._id)}
+                                  style={{ 
+                                    backgroundColor: 'transparent', 
+                                    border: 'none',
+                                    fontWeight: 'bold',
+                                    width: '80%'
+                                  }}
+                                />
                               <textarea
                                 className="form-control mb-2"
                                 rows="3"
@@ -1161,6 +1188,18 @@ const Tasks = () => {
                             <option value={"Lowest"}>Lowest</option>
                           </select>
                         </div>
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label">Task Title <span className="text-danger">*</span></label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter Task Title"
+                          name="taskTitle"
+                          value={formData.taskTitle}
+                          onChange={handleChange}
+                          required
+                        />
                       </div>
                       <div className="mb-3">
                         <label

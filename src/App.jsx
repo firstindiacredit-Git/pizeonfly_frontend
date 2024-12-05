@@ -26,9 +26,9 @@ import UpdateInvoice from './pages/UpdateInvoice'
 import UrlShortner from './pages/tools/UrlShortner'
 import QrCodeGenerate from './pages/tools/QrCodeGenerate'
 import SaasManager from './pages/tools/SaasManager'
-import HtmlTemplateGenerator from './pages/tools/HtmlTemplateGenerator'
-import CardValidator from './pages/tools/CardValidator'
-import CardGenerator from './pages/tools/CardGenerator'
+// import HtmlTemplateGenerator from './pages/tools/HtmlTemplateGenerator'
+// import CardValidator from './pages/tools/CardValidator'
+// import CardGenerator from './pages/tools/CardGenerator'
 
 import Miscellaneous from './pages/tools/Miscellaneous/Miscellaneous'
 import OnlineScreenrecorder from './pages/tools/Miscellaneous/OnlineScreenrecoder'
@@ -55,6 +55,8 @@ import ClientQrCodeGenerate from './pages/clients-tools/QrCodeGenerate'
 import ClientUrlShortner from './pages/clients-tools/UrlShortner'
 import ClientCardGenerator from './pages/clients-tools/CardGenerator'
 
+import Notepad from './pages/Excel'
+
 // import Test from './pages/test'
 
 import { ThemeProvider } from './context/ThemeContext'
@@ -62,7 +64,7 @@ import { useTheme } from './context/ThemeContext'
 
 function AppContent() {
   const { isDarkMode } = useTheme();
-  
+
   return (
     <div className={`app ${isDarkMode ? 'dark' : 'light'}`}>
       <HashRouter>
@@ -94,9 +96,9 @@ function AppContent() {
           <Route path='/urlShortner' element={<UrlShortner />}></Route>
           <Route path='/qrCodeGenerate' element={<QrCodeGenerate />}></Route>
           <Route path='/saasManager' element={<SaasManager />}></Route>
-          <Route path='/htmlTemplateGenerator' element={<HtmlTemplateGenerator />}></Route>
-          <Route path='/cardValidator' element={<CardValidator />}></Route>
-          <Route path='/cardGenerator' element={<CardGenerator />}></Route>
+          {/* <Route path='/htmlTemplateGenerator' element={<HtmlTemplateGenerator />}></Route> */}
+          {/* <Route path='/cardValidator' element={<CardValidator />}></Route> */}
+          {/* <Route path='/cardGenerator' element={<CardGenerator />}></Route> */}
 
           <Route path='/miscellaneous' element={<Miscellaneous />}></Route>
           <Route path='/online-screenrecorder' element={<OnlineScreenrecorder />}></Route>
@@ -121,6 +123,13 @@ function AppContent() {
           <Route path='/clients-qrCodeGenerate' element={<ClientQrCodeGenerate />}></Route>
           <Route path='/clients-urlShortner' element={<ClientUrlShortner />}></Route>
           <Route path='/clients-cardGenerator' element={<ClientCardGenerator />}></Route>
+
+
+
+
+
+          <Route path='/notepad' element={<Notepad />}></Route>
+
 
 
 
