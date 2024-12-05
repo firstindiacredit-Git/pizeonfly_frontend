@@ -1771,13 +1771,20 @@ const EmployeeDashboard = () => {
 
                             <div className="d-flex justify-content-between align-items-center">
                               {/* Color Picker */}
-                              <div className="position-relative">
+                              <div className="position-relative btn-group">
                                 <button
-                                  className="btn btn-secondary btn-sm"
+                                  className="btn btn-secondary btn-sm me-1"
                                   onClick={() => setShowNotePadPicker(!showNotePadPicker)}
                                   title="Change background color"
                                 >
                                   <i className="bi bi-palette-fill"></i>
+                                </button>
+                                <button
+                                  className="btn btn-dark btn-sm"
+                                  onClick={downloadNotePad}
+                                  title="Download notepad"
+                                >
+                                  <i className="bi bi-download"></i>
                                 </button>
                                 {showNotePadPicker && (
                                   <CustomColorPicker
@@ -1787,18 +1794,19 @@ const EmployeeDashboard = () => {
                                   />
                                 )}
                               </div>
-                              <div className="d-flex gap-2">
+
+                              <div className="d-flex">
                                 {/* Text Formatting Controls */}
-                                <div className="btn-group">
+                                <div className="btn-group me-2">
                                   <button
-                                    className={`btn btn-sm ${isBold ? 'btn-primary' : 'btn-outline-primary'}`}
+                                    className={`btn btn-sm ${isBold ? 'btn-dark' : 'btn-outline-dark'}`}
                                     onClick={toggleBold}
                                     title="Toggle Bold"
                                   >
                                     <i className="bi bi-type-bold"></i>
                                   </button>
                                   <button
-                                    className={`btn btn-sm ${isUnderline ? 'btn-primary' : 'btn-outline-primary'}`}
+                                    className={`btn btn-sm ${isUnderline ? 'btn-dark' : 'btn-outline-dark'}`}
                                     onClick={toggleUnderline}
                                     title="Toggle Underline"
                                   >
@@ -1807,7 +1815,7 @@ const EmployeeDashboard = () => {
                                 </div>
 
                                 {/* Font Size Controls */}
-                                <div className="btn-group">
+                                <div className="btn-group me-2">
                                   <button
                                     className="btn btn-sm btn-outline-secondary"
                                     onClick={() => handleFontSizeChange(fontSize - 1)}
@@ -1835,79 +1843,76 @@ const EmployeeDashboard = () => {
                                 </div>
 
 
+                                <div className="d-flex btn-group">
+                                  {/* Speech Controls */}
+                                  <button
+                                    className={`btn ${isListening ? 'btn-danger' : 'btn-secondary'} btn-sm me-1`}
+                                    onClick={toggleSpeechToText}
+                                    title={isListening ? 'Stop recording' : 'Start speech to text'}
+                                  >
+                                    <i className={`bi ${isListening ? 'bi-mic-fill' : 'bi-mic'}`}></i>
+                                  </button>
 
-                                {/* Speech Controls */}
-                                <button
-                                  className={`btn ${isListening ? 'btn-danger' : 'btn-primary'} btn-sm`}
-                                  onClick={toggleSpeechToText}
-                                  title={isListening ? 'Stop recording' : 'Start speech to text'}
-                                >
-                                  <i className={`bi ${isListening ? 'bi-mic-fill' : 'bi-mic'}`}></i>
-                                </button>
+                                  <button
+                                    className={`btn ${isSpeaking ? 'btn-danger' : 'btn-secondary'} btn-sm me-1`}
+                                    onClick={speakText}
+                                    title={isSpeaking ? 'Stop speaking' : 'Read text aloud'}
+                                  >
+                                    <i className={`bi ${isSpeaking ? 'bi-volume-up-fill' : 'bi-volume-up'}`}></i>
+                                  </button>
 
-                                <button
-                                  className={`btn ${isSpeaking ? 'btn-danger' : 'btn-primary'} btn-sm`}
-                                  onClick={speakText}
-                                  title={isSpeaking ? 'Stop speaking' : 'Read text aloud'}
-                                >
-                                  <i className={`bi ${isSpeaking ? 'bi-volume-up-fill' : 'bi-volume-up'}`}></i>
-                                </button>
+                                  {/* Zoom Controls */}
+                                  <button
+                                    className="btn btn-secondary btn-sm me-1"
+                                    onClick={handleZoomIn}
+                                    title="Zoom in"
+                                    disabled={zoomLevel >= 200}
+                                  >
+                                    <i className="bi bi-zoom-in"></i>
+                                  </button>
 
-                                {/* Zoom Controls */}
-                                <button
-                                  className="btn btn-info btn-sm"
-                                  onClick={handleZoomIn}
-                                  title="Zoom in"
-                                  disabled={zoomLevel >= 200}
-                                >
-                                  <i className="bi bi-zoom-in"></i>
-                                </button>
+                                  <button
+                                    className="btn btn-secondary btn-sm me-1"
+                                    onClick={handleZoomOut}
+                                    title="Zoom out"
+                                    disabled={zoomLevel <= 50}
+                                  >
+                                    <i className="bi bi-zoom-out"></i>
+                                  </button>
 
-                                <button
-                                  className="btn btn-info btn-sm"
-                                  onClick={handleZoomOut}
-                                  title="Zoom out"
-                                  disabled={zoomLevel <= 50}
-                                >
-                                  <i className="bi bi-zoom-out"></i>
-                                </button>
+                                  {/* Fullscreen and Select All */}
+                                  {/* <button
+                                    className="btn btn-secondary btn-sm me-1"
+                                    onClick={toggleFullscreen}
+                                    title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                                  >
+                                    <i className={`bi bi-${isFullscreen ? 'fullscreen-exit' : 'fullscreen'}`}></i>
+                                  </button> */}
 
-                                {/* Fullscreen and Select All */}
-                                <button
-                                  className="btn btn-secondary btn-sm"
-                                  onClick={toggleFullscreen}
-                                  title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-                                >
-                                  <i className={`bi bi-${isFullscreen ? 'fullscreen-exit' : 'fullscreen'}`}></i>
-                                </button>
+                                  <button
+                                    className="btn btn-secondary btn-sm"
+                                    onClick={handleSelectAll}
+                                    title="Select all text"
+                                  >
+                                    <i className="bi bi-check-all"></i>
+                                  </button>
+                                </div>
 
-                                <button
-                                  className="btn btn-secondary btn-sm"
-                                  onClick={handleSelectAll}
-                                  title="Select all text"
-                                >
-                                  <i className="bi bi-check-all"></i>
-                                </button>
                               </div>
 
-                              {/* Existing Clear and Download buttons */}
-                              <div className="d-flex gap-2">
+                              {/* Existing Clear */}
+                              <div className="d-flex">
                                 <button
-                                  className="btn btn-warning btn-sm"
+                                  className="btn btn-danger btn-sm text-white"
                                   onClick={() => handleDeleteAction('notepad')}
                                   title="Clear notepad"
                                 >
-                                  <i className="bi bi-eraser-fill"></i>
+                                  <i className="bi bi-trash"></i>
                                 </button>
-                                <button
-                                  className="btn btn-dark btn-sm"
-                                  onClick={downloadNotePad}
-                                  title="Download notepad"
-                                >
-                                  <i className="bi bi-download"></i>
-                                </button>
+
                               </div>
                             </div>
+
                           </div>
                         </div>
                       </div>
@@ -2083,10 +2088,10 @@ const EmployeeDashboard = () => {
                               <div>
                                 {todos.length > 0 && (
                                   <button
-                                    className="btn btn-warning btn-sm"
+                                    className="btn btn-danger btn-sm text-white"
                                     onClick={() => handleDeleteAction('todo', 'all')}
                                   >
-                                    <i className="bi bi-eraser-fill" title='Clear all'></i>
+                                    <i className="bi bi-trash" title='Clear all'></i>
                                   </button>
                                 )}
                               </div>
@@ -2254,15 +2259,24 @@ const EmployeeDashboard = () => {
                                           </tbody>
                                         </table>
                                       </div>
-                                      <div className="mb-4 d-flex justify-content-center">
-                                        <div className="position-relative">
+
+                                      <div className="mb-4 d-flex justify-content-between">
+                                        <div className="position-relative btn-group">
                                           <button
-                                            className="btn btn-secondary me-2"
+                                            className="btn btn-secondary me-1"
                                             onClick={() => setShowExcelPicker(!showExcelPicker)}
                                             title='Color The Sheet'
                                           >
                                             <i className="bi bi-palette-fill"></i>
                                             <span className="ms-1">Color</span>
+                                          </button>
+                                          <button
+                                            className="btn btn-dark btn-sm"
+                                            onClick={() => downloadExcelSheet(tableIndex)}
+                                            title='Download The Excel Sheet'
+                                          >
+                                            <i className="bi bi-download"></i>
+                                            <span className="ms-1">Excel</span>
                                           </button>
                                           {showExcelPicker && (
                                             <CustomColorPicker
@@ -2273,56 +2287,54 @@ const EmployeeDashboard = () => {
                                           )}
                                         </div>
 
-                                        <button
-                                          className="btn btn-warning me-2"
-                                          onClick={() => handleDeleteAction('excel-clear', tableIndex)}
-                                          title='Clear All Table Value'
-                                        >
-                                          <i className="icofont-eraser me-1" />
-                                          <span className="">Table</span>
-                                        </button>
-                                        {tables.length > 1 && (
+                                        <div className='btn-group'>
                                           <button
-                                            className="btn btn-danger me-2"
-                                            onClick={() => handleDeleteAction('excel-table', tableIndex)}
+                                            className="btn btn-primary me-1"
+                                            onClick={addTable}
+                                            title='Add New Table'
                                           >
-                                            <i className="icofont-trash me-1 text-white" />
-                                            <span className="text-white">Table</span>
+                                            <i className="icofont-plus me-1" />
+                                            <span className="">Table</span>
                                           </button>
-                                        )}
+                                          <button
+                                            className="btn btn-secondary me-1"
+                                            onClick={() => addRow(tableIndex)}
+                                            title='Add New Row In Table'
+                                          >
+                                            <i className="icofont-plus me-1" />
+                                            <span className="">Row</span>
+                                          </button>
+                                          <button
+                                            className="btn btn-secondary me-2"
+                                            onClick={() => addColumn(tableIndex)}
+                                            title='Add New Column In Table'
+                                          >
+                                            <i className="icofont-plus me-1" />
+                                            <span className="">Column</span>
+                                          </button>
+                                        </div>
 
-                                        <button
-                                          className="btn btn-primary me-2"
-                                          onClick={addTable}
-                                          title='Add New Table'
-                                        >
-                                          <i className="icofont-plus me-1" />
-                                          <span className="">Table</span>
-                                        </button>
-                                        <button
-                                          className="btn btn-secondary me-2"
-                                          onClick={() => addRow(tableIndex)}
-                                          title='Add New Row In Table'
-                                        >
-                                          <i className="icofont-plus me-1" />
-                                          <span className="">Row</span>
-                                        </button>
-                                        <button
-                                          className="btn btn-secondary me-2"
-                                          onClick={() => addColumn(tableIndex)}
-                                          title='Add New Column In Table'
-                                        >
-                                          <i className="icofont-plus me-1" />
-                                          <span className="">Column</span>
-                                        </button>
-                                        <button
-                                          className="btn btn-dark btn-sm"
-                                          onClick={() => downloadExcelSheet(tableIndex)}
-                                          title='Download The Excel Sheet'
-                                        >
-                                          <i className="bi bi-download"></i>
-                                          <span className="ms-1">Excel</span>
-                                        </button>
+
+                                        <div className='btn-group'>
+                                          <button
+                                            className="btn btn-danger me-1 text-white"
+                                            onClick={() => handleDeleteAction('excel-clear', tableIndex)}
+                                            title='Clear All Table Value'
+                                          >
+                                            <i className="icofont-eraser me-1" />
+                                            <span className="">Erase</span>
+                                          </button>
+                                          {tables.length > 1 && (
+                                            <button
+                                              className="btn btn-danger me-2"
+                                              onClick={() => handleDeleteAction('excel-table', tableIndex)}
+                                            >
+                                              <i className="icofont-trash me-1 text-white" />
+                                              <span className="text-white">Table</span>
+                                            </button>
+                                          )}
+                                        </div>
+
                                       </div>
                                       <hr className="my-4" />
                                     </div>
