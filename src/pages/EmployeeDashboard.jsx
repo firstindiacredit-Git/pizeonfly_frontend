@@ -2039,13 +2039,15 @@ const EmployeeDashboard = () => {
                                                           onChange={() => toggleTodo(index)}
                                                           style={{ height: '10px', width: '10px' }}
                                                         />
-                                                        <IconButton
-                                                          onClick={() => handleDeleteAction('todo', index)}
-                                                          size="small"
-                                                          style={{ marginLeft: '8px' }}
-                                                        >
-                                                          <DeleteIcon style={{ height: '20px', width: '20px' }} />
-                                                        </IconButton>
+                                                        {todo.source !== 'membersDashboard' && (
+                                                          <IconButton
+                                                            onClick={() => handleDeleteAction('todo', index)}
+                                                            size="small"
+                                                            style={{ marginLeft: '8px' }}
+                                                          >
+                                                            <DeleteIcon style={{ height: '20px', width: '20px' }} />
+                                                          </IconButton>
+                                                        )}
                                                       </>
                                                     )}
                                                   </div>
@@ -2085,7 +2087,7 @@ const EmployeeDashboard = () => {
                                 )}
                               </div>
 
-                              <div>
+                              {/* <div>
                                 {todos.length > 0 && (
                                   <button
                                     className="btn btn-danger btn-sm text-white"
@@ -2094,7 +2096,7 @@ const EmployeeDashboard = () => {
                                     <i className="bi bi-trash" title='Clear all'></i>
                                   </button>
                                 )}
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                         </div>

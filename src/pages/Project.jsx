@@ -1247,7 +1247,7 @@ const Project = () => {
                                   style={{
                                     backgroundColor: project.backgroundColor || '#ffffff',
                                     color: project.backgroundColor ? getContrastColor(project.backgroundColor) : 'inherit',
-                                    height: '450px' // Fixed height for the card
+                                    height: '470px' // Fixed height for the card
                                   }}
                                 >
                                   <div className="card-body d-flex flex-column">
@@ -1389,6 +1389,9 @@ const Project = () => {
                                             </span>
                                           )}
                                         </button>
+                                      </div>
+                                      <div className="d-flex justify-content-start text-muted">
+                                        {getFormattedDate(project.projectDate, true)}
                                       </div>
                                     </div>
                                   </div>

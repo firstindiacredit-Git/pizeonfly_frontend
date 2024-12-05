@@ -649,7 +649,8 @@ const MemberDashboard = () => {
                 const newTodoItem = {
                     text: newTodo,
                     completed: false,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    source: 'membersDashboard' // Add this line
                 };
                 const updatedTodos = [...todos, newTodoItem];
                 setTodos(updatedTodos);
@@ -2310,9 +2311,7 @@ const MemberDashboard = () => {
                                                                                                 </div>
                                                                                                 <span className='text-muted' style={{ fontSize: '0.7rem', marginRight: '10px' }}>
                                                                                                     {todo.createdAt ? (
-                                                                                                        <>
-                                                                                                            {new Date(todo.createdAt).toLocaleString()} ({getTimeAgo(todo.createdAt)})
-                                                                                                        </>
+                                                                                                        `${new Date(todo.createdAt).toLocaleString()} (${getTimeAgo(todo.createdAt)})`
                                                                                                     ) : 'No date'}
                                                                                                 </span>
                                                                                             </li>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
-import { MultiSelect } from "react-multi-select-component";
 import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -129,7 +128,7 @@ const Tasks = () => {
   const formatDate = (dateString, includeTime = false) => {
     const date = new Date(dateString);
     if (includeTime) {
-      return date.toLocaleString('en-US', {
+      return date.toLocaleString('en-GB', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -867,7 +866,7 @@ const Tasks = () => {
                               <div className="d-flex justify-content-between align-items-center mb-2">
                                 <span className="fw-bold fs-6">{index + 1}. </span>
                                 <h5 className="fw-bold mb-0">{task.projectName}</h5>
-                                
+
                                 <Link
                                   to="/images"
                                   state={{
@@ -879,19 +878,19 @@ const Tasks = () => {
                                 </Link>
                               </div>
                               <input
-                                  className="form-control"
-                                  type="text"
-                                  name="taskTitle"
-                                  placeholder="Task Title"
-                                  value={task.taskTitle}
-                                  onChange={(e) => taskHandleChange(e, task._id)}
-                                  style={{ 
-                                    backgroundColor: 'transparent', 
-                                    border: 'none',
-                                    fontWeight: 'bold',
-                                    width: '80%'
-                                  }}
-                                />
+                                className="form-control"
+                                type="text"
+                                name="taskTitle"
+                                placeholder="Task Title"
+                                value={task.taskTitle}
+                                onChange={(e) => taskHandleChange(e, task._id)}
+                                style={{
+                                  backgroundColor: 'transparent',
+                                  border: 'none',
+                                  fontWeight: 'bold',
+                                  width: '80%'
+                                }}
+                              />
                               <textarea
                                 className="form-control mb-2"
                                 rows="3"
@@ -1160,13 +1159,18 @@ const Tasks = () => {
                             Task Assign Person <span className="text-danger">*</span>
                           </label>
                           <div>
-                            <MultiSelect
-
-                              options={assignEmployee}
-                              value={selectedEmployees}
-                              onChange={setSelectedEmployees}
-                              labelledBy="Select Employees"
-                            />
+                            <select
+                              className="form-select"
+                              value={selectedEmployees[0]?.value || ""}
+                              onChange={(e) => setSelectedEmployees([{ label: e.target.options[e.target.selectedIndex].text, value: e.target.value }])}
+                            >
+                              <option value="" disabled>Select Employee</option>
+                              {assignEmployee.map((employee) => (
+                                <option key={employee.value} value={employee.value}>
+                                  {employee.label}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                         </div>
                       </div>
@@ -1441,12 +1445,18 @@ const Tasks = () => {
                             Task Assign Person
                           </label>
                           <div>
-                            <MultiSelect
-                              options={assignEmployee}
-                              value={selectedEmployees}
-                              onChange={setSelectedEmployees}
-                              labelledBy="Select Employees"
-                            />
+                            <select
+                              className="form-select"
+                              value={selectedEmployees[0]?.value || ""}
+                              onChange={(e) => setSelectedEmployees([{ label: e.target.options[e.target.selectedIndex].text, value: e.target.value }])}
+                            >
+                              <option value="" disabled>Select Employee</option>
+                              {assignEmployee.map((employee) => (
+                                <option key={employee.value} value={employee.value}>
+                                  {employee.label}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                         </div>
                       </div>
