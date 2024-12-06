@@ -15,7 +15,10 @@ const Project = () => {
   const [currProj, setCurrProj] = useState({});
   const [viewMode, setViewMode] = useState('row');
   const [searchTerm, setSearchTerm] = useState("");
-  const [notifications, setNotifications] = useState({});
+  const [notifications, setNotifications] = useState(() => {
+    const savedNotifications = localStorage.getItem('projectNotifications');
+    return savedNotifications ? JSON.parse(savedNotifications) : {};
+  });
 
   // CREATE PROJECT
   const [formData, setFormData] = useState({
@@ -495,8 +498,6 @@ const Project = () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/messages/${projectId}`);
       setMessages(response.data);
-      // Clear notifications for this project
-      setNotifications(prev => ({ ...prev, [projectId]: 0 }));
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -519,24 +520,41 @@ const Project = () => {
     return () => newSocket.close();
   }, []);
 
+  // Add this state near your other state declarations
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+
+  // Update the socket effect to save notifications to localStorage
   useEffect(() => {
     if (socket == null) return;
 
     const handleNewMessage = (message) => {
       console.log('New message received:', message);
       setMessages((prevMessages) => [...prevMessages, message]);
-      setNotifications(prev => ({
-        ...prev,
-        [message.projectId]: (prev[message.projectId] || 0) + 1
-      }));
+      
+      if (!isChatModalOpen || selectProject._id !== message.projectId) {
+        setNotifications(prev => {
+          const newNotifications = {
+            ...prev,
+            [message.projectId]: (prev[message.projectId] || 0) + 1
+          };
+          localStorage.setItem('projectNotifications', JSON.stringify(newNotifications));
+          return newNotifications;
+        });
+      }
     };
 
     const handleNewNotification = (notification) => {
       console.log('New notification received:', notification);
-      setNotifications(prev => ({
-        ...prev,
-        [notification.projectId]: (prev[notification.projectId] || 0) + 1
-      }));
+      if (!isChatModalOpen || selectProject._id !== notification.projectId) {
+        setNotifications(prev => {
+          const newNotifications = {
+            ...prev,
+            [notification.projectId]: (prev[notification.projectId] || 0) + 1
+          };
+          localStorage.setItem('projectNotifications', JSON.stringify(newNotifications));
+          return newNotifications;
+        });
+      }
     };
 
     socket.on('new message', handleNewMessage);
@@ -546,7 +564,7 @@ const Project = () => {
       socket.off('new message', handleNewMessage);
       socket.off('new notification', handleNewNotification);
     };
-  }, [socket]);
+  }, [socket, selectProject._id, isChatModalOpen]);
 
   useEffect(() => {
     if (socket == null || projects.length === 0) return;
@@ -585,9 +603,14 @@ const Project = () => {
         },
       });
 
-      // The server will emit the socket event, so we don't need to update messages here
+      // Clear the form and files
       setContent('');
       setFiles([]);
+      // Reset the file input element
+      const fileInput = document.getElementById('fileUpload');
+      if (fileInput) {
+        fileInput.value = '';
+      }
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -608,26 +631,42 @@ const Project = () => {
 
       return () => clearInterval(interval); // Clean up interval on component unmount
     }
-  }, [selectProject]);
+  }, [selectProject, isChatModalOpen]); // Add isChatModalOpen as dependency
 
   const messageInputRef = useRef(null);
 
+  // Update handleOpenMessages to clear notifications only when explicitly opening the chat
   const handleOpenMessages = (project) => {
     setSelectProject(project);
     fetchProjectMessages(project._id);
-    // Clear notifications for this project
-    setNotifications(prev => ({ ...prev, [project._id]: 0 }));
+    
+    // Clear notifications for this specific project only
+    setNotifications(prev => {
+      const newNotifications = { ...prev, [project._id]: 0 };
+      localStorage.setItem('projectNotifications', JSON.stringify(newNotifications));
+      return newNotifications;
+    });
+    
+    setIsChatModalOpen(true);
 
-    // Use setTimeout to ensure the modal is open before we try to focus and scroll
     setTimeout(() => {
       if (messageInputRef.current) {
         messageInputRef.current.focus();
         messageInputRef.current.scrollIntoView({ behavior: 'smooth' });
       }
-    }, 300); // Adjust this delay if needed
+    }, 300);
   };
 
-  // Add this where you display your project cards/list items
+  // Add effect to handle modal close events
+  useEffect(() => {
+    const modalElement = document.getElementById('addUser');
+    if (modalElement) {
+      modalElement.addEventListener('hidden.bs.modal', () => {
+        setIsChatModalOpen(false);
+      });
+    }
+  }, []);
+
   const ProjectProgressBar = ({ project }) => {
     const total = project.totalTasks;
     const completed = project.taskStats.completed;
@@ -1933,14 +1972,14 @@ const Project = () => {
             </div>
 
             {/* Message Modal */}
-            <div className="modal fade" id="addUser" tabIndex={-1} aria-labelledby="addUserLabel" aria-hidden="true">
+            <div className="modal fade" id="addUser" tabIndex={-1} aria-labelledby="addUserLabel" aria-hidden="true" onHide={() => setIsChatModalOpen(false)}>
               <div className="modal-dialog modal-dialog-centered modal-lg">
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="addUserLabel">
                       {selectProject.projectName}
                     </h5>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => setIsChatModalOpen(false)}></button>
                   </div>
                   <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
                     {/* Message List */}

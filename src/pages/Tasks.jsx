@@ -416,7 +416,11 @@ const Tasks = () => {
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]);
-  const [notifications, setNotifications] = useState({});
+  const [notifications, setNotifications] = useState(() => {
+    // Load notifications from localStorage on component mount
+    const savedNotifications = localStorage.getItem('taskNotifications');
+    return savedNotifications ? JSON.parse(savedNotifications) : {};
+  });
   const [selectTask, setSelectTask] = useState({});
   const messageInputRef = useRef(null);
   const [socket, setSocket] = useState(null);
@@ -432,6 +436,8 @@ const Tasks = () => {
     return () => newSocket.close();
   }, []);
 
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+
   useEffect(() => {
     if (socket == null) return;
 
@@ -441,10 +447,13 @@ const Tasks = () => {
 
     socket.on('new task message', (message) => {
       setMessages(prevMessages => [...prevMessages, message]);
-    });
-
-    socket.on('new task notification', ({ taskId }) => {
-      setNotifications(prev => ({ ...prev, [taskId]: (prev[taskId] || 0) + 1 }));
+      // Only add notification if the message modal for this task isn't currently open
+      if (!isMessageModalOpen || selectedTaskId !== message.taskId) {
+        setNotifications(prev => ({
+          ...prev,
+          [message.taskId]: (prev[message.taskId] || 0) + 1
+        }));
+      }
     });
 
     return () => {
@@ -452,9 +461,13 @@ const Tasks = () => {
         socket.emit('leave task', task._id);
       });
       socket.off('new task message');
-      socket.off('new task notification');
     };
-  }, [socket, tasks]);
+  }, [socket, tasks, isMessageModalOpen, selectedTaskId]);
+
+  // Add useEffect to save notifications to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('taskNotifications', JSON.stringify(notifications));
+  }, [notifications]);
 
   const fetchTaskMessages = async (taskId) => {
     try {
@@ -487,6 +500,18 @@ const Tasks = () => {
       });
       setContent('');
       setFiles([]);
+      // Reset the file input element
+      const fileInput = document.getElementById('fileUpload');
+      if (fileInput) {
+        fileInput.value = '';
+      }
+      
+      // Add a small delay before scrolling
+      setTimeout(() => {
+        if (messageContainerRef.current) {
+          messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+        }
+      }, 100);
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -498,15 +523,15 @@ const Tasks = () => {
 
   const handleOpenMessages = (task) => {
     setSelectTask(task);
+    setSelectedTaskId(task._id);
     fetchTaskMessages(task._id);
-    setNotifications(prev => ({ ...prev, [task._id]: 0 }));
-
+    
+    // Add a small delay to ensure messages are loaded before scrolling
     setTimeout(() => {
-      if (messageInputRef.current) {
-        messageInputRef.current.focus();
-        messageInputRef.current.scrollIntoView({ behavior: 'smooth' });
+      if (messageContainerRef.current) {
+        messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
       }
-    }, 300);
+    }, 100);
   };
 
   const globalSearch = () => {
@@ -549,6 +574,16 @@ const Tasks = () => {
 
     }),
   };
+
+  const messageContainerRef = useRef(null);
+
+  // Modify the useEffect that handles messages
+  useEffect(() => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  }, [messages, selectedTaskId]); // Add selectedTaskId as dependency
+
 
 
 
@@ -1524,7 +1559,7 @@ const Tasks = () => {
                       <h5 className="modal-title" id="taskMessageLabel">{selectTask.projectName} - Task Messages</h5>
                       <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                    <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }} ref={messageContainerRef}>
                       {/* Message List */}
                       <ul className="list-group mb-3">
                         {messages.map((message) => (

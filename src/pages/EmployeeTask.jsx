@@ -26,6 +26,7 @@ const Tasks = () => {
   const messageInputRef = useRef(null);
   const [socket, setSocket] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -141,6 +142,11 @@ const Tasks = () => {
       });
       setContent('');
       setFiles([]);
+      // Reset the file input element
+      const fileInput = document.getElementById('fileUpload');
+      if (fileInput) {
+        fileInput.value = '';
+      }
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -167,18 +173,27 @@ const Tasks = () => {
     if (!socket) return;
 
     const handleNewTaskMessage = (message) => {
-      setMessages(prevMessages => [...prevMessages, message]);
-      setNotifications(prev => ({
-        ...prev,
-        [message.taskId]: (prev[message.taskId] || 0) + 1
-      }));
+      if (message.taskId) {
+        setMessages(prevMessages => [...prevMessages, message]);
+
+        // Only update notification if the chat modal is not open for this specific task
+        if (!isChatModalOpen || (selectedTask && message.taskId !== selectedTask._id)) {
+          setNotifications(prev => ({
+            ...prev,
+            [message.taskId]: (prev[message.taskId] || 0) + 1
+          }));
+        }
+      }
     };
 
     const handleNewTaskNotification = ({ taskId }) => {
-      setNotifications(prev => ({
-        ...prev,
-        [taskId]: (prev[taskId] || 0) + 1
-      }));
+      // Only show notification if chat modal is closed or if it's for a different task
+      if (!isChatModalOpen || (selectedTask && taskId !== selectedTask._id)) {
+        setNotifications(prev => ({
+          ...prev,
+          [taskId]: (prev[taskId] || 0) + 1
+        }));
+      }
     };
 
     socket.on('new task message', handleNewTaskMessage);
@@ -188,7 +203,7 @@ const Tasks = () => {
       socket.off('new task message', handleNewTaskMessage);
       socket.off('new task notification', handleNewTaskNotification);
     };
-  }, [socket]);
+  }, [socket, isChatModalOpen, selectedTask]);
 
   useEffect(() => {
     if (!socket) return;
@@ -256,6 +271,47 @@ const Tasks = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Modify the handleOpenMessages function
+  const handleOpenMessages = (task) => {
+    setSelectedTask(task);
+    fetchMessages(task._id);
+    // Only clear notifications when modal is actually opened
+    if (document.getElementById('taskMessages').classList.contains('show')) {
+      setNotifications(prev => ({ ...prev, [task._id]: 0 }));
+    }
+    setIsChatModalOpen(true);
+  };
+
+  // Add event listener for modal close
+  useEffect(() => {
+    const taskMessagesModal = document.getElementById('taskMessages');
+    if (taskMessagesModal) {
+      const handleModalHidden = () => {
+        setIsChatModalOpen(false);
+      };
+
+      taskMessagesModal.addEventListener('hidden.bs.modal', handleModalHidden);
+
+      return () => {
+        taskMessagesModal.removeEventListener('hidden.bs.modal', handleModalHidden);
+      };
+    }
+  }, []);
+
+  // Add this to persist notifications in localStorage
+  useEffect(() => {
+    // Load notifications from localStorage on component mount
+    const savedNotifications = localStorage.getItem('taskNotifications');
+    if (savedNotifications) {
+      setNotifications(JSON.parse(savedNotifications));
+    }
+  }, []);
+
+  // Save notifications to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('taskNotifications', JSON.stringify(notifications));
+  }, [notifications]);
 
   return (
     <>
@@ -433,7 +489,7 @@ const Tasks = () => {
                                       width: "200px",  // Adjust this value as needed
                                     }}
                                   >
-                                    
+
                                     {task.description}
                                   </p>
                                 </td>
@@ -481,10 +537,7 @@ const Tasks = () => {
                                       className="btn btn-outline-secondary btn-sm me-2 position-relative"
                                       data-bs-toggle="modal"
                                       data-bs-target="#taskMessages"
-                                      onClick={() => {
-                                        setSelectedTask(task);
-                                        fetchMessages(task._id);
-                                      }}
+                                      onClick={() => handleOpenMessages(task)}
                                     >
                                       <i className="bi bi-chat-left-dots"></i>
                                       {notifications[task._id] > 0 && (
@@ -536,7 +589,7 @@ const Tasks = () => {
                                   <h6 className="py-1 px-2 rounded-1 d-inline-block fw-bold small-14 mb-0">
                                     <span className={`badge ${taskStatuses[task._id] === "Not Started" ? "bg-warning text-dark" : taskStatuses[task._id] === "In Progress" ? "bg-info text-dark" : "bg-success"}`}>
                                       {taskStatuses[task._id]}
-                                      
+
                                     </span>
                                   </h6>
                                   <div className="task-priority d-flex flex-column align-items-center justify-content-center">
@@ -592,10 +645,7 @@ const Tasks = () => {
                                             className="btn btn-outline-secondary btn-sm me-2 position-relative"
                                             data-bs-toggle="modal"
                                             data-bs-target="#taskMessages"
-                                            onClick={() => {
-                                              setSelectedTask(task);
-                                              fetchMessages(task._id);
-                                            }}
+                                            onClick={() => handleOpenMessages(task)}
                                           >
                                             <i className="bi bi-chat-left-dots"></i>
                                             {notifications[task._id] > 0 && (

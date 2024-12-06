@@ -43,7 +43,7 @@ const Project = () => {
         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/employee-projects`, {
           _id: Token,
         });
-        // console.log(response.data);
+        console.log(response.data);
         setProjects(response.data);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -59,8 +59,12 @@ const Project = () => {
   const [content, setContent] = useState('');
   const [files, setFiles] = useState([]);
   const [socket, setSocket] = useState(null);
-  const [notifications, setNotifications] = useState({});
+  const [notifications, setNotifications] = useState(() => {
+    const savedNotifications = localStorage.getItem('employeeProjectNotifications');
+    return savedNotifications ? JSON.parse(savedNotifications) : {};
+  });
   const messageInputRef = useRef(null);
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 
   useEffect(() => {
     const newSocket = io(`${import.meta.env.VITE_BASE_URL}`);
@@ -74,20 +78,23 @@ const Project = () => {
 
     socket.on('new message', (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
-    });
-
-    socket.on('new notification', (notification) => {
-      setNotifications(prev => ({
-        ...prev,
-        [notification.projectId]: (prev[notification.projectId] || 0) + 1
-      }));
+      
+      if (!isChatModalOpen || selectProject._id !== message.projectId) {
+        setNotifications(prev => {
+          const newNotifications = {
+            ...prev,
+            [message.projectId]: (prev[message.projectId] || 0) + 1
+          };
+          localStorage.setItem('employeeProjectNotifications', JSON.stringify(newNotifications));
+          return newNotifications;
+        });
+      }
     });
 
     return () => {
       socket.off('new message');
-      socket.off('new notification');
     };
-  }, [socket]);
+  }, [socket, selectProject._id, isChatModalOpen]);
 
   useEffect(() => {
     if (socket == null) return;
@@ -134,42 +141,39 @@ const Project = () => {
       });
       setContent('');
       setFiles([]);
-      // No need to manually fetch messages here, as the socket will handle real-time updates
+      // Reset the file input element
+      const fileInput = document.getElementById('fileUpload');
+      if (fileInput) {
+        fileInput.value = '';
+      }
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
-  // Handle file selection
   const messageFileChange = (e) => {
-    setFiles(Array.from(e.target.files)); // Set selected files
+    setFiles(Array.from(e.target.files));
   };
-
-
-  useEffect(() => {
-    if (selectProject._id) {
-      // fetchProjectMessages(selectProject._id);
-      const interval = setInterval(() => {
-        fetchProjectMessages(selectProject._id); // Polling every 5 seconds
-      }, 1000);
-
-      return () => clearInterval(interval); // Clean up interval on component unmount
-    }
-  }, [selectProject]);
 
   const handleOpenMessages = (project) => {
     setSelectProject(project);
     fetchProjectMessages(project._id);
-    // Clear notifications for this project
-    setNotifications(prev => ({ ...prev, [project._id]: 0 }));
+    
+    // Clear notifications for this specific project only
+    setNotifications(prev => {
+      const newNotifications = { ...prev, [project._id]: 0 };
+      localStorage.setItem('employeeProjectNotifications', JSON.stringify(newNotifications));
+      return newNotifications;
+    });
+    
+    setIsChatModalOpen(true);
 
-    // Use setTimeout to ensure the modal is open before we try to focus and scroll
     setTimeout(() => {
       if (messageInputRef.current) {
         messageInputRef.current.focus();
         messageInputRef.current.scrollIntoView({ behavior: 'smooth' });
       }
-    }, 300); // Adjust this delay if needed
+    }, 300);
   };
 
   return (
@@ -264,6 +268,7 @@ const Project = () => {
                                       <figcaption className="blockquote-footer">
                                         {project.projectCategory}
                                       </figcaption>
+                                      <p>{getFormattedDate(project.projectDate)}</p>
                                     </td>
                                     <td>
                                       {project.clientAssignPerson.map(
@@ -355,14 +360,27 @@ const Project = () => {
             </div>
 
             {/* Message Modal */}
-            <div className="modal fade" id="addUser" tabIndex={-1} aria-labelledby="addUserLabel" aria-hidden="true">
+            <div 
+              className="modal fade" 
+              id="addUser" 
+              tabIndex={-1} 
+              aria-labelledby="addUserLabel" 
+              aria-hidden="true"
+              onHide={() => setIsChatModalOpen(false)}
+            >
               <div className="modal-dialog modal-dialog-centered modal-lg">
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title" id="addUserLabel">
                       {selectProject.projectName}
                     </h5>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button 
+                      type="button" 
+                      className="btn-close" 
+                      data-bs-dismiss="modal" 
+                      aria-label="Close"
+                      onClick={() => setIsChatModalOpen(false)}
+                    ></button>
                   </div>
                   <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
                     {/* Message List */}
@@ -375,12 +393,10 @@ const Project = () => {
                               <span className="px-3 text-break">{message.content}</span>
                               {message.fileUrls && message.fileUrls.map((fileUrl, index) => {
                                 if (fileUrl) {
-                                  // Remove 'uploads/' from the file path and add VITE_BASE_URL
                                   const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}${fileUrl.replace('uploads/', '')}`;
                                   const fileExtension = cleanFileUrl.split('.').pop().toLowerCase();
 
                                   if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                                    // Display image if the file is an image
                                     return (
                                       <div key={index} className="px-3">
                                         <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer">
@@ -388,15 +404,7 @@ const Project = () => {
                                         </a>
                                       </div>
                                     );
-                                  } else if (fileExtension === 'pdf') {
-                                    // Provide a download link for PDF
-                                    return (
-                                      <div key={index} className="px-3">
-                                        <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer" className="">PDF File</a>
-                                      </div>
-                                    );
                                   } else {
-                                    // Default for other file types (e.g., DOC, XLS)
                                     return (
                                       <div key={index} className="px-3">
                                         <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer" className="">Download File</a>
@@ -407,15 +415,15 @@ const Project = () => {
                                 return null;
                               })}
                             </div>
-                            <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>{new Date(message.createdAt).toLocaleString()}</p>
-
+                            <p className="text-muted" style={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>
+                              {new Date(message.createdAt).toLocaleString()}
+                            </p>
                           </div>
-
                         </li>
                       ))}
                     </ul>
 
-                    {/* Message Submission Form */}
+                    {/* Message Form */}
                     <form onSubmit={messageSubmit}>
                       <div className="mb-3">
                         <label htmlFor="currentMessage" className="form-label">Add Message</label>
