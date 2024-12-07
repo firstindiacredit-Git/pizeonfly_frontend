@@ -291,8 +291,9 @@ const Client = () => {
         }
     };
 
-
-
+    // Add this state for password visibility
+    const [showPassword, setShowPassword] = useState(false);
+    const [showEditPassword, setShowEditPassword] = useState(false);
 
     return (
         <>
@@ -672,13 +673,24 @@ const Client = () => {
                                                         >
                                                             Password <span className="text-danger">*</span>
                                                         </label>
-                                                        <input
-                                                            type="password"
-                                                            className="form-control"
-                                                            id="exampleFormControlInput277"
-                                                            placeholder="Password"
-                                                            name="clientPassword" value={formData.clientPassword} onChange={handleChange}
-                                                        />
+                                                        <div className="input-group">
+                                                            <input
+                                                                type={showPassword ? "text" : "password"}
+                                                                className="form-control"
+                                                                id="exampleFormControlInput277"
+                                                                placeholder="Password"
+                                                                name="clientPassword"
+                                                                value={formData.clientPassword}
+                                                                onChange={handleChange}
+                                                            />
+                                                            <button
+                                                                className="btn btn-outline-secondary"
+                                                                type="button"
+                                                                onClick={() => setShowPassword(!showPassword)}
+                                                            >
+                                                                <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="row g-3 mb-3">
@@ -924,15 +936,24 @@ const Client = () => {
                                                     </div>
                                                     <div className="col">
                                                         <label htmlFor="exampleFormControlInput277" className="form-label">Password</label>
-                                                        <input
-                                                            type="password"
-                                                            className="form-control"
-                                                            id="exampleFormControlInput277"
-                                                            placeholder="Password"
-                                                            name="clientPassword"
-                                                            value={clientData.clientPassword}
-                                                            onChange={updateChange}
-                                                        />
+                                                        <div className="input-group">
+                                                            <input
+                                                                type={showEditPassword ? "text" : "password"}
+                                                                className="form-control"
+                                                                id="exampleFormControlInput277"
+                                                                placeholder="Password"
+                                                                name="clientPassword"
+                                                                value={clientData.clientPassword}
+                                                                onChange={updateChange}
+                                                            />
+                                                            <button
+                                                                className="btn btn-outline-secondary"
+                                                                type="button"
+                                                                onClick={() => setShowEditPassword(!showEditPassword)}
+                                                            >
+                                                                <i className={`bi ${showEditPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="row g-3 mb-3">

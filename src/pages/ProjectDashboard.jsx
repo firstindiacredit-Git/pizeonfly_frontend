@@ -6,12 +6,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Link } from "react-router-dom";
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
-import Chat from "../components/Chat";
-import FloatingMenu from '../components/FloatingMenu';
+import Chat from "../Chats/Chat";
+import FloatingMenu from '../Chats/FloatingMenu';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Checkbox, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CustomColorPicker, { isLightColor } from "./colorpicker/CustomColorPicker";
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import axios from 'axios';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -46,6 +49,11 @@ const ProjectDashboard = () => {
   const [excelSheetColor, setExcelSheetColor] = useState('#d4edda');
   const [showExcelPicker, setShowExcelPicker] = useState(false);
   const [deleteAction, setDeleteAction] = useState({ type: '', index: null });
+  const [holidays, setHolidays] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedHoliday, setSelectedHoliday] = useState(null);
+  const [isConfirmed, setIsConfirmed] = useState(null);
+  const [decisionMade, setDecisionMade] = useState(false);
 
   const notePadRef = useRef(null);
   const colorPickerRef = useRef(null);
@@ -228,6 +236,27 @@ const ProjectDashboard = () => {
     };
 
     fetchColors();
+  }, []);
+
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/holidays`);
+        setHolidays(response.data.response.holidays);
+      } catch (error) {
+        toast.error("Error fetching holidays");
+      }
+    };
+    fetchHolidays();
+
+    const existingDecisionDate = localStorage.getItem("decisionDate");
+    const today = new Date().toISOString().split('T')[0];
+
+    if (existingDecisionDate === today) {
+      setDecisionMade(true);
+    } else {
+      setDecisionMade(false);
+    }
   }, []);
 
   const handleNotesChange = async (e) => {
@@ -907,6 +936,46 @@ const ProjectDashboard = () => {
     }
   };
 
+  const highlightHolidays = ({ date }) => {
+    const adjustedDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+    const isoDate = adjustedDate.toISOString().split('T')[0];
+
+    if (holidays.find(h => h.date.iso === isoDate)) {
+      return 'text-success';
+    }
+  };
+
+  const handleDateChange = (newDate) => {
+    setSelectedDate(newDate);
+    const adjustedDate = new Date(newDate.getTime() - (newDate.getTimezoneOffset() * 60000));
+    const isoDate = adjustedDate.toISOString().split('T')[0];
+
+    const holiday = holidays.find(h => h.date.iso === isoDate);
+    setSelectedHoliday(holiday ? holiday : null);
+    setDecisionMade(false);
+  };
+
+  const handleConfirm = async (confirmation) => {
+    setIsConfirmed(confirmation);
+    setDecisionMade(true);
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem("decisionDate", today);
+
+    if (confirmation && selectedHoliday) {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/notifyHoliday`, {
+        holidayName: selectedHoliday.name,
+        holidayDate: selectedHoliday.date.iso,
+        isConfirmed: confirmation
+      });
+      toast.success(`Tomorrow is a holiday of ${selectedHoliday.name} on ${selectedHoliday.date.iso}. Enjoy your day off!`);
+    } else {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/notifyHoliday`, {
+        isConfirmed: confirmation
+      });
+      toast.info("There is no holiday tomorrow. Please come on time, all employees.");
+    }
+  };
+
   return (
     <>
       <div id="mytask-layout">
@@ -1392,7 +1461,7 @@ const ProjectDashboard = () => {
                                     }}
                                   />
                                 </div>
-                                <div className="table-responsive mb-3" style={{ 
+                                <div className="table-responsive mb-3" style={{
                                   maxHeight: table.rows > 10 ? '400px' : 'auto',
                                   overflowY: table.rows > 10 ? 'auto' : 'visible',
                                   overflowX: 'auto',
@@ -1595,6 +1664,79 @@ const ProjectDashboard = () => {
                   </div>
                 </div>
 
+                <div className="card shadow-lg mb-5">
+                  <div className="card-body">
+                    <div className='d-flex justify-content-around gap-5'>
+                      <div>
+                        <h5 className="card-title text-center mb-4">Calendar</h5>
+                        <Calendar
+                          onChange={handleDateChange}
+                          value={selectedDate}
+                          tileClassName={highlightHolidays}
+                        />
+                      </div>
+                      <div className='text-center'>
+                        {decisionMade ? (
+                          <h4 className='text-center mb-5'>Thank you for your decision!</h4>
+                        ) : (
+                          <div>
+                            <h4 className='text-center mb-5 mt-5'>Do you want to declare tomorrow as an office holiday?</h4>
+                            <div className=''>
+                              <button
+                                className="btn btn-success me-5"
+                                onClick={() => handleConfirm(true)}
+                                disabled={decisionMade}
+                              >
+                                Yes
+                              </button>
+                              <button
+                                className="btn btn-danger"
+                                onClick={() => handleConfirm(false)}
+                                disabled={decisionMade}
+                              >
+                                No
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      {selectedHoliday ? (
+                        <div className="card">
+                          <div className="card-header">
+                            <h3>Holiday Details:</h3>
+                          </div>
+                          <div className="card-body">
+                            <table className="table table-bordered">
+                              <thead className="thead-light">
+                                <tr>
+                                  <th>Name</th>
+                                  <th>Date</th>
+                                  <th>Description</th>
+                                  <th>Type</th>
+                                  <th>Location</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>{selectedHoliday.name}</td>
+                                  <td>{selectedHoliday.date.iso}</td>
+                                  <td>{selectedHoliday.description}</td>
+                                  <td>{selectedHoliday.type.join(', ')}</td>
+                                  <td>{selectedHoliday.locations}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ) : (
+                        <p>No holiday details available for the selected date.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 <div className="mt-5 mb-4 text-center">
                   <Link
                     to="https://pizeonfly.com/"
@@ -1631,7 +1773,7 @@ const ProjectDashboard = () => {
           </div>
         </div>
         <ToastContainer />
-        <FloatingMenu isMobile={isMobile} />
+        <FloatingMenu userType="admin" isMobile={isMobile} />
       </div>
 
       {/* Modal Delete Confirmation */}

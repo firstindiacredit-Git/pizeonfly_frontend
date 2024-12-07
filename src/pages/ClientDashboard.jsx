@@ -5,6 +5,7 @@ import Header from '../clientCompt/ClientHeader'
 import axios from 'axios'
 import { Bar, Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js'
+import FloatingMenu from '../Chats/FloatingMenu'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
@@ -200,6 +201,7 @@ const ClientDashboard = () => {
             </div>
           </div>
         </div>
+        <FloatingMenu userType="client" isMobile={isMobile} />
       </div>
     </>
   )

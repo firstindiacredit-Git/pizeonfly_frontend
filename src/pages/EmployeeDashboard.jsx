@@ -13,6 +13,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CustomColorPicker, { isLightColor } from './colorpicker/CustomColorPicker';
+import FloatingMenu from '../Chats/FloatingMenu';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
@@ -40,6 +41,7 @@ const isValidUrl = (string) => {
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
+  
   const [totalProjects, setTotalProjects] = useState(0)
   const [totalTasks, setTotalTasks] = useState(0)
   const [taskStatusCount, setTaskStatusCount] = useState({
@@ -1322,6 +1324,15 @@ const EmployeeDashboard = () => {
     setShowDeleteModal(false);
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <>
       <div id="mytask-layout">
@@ -2386,6 +2397,7 @@ const EmployeeDashboard = () => {
             </div>
           </div>
         </div>
+        <FloatingMenu userType="employee" isMobile={isMobile} />
       </div>
 
       {/* PDF Viewer Modal */}
