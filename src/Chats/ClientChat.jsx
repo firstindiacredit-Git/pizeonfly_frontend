@@ -110,6 +110,7 @@ const ClientChat = () => {
                         <img
                             src={`${import.meta.env.VITE_BASE_URL}${user.employeeImage.replace('uploads/', '')}`}
                             className="avatar rounded-circle"
+                            style={{ objectFit: 'contain' }}
                             alt={user.employeeName}
                         />
                     )}

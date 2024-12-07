@@ -3,6 +3,8 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import { toast } from 'react-toastify';
 import ChatLayout from './ChatLayout';
+import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
 
 const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -18,7 +20,7 @@ const Chat = () => {
   useEffect(() => {
     // Socket connection
     socket.current = io(import.meta.env.VITE_BASE_URL);
-    
+
     // Join personal chat room
     socket.current.emit('join_chat', currentUser._id);
 
@@ -105,7 +107,7 @@ const Chat = () => {
 
       setMessages(prev => [...prev, response.data]);
       setNewMessage('');
-      
+
       // Emit socket event
       socket.current.emit('private_message', {
         receiverId: selectedUser._id,
@@ -130,18 +132,20 @@ const Chat = () => {
     return (
       <li
         key={user._id}
-        className={`list-group-item px-md-4 py-3 py-md-4 ${selectedUser?._id === user._id ? 'active' : ''}`}
+        className={`list-group-item  ${selectedUser?._id === user._id ? 'active' : ''}`}
+        style={{ backgroundColor: selectedUser?._id === user._id ? '#80808069' : '' }}
         onClick={() => onUserSelect(user, isEmployee ? 'Employee' : 'Client')}
       >
         <div className="d-flex align-items-center">
           <img
             src={`${import.meta.env.VITE_BASE_URL}${(isEmployee ? user.employeeImage : user.clientImage).replace('uploads/', '')}`}
             className="avatar rounded-circle"
+            style={{ objectFit: 'contain' }}
             alt={isEmployee ? user.employeeName : user.clientName}
           />
           <div className="flex-fill ms-3">
-            <h6 className="mb-0">{isEmployee ? user.employeeName : user.clientName}</h6>
-            <small className="text-muted">{isEmployee ? user.emailid : user.clientEmail}</small>
+            <h6 className="mb-0 fw-semibold" style={{fontSize: '14px'}}>{isEmployee ? user.employeeName : user.clientName}</h6>
+            <small className="">{isEmployee ? user.phone ? user.phone : user.emailid : user.clientPhone ? user.clientPhone : user.clientEmail}</small>
           </div>
         </div>
       </li>
@@ -149,27 +153,37 @@ const Chat = () => {
   };
 
   return (
-    <ChatLayout
-      users={activeTab === 'employees' ? employees : clients}
-      selectedUser={selectedUser}
-      messages={messages.map(msg => ({
-        ...msg,
-        isCurrentUser: msg.senderId === currentUser._id
-      }))}
-      newMessage={newMessage}
-      activeTab={activeTab}
-      tabs={[
-        { id: 'employees', label: 'Employees' },
-        { id: 'clients', label: 'Clients' }
-      ]}
-      onTabChange={setActiveTab}
-      onUserSelect={handleUserSelect}
-      onMessageChange={(e) => setNewMessage(e.target.value)}
-      onMessageSubmit={sendMessage}
-      messagesEndRef={messagesEndRef}
-      renderUserItem={renderUserItem}
-    />
+    <>
+      <div id="mytask-layout">
+        <Sidebar />
+        <div className="main px-lg-4 px-md-4">
+          {/* <Header /> */}
+          <div className="body d-flex py-lg-3 py-md-2">
+          <ChatLayout
+            users={activeTab === 'employees' ? employees : clients}
+            selectedUser={selectedUser}
+            messages={messages.map(msg => ({
+              ...msg,
+              isCurrentUser: msg.senderId === currentUser._id
+            }))}
+            newMessage={newMessage}
+            activeTab={activeTab}
+            tabs={[
+              { id: 'employees', label: 'Employees' },
+              { id: 'clients', label: 'Clients' }
+            ]}
+            onTabChange={setActiveTab}
+            onUserSelect={handleUserSelect}
+            onMessageChange={(e) => setNewMessage(e.target.value)}
+            onMessageSubmit={sendMessage}
+            messagesEndRef={messagesEndRef}
+            renderUserItem={renderUserItem}
+          />
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 
-export default Chat;
+        export default Chat;

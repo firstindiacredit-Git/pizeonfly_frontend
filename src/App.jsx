@@ -56,11 +56,14 @@ import ClientUrlShortner from './pages/clients-tools/UrlShortner'
 import ClientCardGenerator from './pages/clients-tools/CardGenerator'
 
 import Notepad from './pages/Excel'
-
 // import Test from './pages/test'
 
 import { ThemeProvider } from './context/ThemeContext'
 import { useTheme } from './context/ThemeContext'
+
+import Chat from './Chats/Chat';
+import EmployeeChat from './Chats/EmployeeChat';
+import ClientChat from './Chats/ClientChat';
 
 function AppContent() {
   const { isDarkMode } = useTheme();
@@ -124,11 +127,12 @@ function AppContent() {
           <Route path='/clients-urlShortner' element={<ClientUrlShortner />}></Route>
           <Route path='/clients-cardGenerator' element={<ClientCardGenerator />}></Route>
 
-
-
-
-
           <Route path='/notepad' element={<Notepad />}></Route>
+
+          <Route path='/admin-chat' element={<Chat />}></Route>
+          <Route path='/employee-chat' element={<EmployeeChat />}></Route>
+          <Route path='/client-chat' element={<ClientChat />}></Route>
+          <Route path='/chat' element={<Chat />}></Route>
 
 
 

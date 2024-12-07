@@ -30,7 +30,7 @@
     "konva": "^9.3.16",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
-    "react-bootstrap": "^2.10.5",
+    "react-bootstrap": "^2.10.6",
     "react-bootstrap-icons": "^1.11.4",
     "react-calendar": "^5.0.0",
     "react-chartjs-2": "^5.2.0",
