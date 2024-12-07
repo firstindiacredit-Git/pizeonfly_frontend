@@ -31,10 +31,12 @@ const ChatLayout = ({
                                 <div className="d-flex align-items-center">
                                     <div onClick={() => setShowUserModal(true)} style={{ cursor: 'pointer' }}>
                                         {selectedUser.userType === 'AdminUser' ? (
-                                            <div className="avatar rounded-circle d-flex align-items-center justify-content-center"
-                                                style={{ width: '40px', height: '40px', backgroundColor: '#25D366', color: 'white' }}>
-                                                {selectedUser.email.charAt(0).toUpperCase()}
-                                            </div>
+                                            <img
+                                                src={`${import.meta.env.VITE_BASE_URL}${selectedUser.profileImage.replace('uploads/', '')}`}
+                                                className="avatar rounded-circle"
+                                                alt={selectedUser.username}
+                                                style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                                            />
                                         ) : (
                                             <img
                                                 src={`${import.meta.env.VITE_BASE_URL}${selectedUser.userType === 'Employee'
@@ -93,27 +95,49 @@ const ChatLayout = ({
                             <div className="card-footer py-2 px-3" style={{ backgroundColor: '#80808069' }}>
                                 <form onSubmit={onMessageSubmit}>
                                     <div className="input-group">
+                                        {/* Emoji Button */}
+                                        <button type="button"
+                                            className="btn"
+                                            style={{ backgroundColor: 'transparent', border: 'none' }}>
+                                            <i className="bi bi-emoji-smile" style={{ color: '#54656f' }}></i>
+                                        </button>
+
+                                        {/* Attachment Button */}
+                                        <button type="button"
+                                            className="btn"
+                                            style={{ backgroundColor: 'transparent', border: 'none' }}>
+                                            <i className="bi bi-paperclip" style={{ color: '#54656f' }}></i>
+                                        </button>
+
+                                        {/* Message Input */}
                                         <input
                                             type="text"
-                                            className="form-control rounded-pill me-2"
+                                            className="form-control rounded-pill me-2 "
                                             placeholder="Type a message"
                                             value={newMessage}
                                             onChange={onMessageChange}
                                             style={{
                                                 backgroundColor: '#ffffff',
                                                 border: 'none',
-                                                padding: '12px 20px'
+                                                padding: '5px 20px'
                                             }}
                                         />
+
+                                        {/* Voice Recording/Send Button */}
                                         <button type="submit"
                                             className="btn rounded-circle d-flex align-items-center justify-content-center"
                                             style={{
-                                                width: '45px',
-                                                height: '45px',
-                                                backgroundColor: '#128C7E',
-                                                color: 'white'
+                                                width: '40px',
+                                                height: '40px',
+                                                backgroundColor: '#00a884',
+                                                color: 'white',
+                                                marginLeft: '8px'
                                             }}>
-                                            <i className="bi bi-send"></i>
+                                            {newMessage ? (
+                                                <i className="bi bi-send"></i>
+                                            ) : (
+                                                <i className="bi bi-mic"></i>
+                                            )}
                                         </button>
                                     </div>
                                 </form>
@@ -177,22 +201,17 @@ const ChatLayout = ({
                 </Modal.Header>
                 <Modal.Body>
                     <div className="text-center mb-4">
-                        {selectedUser?.userType === 'AdminUser' ? (
-                            <div className="avatar rounded-circle d-flex align-items-center justify-content-center mx-auto"
-                                style={{ width: '100px', height: '100px', backgroundColor: '#25D366', color: 'white', fontSize: '2.5rem' }}>
-                                {selectedUser.email.charAt(0).toUpperCase()}
-                            </div>
-                        ) : (
-                            <img
-                                src={`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
-                                    ? selectedUser?.employeeImage.replace('uploads/', '')
+                        <img
+                            src={`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
+                                ? selectedUser?.employeeImage.replace('uploads/', '')
+                                : selectedUser?.userType === 'AdminUser'
+                                    ? selectedUser?.profileImage.replace('uploads/', '')
                                     : selectedUser?.clientImage.replace('uploads/', '')
-                                    }`}
-                                className="rounded-circle"
-                                alt="Profile"
-                                style={{ width: '100px', height: '100px', objectFit: 'contain' }}
-                            />
-                        )}
+                                }`}
+                            className="rounded-circle"
+                            alt="Profile"
+                            style={{ width: '100px', height: '100px', objectFit: 'contain' }}
+                        />
                     </div>
                     <div className="user-details">
                         <h5 className="text-center mb-3">

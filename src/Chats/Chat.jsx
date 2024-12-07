@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import { toast } from 'react-toastify';
 import ChatLayout from './ChatLayout';
 import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+// import Header from "../components/Header";
 
 const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);

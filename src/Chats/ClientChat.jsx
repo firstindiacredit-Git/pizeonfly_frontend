@@ -3,6 +3,8 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import { toast } from 'react-toastify';
 import ChatLayout from './ChatLayout';
+import Sidebar from '../clientCompt/ClientSidebar';
+// import Header from '../clientCompt/ClientHeader';
 
 const ClientChat = () => {
     const [selectedUser, setSelectedUser] = useState(null);
@@ -98,25 +100,21 @@ const ClientChat = () => {
         return (
             <li
                 key={user._id}
-                className={`list-group-item px-md-4 py-3 py-md-4 ${selectedUser?._id === user._id ? 'active' : ''}`}
+                className={`list-group-item  ${selectedUser?._id === user._id ? 'active' : ''}`}
+                style={{ backgroundColor: selectedUser?._id === user._id ? '#80808069' : '' }}
                 onClick={() => onUserSelect(user, isAdmin ? 'Admin' : 'Employee')}
             >
                 <div className="d-flex align-items-center">
-                    {isAdmin ? (
-                        <div className="avatar rounded-circle">
-                            {user.email.charAt(0).toUpperCase()}
-                        </div>
-                    ) : (
-                        <img
-                            src={`${import.meta.env.VITE_BASE_URL}${user.employeeImage.replace('uploads/', '')}`}
-                            className="avatar rounded-circle"
-                            style={{ objectFit: 'contain' }}
-                            alt={user.employeeName}
-                        />
-                    )}
+
+                    <img
+                        src={`${import.meta.env.VITE_BASE_URL}${(isAdmin ? user.profileImage : user.employeeImage).replace('uploads/', '')}`}
+                        className="avatar rounded-circle"
+                        style={{ objectFit: 'contain' }}
+                        alt={user.employeeName}
+                    />
                     <div className="flex-fill ms-3">
-                        <h6 className="mb-0">{isAdmin ? user.email : user.employeeName}</h6>
-                        <small className="text-muted">{isAdmin ? 'Admin' : user.emailid}</small>
+                        <h6 className="mb-0 fw-semibold" style={{ fontSize: '14px' }}>{isAdmin ? user.username : user.employeeName}</h6>
+                        <small className="">{isAdmin ? 'Admin' : user.emailid}</small>
                     </div>
                 </div>
             </li>
@@ -124,26 +122,36 @@ const ClientChat = () => {
     };
 
     return (
-        <ChatLayout
-            users={activeTab === 'admins' ? admins : employees}
-            selectedUser={selectedUser}
-            messages={messages.map(msg => ({
-                ...msg,
-                isCurrentUser: msg.senderId === currentClient._id
-            }))}
-            newMessage={newMessage}
-            activeTab={activeTab}
-            tabs={[
-                { id: 'admins', label: 'Admins' },
-                { id: 'employees', label: 'Employees' }
-            ]}
-            onTabChange={setActiveTab}
-            onUserSelect={handleUserSelect}
-            onMessageChange={(e) => setNewMessage(e.target.value)}
-            onMessageSubmit={sendMessage}
-            messagesEndRef={messagesEndRef}
-            renderUserItem={renderUserItem}
-        />
+        <>
+            <div id="mytask-layout">
+                <Sidebar />
+                <div className="main px-lg-4 px-md-4">
+                    {/* <Header /> */}
+                    <div className="body d-flex py-lg-3 py-md-2">
+                        <ChatLayout
+                            users={activeTab === 'admins' ? admins : employees}
+                            selectedUser={selectedUser}
+                            messages={messages.map(msg => ({
+                                ...msg,
+                                isCurrentUser: msg.senderId === currentClient._id
+                            }))}
+                            newMessage={newMessage}
+                            activeTab={activeTab}
+                            tabs={[
+                                { id: 'admins', label: 'Admins' },
+                                { id: 'employees', label: 'Employees' }
+                            ]}
+                            onTabChange={setActiveTab}
+                            onUserSelect={handleUserSelect}
+                            onMessageChange={(e) => setNewMessage(e.target.value)}
+                            onMessageSubmit={sendMessage}
+                            messagesEndRef={messagesEndRef}
+                            renderUserItem={renderUserItem}
+                        />
+                    </div>
+                </div>
+            </div>
+        </>
     );
 };
 
