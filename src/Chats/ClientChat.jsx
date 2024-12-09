@@ -65,7 +65,11 @@ const ClientChat = () => {
         fetchMessages(user._id);
     };
 
-    const sendMessage = async (e) => {
+    const handleMessageChange = (e) => {
+        setNewMessage(e.target.value);
+    };
+
+    const handleMessageSubmit = async (e) => {
         e.preventDefault();
         if (!newMessage.trim()) return;
 
@@ -95,26 +99,107 @@ const ClientChat = () => {
         }
     };
 
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const uploadResponse = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/upload`,
+                formData
+            );
+
+            const fileUrl = uploadResponse.data.path;
+            const fileType = e.target.accept.split('/')[0];
+
+            const messageData = {
+                senderId: currentClient._id,
+                senderType: 'Client',
+                receiverId: selectedUser._id,
+                receiverType: selectedUser.userType,
+                message: '',
+                [fileType === 'image' ? 'imageUrls' : `${fileType}Url`]: fileType === 'image' ? [fileUrl] : fileUrl
+            };
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/createChat`,
+                messageData
+            );
+
+            setMessages(prev => [...prev, response.data]);
+            socket.current.emit('private_message', {
+                receiverId: selectedUser._id,
+                message: response.data
+            });
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            toast.error('Error uploading file');
+        }
+    };
+
+    const handleVoiceRecordingComplete = async (blob) => {
+        const formData = new FormData();
+        formData.append('file', blob, 'recording.webm');
+
+        try {
+            const uploadResponse = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/upload`,
+                formData
+            );
+
+            const recordingUrl = uploadResponse.data.path;
+
+            const messageData = {
+                senderId: currentClient._id,
+                senderType: 'Client',
+                receiverId: selectedUser._id,
+                receiverType: selectedUser.userType,
+                message: '',
+                recordingUrl
+            };
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/createChat`,
+                messageData
+            );
+
+            setMessages(prev => [...prev, response.data]);
+            socket.current.emit('private_message', {
+                receiverId: selectedUser._id,
+                message: response.data
+            });
+        } catch (error) {
+            console.error('Error uploading recording:', error);
+            toast.error('Error uploading recording');
+        }
+    };
+
     const renderUserItem = (user, selectedUser, onUserSelect) => {
         const isAdmin = activeTab === 'admins';
         return (
             <li
                 key={user._id}
-                className={`list-group-item  ${selectedUser?._id === user._id ? 'active' : ''}`}
+                className={`list-group-item ${selectedUser?._id === user._id ? 'active' : ''}`}
                 style={{ backgroundColor: selectedUser?._id === user._id ? '#80808069' : '' }}
                 onClick={() => onUserSelect(user, isAdmin ? 'Admin' : 'Employee')}
             >
                 <div className="d-flex align-items-center">
-
                     <img
                         src={`${import.meta.env.VITE_BASE_URL}${(isAdmin ? user.profileImage : user.employeeImage).replace('uploads/', '')}`}
                         className="avatar rounded-circle"
                         style={{ objectFit: 'contain' }}
-                        alt={user.employeeName}
+                        alt={isAdmin ? user.username : user.employeeName}
                     />
                     <div className="flex-fill ms-3">
-                        <h6 className="mb-0 fw-semibold" style={{ fontSize: '14px' }}>{isAdmin ? user.username : user.employeeName}</h6>
-                        <small className="">{isAdmin ? 'Admin' : user.emailid}</small>
+                        <h6 className="mb-0 fw-semibold" style={{fontSize: '14px'}}>
+                            {isAdmin ? user.username : user.employeeName}
+                        </h6>
+                        <small className="">
+                            {isAdmin ? 'Admin' : user.emailid}
+                        </small>
                     </div>
                 </div>
             </li>
@@ -122,36 +207,35 @@ const ClientChat = () => {
     };
 
     return (
-        <>
-            <div id="mytask-layout">
-                <Sidebar />
-                <div className="main px-lg-4 px-md-4">
-                    {/* <Header /> */}
-                    <div className="body d-flex py-lg-3 py-md-2">
-                        <ChatLayout
-                            users={activeTab === 'admins' ? admins : employees}
-                            selectedUser={selectedUser}
-                            messages={messages.map(msg => ({
-                                ...msg,
-                                isCurrentUser: msg.senderId === currentClient._id
-                            }))}
-                            newMessage={newMessage}
-                            activeTab={activeTab}
-                            tabs={[
-                                { id: 'admins', label: 'Admins' },
-                                { id: 'employees', label: 'Employees' }
-                            ]}
-                            onTabChange={setActiveTab}
-                            onUserSelect={handleUserSelect}
-                            onMessageChange={(e) => setNewMessage(e.target.value)}
-                            onMessageSubmit={sendMessage}
-                            messagesEndRef={messagesEndRef}
-                            renderUserItem={renderUserItem}
-                        />
-                    </div>
+        <div id="mytask-layout">
+            <Sidebar />
+            <div className="main px-lg-4 px-md-4">
+                <div className="body d-flex py-lg-3 py-md-2">
+                    <ChatLayout
+                        users={activeTab === 'admins' ? admins : employees}
+                        selectedUser={selectedUser}
+                        messages={messages.map(msg => ({
+                            ...msg,
+                            isCurrentUser: msg.senderId === currentClient._id
+                        }))}
+                        newMessage={newMessage}
+                        activeTab={activeTab}
+                        tabs={[
+                            { id: 'admins', label: 'Admins' },
+                            { id: 'employees', label: 'Employees' }
+                        ]}
+                        onTabChange={setActiveTab}
+                        onUserSelect={handleUserSelect}
+                        onMessageChange={handleMessageChange}
+                        onMessageSubmit={handleMessageSubmit}
+                        onFileUpload={handleFileUpload}
+                        onVoiceRecordingComplete={handleVoiceRecordingComplete}
+                        messagesEndRef={messagesEndRef}
+                        renderUserItem={renderUserItem}
+                    />
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

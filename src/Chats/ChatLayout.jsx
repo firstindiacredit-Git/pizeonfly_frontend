@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Modal } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Modal, Dropdown } from 'react-bootstrap';
+import EmojiPicker from 'emoji-picker-react';
 
 const ChatLayout = ({
     users,
@@ -12,10 +13,59 @@ const ChatLayout = ({
     onUserSelect,
     onMessageChange,
     onMessageSubmit,
+    onFileUpload,
+    onVoiceRecordingComplete,
     messagesEndRef,
     renderUserItem
 }) => {
     const [showUserModal, setShowUserModal] = useState(false);
+    const [showImageModal, setShowImageModal] = useState(false);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+    const [mediaRecorder, setMediaRecorder] = useState(null);
+
+    const handleClickOutside = (event) => {
+        const emojiPicker = document.querySelector('.EmojiPickerReact');
+        if (emojiPicker && !emojiPicker.contains(event.target) && 
+            !event.target.closest('button[data-emoji-button="true"]')) {
+            setShowEmojiPicker(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const recorder = new MediaRecorder(stream);
+            const chunks = [];
+
+            recorder.ondataavailable = (e) => chunks.push(e.data);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'audio/webm' });
+                onVoiceRecordingComplete(blob);
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            recorder.start();
+            setMediaRecorder(recorder);
+            setIsRecording(true);
+        } catch (error) {
+            console.error('Error starting recording:', error);
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+            setIsRecording(false);
+        }
+    };
 
     return (
         <div className="container-fluid mt-2" style={{}}>
@@ -80,7 +130,49 @@ const ChatLayout = ({
                                                 backgroundColor: msg.isCurrentUser ? '#075E54' : '#ffffff',
                                                 borderRadius: '7.5px'
                                             }}>
-                                            {msg.message}
+                                            {/* Text message */}
+                                            {msg.message && <div className="mb-1">{msg.message}</div>}
+                                            
+                                            {/* Images */}
+                                            {msg.imageUrls && msg.imageUrls.map((url, i) => (
+                                                <img 
+                                                    key={i}
+                                                    src={`${import.meta.env.VITE_BASE_URL}${url}`}
+                                                    alt="Shared image"
+                                                    className="img-fluid rounded mb-1"
+                                                    style={{ maxHeight: '200px', cursor: 'pointer' }}
+                                                    onClick={() => setShowImageModal(true)}
+                                                />
+                                            ))}
+                                            
+                                            {/* Video */}
+                                            {msg.videoUrl && (
+                                                <video 
+                                                    controls 
+                                                    className="img-fluid rounded mb-1"
+                                                    style={{ maxHeight: '200px' }}
+                                                >
+                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.videoUrl}`} type="video/mp4" />
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                            )}
+                                            
+                                            {/* Audio */}
+                                            {msg.audioUrl && (
+                                                <audio controls className="w-100 mb-1">
+                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.audioUrl}`} type="audio/mpeg" />
+                                                    Your browser does not support the audio element.
+                                                </audio>
+                                            )}
+                                            
+                                            {/* Voice Recording */}
+                                            {msg.recordingUrl && (
+                                                <audio controls className="w-100 mb-1">
+                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.recordingUrl}`} type="audio/webm" />
+                                                    Your browser does not support the audio element.
+                                                </audio>
+                                            )}
+
                                             <small className={`d-block text-end ${msg.isCurrentUser ? 'text-white-50' : 'text-muted'}`}
                                                 style={{ fontSize: '0.6rem' }}>
                                                 {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -95,24 +187,73 @@ const ChatLayout = ({
                             <div className="card-footer py-2 px-3" style={{ backgroundColor: '#80808069' }}>
                                 <form onSubmit={onMessageSubmit}>
                                     <div className="input-group">
-                                        {/* Emoji Button */}
-                                        <button type="button"
-                                            className="btn"
-                                            style={{ backgroundColor: 'transparent', border: 'none' }}>
-                                            <i className="bi bi-emoji-smile" style={{ color: '#54656f' }}></i>
-                                        </button>
+                                        {/* Emoji Picker */}
+                                        <div className="position-relative">
+                                            <button 
+                                                type="button"
+                                                className="btn"
+                                                data-emoji-button="true"
+                                                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                                style={{ backgroundColor: 'transparent', border: 'none' }}
+                                            >
+                                                <i className="bi bi-emoji-smile" style={{ color: '#54656f' }}></i>
+                                            </button>
+                                            {showEmojiPicker && (
+                                                <div className="position-absolute bottom-100 start-0" style={{ zIndex: 1000 }}>
+                                                    <EmojiPicker onEmojiClick={(emojiObj) => {
+                                                        onMessageChange({ target: { value: newMessage + emojiObj.emoji } });
+                                                    }} />
+                                                </div>
+                                            )}
+                                        </div>
 
                                         {/* Attachment Button */}
-                                        <button type="button"
-                                            className="btn"
-                                            style={{ backgroundColor: 'transparent', border: 'none' }}>
-                                            <i className="bi bi-paperclip" style={{ color: '#54656f' }}></i>
-                                        </button>
+                                        <Dropdown>
+                                            <Dropdown.Toggle variant="transparent" style={{ border: 'none' }}>
+                                                <i className="bi bi-paperclip" style={{ color: '#54656f' }}></i>
+                                            </Dropdown.Toggle>
+
+                                            <Dropdown.Menu>
+                                                <Dropdown.Item onClick={() => document.getElementById('imageUpload').click()}>
+                                                    <i className="bi bi-image me-2"></i>Image
+                                                </Dropdown.Item>
+                                                <Dropdown.Item onClick={() => document.getElementById('videoUpload').click()}>
+                                                    <i className="bi bi-camera-video me-2"></i>Video
+                                                </Dropdown.Item>
+                                                <Dropdown.Item onClick={() => document.getElementById('audioUpload').click()}>
+                                                    <i className="bi bi-file-music me-2"></i>Audio
+                                                </Dropdown.Item>
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+
+                                        {/* Hidden file inputs */}
+                                        <input
+                                            type="file"
+                                            id="imageUpload"
+                                            accept="image/*"
+                                            style={{ display: 'none' }}
+                                            onChange={onFileUpload}
+                                            multiple
+                                        />
+                                        <input
+                                            type="file"
+                                            id="videoUpload"
+                                            accept="video/*"
+                                            style={{ display: 'none' }}
+                                            onChange={onFileUpload}
+                                        />
+                                        <input
+                                            type="file"
+                                            id="audioUpload"
+                                            accept="audio/*"
+                                            style={{ display: 'none' }}
+                                            onChange={onFileUpload}
+                                        />
 
                                         {/* Message Input */}
                                         <input
                                             type="text"
-                                            className="form-control rounded-pill me-2 "
+                                            className="form-control rounded-pill me-2"
                                             placeholder="Type a message"
                                             value={newMessage}
                                             onChange={onMessageChange}
@@ -123,8 +264,9 @@ const ChatLayout = ({
                                             }}
                                         />
 
-                                        {/* Voice Recording/Send Button */}
-                                        <button type="submit"
+                                        {/* Send/Record Button */}
+                                        <button 
+                                            type="submit"
                                             className="btn rounded-circle d-flex align-items-center justify-content-center"
                                             style={{
                                                 width: '40px',
@@ -132,11 +274,15 @@ const ChatLayout = ({
                                                 backgroundColor: '#00a884',
                                                 color: 'white',
                                                 marginLeft: '8px'
-                                            }}>
+                                            }}
+                                            onMouseDown={!newMessage ? startRecording : undefined}
+                                            onMouseUp={!newMessage ? stopRecording : undefined}
+                                            onClick={newMessage ? onMessageSubmit : undefined}
+                                        >
                                             {newMessage ? (
                                                 <i className="bi bi-send"></i>
                                             ) : (
-                                                <i className="bi bi-mic"></i>
+                                                <i className={`bi ${isRecording ? 'bi-mic-fill' : 'bi-mic'}`}></i>
                                             )}
                                         </button>
                                     </div>
@@ -197,7 +343,8 @@ const ChatLayout = ({
             </div>
             <Modal show={showUserModal} onHide={() => setShowUserModal(false)} centered>
                 <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
-                    <Modal.Title>User Details</Modal.Title>
+                    <Modal.Title>{selectedUser?.employeeName || selectedUser?.clientName || selectedUser?.username}
+                    </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="text-center mb-4">
@@ -210,7 +357,8 @@ const ChatLayout = ({
                                 }`}
                             className="rounded-circle"
                             alt="Profile"
-                            style={{ width: '100px', height: '100px', objectFit: 'contain' }}
+                            style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
+                            onClick={() => setShowImageModal(true)}
                         />
                     </div>
                     <div className="user-details">
@@ -308,6 +456,26 @@ const ChatLayout = ({
                             </>
                         )}
                     </div>
+                </Modal.Body>
+            </Modal>
+
+            {/* Add new Image Modal */}
+            <Modal show={showImageModal} onHide={() => setShowImageModal(false)} centered>
+                <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
+                    <Modal.Title>{selectedUser?.employeeName || selectedUser?.clientName || selectedUser?.username}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-center">
+                    <img
+                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
+                            ? selectedUser?.employeeImage.replace('uploads/', '')
+                            : selectedUser?.userType === 'AdminUser'
+                                ? selectedUser?.profileImage.replace('uploads/', '')
+                                : selectedUser?.clientImage.replace('uploads/', '')
+                            }`}
+                        alt="Profile"
+                        style={{ width: '100%', height: '80vh', objectFit: 'contain' }}
+                    />
                 </Modal.Body>
             </Modal>
         </div>
