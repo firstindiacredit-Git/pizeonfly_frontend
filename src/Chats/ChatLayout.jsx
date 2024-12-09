@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Dropdown } from 'react-bootstrap';
 import EmojiPicker from 'emoji-picker-react';
+import RecordingWave from './RecordingWave';
 
 const ChatLayout = ({
     users,
@@ -23,10 +24,11 @@ const ChatLayout = ({
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     const handleClickOutside = (event) => {
         const emojiPicker = document.querySelector('.EmojiPickerReact');
-        if (emojiPicker && !emojiPicker.contains(event.target) && 
+        if (emojiPicker && !emojiPicker.contains(event.target) &&
             !event.target.closest('button[data-emoji-button="true"]')) {
             setShowEmojiPicker(false);
         }
@@ -126,49 +128,53 @@ const ChatLayout = ({
                                             }`}
                                             style={{
                                                 maxWidth: '75%',
+                                                maxHeight: '75%',
                                                 position: 'relative',
                                                 backgroundColor: msg.isCurrentUser ? '#075E54' : '#ffffff',
                                                 borderRadius: '7.5px'
                                             }}>
                                             {/* Text message */}
                                             {msg.message && <div className="mb-1">{msg.message}</div>}
-                                            
+
                                             {/* Images */}
                                             {msg.imageUrls && msg.imageUrls.map((url, i) => (
-                                                <img 
+                                                <img
                                                     key={i}
-                                                    src={`${import.meta.env.VITE_BASE_URL}${url}`}
+                                                    src={`${import.meta.env.VITE_BASE_URL}${url.replace('uploads/', '')}`}
                                                     alt="Shared image"
-                                                    className="img-fluid rounded mb-1"
+                                                    className="img-fluid rounded mb-1 py-2"
                                                     style={{ maxHeight: '200px', cursor: 'pointer' }}
-                                                    onClick={() => setShowImageModal(true)}
+                                                    onClick={() => {
+                                                        setSelectedImage(`${import.meta.env.VITE_BASE_URL}${url.replace('uploads/', '')}`);
+                                                        setShowImageModal(true);
+                                                    }}
                                                 />
                                             ))}
-                                            
+
                                             {/* Video */}
                                             {msg.videoUrl && (
-                                                <video 
-                                                    controls 
-                                                    className="img-fluid rounded mb-1"
+                                                <video
+                                                    controls
+                                                    className="img-fluid rounded mb-1 py-2"
                                                     style={{ maxHeight: '200px' }}
                                                 >
-                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.videoUrl}`} type="video/mp4" />
+                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.videoUrl.replace('uploads/', '')}`} type="video/mp4" />
                                                     Your browser does not support the video tag.
                                                 </video>
                                             )}
-                                            
+
                                             {/* Audio */}
                                             {msg.audioUrl && (
                                                 <audio controls className="w-100 mb-1">
-                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.audioUrl}`} type="audio/mpeg" />
+                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.audioUrl.replace('uploads/', '')}`} type="audio/mpeg" />
                                                     Your browser does not support the audio element.
                                                 </audio>
                                             )}
-                                            
+
                                             {/* Voice Recording */}
                                             {msg.recordingUrl && (
-                                                <audio controls className="w-100 mb-1">
-                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.recordingUrl}`} type="audio/webm" />
+                                                <audio controls className="mb-1 py-2">
+                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.recordingUrl.replace('uploads/', '')}`} type="audio/webm" style={{ backgroundColor: 'black' }} />
                                                     Your browser does not support the audio element.
                                                 </audio>
                                             )}
@@ -185,11 +191,11 @@ const ChatLayout = ({
 
                             {/* Message Input - WhatsApp style */}
                             <div className="card-footer py-2 px-3" style={{ backgroundColor: '#80808069' }}>
-                                <form onSubmit={onMessageSubmit}>
+                                <form onSubmit={onMessageSubmit} style={{ position: 'relative' }}>
                                     <div className="input-group">
                                         {/* Emoji Picker */}
                                         <div className="position-relative">
-                                            <button 
+                                            <button
                                                 type="button"
                                                 className="btn"
                                                 data-emoji-button="true"
@@ -254,9 +260,10 @@ const ChatLayout = ({
                                         <input
                                             type="text"
                                             className="form-control rounded-pill me-2"
-                                            placeholder="Type a message"
+                                            placeholder={isRecording ? "Recording..." : "Type a message"}
                                             value={newMessage}
                                             onChange={onMessageChange}
+                                            disabled={isRecording}
                                             style={{
                                                 backgroundColor: '#ffffff',
                                                 border: 'none',
@@ -265,15 +272,16 @@ const ChatLayout = ({
                                         />
 
                                         {/* Send/Record Button */}
-                                        <button 
+                                        <button
                                             type="submit"
                                             className="btn rounded-circle d-flex align-items-center justify-content-center"
                                             style={{
                                                 width: '40px',
                                                 height: '40px',
-                                                backgroundColor: '#00a884',
+                                                backgroundColor: isRecording ? '#ff0000' : '#00a884',
                                                 color: 'white',
-                                                marginLeft: '8px'
+                                                marginLeft: '8px',
+                                                transition: 'background-color 0.3s'
                                             }}
                                             onMouseDown={!newMessage ? startRecording : undefined}
                                             onMouseUp={!newMessage ? stopRecording : undefined}
@@ -286,6 +294,9 @@ const ChatLayout = ({
                                             )}
                                         </button>
                                     </div>
+
+                                    {/* Recording Wave Overlay */}
+                                    {isRecording && <RecordingWave />}
                                 </form>
                             </div>
                         </div>
@@ -460,20 +471,19 @@ const ChatLayout = ({
             </Modal>
 
             {/* Add new Image Modal */}
-            <Modal show={showImageModal} onHide={() => setShowImageModal(false)} centered>
+            <Modal show={showImageModal} onHide={() => {
+                setShowImageModal(false);
+                setSelectedImage(null);
+            }} centered>
                 <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
-                    <Modal.Title>{selectedUser?.employeeName || selectedUser?.clientName || selectedUser?.username}
+                    <Modal.Title>
+                        {selectedImage ? selectedImage.split('/').pop() : 'Image Preview'}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="text-center">
                     <img
-                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
-                            ? selectedUser?.employeeImage.replace('uploads/', '')
-                            : selectedUser?.userType === 'AdminUser'
-                                ? selectedUser?.profileImage.replace('uploads/', '')
-                                : selectedUser?.clientImage.replace('uploads/', '')
-                            }`}
-                        alt="Profile"
+                        src={selectedImage}
+                        alt="Preview"
                         style={{ width: '100%', height: '80vh', objectFit: 'contain' }}
                     />
                 </Modal.Body>

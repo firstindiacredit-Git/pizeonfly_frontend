@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import ChatLayout from './ChatLayout';
 import Sidebar from '../clientCompt/ClientSidebar';
 // import Header from '../clientCompt/ClientHeader';
+import FilePreview from './FilePreview';
 
 const ClientChat = () => {
     const [selectedUser, setSelectedUser] = useState(null);
@@ -16,6 +17,8 @@ const ClientChat = () => {
     const messagesEndRef = useRef(null);
     const socket = useRef();
     const currentClient = JSON.parse(localStorage.getItem('client_user'));
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [showFilePreview, setShowFilePreview] = useState(false);
 
     useEffect(() => {
         socket.current = io(import.meta.env.VITE_BASE_URL);
@@ -99,34 +102,56 @@ const ClientChat = () => {
         }
     };
 
-    const handleFileUpload = async (e) => {
+    const handleFileUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
+        // Validate file type
+        const fileType = file.type.split('/')[0];
+        if (!['image', 'video', 'audio'].includes(fileType)) {
+            toast.error('Unsupported file type');
+            return;
+        }
+
+        // Validate file size (15MB)
+        const maxSize = 15 * 1024 * 1024;
+        if (file.size > maxSize) {
+            toast.error('File size should be less than 15MB');
+            return;
+        }
+
+        setSelectedFile(file);
+        setShowFilePreview(true);
+    };
+
+    const handleFileSend = async (file) => {
         const formData = new FormData();
-        formData.append('file', file);
+        
+        formData.append('senderId', currentClient._id);
+        formData.append('senderType', 'Client');
+        formData.append('receiverId', selectedUser._id);
+        formData.append('receiverType', selectedUser.userType);
+        formData.append('message', '');
+        
+        // Determine file type and append with correct field name
+        const fileType = file.type.split('/')[0];
+        if (fileType === 'image') {
+            formData.append('images', file);
+        } else if (fileType === 'video') {
+            formData.append('video', file);
+        } else if (fileType === 'audio') {
+            formData.append('audio', file);
+        }
 
         try {
-            const uploadResponse = await axios.post(
-                `${import.meta.env.VITE_BASE_URL}api/upload`,
-                formData
-            );
-
-            const fileUrl = uploadResponse.data.path;
-            const fileType = e.target.accept.split('/')[0];
-
-            const messageData = {
-                senderId: currentClient._id,
-                senderType: 'Client',
-                receiverId: selectedUser._id,
-                receiverType: selectedUser.userType,
-                message: '',
-                [fileType === 'image' ? 'imageUrls' : `${fileType}Url`]: fileType === 'image' ? [fileUrl] : fileUrl
-            };
-
             const response = await axios.post(
                 `${import.meta.env.VITE_BASE_URL}api/createChat`,
-                messageData
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
             );
 
             setMessages(prev => [...prev, response.data]);
@@ -134,6 +159,10 @@ const ClientChat = () => {
                 receiverId: selectedUser._id,
                 message: response.data
             });
+            
+            // Close the preview after successful upload
+            setShowFilePreview(false);
+            setSelectedFile(null);
         } catch (error) {
             console.error('Error uploading file:', error);
             toast.error('Error uploading file');
@@ -142,28 +171,26 @@ const ClientChat = () => {
 
     const handleVoiceRecordingComplete = async (blob) => {
         const formData = new FormData();
-        formData.append('file', blob, 'recording.webm');
+        
+        // Add message data
+        formData.append('senderId', currentClient._id);
+        formData.append('senderType', 'Client');
+        formData.append('receiverId', selectedUser._id);
+        formData.append('receiverType', selectedUser.userType);
+        formData.append('message', '');
+        
+        // Add the recording file
+        formData.append('recording', blob, 'recording.webm');
 
         try {
-            const uploadResponse = await axios.post(
-                `${import.meta.env.VITE_BASE_URL}api/upload`,
-                formData
-            );
-
-            const recordingUrl = uploadResponse.data.path;
-
-            const messageData = {
-                senderId: currentClient._id,
-                senderType: 'Client',
-                receiverId: selectedUser._id,
-                receiverType: selectedUser.userType,
-                message: '',
-                recordingUrl
-            };
-
             const response = await axios.post(
                 `${import.meta.env.VITE_BASE_URL}api/createChat`,
-                messageData
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
             );
 
             setMessages(prev => [...prev, response.data]);
@@ -228,10 +255,20 @@ const ClientChat = () => {
                         onUserSelect={handleUserSelect}
                         onMessageChange={handleMessageChange}
                         onMessageSubmit={handleMessageSubmit}
-                        onFileUpload={handleFileUpload}
+                        onFileSend={handleFileSend}
                         onVoiceRecordingComplete={handleVoiceRecordingComplete}
                         messagesEndRef={messagesEndRef}
                         renderUserItem={renderUserItem}
+                        onFileUpload={handleFileUpload}
+                    />
+                    <FilePreview
+                        show={showFilePreview}
+                        onHide={() => {
+                            setShowFilePreview(false);
+                            setSelectedFile(null);
+                        }}
+                        file={selectedFile}
+                        onSend={handleFileSend}
                     />
                 </div>
             </div>
