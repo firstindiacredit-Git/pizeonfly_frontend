@@ -27,10 +27,40 @@ const Chat = () => {
     // Join personal chat room
     socket.current.emit('join_chat', currentUser._id);
 
-    // Listen for new messages
-    socket.current.on('new_chat_message', (message) => {
-      setMessages(prev => [...prev, message]);
-      toast.info('New message received!');
+    // Listen for received messages
+    socket.current.on('receive_message', (message) => {
+      setMessages(prev => {
+        // Avoid duplicate messages
+        if (!prev.some(m => m._id === message._id)) {
+          return [...prev, message];
+        }
+        return prev;
+      });
+    });
+
+    // Listen for sent message confirmations
+    socket.current.on('message_sent', (message) => {
+      setMessages(prev => {
+        // Avoid duplicate messages
+        if (!prev.some(m => m._id === message._id)) {
+          return [...prev, message];
+        }
+        return prev;
+      });
+    });
+
+    // Listen for message updates
+    socket.current.on('message_updated', (updatedMessage) => {
+      setMessages(prev => prev.map(msg =>
+        msg._id === updatedMessage._id ? updatedMessage : msg
+      ));
+    });
+
+    // Listen for message deletions
+    socket.current.on('message_deleted', (deletedMessage) => {
+      setMessages(prev => prev.map(msg =>
+        msg._id === deletedMessage._id ? deletedMessage : msg
+      ));
     });
 
     // Fetch users
@@ -87,35 +117,25 @@ const Chat = () => {
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !selectedUser) return;
 
     try {
-      // Map the current user's role to the correct sender type
-      const senderType = mapRoleToType(currentUser.role);
-
       const messageData = {
         senderId: currentUser._id,
-        senderType: senderType, // Use the mapped sender type
+        senderType: mapRoleToType(currentUser.role),
         receiverId: selectedUser._id,
         receiverType: selectedUser.userType,
         message: newMessage
       };
 
-      console.log('Sending message with data:', messageData); // For debugging
+      setNewMessage(''); // Clear message input immediately for better UX
 
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}api/createChat`,
         messageData
       );
 
-      setMessages(prev => [...prev, response.data]);
-      setNewMessage('');
-
-      // Emit socket event
-      socket.current.emit('private_message', {
-        receiverId: selectedUser._id,
-        message: response.data
-      });
+      // Socket emit is now handled by backend
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error('Error sending message');
@@ -254,6 +274,29 @@ const Chat = () => {
     }
   };
 
+  const handleMessageEdit = async (messageId, newMessage) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_BASE_URL}api/updateChat/${messageId}`,
+        { message: newMessage }
+      );
+    } catch (error) {
+      console.error('Error updating message:', error);
+      toast.error('Error updating message');
+    }
+  };
+
+  const handleMessageDelete = async (messageId) => {
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_BASE_URL}api/deleteChat/${messageId}`
+      );
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      toast.error('Error deleting message');
+    }
+  };
+
   return (
     <>
       <div id="mytask-layout">
@@ -282,6 +325,9 @@ const Chat = () => {
               renderUserItem={renderUserItem}
               onFileUpload={handleFileUpload}
               onVoiceRecordingComplete={handleVoiceRecordingComplete}
+              onMessageEdit={handleMessageEdit}
+              onMessageDelete={handleMessageDelete}
+              fetchMessages={fetchMessages}
             />
             <FilePreview
               show={showFilePreview}

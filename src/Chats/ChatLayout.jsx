@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Dropdown } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Modal, Dropdown, Button } from 'react-bootstrap';
 import EmojiPicker from 'emoji-picker-react';
 import RecordingWave from './RecordingWave';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import CustomColorPicker from '../pages/colorpicker/CustomColorPicker';
 
 const ChatLayout = ({
     users,
@@ -17,7 +20,10 @@ const ChatLayout = ({
     onFileUpload,
     onVoiceRecordingComplete,
     messagesEndRef,
-    renderUserItem
+    renderUserItem,
+    onMessageEdit,
+    onMessageDelete,
+    fetchMessages
 }) => {
     const [showUserModal, setShowUserModal] = useState(false);
     const [showImageModal, setShowImageModal] = useState(false);
@@ -25,6 +31,13 @@ const ChatLayout = ({
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [editingMessageId, setEditingMessageId] = useState(null);
+    const [editMessage, setEditMessage] = useState('');
+    const [showClearChatModal, setShowClearChatModal] = useState(false);
+    const [showBackgroundSettings, setShowBackgroundSettings] = useState(false);
+    const [backgroundColor, setBackgroundColor] = useState('#efeae2');
+    const [backgroundImage, setBackgroundImage] = useState('');
+    const [showColorPicker, setShowColorPicker] = useState(false);
 
     const handleClickOutside = (event) => {
         const emojiPicker = document.querySelector('.EmojiPickerReact');
@@ -69,6 +82,150 @@ const ChatLayout = ({
         }
     };
 
+    const MessageActions = ({ message }) => {
+        const [show, setShow] = useState(false);
+        const dropdownRef = useRef(null);
+
+        useEffect(() => {
+            const handleClickOutside = (event) => {
+                if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                    setShow(false);
+                }
+            };
+
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }, []);
+
+        return (
+            <div className="message-actions" ref={dropdownRef}>
+                <span
+                    onClick={() => setShow(!show)}
+                    style={{ cursor: 'pointer' }}
+                    className="text-muted"
+                >
+                    ⋮
+                </span>
+                <Dropdown.Menu 
+                    show={show} 
+                    style={{ 
+                        position: 'absolute',
+                        right: '100%',
+                        top: 0,
+                        marginRight: '5px'
+                    }}
+                >
+                    <Dropdown.Item onClick={() => {
+                        setEditingMessageId(message._id);
+                        setEditMessage(message.message);
+                        setShow(false);
+                    }}>
+                        <i className="bi bi-pencil me-2"></i>Edit
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                        className="text-danger"
+                        onClick={() => {
+                            onMessageDelete(message._id);
+                            setShow(false);
+                        }}
+                    >
+                        <i className="bi bi-trash me-2"></i>Delete
+                    </Dropdown.Item>
+                </Dropdown.Menu>
+            </div>
+        );
+    };
+
+    const handleClearChat = async () => {
+        try {
+            const currentUser = JSON.parse(localStorage.getItem('user')) || 
+                              JSON.parse(localStorage.getItem('emp_user')) || 
+                              JSON.parse(localStorage.getItem('client_user'));
+            
+            await axios.post(`${import.meta.env.VITE_BASE_URL}api/clearChat`, {
+                userId: currentUser._id,
+                userType: currentUser.role === 'admin' ? 'AdminUser' : 
+                         currentUser.role === 'employee' ? 'Employee' : 'Client',
+                otherUserId: selectedUser._id
+            });
+
+            fetchMessages(selectedUser._id);
+            setShowClearChatModal(false);
+            toast.success('Chat cleared successfully');
+        } catch (error) {
+            console.error('Error clearing chat:', error);
+            toast.error('Error clearing chat');
+        }
+    };
+
+    const handleEditSubmit = async (messageId, editedMessage) => {
+        await onMessageEdit(messageId, editedMessage);
+        setEditingMessageId(null);
+        setEditMessage('');
+    };
+
+    useEffect(() => {
+        const fetchChatSettings = async () => {
+            if (!selectedUser) return;
+            
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('user')) || 
+                                  JSON.parse(localStorage.getItem('emp_user')) || 
+                                  JSON.parse(localStorage.getItem('client_user'));
+                                  
+                const response = await axios.get(
+                    `${import.meta.env.VITE_BASE_URL}api/getChatSettings/${currentUser._id}/${selectedUser._id}`
+                );
+                if (response.data) {
+                    setBackgroundColor(response.data.backgroundColor);
+                    setBackgroundImage(response.data.backgroundImage || '');
+                }
+            } catch (error) {
+                console.error('Error fetching chat settings:', error);
+            }
+        };
+        fetchChatSettings();
+    }, [selectedUser]);
+
+    const handleBackgroundUpdate = async (color, file) => {
+        try {
+            const currentUser = JSON.parse(localStorage.getItem('user')) || 
+                              JSON.parse(localStorage.getItem('emp_user')) || 
+                              JSON.parse(localStorage.getItem('client_user'));
+
+            const formData = new FormData();
+            formData.append('userId', currentUser._id);
+            formData.append('otherUserId', selectedUser._id);
+            formData.append('userType', currentUser.role === 'admin' ? 'AdminUser' : 
+                         currentUser.role === 'employee' ? 'Employee' : 'Client');
+            formData.append('backgroundColor', color);
+            
+            if (file) {
+                formData.append('backgroundImage', file);
+            }
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}api/updateChatBackground`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+
+            setBackgroundColor(color);
+            if (response.data.backgroundImage) {
+                setBackgroundImage(response.data.backgroundImage);
+            }
+            setShowBackgroundSettings(false);
+            setShowColorPicker(false);
+        } catch (error) {
+            console.error('Error updating background:', error);
+            toast.error('Error updating background');
+        }
+    };
+
     return (
         <div className="container-fluid mt-2" style={{}}>
             <div className="row g-0 rounded-2" style={{ height: '94vh', border: '1px solid #00000061' }}>
@@ -79,34 +236,50 @@ const ChatLayout = ({
                     {selectedUser ? (
                         <div className="card border-0" style={{ height: '93.7vh' }}>
                             {/* Chat Header - WhatsApp style */}
-                            <div className="card-header py-2 px-4 " style={{ backgroundColor: '#075E54', color: 'white', height: '50px' }}>
-                                <div className="d-flex align-items-center">
-                                    <div onClick={() => setShowUserModal(true)} style={{ cursor: 'pointer' }}>
-                                        {selectedUser.userType === 'AdminUser' ? (
-                                            <img
-                                                src={`${import.meta.env.VITE_BASE_URL}${selectedUser.profileImage.replace('uploads/', '')}`}
-                                                className="avatar rounded-circle"
-                                                alt={selectedUser.username}
-                                                style={{ width: '40px', height: '40px', objectFit: 'contain' }}
-                                            />
-                                        ) : (
-                                            <img
-                                                src={`${import.meta.env.VITE_BASE_URL}${selectedUser.userType === 'Employee'
-                                                    ? selectedUser.employeeImage.replace('uploads/', '')
-                                                    : selectedUser.clientImage.replace('uploads/', '')
-                                                    }`}
-                                                className="avatar rounded-circle"
-                                                alt={selectedUser.employeeName || selectedUser.clientName}
-                                                style={{ width: '40px', height: '40px', objectFit: 'contain' }}
-                                            />
-                                        )}
+                            <div className="card-header py-2 px-4" style={{ backgroundColor: '#075E54', color: 'white', height: '50px' }}>
+                                <div className="d-flex align-items-center justify-content-between">
+                                    <div className="d-flex align-items-center">
+                                        <div onClick={() => setShowUserModal(true)} style={{ cursor: 'pointer' }}>
+                                            {selectedUser.userType === 'AdminUser' ? (
+                                                <img
+                                                    src={`${import.meta.env.VITE_BASE_URL}${selectedUser.profileImage.replace('uploads/', '')}`}
+                                                    className="avatar rounded-circle"
+                                                    alt={selectedUser.username}
+                                                    style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                                                />
+                                            ) : (
+                                                <img
+                                                    src={`${import.meta.env.VITE_BASE_URL}${selectedUser.userType === 'Employee'
+                                                        ? selectedUser.employeeImage.replace('uploads/', '')
+                                                        : selectedUser.clientImage.replace('uploads/', '')
+                                                        }`}
+                                                    className="avatar rounded-circle"
+                                                    alt={selectedUser.employeeName || selectedUser.clientName}
+                                                    style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                                                />
+                                            )}
+                                        </div>
+                                        <div className="flex-fill ms-3">
+                                            <h6 className="mb-0 fw-bold">
+                                                {selectedUser.employeeName || selectedUser.clientName || selectedUser.username}
+                                            </h6>
+                                            <small className="text-muted">{selectedUser.userType}</small>
+                                        </div>
                                     </div>
-                                    <div className="flex-fill ms-3">
-                                        <h6 className="mb-0 fw-bold">
-                                            {selectedUser.employeeName || selectedUser.clientName || selectedUser.username}
-                                        </h6>
-                                        <small className="text-muted">{selectedUser.userType}</small>
-                                    </div>
+                                    
+                                    <Dropdown>
+                                        <Dropdown.Toggle variant="transparent" style={{ border: 'none', color: 'white' }}>
+                                            <i className="bi bi-three-dots-vertical"></i>
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item onClick={() => setShowClearChatModal(true)}>
+                                                <i className="bi bi-trash me-2"></i>Clear Chat
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => setShowBackgroundSettings(true)}>
+                                                <i className="bi bi-palette me-2"></i>Chat Background
+                                            </Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
                                 </div>
                             </div>
 
@@ -115,8 +288,13 @@ const ChatLayout = ({
                                 style={{
                                     height: 'calc(93vh - 140px)',
                                     overflowY: 'auto',
-                                    backgroundColor: '#efeae2',
-                                    backgroundImage: `url("data:image/png;base64,...")`,
+                                    backgroundColor: backgroundColor,
+                                    ...(backgroundImage && {
+                                        backgroundImage: `url("${import.meta.env.VITE_BASE_URL}${backgroundImage.replace('uploads/', '')}")`,
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center',
+                                        backgroundRepeat: 'no-repeat',
+                                    }),
                                     msOverflowStyle: 'none',
                                     scrollbarWidth: 'none',
                                     '&::-webkit-scrollbar': { display: 'none' }
@@ -124,8 +302,7 @@ const ChatLayout = ({
                                 {messages.map((msg, index) => (
                                     <div key={index}
                                         className={`chat-message d-flex ${msg.isCurrentUser ? 'justify-content-end' : 'justify-content-start'} mb-3`}>
-                                        <div className={`message-bubble px-2  rounded-1 ${msg.isCurrentUser ? 'text-white' : 'bg-white'
-                                            }`}
+                                        <div className={`message-bubble px-2 rounded-1 ${msg.isCurrentUser ? 'text-white' : 'bg-white'}`}
                                             style={{
                                                 maxWidth: '75%',
                                                 maxHeight: '75%',
@@ -133,56 +310,109 @@ const ChatLayout = ({
                                                 backgroundColor: msg.isCurrentUser ? '#075E54' : '#ffffff',
                                                 borderRadius: '7.5px'
                                             }}>
-                                            {/* Text message */}
-                                            {msg.message && <div className="mb-1">{msg.message}</div>}
+                                            <div className="d-flex justify-content-between align-items-start">
+                                                <div className="message-content pe-2">
+                                                    {msg.isDeleted ? (
+                                                        <em className="text-muted" style={{ fontSize: '0.9em' }}>
+                                                            {msg.isCurrentUser ? 'You deleted this message' : 'This message was deleted'}
+                                                        </em>
+                                                    ) : editingMessageId === msg._id ? (
+                                                        <form onSubmit={(e) => {
+                                                            e.preventDefault();
+                                                            handleEditSubmit(msg._id, editMessage);
+                                                        }}>
+                                                            <div className="input-group">
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control form-control-sm"
+                                                                    value={editMessage}
+                                                                    onChange={(e) => setEditMessage(e.target.value)}
+                                                                    autoFocus
+                                                                />
+                                                                <button type="submit" className="btn btn-sm btn-success">
+                                                                    <i className="bi bi-check"></i>
+                                                                </button>
+                                                                <button 
+                                                                    type="button" 
+                                                                    className="btn btn-sm btn-secondary"
+                                                                    onClick={() => {
+                                                                        setEditingMessageId(null);
+                                                                        setEditMessage('');
+                                                                    }}
+                                                                >
+                                                                    <i className="bi bi-x"></i>
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    ) : (
+                                                        <>
+                                                            {msg.message}
+                                                            {msg.isEdited && <small className="text-muted ms-2">(edited)</small>}
+                                                        </>
+                                                    )}
+                                                </div>
+                                                {!msg.isDeleted && msg.isCurrentUser && <MessageActions message={msg} />}
+                                            </div>
 
-                                            {/* Images */}
-                                            {msg.imageUrls && msg.imageUrls.map((url, i) => (
-                                                <img
-                                                    key={i}
-                                                    src={`${import.meta.env.VITE_BASE_URL}${url.replace('uploads/', '')}`}
-                                                    alt="Shared image"
-                                                    className="img-fluid rounded mb-1 py-2"
-                                                    style={{ maxHeight: '200px', cursor: 'pointer' }}
-                                                    onClick={() => {
-                                                        setSelectedImage(`${import.meta.env.VITE_BASE_URL}${url.replace('uploads/', '')}`);
-                                                        setShowImageModal(true);
+                                            {!msg.isDeleted && (
+                                                <>
+                                                    {/* Images */}
+                                                    {msg.imageUrls && msg.imageUrls.map((url, i) => (
+                                                        <img
+                                                            key={i}
+                                                            src={`${import.meta.env.VITE_BASE_URL}${url.replace('uploads/', '')}`}
+                                                            alt="Shared image"
+                                                            className="img-fluid rounded mb-1 py-2"
+                                                            style={{ maxHeight: '200px', cursor: 'pointer' }}
+                                                            onClick={() => {
+                                                                setSelectedImage(`${import.meta.env.VITE_BASE_URL}${url.replace('uploads/', '')}`);
+                                                                setShowImageModal(true);
+                                                            }}
+                                                        />
+                                                    ))}
+
+                                                    {/* Video */}
+                                                    {msg.videoUrl && (
+                                                        <video
+                                                            controls
+                                                            className="img-fluid rounded mb-1 py-2"
+                                                            style={{ maxHeight: '200px' }}
+                                                        >
+                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.videoUrl.replace('uploads/', '')}`} type="video/mp4" />
+                                                            Your browser does not support the video tag.
+                                                        </video>
+                                                    )}
+
+                                                    {/* Audio */}
+                                                    {msg.audioUrl && (
+                                                        <audio controls className="w-100 mb-1">
+                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.audioUrl.replace('uploads/', '')}`} type="audio/mpeg" />
+                                                            Your browser does not support the audio element.
+                                                        </audio>
+                                                    )}
+
+                                                    {/* Voice Recording */}
+                                                    {msg.recordingUrl && (
+                                                        <audio controls className="mb-1 py-2">
+                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.recordingUrl.replace('uploads/', '')}`} type="audio/webm" style={{ backgroundColor: 'black' }} />
+                                                            Your browser does not support the audio element.
+                                                        </audio>
+                                                    )}
+                                                </>
+                                            )}
+
+                                            {/* Timestamp */}
+                                            <div className="message-footer">
+                                                <small
+                                                    className={`d-block text-end ${msg.isCurrentUser ? 'text-white-50' : 'text-muted'}`}
+                                                    style={{
+                                                        fontSize: '0.6rem',
+                                                        marginTop: '1px'
                                                     }}
-                                                />
-                                            ))}
-
-                                            {/* Video */}
-                                            {msg.videoUrl && (
-                                                <video
-                                                    controls
-                                                    className="img-fluid rounded mb-1 py-2"
-                                                    style={{ maxHeight: '200px' }}
                                                 >
-                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.videoUrl.replace('uploads/', '')}`} type="video/mp4" />
-                                                    Your browser does not support the video tag.
-                                                </video>
-                                            )}
-
-                                            {/* Audio */}
-                                            {msg.audioUrl && (
-                                                <audio controls className="w-100 mb-1">
-                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.audioUrl.replace('uploads/', '')}`} type="audio/mpeg" />
-                                                    Your browser does not support the audio element.
-                                                </audio>
-                                            )}
-
-                                            {/* Voice Recording */}
-                                            {msg.recordingUrl && (
-                                                <audio controls className="mb-1 py-2">
-                                                    <source src={`${import.meta.env.VITE_BASE_URL}${msg.recordingUrl.replace('uploads/', '')}`} type="audio/webm" style={{ backgroundColor: 'black' }} />
-                                                    Your browser does not support the audio element.
-                                                </audio>
-                                            )}
-
-                                            <small className={`d-block text-end ${msg.isCurrentUser ? 'text-white-50' : 'text-muted'}`}
-                                                style={{ fontSize: '0.6rem' }}>
-                                                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </small>
+                                                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </small>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -486,6 +716,70 @@ const ChatLayout = ({
                         alt="Preview"
                         style={{ width: '100%', height: '80vh', objectFit: 'contain' }}
                     />
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={showClearChatModal} onHide={() => setShowClearChatModal(false)} centered>
+                <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
+                    <Modal.Title>Clear Chat</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Are you sure you want to clear this chat? This action cannot be undone.</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowClearChatModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={handleClearChat}>
+                        Clear Chat
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showBackgroundSettings} onHide={() => setShowBackgroundSettings(false)}>
+                <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
+                    <Modal.Title>Chat Background</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="mb-3">
+                        <label className="form-label">Background Color</label>
+                        <div className="d-flex align-items-center">
+                            <div
+                                className="color-preview me-2"
+                                style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    backgroundColor: backgroundColor,
+                                    border: '1px solid #ccc',
+                                    cursor: 'pointer',
+                                    borderRadius: '4px'
+                                }}
+                                onClick={() => setShowColorPicker(!showColorPicker)}
+                            />
+                            {showColorPicker && (
+                                <div style={{ position: 'absolute', zIndex: 2 }}>
+                                    <CustomColorPicker
+                                        color={backgroundColor}
+                                        onChange={(color) => handleBackgroundUpdate(color)}
+                                        onClose={() => setShowColorPicker(false)}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">Background Image</label>
+                        <input
+                            type="file"
+                            className="form-control"
+                            accept="image/*"
+                            onChange={(e) => {
+                                if (e.target.files[0]) {
+                                    handleBackgroundUpdate(backgroundColor, e.target.files[0]);
+                                }
+                            }}
+                        />
+                    </div>
                 </Modal.Body>
             </Modal>
         </div>

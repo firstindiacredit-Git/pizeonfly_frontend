@@ -24,11 +24,41 @@ const ClientChat = () => {
         socket.current = io(import.meta.env.VITE_BASE_URL);
         socket.current.emit('join_chat', currentClient._id);
 
-        socket.current.on('new_chat_message', (message) => {
-            if (message.receiverId === currentClient._id) {
-                setMessages(prev => [...prev, message]);
-                toast.info('New message received!');
-            }
+        // Listen for received messages
+        socket.current.on('receive_message', (message) => {
+            setMessages(prev => {
+                if (!prev.some(m => m._id === message._id)) {
+                    if (message.receiverId === currentClient._id) {
+                        toast.info('New message received!');
+                    }
+                    return [...prev, message];
+                }
+                return prev;
+            });
+        });
+
+        // Listen for sent message confirmations
+        socket.current.on('message_sent', (message) => {
+            setMessages(prev => {
+                if (!prev.some(m => m._id === message._id)) {
+                    return [...prev, message];
+                }
+                return prev;
+            });
+        });
+
+        // Listen for message updates
+        socket.current.on('message_updated', (updatedMessage) => {
+            setMessages(prev => prev.map(msg =>
+                msg._id === updatedMessage._id ? updatedMessage : msg
+            ));
+        });
+
+        // Listen for message deletions
+        socket.current.on('message_deleted', (deletedMessage) => {
+            setMessages(prev => prev.map(msg =>
+                msg._id === deletedMessage._id ? deletedMessage : msg
+            ));
         });
 
         fetchUsers();
@@ -74,7 +104,7 @@ const ClientChat = () => {
 
     const handleMessageSubmit = async (e) => {
         e.preventDefault();
-        if (!newMessage.trim()) return;
+        if (!newMessage.trim() || !selectedUser) return;
 
         try {
             const messageData = {
@@ -85,19 +115,16 @@ const ClientChat = () => {
                 message: newMessage
             };
 
-            const response = await axios.post(
+            setNewMessage(''); // Clear message input immediately
+
+            await axios.post(
                 `${import.meta.env.VITE_BASE_URL}api/createChat`,
                 messageData
             );
 
-            setMessages(prev => [...prev, response.data]);
-            setNewMessage('');
-
-            socket.current.emit('private_message', {
-                receiverId: selectedUser._id,
-                message: response.data
-            });
+            // Socket emit is handled by backend
         } catch (error) {
+            console.error('Error sending message:', error);
             toast.error('Error sending message');
         }
     };
@@ -126,13 +153,13 @@ const ClientChat = () => {
 
     const handleFileSend = async (file) => {
         const formData = new FormData();
-        
+
         formData.append('senderId', currentClient._id);
         formData.append('senderType', 'Client');
         formData.append('receiverId', selectedUser._id);
         formData.append('receiverType', selectedUser.userType);
         formData.append('message', '');
-        
+
         // Determine file type and append with correct field name
         const fileType = file.type.split('/')[0];
         if (fileType === 'image') {
@@ -159,7 +186,7 @@ const ClientChat = () => {
                 receiverId: selectedUser._id,
                 message: response.data
             });
-            
+
             // Close the preview after successful upload
             setShowFilePreview(false);
             setSelectedFile(null);
@@ -171,14 +198,14 @@ const ClientChat = () => {
 
     const handleVoiceRecordingComplete = async (blob) => {
         const formData = new FormData();
-        
+
         // Add message data
         formData.append('senderId', currentClient._id);
         formData.append('senderType', 'Client');
         formData.append('receiverId', selectedUser._id);
         formData.append('receiverType', selectedUser.userType);
         formData.append('message', '');
-        
+
         // Add the recording file
         formData.append('recording', blob, 'recording.webm');
 
@@ -204,6 +231,29 @@ const ClientChat = () => {
         }
     };
 
+    const handleMessageEdit = async (messageId, newMessage) => {
+        try {
+            await axios.put(
+                `${import.meta.env.VITE_BASE_URL}api/updateChat/${messageId}`,
+                { message: newMessage }
+            );
+        } catch (error) {
+            console.error('Error updating message:', error);
+            toast.error('Error updating message');
+        }
+    };
+
+    const handleMessageDelete = async (messageId) => {
+        try {
+            await axios.delete(
+                `${import.meta.env.VITE_BASE_URL}api/deleteChat/${messageId}`
+            );
+        } catch (error) {
+            console.error('Error deleting message:', error);
+            toast.error('Error deleting message');
+        }
+    };
+
     const renderUserItem = (user, selectedUser, onUserSelect) => {
         const isAdmin = activeTab === 'admins';
         return (
@@ -221,7 +271,7 @@ const ClientChat = () => {
                         alt={isAdmin ? user.username : user.employeeName}
                     />
                     <div className="flex-fill ms-3">
-                        <h6 className="mb-0 fw-semibold" style={{fontSize: '14px'}}>
+                        <h6 className="mb-0 fw-semibold" style={{ fontSize: '14px' }}>
                             {isAdmin ? user.username : user.employeeName}
                         </h6>
                         <small className="">
@@ -260,6 +310,9 @@ const ClientChat = () => {
                         messagesEndRef={messagesEndRef}
                         renderUserItem={renderUserItem}
                         onFileUpload={handleFileUpload}
+                        onMessageEdit={handleMessageEdit}
+                        onMessageDelete={handleMessageDelete}
+                        fetchMessages={fetchMessages}
                     />
                     <FilePreview
                         show={showFilePreview}

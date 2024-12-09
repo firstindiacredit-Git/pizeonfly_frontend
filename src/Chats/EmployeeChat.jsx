@@ -24,11 +24,41 @@ const EmployeeChat = () => {
     socket.current = io(import.meta.env.VITE_BASE_URL);
     socket.current.emit('join_chat', currentEmployee._id);
 
-    socket.current.on('new_chat_message', (message) => {
-      if (message.receiverId === currentEmployee._id) {
-        setMessages(prev => [...prev, message]);
-        toast.info('New message received!');
-      }
+    // Listen for received messages
+    socket.current.on('receive_message', (message) => {
+      setMessages(prev => {
+        if (!prev.some(m => m._id === message._id)) {
+          if (message.receiverId === currentEmployee._id) {
+            toast.info('New message received!');
+          }
+          return [...prev, message];
+        }
+        return prev;
+      });
+    });
+
+    // Listen for sent message confirmations
+    socket.current.on('message_sent', (message) => {
+      setMessages(prev => {
+        if (!prev.some(m => m._id === message._id)) {
+          return [...prev, message];
+        }
+        return prev;
+      });
+    });
+
+    // Listen for message updates
+    socket.current.on('message_updated', (updatedMessage) => {
+      setMessages(prev => prev.map(msg =>
+        msg._id === updatedMessage._id ? updatedMessage : msg
+      ));
+    });
+
+    // Listen for message deletions
+    socket.current.on('message_deleted', (deletedMessage) => {
+      setMessages(prev => prev.map(msg =>
+        msg._id === deletedMessage._id ? deletedMessage : msg
+      ));
     });
 
     fetchUsers();
@@ -74,7 +104,7 @@ const EmployeeChat = () => {
 
   const handleMessageSubmit = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !selectedUser) return;
 
     try {
       const messageData = {
@@ -85,19 +115,16 @@ const EmployeeChat = () => {
         message: newMessage
       };
 
-      const response = await axios.post(
+      setNewMessage(''); // Clear message input immediately
+
+      await axios.post(
         `${import.meta.env.VITE_BASE_URL}api/createChat`,
         messageData
       );
 
-      setMessages(prev => [...prev, response.data]);
-      setNewMessage('');
-
-      socket.current.emit('private_message', {
-        receiverId: selectedUser._id,
-        message: response.data
-      });
+      // Socket emit is handled by backend
     } catch (error) {
+      console.error('Error sending message:', error);
       toast.error('Error sending message');
     }
   };
@@ -109,15 +136,15 @@ const EmployeeChat = () => {
     // Validate file type
     const fileType = file.type.split('/')[0];
     if (!['image', 'video', 'audio'].includes(fileType)) {
-        toast.error('Unsupported file type');
-        return;
+      toast.error('Unsupported file type');
+      return;
     }
 
     // Validate file size (15MB)
     const maxSize = 15 * 1024 * 1024;
     if (file.size > maxSize) {
-        toast.error('File size should be less than 15MB');
-        return;
+      toast.error('File size should be less than 15MB');
+      return;
     }
 
     setSelectedFile(file);
@@ -126,81 +153,106 @@ const EmployeeChat = () => {
 
   const handleFileSend = async (file) => {
     const formData = new FormData();
-    
+
     formData.append('senderId', currentEmployee._id);
     formData.append('senderType', 'Employee');
     formData.append('receiverId', selectedUser._id);
     formData.append('receiverType', selectedUser.userType);
     formData.append('message', '');
-    
+
     // Determine file type and append with correct field name
     const fileType = file.type.split('/')[0];
     if (fileType === 'image') {
-        formData.append('images', file);  // Changed from 'image' to 'images'
+      formData.append('images', file);  // Changed from 'image' to 'images'
     } else if (fileType === 'video') {
-        formData.append('video', file);
+      formData.append('video', file);
     } else if (fileType === 'audio') {
-        formData.append('audio', file);
+      formData.append('audio', file);
     }
 
     try {
-        const response = await axios.post(
-            `${import.meta.env.VITE_BASE_URL}api/createChat`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }
-        );
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}api/createChat`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
 
-        setMessages(prev => [...prev, response.data]);
-        socket.current.emit('private_message', {
-            receiverId: selectedUser._id,
-            message: response.data
-        });
-        
-        // Close the preview after successful upload
-        setShowFilePreview(false);
-        setSelectedFile(null);
+      setMessages(prev => [...prev, response.data]);
+      socket.current.emit('private_message', {
+        receiverId: selectedUser._id,
+        message: response.data
+      });
+
+      // Close the preview after successful upload
+      setShowFilePreview(false);
+      setSelectedFile(null);
     } catch (error) {
-        console.error('Error uploading file:', error);
-        toast.error('Error uploading file');
+      console.error('Error uploading file:', error);
+      toast.error('Error uploading file');
     }
   };
 
   const handleVoiceRecordingComplete = async (blob) => {
     const formData = new FormData();
-    
+
     // Add message data
     formData.append('senderId', currentEmployee._id);
     formData.append('senderType', 'Employee');
     formData.append('receiverId', selectedUser._id);
     formData.append('receiverType', selectedUser.userType);
     formData.append('message', '');
-    
+
     // Add the recording file
     formData.append('recording', blob, 'recording.webm');
 
     try {
-        const response = await axios.post(
-            `${import.meta.env.VITE_BASE_URL}api/createChat`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }
-        );
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}api/createChat`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
 
-        setMessages(prev => [...prev, response.data]);
-        socket.current.emit('private_message', {
-            receiverId: selectedUser._id,
-            message: response.data
-        });
+      setMessages(prev => [...prev, response.data]);
+      socket.current.emit('private_message', {
+        receiverId: selectedUser._id,
+        message: response.data
+      });
     } catch (error) {
-        console.error('Error uploading recording:', error);
-        toast.error('Error uploading recording');
+      console.error('Error uploading recording:', error);
+      toast.error('Error uploading recording');
+    }
+  };
+
+  const handleMessageEdit = async (messageId, newMessage) => {
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_BASE_URL}api/updateChat/${messageId}`,
+        { message: newMessage }
+      );
+      // Update will be handled by socket listener
+    } catch (error) {
+      console.error('Error updating message:', error);
+      toast.error('Error updating message');
+    }
+  };
+
+  const handleMessageDelete = async (messageId) => {
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_BASE_URL}api/deleteChat/${messageId}`
+      );
+      // Deletion will be handled by socket listener
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      toast.error('Error deleting message');
     }
   };
 
@@ -261,6 +313,9 @@ const EmployeeChat = () => {
             messagesEndRef={messagesEndRef}
             renderUserItem={renderUserItem}
             onFileUpload={handleFileUpload}
+            onMessageEdit={handleMessageEdit}
+            onMessageDelete={handleMessageDelete}
+            fetchMessages={fetchMessages}
           />
           <FilePreview
             show={showFilePreview}
