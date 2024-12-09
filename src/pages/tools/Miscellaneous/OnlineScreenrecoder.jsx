@@ -2,8 +2,10 @@ import React, { useState, useRef } from 'react';
 import Sidebar from "../../../components/Sidebar";
 import Header from "../../../components/Header";
 import { Link } from 'react-router-dom';
+import FloatingMenu from '../../../Chats/FloatingMenu'
 
 const OnlineScreenrecoder = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); 
     const [recording, setRecording] = useState(false);
     const [recordedChunks, setRecordedChunks] = useState([]);
     const videoRef = useRef(null);
@@ -129,6 +131,7 @@ const OnlineScreenrecoder = () => {
                         </div>
                     </div>
                 </div>
+                <FloatingMenu userType="admin" isMobile={isMobile} />
             </div>
         </>
     );

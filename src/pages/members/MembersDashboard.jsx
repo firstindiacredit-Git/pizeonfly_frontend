@@ -11,6 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useLocation } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CustomColorPicker, { isLightColor } from "../colorpicker/CustomColorPicker";
+import FloatingMenu from '../../Chats/FloatingMenu'
 
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
@@ -2650,6 +2651,7 @@ const MemberDashboard = () => {
                         </div>
                     </div>
                 </div>
+                <FloatingMenu userType="admin" isMobile={isMobile} />
             </div>
 
             {/* PDF Viewer Modal */}

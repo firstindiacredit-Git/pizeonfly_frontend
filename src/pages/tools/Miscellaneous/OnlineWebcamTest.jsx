@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../../../components/Sidebar';
 import Header from '../../../components/Header';
+import FloatingMenu from '../../../Chats/FloatingMenu'
 
 const OnlineWebcamTest = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [videoTracks, setVideoTracks] = useState(null);
     const [audioTracks, setAudioTracks] = useState(null);
     const [alertVisible, setAlertVisible] = useState(false);
@@ -291,6 +293,7 @@ const OnlineWebcamTest = () => {
                         </div>
                     </div>
                 </div>
+                <FloatingMenu userType="admin" isMobile={isMobile} />
             </div>
         </>
     );

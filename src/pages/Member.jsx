@@ -7,8 +7,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Loading.css"
 import { useNavigate } from "react-router-dom";
+import FloatingMenu from '../Chats/FloatingMenu'
 
 const Member = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -829,14 +831,14 @@ const Member = () => {
                                         cursor: 'pointer',
                                         objectFit: 'cover',
                                       }}
-                                      // onMouseEnter={(e) => {
-                                      //   e.target.style.transform = 'scale(2.5)';
-                                      //   e.target.style.zIndex = '100';
-                                      // }}
-                                      // onMouseLeave={(e) => {
-                                      //   e.target.style.transform = 'scale(1)';
-                                      //   e.target.style.zIndex = '1';
-                                      // }}
+                                      onMouseEnter={(e) => {
+                                        e.target.style.transform = 'scale(2.5)';
+                                        e.target.style.zIndex = '100';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.target.style.transform = 'scale(1)';
+                                        e.target.style.zIndex = '1';
+                                      }}
                                       onClick={() => handleImageClick(
                                         `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
                                         employee.employeeName
@@ -2830,6 +2832,7 @@ const Member = () => {
           </>
         </div>
         <ToastContainer />
+        <FloatingMenu userType="admin" isMobile={isMobile} />
       </div>
       <style>
         {`

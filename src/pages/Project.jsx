@@ -8,9 +8,11 @@ import { MultiSelect } from "react-multi-select-component";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Loading.css";
+import FloatingMenu from '../Chats/FloatingMenu'
 
 const Project = () => {
   const [projects, setProjects] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [loading, setLoading] = useState(true);
   const [currProj, setCurrProj] = useState({});
   const [viewMode, setViewMode] = useState('row');
@@ -2142,6 +2144,7 @@ const Project = () => {
           </>
         </div>
         <ToastContainer />
+        <FloatingMenu userType="admin" isMobile={isMobile} />
       </div >
     </>
   );

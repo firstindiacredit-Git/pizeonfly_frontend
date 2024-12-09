@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from "../../../components/Sidebar";
 import Header from "../../../components/Header";
 import { Link } from 'react-router-dom';
+import FloatingMenu from '../../../Chats/FloatingMenu'
 // import axios from 'axios';
 
 const Miscellaneous1 = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     return (
         <>
             <div id="mytask-layout" className="hover-effect">
@@ -65,6 +67,7 @@ const Miscellaneous1 = () => {
                         </div>
                     </div>
                 </div>
+                <FloatingMenu userType="admin" isMobile={isMobile} />
             </div>
         </>
     );

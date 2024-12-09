@@ -8,8 +8,10 @@ import "react-toastify/dist/ReactToastify.css";
 import "./Loading.css";
 import Select from 'react-select';
 import io from 'socket.io-client';
+import FloatingMenu from '../Chats/FloatingMenu'
 
 const Tasks = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const location = useLocation();
   const navigate = useNavigate();
   const [filteredProjectName, setFilteredProjectName] = useState(null);
@@ -1639,6 +1641,7 @@ const Tasks = () => {
           </>
         </div>
         <ToastContainer />
+        <FloatingMenu userType="admin" isMobile={isMobile} />
       </div >
     </>
   );

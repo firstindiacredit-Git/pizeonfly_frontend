@@ -6,18 +6,20 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import axios from 'axios';
+import FloatingMenu from '../Chats/FloatingMenu'
 
 const UpdateInvoice = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Add check for invoice data
   if (!location.state || !location.state.invoice) {
     return <div>No invoice data available. Please try again.</div>;
   }
 
   const { invoice } = location.state;
-  
+
   const initialInvoice = {
     ...invoice,
     clientDetail: invoice.clientDetail || {
@@ -153,10 +155,10 @@ const UpdateInvoice = () => {
       } else {
         setError('Failed to update invoice');
       }
-        // Reload the page after 5 seconds
-        setTimeout(() => {
-          window.location.reload();
-        }, 5000);
+      // Reload the page after 5 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
     } catch (err) {
       console.error("Update Invoice Error:", err);
       setError('Failed to update invoice');
@@ -557,6 +559,7 @@ const UpdateInvoice = () => {
           </button>
         </div>
       </div>
+      <FloatingMenu userType="admin" isMobile={isMobile} />
     </div>
   );
 };

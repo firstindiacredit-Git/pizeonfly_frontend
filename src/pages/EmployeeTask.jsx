@@ -5,8 +5,10 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import "./Loading.css";
 import io from 'socket.io-client';
+import FloatingMenu from '../Chats/FloatingMenu'
 
 const Tasks = () => {
+  
   const [viewMode, setViewMode] = useState("row");
   const [employees, setEmployees] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -738,6 +740,7 @@ const Tasks = () => {
 
           </>
         </div>
+        <FloatingMenu userType="employee" isMobile={isMobile} />
       </div>
 
       {/* Message Modal */}

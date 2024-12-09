@@ -5,8 +5,10 @@ import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import QRCode from "react-qr-code";
 import axios from 'axios';
+import FloatingMenu from '../../Chats/FloatingMenu'
 
 const QrCodeGenerate = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [qrCode, setQrCode] = useState('');
@@ -236,6 +238,7 @@ const QrCodeGenerate = () => {
                         </div>
                     </div>
                 </div>
+                <FloatingMenu userType="admin" isMobile={isMobile} />
             </div>
         </>
     );

@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import Sidebar from "../../../components/Sidebar";
 import Header from "../../../components/Header";
 import { Link } from 'react-router-dom';
+import FloatingMenu from '../../../Chats/FloatingMenu'
 
 const TextToSpeech = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [text, setText] = useState('');
     const [isPaused, setIsPaused] = useState(false);
     const speechSynthesis = window.speechSynthesis;
@@ -149,7 +151,7 @@ const TextToSpeech = () => {
                             </Link>
                             <h4 className="mb-0 fw-bold">Text To Speech</h4>
                         </div>
-                        
+
                         <div className="container mt-4">
                             <div className="row">
                                 <div className="col-12">
@@ -166,17 +168,17 @@ const TextToSpeech = () => {
                                         onChange={(e) => setText(e.target.value)}
                                         placeholder="Type or upload text here..."
                                     />
-                                    
+
                                     <div className="btn-group">
                                         <button className="btn btn-secondary me-2" onClick={handleCopyText}>
                                             <i className="bi bi-clipboard"></i> Copy Text
                                         </button>
                                         {copySuccess && <span className="text-success">Text copied!</span>}
                                     </div>
-                                    
+
                                     <div className="form-group mt-3 d-flex align-items-center gap-2">
                                         <label className="text-nowrap fw-bold">Select Voice:</label>
-                                        <select 
+                                        <select
                                             className="form-select"
                                             onChange={(e) => setSelectedVoice(availableVoices[e.target.value])}
                                         >
@@ -187,7 +189,7 @@ const TextToSpeech = () => {
                                             ))}
                                         </select>
                                     </div>
-                                    
+
                                     <div className="form-group mt-3 d-flex align-items-center gap-3">
                                         <label className="fw-bold text-nowrap">Speech Rate: </label>
                                         <input
@@ -201,7 +203,7 @@ const TextToSpeech = () => {
                                         />
                                         <span className="fw-bold border bg-primary text-white rounded-2 p-1">{rate}</span>
                                     </div>
-                                    
+
                                     <div className="audio-player-controls mt-3" style={audioControlStyles.audioPlayerControls}>
                                         <div className="d-flex align-items-center gap-2">
                                             <span style={audioControlStyles.timeDisplay}>{formatTime(currentTime)}</span>
@@ -220,14 +222,14 @@ const TextToSpeech = () => {
                                             <span style={audioControlStyles.timeDisplay}>{formatTime(duration)}</span>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="btn-group d-flex justify-content-center mt-3">
                                         <button className="btn btn-primary" onClick={handleSpeak}>
                                             <i className="bi bi-play-fill"></i> Speak
                                         </button>
                                         <button className="btn btn-warning" onClick={isPaused ? handleResume : handlePause}>
-                                            {isPaused ? 
-                                                <><i className="bi bi-play-fill"></i> Resume</> : 
+                                            {isPaused ?
+                                                <><i className="bi bi-play-fill"></i> Resume</> :
                                                 <><i className="bi bi-pause-fill"></i> Pause</>
                                             }
                                         </button>
@@ -240,6 +242,7 @@ const TextToSpeech = () => {
                         </div>
                     </div>
                 </div>
+                <FloatingMenu userType="admin" isMobile={isMobile} />
             </div>
         </>
     );

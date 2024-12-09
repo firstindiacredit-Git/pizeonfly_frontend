@@ -2,8 +2,10 @@ import React, { useState, useRef } from 'react';
 import Sidebar from "../../../components/Sidebar";
 import Header from "../../../components/Header";
 import { Link } from 'react-router-dom';
+import FloatingMenu from '../../../Chats/FloatingMenu'
 
 const SpeechToText = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isListening, setIsListening] = useState(false);
     const [text, setText] = useState('');
     const [selectedLanguage, setSelectedLanguage] = useState('en-IN');
@@ -202,6 +204,7 @@ const SpeechToText = () => {
                         </div>
                     </div>
                 </div>
+                <FloatingMenu userType="admin" isMobile={isMobile} />
             </div>
         </>
     );

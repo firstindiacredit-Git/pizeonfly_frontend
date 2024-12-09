@@ -9,11 +9,12 @@ import axios from 'axios';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Loading.css"
+import FloatingMenu from '../Chats/FloatingMenu'
 
 
 
 const CreateInvoice = () => {
-
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const [invoices, setInvoices] = useState([]);
   // Create a Invoice
@@ -753,6 +754,7 @@ const CreateInvoice = () => {
             {/* </form> */}
           </div>
         </div>
+        <FloatingMenu userType="admin" isMobile={isMobile} />
       </div>
     </>
   );

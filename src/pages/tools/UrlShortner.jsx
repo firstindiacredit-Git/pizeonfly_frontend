@@ -6,8 +6,10 @@ import Header from "../../components/Header";
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import FloatingMenu from '../../Chats/FloatingMenu'
 
 const UrlShortner = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [urls, setUrls] = useState([]);
     const [title, setTitle] = useState('');
     const [originalUrl, setOriginalUrl] = useState('');
@@ -225,7 +227,9 @@ const UrlShortner = () => {
                     </div>
                     <ToastContainer />
                     <QRModal qr={selectedQR} onClose={() => setSelectedQR(null)} />
+
                 </div>
+                <FloatingMenu userType="admin" isMobile={isMobile} />
             </div>
         </>
     );

@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import Sidebar from "../../../components/Sidebar";
 import Header from "../../../components/Header";
 import { Link } from 'react-router-dom';
+import FloatingMenu from '../../../Chats/FloatingMenu'
 
 const OnlineVoiceRecorder = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isRecording, setIsRecording] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [audioURL, setAudioURL] = useState('');
@@ -349,6 +351,7 @@ const OnlineVoiceRecorder = () => {
                         </div>
                     </div>
                 </div>
+                <FloatingMenu userType="admin" isMobile={isMobile} />
             </div>
         </>
     );

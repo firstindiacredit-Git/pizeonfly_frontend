@@ -7,9 +7,10 @@ import { io } from 'socket.io-client';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./Loading.css";
-
+import FloatingMenu from '../Chats/FloatingMenu'
 const ClientProject = () => {
   const [viewMode, setViewMode] = useState("list");
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // GET SINGLE PROJECT
   const [client, setClient] = useState([]);
@@ -468,6 +469,7 @@ const ClientProject = () => {
           </>
         </div>
         <ToastContainer />
+        <FloatingMenu userType="client" isMobile={isMobile} />
       </div>
     </>
   );

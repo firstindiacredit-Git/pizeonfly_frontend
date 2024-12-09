@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from "../../../components/Sidebar";
 import Header from "../../../components/Header"
 import { Link } from 'react-router-dom';
+import FloatingMenu from '../../../Chats/FloatingMenu'
 const OnlineScreenshot = () => {
-
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isCaptured, setIsCaptured] = useState(false);
     const [dataAvailableCount, setDataAvailableCount] = useState(0);
     const videoElem = useRef(null);
@@ -243,6 +244,7 @@ const OnlineScreenshot = () => {
 
                     </div>
                 </div>
+                <FloatingMenu userType="admin" isMobile={isMobile} />
             </div>
         </>
     );
