@@ -162,15 +162,15 @@ const Chat = () => {
     // Validate file type
     const fileType = file.type.split('/')[0];
     if (!['image', 'video', 'audio'].includes(fileType)) {
-        toast.error('Unsupported file type');
-        return;
+      toast.error('Unsupported file type');
+      return;
     }
 
     // Validate file size (15MB)
     const maxSize = 15 * 1024 * 1024; // 15MB in bytes
     if (file.size > maxSize) {
-        toast.error('File size should be less than 10MB');
-        return;
+      toast.error('File size should be less than 10MB');
+      return;
     }
 
     setSelectedFile(file);
@@ -179,78 +179,78 @@ const Chat = () => {
 
   const handleFileSend = async (file) => {
     const formData = new FormData();
-    
+
     // Add message data to formData
     formData.append('senderId', currentUser._id);
     formData.append('senderType', mapRoleToType(currentUser.role));
     formData.append('receiverId', selectedUser._id);
     formData.append('receiverType', selectedUser.userType);
     formData.append('message', ''); // Empty message for file uploads
-    
+
     // Determine file type and append accordingly
     const fileType = file.type.split('/')[0];
     if (fileType === 'image') {
-        formData.append('images', file);
+      formData.append('images', file);
     } else if (fileType === 'video') {
-        formData.append('video', file);
+      formData.append('video', file);
     } else if (fileType === 'audio') {
-        formData.append('audio', file);
+      formData.append('audio', file);
     }
 
     try {
-        const response = await axios.post(
-            `${import.meta.env.VITE_BASE_URL}api/createChat`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }
-        );
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}api/createChat`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
 
-        setMessages(prev => [...prev, response.data]);
-        socket.current.emit('private_message', {
-            receiverId: selectedUser._id,
-            message: response.data
-        });
+      setMessages(prev => [...prev, response.data]);
+      socket.current.emit('private_message', {
+        receiverId: selectedUser._id,
+        message: response.data
+      });
     } catch (error) {
-        console.error('Error uploading file:', error);
-        toast.error('Error uploading file');
+      console.error('Error uploading file:', error);
+      toast.error('Error uploading file');
     }
   };
 
   const handleVoiceRecordingComplete = async (blob) => {
     const formData = new FormData();
-    
+
     // Add message data
     formData.append('senderId', currentUser._id);
     formData.append('senderType', mapRoleToType(currentUser.role));
     formData.append('receiverId', selectedUser._id);
     formData.append('receiverType', selectedUser.userType);
     formData.append('message', '');
-    
+
     // Add the recording file
     formData.append('recording', blob, 'recording.webm');
 
     try {
-        const response = await axios.post(
-            `${import.meta.env.VITE_BASE_URL}api/createChat`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }
-        );
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}api/createChat`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
 
-        setMessages(prev => [...prev, response.data]);
-        socket.current.emit('private_message', {
-            receiverId: selectedUser._id,
-            message: response.data
-        });
+      setMessages(prev => [...prev, response.data]);
+      socket.current.emit('private_message', {
+        receiverId: selectedUser._id,
+        message: response.data
+      });
     } catch (error) {
-        console.error('Error uploading recording:', error);
-        toast.error('Error uploading recording');
+      console.error('Error uploading recording:', error);
+      toast.error('Error uploading recording');
     }
   };
 
