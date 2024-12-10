@@ -151,7 +151,6 @@ const ChatLayout = ({
 
             fetchMessages(selectedUser._id);
             setShowClearChatModal(false);
-            toast.success('Chat cleared successfully');
         } catch (error) {
             console.error('Error clearing chat:', error);
             toast.error('Error clearing chat');

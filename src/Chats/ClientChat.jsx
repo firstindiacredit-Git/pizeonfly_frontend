@@ -254,6 +254,25 @@ const ClientChat = () => {
         }
     };
 
+    const handleClearChat = async () => {
+        if (!selectedUser) return;
+
+        try {
+            await axios.post(`${import.meta.env.VITE_BASE_URL}api/clearChat`, {
+                userId: currentClient._id,
+                userType: 'Client',
+                otherUserId: selectedUser._id
+            });
+
+            // Clear messages immediately from the UI
+            setMessages([]);
+            toast.success('Chat cleared successfully');
+        } catch (error) {
+            console.error('Error clearing chat:', error);
+            toast.error('Error clearing chat');
+        }
+    };
+
     const renderUserItem = (user, selectedUser, onUserSelect) => {
         const isAdmin = activeTab === 'admins';
         return (
@@ -313,6 +332,7 @@ const ClientChat = () => {
                         onMessageEdit={handleMessageEdit}
                         onMessageDelete={handleMessageDelete}
                         fetchMessages={fetchMessages}
+                        onClearChat={handleClearChat}
                     />
                     <FilePreview
                         show={showFilePreview}
