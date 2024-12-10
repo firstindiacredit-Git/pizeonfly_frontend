@@ -296,6 +296,8 @@ const EmployeeChat = () => {
     );
   };
 
+  const allUsers = [...admins, ...clients].filter(Boolean);
+
   return (
     <div id="mytask-layout">
       <Sidebar />
@@ -303,7 +305,10 @@ const EmployeeChat = () => {
         {/* <Header /> */}
         <div className="body d-flex py-lg-3 py-md-2">
           <ChatLayout
-            users={activeTab === 'admins' ? admins : activeTab === 'clients' ? clients : groups}
+            users={activeTab === 'admins' ? admins : 
+                  activeTab === 'clients' ? clients : 
+                  activeTab === 'groups' ? allUsers : 
+                  groups}
             selectedUser={selectedUser}
             messages={messages.map(msg => ({
               ...msg,

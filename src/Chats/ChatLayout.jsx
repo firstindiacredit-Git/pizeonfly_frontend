@@ -5,6 +5,7 @@ import RecordingWave from './RecordingWave';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import CustomColorPicker from '../pages/colorpicker/CustomColorPicker';
+import { MultiSelect } from "react-multi-select-component";
 
 const ChatLayout = ({
     users,
@@ -23,7 +24,8 @@ const ChatLayout = ({
     renderUserItem,
     onMessageEdit,
     onMessageDelete,
-    fetchMessages
+    fetchMessages,
+    onGroupCreate
 }) => {
     const [showUserModal, setShowUserModal] = useState(false);
     const [showImageModal, setShowImageModal] = useState(false);
@@ -38,6 +40,66 @@ const ChatLayout = ({
     const [backgroundColor, setBackgroundColor] = useState('#efeae2');
     const [backgroundImage, setBackgroundImage] = useState('');
     const [showColorPicker, setShowColorPicker] = useState(false);
+    const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
+    const [groupName, setGroupName] = useState('');
+    const [selectedMembers, setSelectedMembers] = useState([]);
+
+    
+    // Modified userOptions mapping with debug logs
+    const userOptions = Array.isArray(users) ? users.map(user => {
+
+        let name, type;
+        
+        if (activeTab === 'employees' || user.employeeName) {
+            name = user.employeeName;
+            type = 'Employee';
+        } else if (activeTab === 'clients' || user.clientName) {
+            name = user.clientName;
+            type = 'Client';
+        } else if (activeTab === 'admins' || user.username) {
+            name = user.username;
+            type = 'AdminUser';
+        }
+
+        const option = {
+            label: name || 'Unknown User',
+            value: user._id,
+            type: type
+        };
+        
+        return option;
+    }).filter(option => option.label !== 'Unknown User') : [];
+
+
+    // Handle group creation
+    const handleCreateGroup = async () => {
+        if (!groupName.trim() || selectedMembers.length === 0) {
+            toast.error('Please enter group name and select members');
+            return;
+        }
+
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/createGroup`, {
+                name: groupName,
+                members: selectedMembers.map(member => ({
+                    userId: member.value,
+                    userType: member.type
+                }))
+            });
+
+            toast.success('Group created successfully');
+            setShowCreateGroupModal(false);
+            setGroupName('');
+            setSelectedMembers([]);
+            // Refresh groups list if needed
+            if (typeof onGroupCreate === 'function') {
+                onGroupCreate();
+            }
+        } catch (error) {
+            console.error('Error creating group:', error);
+            toast.error('Error creating group');
+        }
+    };
 
     const handleClickOutside = (event) => {
         const emojiPicker = document.querySelector('.EmojiPickerReact');
@@ -585,6 +647,7 @@ const ChatLayout = ({
                                                         borderRadius: '5px',
                                                         fontSize: '16px'
                                                     }}
+                                                    onClick={() => setShowCreateGroupModal(true)}
                                                 >
                                                     + Create Group
                                                 </button>
@@ -798,6 +861,55 @@ const ChatLayout = ({
                         />
                     </div>
                 </Modal.Body>
+            </Modal>
+
+            {/* Create Group Modal */}
+            <Modal show={showCreateGroupModal} onHide={() => setShowCreateGroupModal(false)}>
+                <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
+                    <Modal.Title>Create New Group</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="mb-3">
+                        <label className="form-label">Group Name</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={groupName}
+                            onChange={(e) => setGroupName(e.target.value)}
+                            placeholder="Enter group name"
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">Select Members</label>
+                        <MultiSelect
+                            options={userOptions}
+                            value={selectedMembers}
+                            onChange={setSelectedMembers}
+                            labelledBy="Select members"
+                            className="custom-multiselect"
+                            hasSelectAll={true}
+                            disableSearch={false}
+                            overrideStrings={{
+                                selectSomeItems: "Select members...",
+                                allItemsAreSelected: "All members selected",
+                                selectAll: "Select All",
+                                search: "Search members"
+                            }}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowCreateGroupModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button 
+                        variant="primary" 
+                        onClick={handleCreateGroup}
+                        style={{ backgroundColor: '#075E54', border: 'none' }}
+                    >
+                        Create Group
+                    </Button>
+                </Modal.Footer>
             </Modal>
         </div>
     );
