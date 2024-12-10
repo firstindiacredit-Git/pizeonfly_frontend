@@ -845,7 +845,7 @@ const ProjectDashboard = () => {
   };
 
   const handleCellKeyDown = (e, tableIndex, rowIndex, colIndex) => {
-    if (e.key === 'Enter' || e.key === 'ArrowDown') {
+    if ( e.key === 'ArrowDown') {
       e.preventDefault();
       // Move to next row
       if (rowIndex < tables[tableIndex].rows - 1) {

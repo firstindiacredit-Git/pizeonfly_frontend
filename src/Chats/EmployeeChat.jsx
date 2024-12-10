@@ -19,6 +19,7 @@ const EmployeeChat = () => {
   const currentEmployee = JSON.parse(localStorage.getItem('emp_user'));
   const [selectedFile, setSelectedFile] = useState(null);
   const [showFilePreview, setShowFilePreview] = useState(false);
+  const [groups, setGroups] = useState([]);
 
   useEffect(() => {
     socket.current = io(import.meta.env.VITE_BASE_URL);
@@ -62,6 +63,7 @@ const EmployeeChat = () => {
     });
 
     fetchUsers();
+    fetchGroups();
 
     return () => {
       socket.current.disconnect();
@@ -78,6 +80,15 @@ const EmployeeChat = () => {
       setClients(clientResponse.data);
     } catch (error) {
       toast.error('Error loading users');
+    }
+  };
+
+  const fetchGroups = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groups`);
+      setGroups(response.data);
+    } catch (error) {
+      toast.error('Error loading groups');
     }
   };
 
@@ -292,7 +303,7 @@ const EmployeeChat = () => {
         {/* <Header /> */}
         <div className="body d-flex py-lg-3 py-md-2">
           <ChatLayout
-            users={activeTab === 'admins' ? admins : clients}
+            users={activeTab === 'admins' ? admins : activeTab === 'clients' ? clients : groups}
             selectedUser={selectedUser}
             messages={messages.map(msg => ({
               ...msg,
@@ -302,7 +313,8 @@ const EmployeeChat = () => {
             activeTab={activeTab}
             tabs={[
               { id: 'admins', label: 'Admins' },
-              { id: 'clients', label: 'Clients' }
+              { id: 'clients', label: 'Clients' },
+              { id: 'groups', label: 'Groups' }
             ]}
             onTabChange={setActiveTab}
             onUserSelect={handleUserSelect}

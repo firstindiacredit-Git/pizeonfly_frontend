@@ -106,9 +106,9 @@ const ChatLayout = ({
                 >
                     ⋮
                 </span>
-                <Dropdown.Menu 
-                    show={show} 
-                    style={{ 
+                <Dropdown.Menu
+                    show={show}
+                    style={{
                         position: 'absolute',
                         right: '100%',
                         top: 0,
@@ -138,14 +138,14 @@ const ChatLayout = ({
 
     const handleClearChat = async () => {
         try {
-            const currentUser = JSON.parse(localStorage.getItem('user')) || 
-                              JSON.parse(localStorage.getItem('emp_user')) || 
-                              JSON.parse(localStorage.getItem('client_user'));
-            
+            const currentUser = JSON.parse(localStorage.getItem('user')) ||
+                JSON.parse(localStorage.getItem('emp_user')) ||
+                JSON.parse(localStorage.getItem('client_user'));
+
             await axios.post(`${import.meta.env.VITE_BASE_URL}api/clearChat`, {
                 userId: currentUser._id,
-                userType: currentUser.role === 'admin' ? 'AdminUser' : 
-                         currentUser.role === 'employee' ? 'Employee' : 'Client',
+                userType: currentUser.role === 'admin' ? 'AdminUser' :
+                    currentUser.role === 'employee' ? 'Employee' : 'Client',
                 otherUserId: selectedUser._id
             });
 
@@ -166,12 +166,12 @@ const ChatLayout = ({
     useEffect(() => {
         const fetchChatSettings = async () => {
             if (!selectedUser) return;
-            
+
             try {
-                const currentUser = JSON.parse(localStorage.getItem('user')) || 
-                                  JSON.parse(localStorage.getItem('emp_user')) || 
-                                  JSON.parse(localStorage.getItem('client_user'));
-                                  
+                const currentUser = JSON.parse(localStorage.getItem('user')) ||
+                    JSON.parse(localStorage.getItem('emp_user')) ||
+                    JSON.parse(localStorage.getItem('client_user'));
+
                 const response = await axios.get(
                     `${import.meta.env.VITE_BASE_URL}api/getChatSettings/${currentUser._id}/${selectedUser._id}`
                 );
@@ -188,17 +188,17 @@ const ChatLayout = ({
 
     const handleBackgroundUpdate = async (color, file) => {
         try {
-            const currentUser = JSON.parse(localStorage.getItem('user')) || 
-                              JSON.parse(localStorage.getItem('emp_user')) || 
-                              JSON.parse(localStorage.getItem('client_user'));
+            const currentUser = JSON.parse(localStorage.getItem('user')) ||
+                JSON.parse(localStorage.getItem('emp_user')) ||
+                JSON.parse(localStorage.getItem('client_user'));
 
             const formData = new FormData();
             formData.append('userId', currentUser._id);
             formData.append('otherUserId', selectedUser._id);
-            formData.append('userType', currentUser.role === 'admin' ? 'AdminUser' : 
-                         currentUser.role === 'employee' ? 'Employee' : 'Client');
+            formData.append('userType', currentUser.role === 'admin' ? 'AdminUser' :
+                currentUser.role === 'employee' ? 'Employee' : 'Client');
             formData.append('backgroundColor', color);
-            
+
             if (file) {
                 formData.append('backgroundImage', file);
             }
@@ -227,11 +227,11 @@ const ChatLayout = ({
 
     return (
         <div className="container-fluid mt-2" style={{}}>
-            <div className="row g-0 rounded-2" style={{ height: '94vh', border: '1px solid #00000061' }}>
+            <div className="d-flex g-0 rounded-2" style={{ height: '94vh', border: '1px solid #00000061' }}>
 
 
                 {/* Chat Area */}
-                <div className="col-lg-9 col-md-12 rounded-2" style={{ height: '93vh', backgroundColor: '#efeae2' }}>
+                <div className=" rounded-2" style={{ height: '93vh', backgroundColor: '#efeae2', width: '43.2rem' }}>
                     {selectedUser ? (
                         <div className="card border-0" style={{ height: '93.7vh' }}>
                             {/* Chat Header - WhatsApp style */}
@@ -265,7 +265,7 @@ const ChatLayout = ({
                                             <small className="text-muted">{selectedUser.userType}</small>
                                         </div>
                                     </div>
-                                    
+
                                     <Dropdown>
                                         <Dropdown.Toggle variant="transparent" style={{ border: 'none', color: 'white' }}>
                                             <i className="bi bi-three-dots-vertical"></i>
@@ -331,8 +331,8 @@ const ChatLayout = ({
                                                                 <button type="submit" className="btn btn-sm btn-success">
                                                                     <i className="bi bi-check"></i>
                                                                 </button>
-                                                                <button 
-                                                                    type="button" 
+                                                                <button
+                                                                    type="button"
                                                                     className="btn btn-sm btn-secondary"
                                                                     onClick={() => {
                                                                         setEditingMessageId(null);
@@ -540,11 +540,11 @@ const ChatLayout = ({
                     )}
                 </div>
                 {/* Users List */}
-                <div className="col-lg-3 col-md-12 border-start" style={{ height: '93vh', backgroundColor: '#ffffff', borderLeftColor: '#00000061' }}>
+                <div className=" border-start" style={{ height: '93vh', backgroundColor: '#ffffff', borderLeftColor: '#00000061', }}>
                     <div className="card border-0 h-100">
                         <div className="card-body p-0">
                             {/* Tabs - WhatsApp style */}
-                            <div className="px-4 py-2" style={{ backgroundColor: '#075E54', height: '50px' }}>
+                            <div className="px-4 py-2" style={{ backgroundColor: '#075E54', height: '50px'}}>
                                 <ul className="nav nav-pills" role="tablist">
                                     {tabs.map(tab => (
                                         <li key={tab.id} className="nav-item">
@@ -560,6 +560,7 @@ const ChatLayout = ({
                                             </button>
                                         </li>
                                     ))}
+
                                 </ul>
                             </div>
 
@@ -573,7 +574,24 @@ const ChatLayout = ({
                             }}>
                                 <div className="tab-pane fade show active">
                                     <ul className="list-unstyled list-group list-group-custom list-group-flush mb-0" style={{ cursor: 'pointer' }}>
-                                        {users.map(user => renderUserItem(user, selectedUser, onUserSelect))}
+                                        {activeTab === 'groups' ? (
+                                            <div className="p-3">
+                                                <button 
+                                                    className="btn btn-primary w-100"
+                                                    style={{ 
+                                                        backgroundColor: '#128C7E',
+                                                        border: 'none',
+                                                        padding: '10px',
+                                                        borderRadius: '5px',
+                                                        fontSize: '16px'
+                                                    }}
+                                                >
+                                                    + Create Group
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            users.map(user => renderUserItem(user, selectedUser, onUserSelect))
+                                        )}
                                     </ul>
                                 </div>
                             </div>

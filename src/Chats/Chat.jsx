@@ -19,6 +19,7 @@ const Chat = () => {
   const currentUser = JSON.parse(localStorage.getItem('user'));
   const [selectedFile, setSelectedFile] = useState(null);
   const [showFilePreview, setShowFilePreview] = useState(false);
+  const [groups, setGroups] = useState([]);
 
   useEffect(() => {
     // Socket connection
@@ -63,8 +64,14 @@ const Chat = () => {
       ));
     });
 
+    // Listen for group messages
+    socket.current.on('receive_group_message', (message) => {
+      setMessages(prev => [...prev, message]);
+    });
+
     // Fetch users
     fetchUsers();
+    fetchGroups();
 
     return () => {
       socket.current.disconnect();
@@ -83,6 +90,16 @@ const Chat = () => {
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Error loading users');
+    }
+  };
+
+  const fetchGroups = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groups`);
+      setGroups(response.data);
+    } catch (error) {
+      console.error('Error fetching groups:', error);
+      toast.error('Error loading groups');
     }
   };
 
@@ -305,7 +322,7 @@ const Chat = () => {
           {/* <Header /> */}
           <div className="body d-flex py-lg-3 py-md-2">
             <ChatLayout
-              users={activeTab === 'employees' ? employees : clients}
+              users={activeTab === 'employees' ? employees : activeTab === 'clients' ? clients : groups}
               selectedUser={selectedUser}
               messages={messages.map(msg => ({
                 ...msg,
@@ -315,7 +332,8 @@ const Chat = () => {
               activeTab={activeTab}
               tabs={[
                 { id: 'employees', label: 'Employees' },
-                { id: 'clients', label: 'Clients' }
+                { id: 'clients', label: 'Clients' },
+                { id: 'groups', label: 'Groups' }
               ]}
               onTabChange={setActiveTab}
               onUserSelect={handleUserSelect}

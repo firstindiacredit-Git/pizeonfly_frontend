@@ -19,6 +19,7 @@ const ClientChat = () => {
     const currentClient = JSON.parse(localStorage.getItem('client_user'));
     const [selectedFile, setSelectedFile] = useState(null);
     const [showFilePreview, setShowFilePreview] = useState(false);
+    const [groups, setGroups] = useState([]);
 
     useEffect(() => {
         socket.current = io(import.meta.env.VITE_BASE_URL);
@@ -62,6 +63,7 @@ const ClientChat = () => {
         });
 
         fetchUsers();
+        fetchGroups();
 
         return () => {
             socket.current.disconnect();
@@ -264,8 +266,7 @@ const ClientChat = () => {
                 otherUserId: selectedUser._id
             });
 
-            // Clear messages immediately from the UI
-            setMessages([]);
+            fetchMessages(selectedUser._id);
             toast.success('Chat cleared successfully');
         } catch (error) {
             console.error('Error clearing chat:', error);
@@ -302,13 +303,23 @@ const ClientChat = () => {
         );
     };
 
+    // Fetch groups
+    const fetchGroups = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groups`);
+            setGroups(response.data);
+        } catch (error) {
+            toast.error('Error loading groups');
+        }
+    };
+
     return (
         <div id="mytask-layout">
             <Sidebar />
             <div className="main px-lg-4 px-md-4">
                 <div className="body d-flex py-lg-3 py-md-2">
                     <ChatLayout
-                        users={activeTab === 'admins' ? admins : employees}
+                        users={activeTab === 'admins' ? admins : activeTab === 'employees' ? employees : groups}
                         selectedUser={selectedUser}
                         messages={messages.map(msg => ({
                             ...msg,
@@ -318,7 +329,8 @@ const ClientChat = () => {
                         activeTab={activeTab}
                         tabs={[
                             { id: 'admins', label: 'Admins' },
-                            { id: 'employees', label: 'Employees' }
+                            { id: 'employees', label: 'Employees' },
+                            { id: 'groups', label: 'Groups' }
                         ]}
                         onTabChange={setActiveTab}
                         onUserSelect={handleUserSelect}
