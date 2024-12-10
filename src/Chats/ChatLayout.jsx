@@ -137,7 +137,7 @@ const ChatLayout = ({
         }
     };
 
-    const stopRecording = () => {
+    const stopRecording = () => {   
         if (mediaRecorder && isRecording) {
             mediaRecorder.stop();
             setIsRecording(false);

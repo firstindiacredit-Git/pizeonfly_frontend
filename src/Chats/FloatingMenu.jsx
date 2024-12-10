@@ -125,7 +125,7 @@ const FloatingMenu = ({ userType }) => {
                     width: '50px',
                     height: '50px',
                     // backgroundColor: '#1daa61',
-                    backgroundColor: '#a8acaa91',
+                    // backgroundColor: '#a8acaa91',
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
@@ -134,7 +134,7 @@ const FloatingMenu = ({ userType }) => {
                 onClick={() => navigate(getChatRoute())}
             >
                 {/* <i className="bi bi-chat" style={{ fontSize: '1.5rem' }}></i> */}
-                <img src="/Images/chat.gif" alt="chat" style={{ width: '2.3rem', height: '2.3rem' }} />
+                <img src="/Images/meesage.gif" alt="chat" style={{ width: '3rem', height: '3rem' }} />
                 
             </button>
         </div>
