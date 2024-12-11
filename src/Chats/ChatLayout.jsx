@@ -289,11 +289,11 @@ const ChatLayout = ({
 
     return (
         <div className="container-fluid mt-2" style={{}}>
-            <div className="d-flex g-0 rounded-2" style={{ height: '94vh', border: '1px solid #00000061' }}>
+            <div className="row g-0 rounded-2" style={{ height: '94vh', border: '1px solid #00000061' }}>
 
 
                 {/* Chat Area */}
-                <div className=" rounded-2" style={{ height: '93vh', backgroundColor: '#efeae2', width: '43.2rem' }}>
+                <div className="col-md-8 rounded-2" style={{ height: '93vh', backgroundColor: '#efeae2' }}>
                     {selectedUser ? (
                         <div className="card border-0" style={{ height: '93.7vh' }}>
                             {/* Chat Header - WhatsApp style */}
@@ -602,7 +602,7 @@ const ChatLayout = ({
                     )}
                 </div>
                 {/* Users List */}
-                <div className=" border-start" style={{ height: '93vh', backgroundColor: '#ffffff', borderLeftColor: '#00000061', }}>
+                <div className=" col-md-4 border-start" style={{ height: '93vh', backgroundColor: '#ffffff', borderLeftColor: '#00000061', }}>
                     <div className="card border-0 h-100">
                         <div className="card-body p-0">
                             {/* Tabs - WhatsApp style */}
