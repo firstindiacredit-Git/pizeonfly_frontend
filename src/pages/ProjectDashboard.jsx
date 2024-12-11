@@ -15,10 +15,12 @@ import CustomColorPicker, { isLightColor } from "./colorpicker/CustomColorPicker
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import axios from 'axios';
+import { useTheme } from '../context/ThemeContext';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
 const ProjectDashboard = () => {
+  const { isDarkMode } = useTheme();
   const [totalProjects, setTotalProjects] = useState(0);
   const [totalClients, setTotalClients] = useState(0);
   const [totalEmployees, setTotalEmployees] = useState(0);
@@ -845,7 +847,7 @@ const ProjectDashboard = () => {
   };
 
   const handleCellKeyDown = (e, tableIndex, rowIndex, colIndex) => {
-    if ( e.key === 'ArrowDown') {
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
       // Move to next row
       if (rowIndex < tables[tableIndex].rows - 1) {
@@ -976,6 +978,26 @@ const ProjectDashboard = () => {
     }
   };
 
+  // Add these theme-based styles
+  const darkModeStyles = {
+    card: {
+      backgroundColor: isDarkMode ? '#2b2b2b' : '#fff',
+      color: isDarkMode ? '#fff' : '#000',
+    },
+    cardHeader: {
+      backgroundColor: isDarkMode ? '#363636' : '#f8f9fa',
+      color: isDarkMode ? '#fff' : '#000',
+    },
+    table: {
+      backgroundColor: isDarkMode ? '#2b2b2b' : '#fff',
+      color: isDarkMode ? '#fff' : '#000',
+    },
+    tableHeader: {
+      backgroundColor: isDarkMode ? '#363636' : '#f8f9fa',
+      color: isDarkMode ? '#fff' : '#000',
+    }
+  };
+
   return (
     <>
       <div id="mytask-layout">
@@ -1004,7 +1026,7 @@ const ProjectDashboard = () => {
                 <div className="row justify-content-center mt-4">
                   <div className="col-12 col-md-4 mb-4">
                     <Link to="/projects">
-                      <div className="card shadow-lg">
+                      <div className="card shadow-lg" style={darkModeStyles.card}>
                         <div className="card-body">
                           <h5 className="card-title text-center">Projects</h5>
                           <h2 className="text-center mb-4" style={{ color: 'rgba(255, 99, 132, 1)' }}>{totalProjects}</h2>
@@ -1015,7 +1037,7 @@ const ProjectDashboard = () => {
                   </div>
                   <div className="col-12 col-md-4 mb-4">
                     <Link to="/clients">
-                      <div className="card shadow-lg">
+                      <div className="card shadow-lg" style={darkModeStyles.card}>
                         <div className="card-body">
                           <h5 className="card-title text-center">Clients</h5>
                           <h2 className="text-center mb-4" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalClients}</h2>
@@ -1026,7 +1048,7 @@ const ProjectDashboard = () => {
                   </div>
                   <div className="col-12 col-md-4 mb-4">
                     <Link to="/members">
-                      <div className="card shadow-lg">
+                      <div className="card shadow-lg" style={darkModeStyles.card}>
                         <div className="card-body">
                           <h5 className="card-title text-center">Employees</h5>
                           <h2 className="text-center mb-4" style={{ color: 'rgba(75, 192, 192, 1)' }}>{totalEmployees}</h2>
@@ -1040,7 +1062,7 @@ const ProjectDashboard = () => {
 
                 <div className="row justify-content-center">
                   <div className="col-12 col-md-8 mb-4">
-                    <div className="card shadow-lg">
+                    <div className="card shadow-lg" style={darkModeStyles.card}>
                       <div className="card-body">
                         <h5 className="card-title text-center mb-4">Overall Summary</h5>
                         <Bar data={chartData} options={chartOptions} />
@@ -1048,7 +1070,7 @@ const ProjectDashboard = () => {
                     </div>
                   </div>
                   <div className="col-12 col-md-4 mb-4">
-                    <div className="card shadow-lg">
+                    <div className="card shadow-lg" style={darkModeStyles.card}>
                       <div className="card-body">
                         <h5 className="card-title text-center">Project Status</h5>
                         <Doughnut data={projectStatusChartData} options={projectStatusChartOptions} />
@@ -1060,8 +1082,11 @@ const ProjectDashboard = () => {
                 {/* NotePad */}
                 <div className="row justify-content-center">
                   <div className="col-12 col-md-8 mb-4">
-                    <div className="card shadow-lg">
-                      <div className="card-body" style={{ backgroundColor: notepadColor }}>
+                    <div className="card shadow-lg" style={darkModeStyles.card}>
+                      <div className="card-body" style={{
+                        backgroundColor: notepadColor,
+                        color: isLightColor(notepadColor) ? '#000' : '#fff'
+                      }}>
                         <h5 className="card-title text-center mb-3" style={{ color: isLightColor(notepadColor) ? '#000' : '#fff' }}>
                           NotePad
                         </h5>
@@ -1249,8 +1274,11 @@ const ProjectDashboard = () => {
 
                   {/* Todo List */}
                   <div className="col-12 col-md-4 mb-4">
-                    <div className="card shadow-lg">
-                      <div className="card-body" style={{ backgroundColor: todoColor }}>
+                    <div className="card shadow-lg" style={darkModeStyles.card}>
+                      <div className="card-body" style={{
+                        backgroundColor: todoColor,
+                        color: isLightColor(todoColor) ? '#000' : '#fff'
+                      }}>
                         <h5 className="card-title text-center mb-3">Todo List</h5>
 
                         <form onSubmit={addTodo} className="mb-3">
@@ -1417,8 +1445,10 @@ const ProjectDashboard = () => {
                 </div>
 
                 {/* Excel Sheet */}
-                <div className="card shadow-lg mb-5" style={{ backgroundColor: excelSheetColor }}>
-                  <div className="card-body">
+                <div className="card shadow-lg mb-5" style={darkModeStyles.card}>
+                  <div className="card-body" style={{
+                    backgroundColor: excelSheetColor
+                  }}>
                     {/* <div className="d-flex justify-content-between align-items-center mb-3">
                       <h5 className="card-title text-center flex-grow-1" style={{ color: isLightColor(excelSheetColor) ? '#000' : '#fff' }}>
                         Excel Sheet
@@ -1471,11 +1501,13 @@ const ProjectDashboard = () => {
                                     display: 'none'
                                   }
                                 }}>
-                                  <table className="table table-bordered" style={{
-                                    minWidth: '100%',
-                                    width: 'max-content'
-                                  }}>
-                                    <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
+                                  <table className="table table-bordered" style={darkModeStyles.table}>
+                                    <thead style={{
+                                      ...darkModeStyles.tableHeader,
+                                      position: 'sticky',
+                                      top: 0,
+                                      zIndex: 1
+                                    }}>
                                       <tr>
                                         <th style={{
                                           width: '30px',
@@ -1504,7 +1536,7 @@ const ProjectDashboard = () => {
                                         ))}
                                       </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody style={darkModeStyles.table}>
                                       {Array(table.rows).fill().map((_, rowIndex) => (
                                         <tr key={rowIndex}>
                                           <td className="text-center" style={{
@@ -1664,23 +1696,28 @@ const ProjectDashboard = () => {
                   </div>
                 </div>
 
-                <div className="card shadow-lg mb-5">
+                <div className="card shadow-lg mb-5" style={darkModeStyles.card}>
                   <div className="card-body">
                     <div className='d-flex justify-content-around gap-5'>
                       <div>
-                        <h5 className="card-title text-center mb-4">Calendar</h5>
+                        <h5 className="card-title text-center mb-4" style={{ color: isDarkMode ? '#fff' : '#000' }}>Calendar</h5>
                         <Calendar
                           onChange={handleDateChange}
                           value={selectedDate}
                           tileClassName={highlightHolidays}
+                          className={isDarkMode ? 'dark-calendar' : ''}
                         />
                       </div>
                       <div className='text-center'>
                         {decisionMade ? (
-                          <h4 className='text-center mb-5'>Thank you for your decision!</h4>
+                          <h4 className='text-center mb-5' style={{ color: isDarkMode ? '#fff' : '#000' }}>
+                            Thank you for your decision!
+                          </h4>
                         ) : (
                           <div>
-                            <h4 className='text-center mb-5 mt-5'>Do you want to declare tomorrow as an office holiday?</h4>
+                            <h4 className='text-center mb-5 mt-5' style={{ color: isDarkMode ? '#fff' : '#000' }}>
+                              Do you want to declare tomorrow as an office holiday?
+                            </h4>
                             <div className=''>
                               <button
                                 className="btn btn-success me-5"
@@ -1703,13 +1740,13 @@ const ProjectDashboard = () => {
                     </div>
                     <div className="mt-4">
                       {selectedHoliday ? (
-                        <div className="card">
-                          <div className="card-header">
-                            <h3>Holiday Details:</h3>
+                        <div className="card" style={darkModeStyles.card}>
+                          <div className="card-header" style={darkModeStyles.cardHeader}>
+                            <h3 style={{ color: isDarkMode ? '#fff' : '#000' }}>Holiday Details:</h3>
                           </div>
                           <div className="card-body">
-                            <table className="table table-bordered">
-                              <thead className="thead-light">
+                            <table className="table table-bordered" style={darkModeStyles.table}>
+                              <thead className="thead-light" style={darkModeStyles.tableHeader}>
                                 <tr>
                                   <th>Name</th>
                                   <th>Date</th>
@@ -1719,7 +1756,7 @@ const ProjectDashboard = () => {
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr>
+                                <tr style={{ color: isDarkMode ? '#fff' : '#000' }}>
                                   <td>{selectedHoliday.name}</td>
                                   <td>{selectedHoliday.date.iso}</td>
                                   <td>{selectedHoliday.description}</td>
@@ -1731,7 +1768,9 @@ const ProjectDashboard = () => {
                           </div>
                         </div>
                       ) : (
-                        <p>No holiday details available for the selected date.</p>
+                        <p style={{ color: isDarkMode ? '#fff' : '#000' }}>
+                          No holiday details available for the selected date.
+                        </p>
                       )}
                     </div>
                   </div>
