@@ -28,7 +28,6 @@ const ChatLayout = ({
     onGroupCreate
 }) => {
     const [showUserModal, setShowUserModal] = useState(false);
-    const [showImageModal, setShowImageModal] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -43,13 +42,15 @@ const ChatLayout = ({
     const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
     const [groupName, setGroupName] = useState('');
     const [selectedMembers, setSelectedMembers] = useState([]);
+    const [showImageModal, setShowImageModal] = useState(false);
+    const [modalImage, setModalImage] = useState('');
 
-    
+
     // Modified userOptions mapping with debug logs
     const userOptions = Array.isArray(users) ? users.map(user => {
 
         let name, type;
-        
+
         if (activeTab === 'employees' || user.employeeName) {
             name = user.employeeName;
             type = 'Employee';
@@ -66,7 +67,7 @@ const ChatLayout = ({
             value: user._id,
             type: type
         };
-        
+
         return option;
     }).filter(option => option.label !== 'Unknown User') : [];
 
@@ -137,7 +138,7 @@ const ChatLayout = ({
         }
     };
 
-    const stopRecording = () => {   
+    const stopRecording = () => {
         if (mediaRecorder && isRecording) {
             mediaRecorder.stop();
             setIsRecording(false);
@@ -287,6 +288,11 @@ const ChatLayout = ({
         }
     };
 
+    const handleProfileImageClick = (imageUrl) => {
+        setModalImage(imageUrl);
+        setShowImageModal(true);
+    };
+
     return (
         <div className="container-fluid mt-2" style={{}}>
             <div className="row g-0 rounded-2" style={{ height: '94vh', border: '1px solid #00000061' }}>
@@ -427,7 +433,6 @@ const ChatLayout = ({
                                                             style={{ maxHeight: '200px', cursor: 'pointer' }}
                                                             onClick={() => {
                                                                 setSelectedImage(`${import.meta.env.VITE_BASE_URL}${url.replace('uploads/', '')}`);
-                                                                setShowImageModal(true);
                                                             }}
                                                         />
                                                     ))}
@@ -606,7 +611,7 @@ const ChatLayout = ({
                     <div className="card border-0 h-100">
                         <div className="card-body p-0">
                             {/* Tabs - WhatsApp style */}
-                            <div className="px-4 py-2" style={{ backgroundColor: '#075E54', height: '50px'}}>
+                            <div className="px-4 py-2" style={{ backgroundColor: '#075E54', height: '50px' }}>
                                 <ul className="nav nav-pills" role="tablist">
                                     {tabs.map(tab => (
                                         <li key={tab.id} className="nav-item">
@@ -638,9 +643,9 @@ const ChatLayout = ({
                                     <ul className="list-unstyled list-group list-group-custom list-group-flush mb-0" style={{ cursor: 'pointer' }}>
                                         {activeTab === 'groups' ? (
                                             <div className="p-3">
-                                                <button 
+                                                <button
                                                     className="btn btn-primary w-100"
-                                                    style={{ 
+                                                    style={{
                                                         backgroundColor: '#128C7E',
                                                         border: 'none',
                                                         padding: '10px',
@@ -679,7 +684,12 @@ const ChatLayout = ({
                             className="rounded-circle"
                             alt="Profile"
                             style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
-                            onClick={() => setShowImageModal(true)}
+                            onClick={() => handleProfileImageClick(`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
+                                ? selectedUser?.employeeImage.replace('uploads/', '')
+                                : selectedUser?.userType === 'AdminUser'
+                                    ? selectedUser?.profileImage.replace('uploads/', '')
+                                    : selectedUser?.clientImage.replace('uploads/', '')
+                                }`)}
                         />
                     </div>
                     <div className="user-details">
@@ -726,15 +736,6 @@ const ChatLayout = ({
                                     <strong>Join Date:</strong> {new Date(selectedUser?.joiningDate).toLocaleDateString()}
                                 </div>
                                 <div className="info-item mb-2">
-                                    <strong>Address:</strong> {selectedUser?.address}
-                                </div>
-                                <div className="info-item mb-2">
-                                    <strong>City:</strong> {selectedUser?.city}
-                                </div>
-                                <div className="info-item mb-2">
-                                    <strong>Country:</strong> {selectedUser?.country}
-                                </div>
-                                <div className="info-item mb-2">
                                     <strong>Status:</strong> {selectedUser?.status}
                                 </div>
                             </>
@@ -763,15 +764,6 @@ const ChatLayout = ({
                                     <strong>Address:</strong> {selectedUser?.clientAddress}
                                 </div>
                                 <div className="info-item mb-2">
-                                    <strong>City:</strong> {selectedUser?.clientCity}
-                                </div>
-                                <div className="info-item mb-2">
-                                    <strong>Country:</strong> {selectedUser?.clientCountry}
-                                </div>
-                                <div className="info-item mb-2">
-                                    <strong>Website:</strong> {selectedUser?.clientWebsite}
-                                </div>
-                                <div className="info-item mb-2">
                                     <strong>Status:</strong> {selectedUser?.clientStatus}
                                 </div>
                             </>
@@ -780,24 +772,7 @@ const ChatLayout = ({
                 </Modal.Body>
             </Modal>
 
-            {/* Add new Image Modal */}
-            <Modal show={showImageModal} onHide={() => {
-                setShowImageModal(false);
-                setSelectedImage(null);
-            }} centered>
-                <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
-                    <Modal.Title>
-                        {selectedImage ? selectedImage.split('/').pop() : 'Image Preview'}
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body className="text-center">
-                    <img
-                        src={selectedImage}
-                        alt="Preview"
-                        style={{ width: '100%', height: '80vh', objectFit: 'contain' }}
-                    />
-                </Modal.Body>
-            </Modal>
+
 
             <Modal show={showClearChatModal} onHide={() => setShowClearChatModal(false)} centered>
                 <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
@@ -902,14 +877,30 @@ const ChatLayout = ({
                     <Button variant="secondary" onClick={() => setShowCreateGroupModal(false)}>
                         Cancel
                     </Button>
-                    <Button 
-                        variant="primary" 
+                    <Button
+                        variant="primary"
                         onClick={handleCreateGroup}
                         style={{ backgroundColor: '#075E54', border: 'none' }}
                     >
                         Create Group
                     </Button>
                 </Modal.Footer>
+            </Modal>
+
+            {/* Add new Image Modal */}
+            <Modal
+                show={showImageModal}
+                onHide={() => setShowImageModal(false)}
+                centered
+                size="md"
+            >
+                <Modal.Body className="text-center" closeButton>
+                    <img
+                        src={modalImage}
+                        alt="Profile"
+                        style={{ maxWidth: '100%', maxHeight: '80vh' }}
+                    />
+                </Modal.Body>
             </Modal>
         </div>
     );
