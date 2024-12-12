@@ -561,37 +561,56 @@ const EmployeeDashboard = () => {
 
   // Excel sheet functions
   const handleCellChange = async (tableIndex, rowIndex, colIndex, value) => {
-    if (!currentEmployeeId) {
-      console.error('No employee ID found');
-      setError(prev => ({ ...prev, excelSheet: 'Employee ID not found' }));
-      return;
-    }
-
     try {
       const newTables = [...tables];
-      newTables[tableIndex].data[rowIndex][colIndex] = value;
+
+      // Check if the value starts with '=' for formula
+      if (value.startsWith('=')) {
+        const result = evaluateFormula(value, newTables[tableIndex].data);
+        newTables[tableIndex].data[rowIndex][colIndex] = {
+          formula: value,
+          value: result
+        };
+      } else {
+        // For non-formula values, store the value directly
+        newTables[tableIndex].data[rowIndex][colIndex] = value;
+      }
+
       setTables(newTables);
 
+      const payload = {
+        tables: newTables.map(table => ({
+          ...table,
+          data: table.data.map(row =>
+            row.map(cell => {
+              // If cell is an object with formula and value
+              if (cell && typeof cell === 'object' && 'formula' in cell) {
+                return cell;
+              }
+              // Otherwise return the cell value directly
+              return cell;
+            })
+          )
+        })),
+        employeeId: currentEmployeeId
+      };
+
       if (dashboardIds.excelSheet) {
+        // Update existing excel sheet
         await axios.put(
           `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
-          {
-            tables: newTables,
-            employeeId: currentEmployeeId
-          }
+          payload
         );
       } else {
+        // Create new excel sheet
         const response = await axios.post(
           `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
-          {
-            tables: newTables,
-            employeeId: currentEmployeeId
-          }
+          payload
         );
         setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
       }
     } catch (error) {
-      console.error('Error saving excel sheet:', error);
+      console.error('Error saving cell:', error);
       setError(prev => ({ ...prev, excelSheet: 'Failed to save changes' }));
     }
   };
@@ -1385,48 +1404,51 @@ const EmployeeDashboard = () => {
   const handleApplyFormula = async (tableIndex, rowIndex, colIndex) => {
     try {
       const newTables = [...tables];
-      const currentValue = newTables[tableIndex].data[rowIndex][colIndex];
+      const cell = newTables[tableIndex].data[rowIndex][colIndex];
+      const formula = typeof cell === 'object' ? cell.formula : cell;
 
-      if (currentValue.startsWith('=')) {
-        const result = evaluateFormula(currentValue, newTables[tableIndex].data);
-        newTables[tableIndex].data[rowIndex][colIndex] = {
-          formula: currentValue,
-          value: result
-        };
+      if (!formula?.startsWith('=')) {
+        return;
+      }
 
-        setTables(newTables);
+      const result = evaluateFormula(formula, newTables[tableIndex].data);
+      newTables[tableIndex].data[rowIndex][colIndex] = {
+        formula: formula,
+        value: result
+      };
 
-        const userData = JSON.parse(localStorage.getItem('user'));
-        const email = userData.email;
+      setTables(newTables);
 
-        const url = dashboardIds.excelSheet
-          ? `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`
-          : `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`;
+      const payload = {
+        tables: newTables.map(table => ({
+          ...table,
+          data: table.data.map(row =>
+            row.map(cell => {
+              if (cell && typeof cell === 'object' && 'formula' in cell) {
+                return cell;
+              }
+              return cell;
+            })
+          )
+        })),
+        employeeId: currentEmployeeId
+      };
 
-        const method = dashboardIds.excelSheet ? 'PUT' : 'POST';
-
-        const response = await fetch(url, {
-          method,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ tables: newTables, email }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (data._id) {
-          setDashboardIds(prev => ({ ...prev, excelSheet: data._id }));
-        }
-
-        // toast.success('Formula applied successfully!');
+      if (dashboardIds.excelSheet) {
+        await axios.put(
+          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
+          payload
+        );
+      } else {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
+          payload
+        );
+        setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
       }
     } catch (error) {
-      console.error("Error applying formula:", error);
-      toast.error("Failed to apply formula");
+      console.error('Error applying formula:', error);
+      setError(prev => ({ ...prev, excelSheet: 'Failed to apply formula' }));
     }
   };
 
@@ -2441,17 +2463,12 @@ const EmployeeDashboard = () => {
                                                     >
                                                       <textarea
                                                         data-cell={`${tableIndex}-${rowIndex}-${colIndex}`}
-                                                        value={typeof table.data[rowIndex][colIndex] === 'object'
+                                                        value={typeof table.data[rowIndex][colIndex] === 'object' && table.data[rowIndex][colIndex] !== null
                                                           ? (document.activeElement === document.querySelector(`[data-cell="${tableIndex}-${rowIndex}-${colIndex}"]`)
                                                             ? table.data[rowIndex][colIndex].formula
                                                             : table.data[rowIndex][colIndex].value)
-                                                          : table.data[rowIndex][colIndex]}
-                                                        onChange={(e) => {
-                                                          const newValue = e.target.value;
-                                                          const newTables = [...tables];
-                                                          newTables[tableIndex].data[rowIndex][colIndex] = newValue;
-                                                          setTables(newTables);
-                                                        }}
+                                                          : (table.data[rowIndex][colIndex] || '')}
+                                                        onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
                                                         onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
                                                         className="cell-input"
                                                         tabIndex={0}
@@ -2481,8 +2498,15 @@ const EmployeeDashboard = () => {
                                                         onMouseDown={(e) => handleRowResizeStart(e, tableIndex, rowIndex)}
                                                       />
                                                       {/* Add Apply Formula Button */}
-                                                      {typeof table.data[rowIndex][colIndex] === 'string' &&
-                                                        table.data[rowIndex][colIndex].startsWith('=') && (
+                                                      {(typeof table.data[rowIndex][colIndex] === 'string' ||
+                                                        (typeof table.data[rowIndex][colIndex] === 'object' &&
+                                                          table.data[rowIndex][colIndex]?.formula)) &&
+                                                        (table.data[rowIndex][colIndex]?.formula?.startsWith('=') ||
+                                                          (typeof table.data[rowIndex][colIndex] === 'string' &&
+                                                            table.data[rowIndex][colIndex].startsWith('='))) &&
+                                                        // Only show button if it's a string (not yet applied) or if we're actively editing
+                                                        (typeof table.data[rowIndex][colIndex] === 'string' ||
+                                                          document.activeElement === document.querySelector(`[data-cell="${tableIndex}-${rowIndex}-${colIndex}"]`)) && (
                                                           <button
                                                             className="btn btn-sm btn-success"
                                                             style={{
@@ -2500,6 +2524,7 @@ const EmployeeDashboard = () => {
                                                             Apply
                                                           </button>
                                                         )}
+
                                                       {/* Existing URL icon code */}
                                                       {isValidUrl(table.data[rowIndex][colIndex]) && (
                                                         <a
