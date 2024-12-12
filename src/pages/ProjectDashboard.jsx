@@ -20,6 +20,34 @@ import { evaluateFormula } from '../utils/excelFormulas';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
+const styles = {
+  resizableCell: {
+    position: 'relative',
+    minWidth: '80px',
+    padding: '0px',
+  },
+  resizeHandle: {
+    position: 'absolute',
+    right: '-2px',
+    top: '0',
+    bottom: '0',
+    width: '4px',
+    background: 'transparent',
+    cursor: 'col-resize',
+    zIndex: 10,
+  },
+  rowResizeHandle: {
+    position: 'absolute',
+    bottom: '-2px',
+    left: '0',
+    right: '0',
+    height: '4px',
+    background: 'transparent',
+    cursor: 'row-resize',
+    zIndex: 10,
+  }
+};
+
 const ProjectDashboard = () => {
   const { isDarkMode } = useTheme();
   const [totalProjects, setTotalProjects] = useState(0);
@@ -57,6 +85,9 @@ const ProjectDashboard = () => {
   const [selectedHoliday, setSelectedHoliday] = useState(null);
   const [isConfirmed, setIsConfirmed] = useState(null);
   const [decisionMade, setDecisionMade] = useState(false);
+  const [columnWidths, setColumnWidths] = useState({});
+  const [rowHeights, setRowHeights] = useState({});
+  const [resizing, setResizing] = useState(null);
 
   const notePadRef = useRef(null);
   const colorPickerRef = useRef(null);
@@ -1086,6 +1117,93 @@ const ProjectDashboard = () => {
     }
   };
 
+  const handleColumnResizeStart = (e, tableIndex, colIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.pageX;
+    const currentWidth = columnWidths[`${tableIndex}-${colIndex}`] || 80;
+
+    const handleMouseMove = (e) => {
+      e.preventDefault();
+      const diff = e.pageX - startX;
+      const newWidth = Math.max(50, currentWidth + diff); // Minimum width of 50px
+      setColumnWidths(prev => ({
+        ...prev,
+        [`${tableIndex}-${colIndex}`]: newWidth
+      }));
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      setResizing(null);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    setResizing('column');
+  };
+
+  const handleRowResizeStart = (e, tableIndex, rowIndex) => {
+    e.preventDefault();
+    const startY = e.pageY;
+    const currentHeight = rowHeights[`${tableIndex}-${rowIndex}`] || 22;
+
+    const handleMouseMove = (e) => {
+      const diff = e.pageY - startY;
+      const newHeight = Math.max(22, currentHeight + diff); // Minimum height of 22px
+      setRowHeights(prev => ({
+        ...prev,
+        [`${tableIndex}-${rowIndex}`]: newHeight
+      }));
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      setResizing(null);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    setResizing('row');
+  };
+
+  const additionalStyles = `
+    .resize-handle {
+      position: absolute;
+      right: -2px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: transparent;
+      cursor: col-resize;
+      z-index: 10;
+    }
+
+    .resize-handle:hover,
+    .resize-handle.active {
+      background: #0d6efd !important;
+    }
+
+    td {
+      position: relative;
+    }
+
+    td:hover .resize-handle {
+      background: rgba(13, 110, 253, 0.2);
+    }
+  `;
+
+  useEffect(() => {
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = additionalStyles;
+    document.head.appendChild(styleSheet);
+    return () => {
+      document.head.removeChild(styleSheet);
+    };
+  }, []);
+
   return (
     <>
       <div id="mytask-layout">
@@ -1645,12 +1763,23 @@ const ProjectDashboard = () => {
                                             </button>
                                           </td>
                                           {Array(table.cols).fill().map((_, colIndex) => (
-                                            <td key={colIndex} style={{
-                                              padding: '0px',
-                                              width: '80px',
-                                              maxWidth: '80px'
-                                            }}>
-                                              <div className="d-flex align-items-center" style={{ position: 'relative' }}>
+                                            <td
+                                              key={colIndex}
+                                              style={{
+                                                ...styles.resizableCell,
+                                                width: columnWidths[`${tableIndex}-${colIndex}`] || '80px',
+                                                maxWidth: 'none',
+                                                position: 'relative'
+                                              }}
+                                            >
+                                              <div
+                                                className="d-flex align-items-center"
+                                                style={{
+                                                  position: 'relative',
+                                                  height: rowHeights[`${tableIndex}-${rowIndex}`] || '22px',
+                                                  width: '100%'
+                                                }}
+                                              >
                                                 <textarea
                                                   data-cell={`${tableIndex}-${rowIndex}-${colIndex}`}
                                                   value={typeof table.data[rowIndex][colIndex] === 'object'
@@ -1661,7 +1790,6 @@ const ProjectDashboard = () => {
                                                   onChange={(e) => {
                                                     const newValue = e.target.value;
                                                     const newTables = [...tables];
-                                                    // Just store the raw value/formula without evaluating
                                                     newTables[tableIndex].data[rowIndex][colIndex] = newValue;
                                                     setTables(newTables);
                                                   }}
@@ -1670,18 +1798,32 @@ const ProjectDashboard = () => {
                                                   tabIndex={0}
                                                   style={{
                                                     width: '100%',
+                                                    height: '100%',
                                                     padding: '1px 2px',
                                                     border: 'none',
                                                     background: 'transparent',
                                                     resize: 'none',
                                                     overflow: 'hidden',
-                                                    minHeight: '22px',
-                                                    maxHeight: '60px',
                                                     fontSize: '12px',
                                                     color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColor) ? '#000' : '#fff'),
                                                     textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
                                                   }}
                                                 />
+
+                                                {/* Column resize handle */}
+                                                <div
+                                                  className={`resize-handle ${resizing === 'column' ? 'active' : ''}`}
+                                                  onMouseDown={(e) => handleColumnResizeStart(e, tableIndex, colIndex)}
+                                                />
+
+                                                {/* Row resize handle */}
+                                                <div
+                                                  style={styles.rowResizeHandle}
+                                                  onMouseDown={(e) => handleRowResizeStart(e, tableIndex, rowIndex)}
+                                                  className={resizing === 'row' ? 'active' : ''}
+                                                />
+
+                                                {/* Existing URL icon and formula button code */}
                                                 {/* Add Apply Formula Button */}
                                                 {typeof table.data[rowIndex][colIndex] === 'string' &&
                                                   table.data[rowIndex][colIndex].startsWith('=') && (

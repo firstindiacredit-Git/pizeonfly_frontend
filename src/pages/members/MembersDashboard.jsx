@@ -152,118 +152,131 @@ const MemberDashboard = () => {
     const [shareEmail, setShareEmail] = useState('');
     const [shareMessage, setShareMessage] = useState('');
 
-    // // Add these new color options
-    // const colorOptions = {
-    //     standard: [
-    //         // Row 1
-    //         '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF', '#fdf8c8',
-    //         // Row 2 
-    //         '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
-    //         // Row 3
-    //         '#FFB6C1', '#FFA07A', '#FFE4B5', '#FFFACD', '#98FB98', '#AFEEEE', '#87CEEB', '#E6E6FA', '#DDA0DD', '#FFC0CB',
-    //         // Row 4
-    //         '#DC143C', '#FF4500', '#FFA500', '#FFD700', '#32CD32', '#20B2AA', '#4169E1', '#8A2BE2', '#9370DB', '#FF69B4',
-    //         // Row 5
-    //         '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585'
-    //     ],
-    //     custom: ['#FFFFFF', '#000000']
-    // };
+    // Add these new color options
+    const colorOptions = {
+        standard: [
+            // Row 1
+            '#000000', '#424242', '#666666', '#808080', '#999999', '#B3B3B3', '#CCCCCC', '#E6E6E6', '#F2F2F2', '#FFFFFF', '#fdf8c8',
+            // Row 2 
+            '#FF0000', '#FF4500', '#FF8C00', '#FFD700', '#32CD32', '#00FF00', '#00CED1', '#0000FF', '#8A2BE2', '#FF00FF',
+            // Row 3
+            '#FFB6C1', '#FFA07A', '#FFE4B5', '#FFFACD', '#98FB98', '#AFEEEE', '#87CEEB', '#E6E6FA', '#DDA0DD', '#FFC0CB',
+            // Row 4
+            '#DC143C', '#FF4500', '#FFA500', '#FFD700', '#32CD32', '#20B2AA', '#4169E1', '#8A2BE2', '#9370DB', '#FF69B4',
+            // Row 5
+            '#800000', '#D2691E', '#DAA520', '#808000', '#006400', '#008080', '#000080', '#4B0082', '#800080', '#C71585'
+        ],
+        custom: ['#FFFFFF', '#000000']
+    };
 
-    // // Update the color picker component
-    // const CustomColorPicker = ({ color, onChange, onClose }) => {
-    //     return (
-    //         <div className="custom-color-picker mt-2" style={{
-    //             position: 'absolute',
-    //             zIndex: 1000,
-    //             backgroundColor: 'white',
-    //             border: '1px solid #ccc',
-    //             borderRadius: '4px',
-    //             padding: '8px',
-    //             boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    //             width: '250px'
-    //         }}>
-    //             <div style={{ marginBottom: '10px' }} className='border-bottom pb-2'>
-    //                 <strong>STANDARD</strong>
-    //                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '2px' }}>
-    //                     {colorOptions.standard.map((c, i) => (
-    //                         <div
-    //                             key={i}
-    //                             onClick={() => {
-    //                                 onChange(c);
-    //                                 onClose();
-    //                             }}
-    //                             style={{
-    //                                 width: '20px',
-    //                                 height: '20px',
-    //                                 backgroundColor: c,
-    //                                 border: '1px solid #ccc',
-    //                                 cursor: 'pointer',
-    //                                 borderRadius: '9px',
-    //                                 position: 'relative'
-    //                             }}
-    //                         >
-    //                             {color === c && (
-    //                                 <span style={{
-    //                                     position: 'absolute',
-    //                                     top: '50%',
-    //                                     left: '50%',
-    //                                     transform: 'translate(-50%, -50%)',
-    //                                     color: isLightColor(c) ? '#000' : '#fff'
-    //                                 }}>✓</span>
-    //                             )}
-    //                         </div>
-    //                     ))}
-    //                 </div>
-    //             </div>
+    // Add these state variables
+    const [columnWidths, setColumnWidths] = useState({});
+    const [rowHeights, setRowHeights] = useState({});
+    const [resizing, setResizing] = useState(null);
 
-    //             <div>
-    //                 <strong>CUSTOM</strong>
-    //                 <div style={{ display: 'flex', gap: '4px' }}>
-    //                     {colorOptions.custom.map((c, i) => (
-    //                         <div
-    //                             key={i}
-    //                             onClick={() => onChange(c)}
-    //                             style={{
-    //                                 width: '20px',
-    //                                 height: '20px',
-    //                                 backgroundColor: c,
-    //                                 border: '1px solid #ccc',
-    //                                 cursor: 'pointer',
-    //                                 borderRadius: '9px'
-    //                             }}
-    //                         />
-    //                     ))}
-    //                     <input
-    //                         type="color"
-    //                         value={color}
-    //                         onChange={(e) => onChange(e.target.value)}
-    //                         style={{ width: '20px', height: '20px', padding: 0, borderRadius: '9px', border: 'none' }}
-    //                         title='Custom Color'
-    //                     />
-    //                 </div>
-    //             </div>
+    // Add these resize handler functions
+    const handleColumnResizeStart = (e, tableIndex, colIndex) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const startX = e.pageX;
+        const currentWidth = columnWidths[`${tableIndex}-${colIndex}`] || 80;
 
-    //             {/* <div style={{ marginTop: '8px', borderTop: '1px solid #ccc', paddingTop: '8px' }}>
-    //                 <div>Conditional formatting</div>
-    //                 <div>Alternating colors</div>
-    //             </div> */}
-    //         </div>
-    //     );
-    // };
+        const handleMouseMove = (e) => {
+            e.preventDefault();
+            const diff = e.pageX - startX;
+            const newWidth = Math.max(50, currentWidth + diff);
+            setColumnWidths(prev => ({
+                ...prev,
+                [`${tableIndex}-${colIndex}`]: newWidth
+            }));
+        };
 
-    // // Helper function to determine if a color is light
-    // const isLightColor = (color) => {
-    //     // Handle empty or invalid colors
-    //     if (!color) return true;
+        const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            setResizing(null);
+        };
 
-    //     const hex = color.replace('#', '');
-    //     const r = parseInt(hex.substr(0, 2), 16);
-    //     const g = parseInt(hex.substr(2, 2), 16);
-    //     const b = parseInt(hex.substr(4, 2), 16);
-    //     // Using YIQ formula for better contrast detection
-    //     const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    //     return yiq >= 128;
-    // };
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        setResizing('column');
+    };
+
+    const handleRowResizeStart = (e, tableIndex, rowIndex) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const startY = e.pageY;
+        const currentHeight = rowHeights[`${tableIndex}-${rowIndex}`] || 22;
+
+        const handleMouseMove = (e) => {
+            e.preventDefault();
+            const diff = e.pageY - startY;
+            const newHeight = Math.max(22, currentHeight + diff);
+            setRowHeights(prev => ({
+                ...prev,
+                [`${tableIndex}-${rowIndex}`]: newHeight
+            }));
+        };
+
+        const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            setResizing(null);
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        setResizing('row');
+    };
+
+    // Add this CSS using useEffect
+    useEffect(() => {
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            .resize-handle {
+                position: absolute;
+                right: -2px;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background: transparent;
+                cursor: col-resize;
+                z-index: 10;
+            }
+
+            .resize-handle:hover,
+            .resize-handle.active {
+                background: #0d6efd !important;
+            }
+
+            td {
+                position: relative;
+            }
+
+            td:hover .resize-handle {
+                background: rgba(13, 110, 253, 0.2);
+            }
+
+            .row-resize-handle {
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: transparent;
+                cursor: row-resize;
+                z-index: 10;
+            }
+
+            td:hover .row-resize-handle {
+                background: rgba(13, 110, 253, 0.2);
+            }
+        `;
+        document.head.appendChild(styleSheet);
+        return () => {
+            document.head.removeChild(styleSheet);
+        };
+    }, []);
 
     useEffect(() => {
         const handleResize = () => {
@@ -1494,6 +1507,35 @@ const MemberDashboard = () => {
         }
     };
 
+    // Add these styles at the beginning of your component
+    const styles = {
+        resizableCell: {
+            position: 'relative',
+            minWidth: '80px',
+            padding: '0px',
+        },
+        resizeHandle: {
+            position: 'absolute',
+            right: '-2px',
+            top: '0',
+            bottom: '0',
+            width: '4px',
+            background: 'transparent',
+            cursor: 'col-resize',
+            zIndex: 10,
+        },
+        rowResizeHandle: {
+            position: 'absolute',
+            bottom: '-2px',
+            left: '0',
+            right: '0',
+            height: '4px',
+            background: 'transparent',
+            cursor: 'row-resize',
+            zIndex: 10,
+        }
+    };
+
     return (
         <>
             <div id="mytask-layout">
@@ -2530,12 +2572,23 @@ const MemberDashboard = () => {
                                                                                                     </button>
                                                                                                 </td>
                                                                                                 {Array(table.cols).fill().map((_, colIndex) => (
-                                                                                                    <td key={colIndex} style={{
-                                                                                                        padding: '0px',
-                                                                                                        width: '80px',
-                                                                                                        maxWidth: '80px'
-                                                                                                    }}>
-                                                                                                        <div className="d-flex align-items-center" style={{ position: 'relative' }}>
+                                                                                                    <td
+                                                                                                        key={colIndex}
+                                                                                                        style={{
+                                                                                                            ...styles.resizableCell,
+                                                                                                            width: columnWidths[`${tableIndex}-${colIndex}`] || '80px',
+                                                                                                            maxWidth: 'none',
+                                                                                                            position: 'relative'
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <div
+                                                                                                            className="d-flex align-items-center"
+                                                                                                            style={{
+                                                                                                                position: 'relative',
+                                                                                                                height: rowHeights[`${tableIndex}-${rowIndex}`] || '22px',
+                                                                                                                width: '100%'
+                                                                                                            }}
+                                                                                                        >
                                                                                                             <textarea
                                                                                                                 data-cell={`${tableIndex}-${rowIndex}-${colIndex}`}
                                                                                                                 value={typeof table.data[rowIndex][colIndex] === 'object'
@@ -2546,27 +2599,36 @@ const MemberDashboard = () => {
                                                                                                                 onChange={(e) => {
                                                                                                                     const newValue = e.target.value;
                                                                                                                     const newTables = [...tables];
-                                                                                                                    // Just store the raw value/formula without evaluating
                                                                                                                     newTables[tableIndex].data[rowIndex][colIndex] = newValue;
                                                                                                                     setTables(newTables);
                                                                                                                 }}
-                                                                                                                onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
-                                                                                                                className="cell-input"
-                                                                                                                tabIndex={0}
                                                                                                                 style={{
                                                                                                                     width: '100%',
+                                                                                                                    height: '100%',
                                                                                                                     padding: '1px 2px',
                                                                                                                     border: 'none',
                                                                                                                     background: 'transparent',
                                                                                                                     resize: 'none',
                                                                                                                     overflow: 'hidden',
-                                                                                                                    minHeight: '22px',
-                                                                                                                    maxHeight: '60px',
                                                                                                                     fontSize: '12px',
                                                                                                                     color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColor) ? '#000' : '#fff'),
                                                                                                                     textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
                                                                                                                 }}
                                                                                                             />
+
+                                                                                                            {/* Column resize handle */}
+                                                                                                            <div
+                                                                                                                className={`resize-handle ${resizing === 'column' ? 'active' : ''}`}
+                                                                                                                onMouseDown={(e) => handleColumnResizeStart(e, tableIndex, colIndex)}
+                                                                                                            />
+
+                                                                                                            {/* Row resize handle */}
+                                                                                                            <div
+                                                                                                                className={`row-resize-handle ${resizing === 'row' ? 'active' : ''}`}
+                                                                                                                onMouseDown={(e) => handleRowResizeStart(e, tableIndex, rowIndex)}
+                                                                                                            />
+
+                                                                                                            {/* Rest of your cell content (formula button, URL icon, etc.) */}
                                                                                                             {/* Add Apply Formula Button */}
                                                                                                             {typeof table.data[rowIndex][colIndex] === 'string' &&
                                                                                                                 table.data[rowIndex][colIndex].startsWith('=') && (
