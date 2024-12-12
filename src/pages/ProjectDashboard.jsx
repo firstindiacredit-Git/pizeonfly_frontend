@@ -1003,18 +1003,23 @@ const ProjectDashboard = () => {
             .fill()
             .map(() => Array(newTables[deleteAction.index].cols).fill(''));
           setTables(newTables);
+          
+          // Add backend update for cleared table
+          await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tables: newTables, email }),
+          });
           break;
 
         case 'deleteTable':
           const updatedTables = tables.filter((_, index) => index !== deleteAction.index);
           setTables(updatedTables);
-          if (excelSheetId) {
-            await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ tables: updatedTables, email }),
-            });
-          }
+          await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tables: updatedTables, email }),
+          });
           break;
       }
 

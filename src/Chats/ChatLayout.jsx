@@ -262,10 +262,16 @@ const ChatLayout = ({
             formData.append('otherUserId', selectedUser._id);
             formData.append('userType', currentUser.role === 'admin' ? 'AdminUser' :
                 currentUser.role === 'employee' ? 'Employee' : 'Client');
-            formData.append('backgroundColor', color);
-
-            if (file) {
-                formData.append('backgroundImage', file);
+            
+            // If color and file are null, set default background color and remove image
+            if (color === null && file === null) {
+                formData.append('backgroundColor', '#efeae2'); // Default WhatsApp background color
+                formData.append('removeImage', true); // Add flag to remove image
+            } else {
+                formData.append('backgroundColor', color);
+                if (file) {
+                    formData.append('backgroundImage', file);
+                }
             }
 
             const response = await axios.post(
@@ -278,10 +284,17 @@ const ChatLayout = ({
                 }
             );
 
-            setBackgroundColor(color);
-            if (response.data.backgroundImage) {
-                setBackgroundImage(response.data.backgroundImage);
+            // Update state with default color and remove background image
+            if (color === null && file === null) {
+                setBackgroundColor('#efeae2');
+                setBackgroundImage('');
+            } else {
+                setBackgroundColor(color);
+                if (response.data.backgroundImage) {
+                    setBackgroundImage(response.data.backgroundImage);
+                }
             }
+            
             setShowBackgroundSettings(false);
             setShowColorPicker(false);
         } catch (error) {
@@ -899,6 +912,11 @@ const ChatLayout = ({
                                 }
                             }}
                         />
+                    </div>
+                    <div className="mb-3">
+                        <button className="btn btn-primary" onClick={() => handleBackgroundUpdate(null, null)}>
+                            Remove Current Background
+                        </button>
                     </div>
                 </Modal.Body>
             </Modal>
