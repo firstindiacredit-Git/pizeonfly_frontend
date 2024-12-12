@@ -12,6 +12,7 @@ import { useLocation } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CustomColorPicker, { isLightColor } from "../colorpicker/CustomColorPicker";
 import FloatingMenu from '../../Chats/FloatingMenu'
+import { evaluateFormula } from '../../utils/excelFormulas';
 
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
@@ -727,22 +728,32 @@ const MemberDashboard = () => {
 
     const handleTableNameChange = async (tableIndex, newName) => {
         try {
-            const newTables = [...tables];
-            newTables[tableIndex].name = newName;
-            setTables(newTables);
+            const updatedTables = [...tables];
+            updatedTables[tableIndex].name = newName;
+            setTables(updatedTables);
 
+            // Save to database
             if (dashboardIds.excelSheet) {
                 await axios.put(
                     `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
                     {
-                        tables: newTables,
+                        tables: updatedTables,
                         employeeId: employeeCode
                     }
                 );
+            } else {
+                const response = await axios.post(
+                    `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
+                    {
+                        tables: updatedTables,
+                        employeeId: employeeCode
+                    }
+                );
+                setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
             }
         } catch (error) {
-            console.error('Error updating table name:', error);
-            setError(prev => ({ ...prev, excelSheet: 'Failed to update table name' }));
+            console.error("Error updating table name:", error);
+            toast.error("Failed to update table name");
         }
     };
 
@@ -1075,38 +1086,39 @@ const MemberDashboard = () => {
     };
 
     // Add this function to download Excel sheet
-    const downloadExcelSheet = async (tableIndex) => {
-        try {
-            const table = tables[tableIndex];
-            let csvContent = "data:text/csv;charset=utf-8,";
+    const downloadExcelSheet = (tableIndex) => {
+        const table = tables[tableIndex];
+        let csv = '';
 
-            // Add table name as header
-            csvContent += `${table.name}\n\n`;
-
-            // Add column headers (A, B, C, etc.)
-            csvContent += "," + Array(table.cols).fill().map((_, i) => getColumnLabel(i)).join(",") + "\n";
-
-            // Add data rows with row numbers
-            table.data.forEach((row, rowIndex) => {
-                csvContent += `${rowIndex + 1},${row.join(",")}\n`;
-            });
-
-            // Create download link
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `${table.name.replace(/\s+/g, '_')}.csv`);
-            document.body.appendChild(link);
-
-            // Trigger download
-            link.click();
-
-            // Cleanup
-            document.body.removeChild(link);
-        } catch (error) {
-            console.error('Error downloading excel sheet:', error);
-            setError(prev => ({ ...prev, excelSheet: 'Failed to download excel sheet' }));
+        // Add headers (A, B, C, etc.)
+        for (let i = 0; i < table.cols; i++) {
+            csv += String.fromCharCode(65 + i) + ',';
         }
+        csv = csv.slice(0, -1) + '\n';
+
+        // Add data
+        table.data.forEach(row => {
+            const processedRow = row.map(cell => {
+                // Check if cell is a formula object
+                if (typeof cell === 'object' && cell !== null && 'value' in cell) {
+                    return cell.value;
+                }
+                return cell;
+            });
+            csv += processedRow.join(',') + '\n';
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        // Use table name if available, otherwise use default name with index
+        const fileName = table.name ? `${table.name}.csv` : `excel_sheet_${tableIndex + 1}.csv`;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
     };
 
     // Add this useEffect for speech recognition setup
@@ -1435,6 +1447,50 @@ const MemberDashboard = () => {
             setShowDeleteModal(false);
         } catch (error) {
             console.error('Delete operation failed:', error);
+        }
+    };
+
+    // Add the handleApplyFormula function
+    const handleApplyFormula = async (tableIndex, rowIndex, colIndex) => {
+        try {
+            const newTables = [...tables];
+            const currentValue = newTables[tableIndex].data[rowIndex][colIndex];
+
+            if (currentValue.startsWith('=')) {
+                const result = evaluateFormula(currentValue, newTables[tableIndex].data);
+                newTables[tableIndex].data[rowIndex][colIndex] = {
+                    formula: currentValue,
+                    value: result
+                };
+
+                setTables(newTables);
+
+                const payload = {
+                    tables: newTables,
+                    employeeId: employeeCode
+                };
+
+                const url = dashboardIds.excelSheet
+                    ? `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`
+                    : `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`;
+
+                const method = dashboardIds.excelSheet ? 'PUT' : 'POST';
+
+                const response = await axios({
+                    method,
+                    url,
+                    data: payload
+                });
+
+                if (response.data._id) {
+                    setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
+                }
+
+                //   toast.success('Formula applied successfully!');
+            }
+        } catch (error) {
+            console.error("Error applying formula:", error);
+            toast.error("Failed to apply formula");
         }
     };
 
@@ -2482,10 +2538,21 @@ const MemberDashboard = () => {
                                                                                                         <div className="d-flex align-items-center" style={{ position: 'relative' }}>
                                                                                                             <textarea
                                                                                                                 data-cell={`${tableIndex}-${rowIndex}-${colIndex}`}
-                                                                                                                value={table.data[rowIndex][colIndex]}
-                                                                                                                onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
+                                                                                                                value={typeof table.data[rowIndex][colIndex] === 'object'
+                                                                                                                    ? (document.activeElement === document.querySelector(`[data-cell="${tableIndex}-${rowIndex}-${colIndex}"]`)
+                                                                                                                        ? table.data[rowIndex][colIndex].formula
+                                                                                                                        : table.data[rowIndex][colIndex].value)
+                                                                                                                    : table.data[rowIndex][colIndex]}
+                                                                                                                onChange={(e) => {
+                                                                                                                    const newValue = e.target.value;
+                                                                                                                    const newTables = [...tables];
+                                                                                                                    // Just store the raw value/formula without evaluating
+                                                                                                                    newTables[tableIndex].data[rowIndex][colIndex] = newValue;
+                                                                                                                    setTables(newTables);
+                                                                                                                }}
                                                                                                                 onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
                                                                                                                 className="cell-input"
+                                                                                                                tabIndex={0}
                                                                                                                 style={{
                                                                                                                     width: '100%',
                                                                                                                     padding: '1px 2px',
@@ -2500,6 +2567,27 @@ const MemberDashboard = () => {
                                                                                                                     textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
                                                                                                                 }}
                                                                                                             />
+                                                                                                            {/* Add Apply Formula Button */}
+                                                                                                            {typeof table.data[rowIndex][colIndex] === 'string' &&
+                                                                                                                table.data[rowIndex][colIndex].startsWith('=') && (
+                                                                                                                    <button
+                                                                                                                        className="btn btn-sm btn-success"
+                                                                                                                        style={{
+                                                                                                                            position: 'absolute',
+                                                                                                                            right: '-60px',
+                                                                                                                            padding: '0px 5px',
+                                                                                                                            fontSize: '10px',
+                                                                                                                            height: '20px',
+                                                                                                                            lineHeight: '20px',
+                                                                                                                            zIndex: 1000
+                                                                                                                        }}
+                                                                                                                        onClick={() => handleApplyFormula(tableIndex, rowIndex, colIndex)}
+                                                                                                                        title="Apply Formula"
+                                                                                                                    >
+                                                                                                                        Apply
+                                                                                                                    </button>
+                                                                                                                )}
+                                                                                                            {/* Existing URL icon code */}
                                                                                                             {isValidUrl(table.data[rowIndex][colIndex]) && (
                                                                                                                 <a
                                                                                                                     href={table.data[rowIndex][colIndex]}

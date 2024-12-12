@@ -16,6 +16,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
+import { evaluateFormula } from '../utils/excelFormulas';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -646,7 +647,19 @@ const ProjectDashboard = () => {
   const handleCellChange = async (tableIndex, rowIndex, colIndex, value) => {
     try {
       const newTables = [...tables];
-      newTables[tableIndex].data[rowIndex][colIndex] = value;
+
+      // Check if the value starts with '=' for formula
+      if (value.startsWith('=')) {
+        const result = evaluateFormula(value, newTables[tableIndex].data);
+        // Store both the formula and the result
+        newTables[tableIndex].data[rowIndex][colIndex] = {
+          formula: value,
+          value: result
+        };
+      } else {
+        newTables[tableIndex].data[rowIndex][colIndex] = value;
+      }
+
       setTables(newTables);
 
       const userData = JSON.parse(localStorage.getItem('user'));
@@ -683,6 +696,7 @@ const ProjectDashboard = () => {
   const addTable = () => {
     const newTable = {
       id: Date.now(),
+      name: `Table ${tables.length + 1}`,
       rows: 5,
       cols: 5,
       data: Array(5).fill().map(() => Array(5).fill(''))
@@ -763,24 +777,50 @@ const ProjectDashboard = () => {
 
     // Add data
     table.data.forEach(row => {
-      csv += row.join(',') + '\n';
+      const processedRow = row.map(cell => {
+        // Check if cell is a formula object
+        if (typeof cell === 'object' && cell !== null && 'value' in cell) {
+          return cell.value;
+        }
+        return cell;
+      });
+      csv += processedRow.join(',') + '\n';
     });
 
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `excel_sheet_${tableIndex + 1}.csv`;
+    // Use table name if available, otherwise use default name with index
+    const fileName = table.name ? `${table.name}.csv` : `excel_sheet_${tableIndex + 1}.csv`;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   };
 
-  const handleTableNameChange = (tableIndex, newName) => {
-    const updatedTables = [...tables];
-    updatedTables[tableIndex].name = newName;
-    setTables(updatedTables);
+  const handleTableNameChange = async (tableIndex, newName) => {
+    try {
+      const updatedTables = [...tables];
+      updatedTables[tableIndex].name = newName;
+      setTables(updatedTables);
+
+      // Save to database
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tables: updatedTables, email }),
+      });
+    } catch (error) {
+      console.error("Error updating table name:", error);
+      toast.error("Failed to update table name");
+    }
   };
 
   const deleteColumn = async (tableIndex, colIndex) => {
@@ -995,6 +1035,54 @@ const ProjectDashboard = () => {
     tableHeader: {
       backgroundColor: isDarkMode ? '#363636' : '#f8f9fa',
       color: isDarkMode ? '#fff' : '#000',
+    }
+  };
+
+  const handleApplyFormula = async (tableIndex, rowIndex, colIndex) => {
+    try {
+      const newTables = [...tables];
+      const currentValue = newTables[tableIndex].data[rowIndex][colIndex];
+
+      if (currentValue.startsWith('=')) {
+        const result = evaluateFormula(currentValue, newTables[tableIndex].data);
+        newTables[tableIndex].data[rowIndex][colIndex] = {
+          formula: currentValue,
+          value: result
+        };
+
+        setTables(newTables);
+
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const email = userData.email;
+
+        const url = excelSheetId
+          ? `${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`
+          : `${import.meta.env.VITE_BASE_URL}api/adminExcelSheet`;
+
+        const method = excelSheetId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ tables: newTables, email }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data._id) {
+          setExcelSheetId(data._id);
+        }
+
+        // toast.success('Formula applied successfully!');
+      }
+    } catch (error) {
+      console.error("Error applying formula:", error);
+      toast.error("Failed to apply formula");
     }
   };
 
@@ -1565,8 +1653,18 @@ const ProjectDashboard = () => {
                                               <div className="d-flex align-items-center" style={{ position: 'relative' }}>
                                                 <textarea
                                                   data-cell={`${tableIndex}-${rowIndex}-${colIndex}`}
-                                                  value={table.data[rowIndex][colIndex]}
-                                                  onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
+                                                  value={typeof table.data[rowIndex][colIndex] === 'object'
+                                                    ? (document.activeElement === document.querySelector(`[data-cell="${tableIndex}-${rowIndex}-${colIndex}"]`)
+                                                      ? table.data[rowIndex][colIndex].formula
+                                                      : table.data[rowIndex][colIndex].value)
+                                                    : table.data[rowIndex][colIndex]}
+                                                  onChange={(e) => {
+                                                    const newValue = e.target.value;
+                                                    const newTables = [...tables];
+                                                    // Just store the raw value/formula without evaluating
+                                                    newTables[tableIndex].data[rowIndex][colIndex] = newValue;
+                                                    setTables(newTables);
+                                                  }}
                                                   onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
                                                   className="cell-input"
                                                   tabIndex={0}
@@ -1584,6 +1682,27 @@ const ProjectDashboard = () => {
                                                     textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
                                                   }}
                                                 />
+                                                {/* Add Apply Formula Button */}
+                                                {typeof table.data[rowIndex][colIndex] === 'string' &&
+                                                  table.data[rowIndex][colIndex].startsWith('=') && (
+                                                    <button
+                                                      className="btn btn-sm btn-success"
+                                                      style={{
+                                                        position: 'absolute',
+                                                        right: '-60px',
+                                                        padding: '0px 5px',
+                                                        fontSize: '10px',
+                                                        height: '20px',
+                                                        lineHeight: '20px',
+                                                        zIndex: 1000
+                                                      }}
+                                                      onClick={() => handleApplyFormula(tableIndex, rowIndex, colIndex)}
+                                                      title="Apply Formula"
+                                                    >
+                                                      Apply
+                                                    </button>
+                                                  )}
+                                                {/* Existing URL icon code */}
                                                 {isValidUrl(table.data[rowIndex][colIndex]) && (
                                                   <a
                                                     href={table.data[rowIndex][colIndex]}
