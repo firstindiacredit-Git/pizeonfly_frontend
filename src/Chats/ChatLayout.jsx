@@ -25,7 +25,8 @@ const ChatLayout = ({
     onMessageEdit,
     onMessageDelete,
     fetchMessages,
-    onGroupCreate
+    onGroupCreate,
+    socket
 }) => {
     const [showUserModal, setShowUserModal] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -44,6 +45,7 @@ const ChatLayout = ({
     const [selectedMembers, setSelectedMembers] = useState([]);
     const [showImageModal, setShowImageModal] = useState(false);
     const [modalImage, setModalImage] = useState('');
+    const [userStatuses, setUserStatuses] = useState({});
 
 
     // Modified userOptions mapping with debug logs
@@ -293,6 +295,62 @@ const ChatLayout = ({
         setShowImageModal(true);
     };
 
+    useEffect(() => {
+        // Check if socket exists and is connected
+        if (socket?.current) {
+            // Listen for user status changes
+            socket.current.on('user_status_changed', (statusData) => {
+                console.log('Status changed:', statusData);
+                setUserStatuses(prev => ({
+                    ...prev,
+                    [statusData.userId]: {
+                        isOnline: statusData.isOnline,
+                        lastSeen: statusData.lastSeen
+                    }
+                }));
+            });
+
+            // Fetch initial status for selected user
+            if (selectedUser?._id) {
+                fetchUserStatus(selectedUser._id);
+            }
+
+            return () => {
+                socket.current.off('user_status_changed');
+            };
+        }
+    }, [socket, selectedUser]);
+
+    const fetchUserStatus = async (userId) => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/getUserStatus/${userId}`);
+            setUserStatuses(prev => ({
+                ...prev,
+                [userId]: {
+                    isOnline: response.data.isOnline,
+                    lastSeen: response.data.lastSeen
+                }
+            }));
+        } catch (error) {
+            console.error('Error fetching user status:', error);
+        }
+    };
+
+    const formatLastSeen = (date) => {
+        if (!date) return '';
+        const now = new Date();
+        const lastSeen = new Date(date);
+        const diff = now - lastSeen;
+
+        if (diff < 60000) return 'last seen just now';
+        if (diff < 3600000) return `last seen ${Math.floor(diff / 60000)} minutes ago`;
+        if (diff < 86400000) return `last seen ${Math.floor(diff / 3600000)} hours ago`;
+        return `last seen ${lastSeen.toLocaleDateString()}`;
+    };
+
+
+
+
     return (
         <div className="container-fluid mt-2" style={{}}>
             <div className="row g-0 rounded-2" style={{ height: '94vh', border: '1px solid #00000061' }}>
@@ -330,7 +388,14 @@ const ChatLayout = ({
                                             <h6 className="mb-0 fw-bold">
                                                 {selectedUser.employeeName || selectedUser.clientName || selectedUser.username}
                                             </h6>
-                                            <small className="text-muted">{selectedUser.userType}</small>
+                                            <small className="text-white-50">
+                                                {selectedUser.userType} {userStatuses[selectedUser._id]?.isOnline
+                                                    ? 'online'
+                                                    : userStatuses[selectedUser._id]?.lastSeen
+                                                        ? formatLastSeen(userStatuses[selectedUser._id].lastSeen)
+                                                        : ''}
+                                            </small>
+
                                         </div>
                                     </div>
 

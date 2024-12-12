@@ -15,7 +15,7 @@ const ClientChat = () => {
     const [employees, setEmployees] = useState([]);
     const [activeTab, setActiveTab] = useState('admins');
     const messagesEndRef = useRef(null);
-    const socket = useRef();
+    const socket = useRef(null);
     const currentClient = JSON.parse(localStorage.getItem('client_user'));
     const [selectedFile, setSelectedFile] = useState(null);
     const [showFilePreview, setShowFilePreview] = useState(false);
@@ -23,51 +23,66 @@ const ClientChat = () => {
 
     useEffect(() => {
         socket.current = io(import.meta.env.VITE_BASE_URL);
-        socket.current.emit('join_chat', currentClient._id);
+        
+        if (socket.current) {
+            socket.current.emit('join_chat', currentClient._id);
 
-        // Listen for received messages
-        socket.current.on('receive_message', (message) => {
-            setMessages(prev => {
-                if (!prev.some(m => m._id === message._id)) {
-                    if (message.receiverId === currentClient._id) {
-                        toast.info('New message received!');
+            const currentUser = JSON.parse(localStorage.getItem('user')) ||
+                JSON.parse(localStorage.getItem('emp_user')) ||
+                JSON.parse(localStorage.getItem('client_user'));
+
+            socket.current.emit('user_connected', {
+                userId: currentUser._id,
+                userType: currentUser.role === 'admin' ? 'AdminUser' :
+                    currentUser.role === 'employee' ? 'Employee' : 'Client'
+            });
+
+            // Listen for received messages
+            socket.current.on('receive_message', (message) => {
+                setMessages(prev => {
+                    if (!prev.some(m => m._id === message._id)) {
+                        if (message.receiverId === currentClient._id) {
+                            toast.info('New message received!');
+                        }
+                        return [...prev, message];
                     }
-                    return [...prev, message];
-                }
-                return prev;
+                    return prev;
+                });
             });
-        });
 
-        // Listen for sent message confirmations
-        socket.current.on('message_sent', (message) => {
-            setMessages(prev => {
-                if (!prev.some(m => m._id === message._id)) {
-                    return [...prev, message];
-                }
-                return prev;
+            // Listen for sent message confirmations
+            socket.current.on('message_sent', (message) => {
+                setMessages(prev => {
+                    if (!prev.some(m => m._id === message._id)) {
+                        return [...prev, message];
+                    }
+                    return prev;
+                });
             });
-        });
 
-        // Listen for message updates
-        socket.current.on('message_updated', (updatedMessage) => {
-            setMessages(prev => prev.map(msg =>
-                msg._id === updatedMessage._id ? updatedMessage : msg
-            ));
-        });
+            // Listen for message updates
+            socket.current.on('message_updated', (updatedMessage) => {
+                setMessages(prev => prev.map(msg =>
+                    msg._id === updatedMessage._id ? updatedMessage : msg
+                ));
+            });
 
-        // Listen for message deletions
-        socket.current.on('message_deleted', (deletedMessage) => {
-            setMessages(prev => prev.map(msg =>
-                msg._id === deletedMessage._id ? deletedMessage : msg
-            ));
-        });
+            // Listen for message deletions
+            socket.current.on('message_deleted', (deletedMessage) => {
+                setMessages(prev => prev.map(msg =>
+                    msg._id === deletedMessage._id ? deletedMessage : msg
+                ));
+            });
 
-        fetchUsers();
-        fetchGroups();
+            fetchUsers();
+            fetchGroups();
 
-        return () => {
-            socket.current.disconnect();
-        };
+            return () => {
+                if (socket.current) {
+                    socket.current.disconnect();
+                }
+            };
+        }
     }, []);
 
     const fetchUsers = async () => {
@@ -321,10 +336,11 @@ const ClientChat = () => {
             <div className="main px-lg-4 px-md-4">
                 <div className="body d-flex py-lg-3 py-md-2">
                     <ChatLayout
-                        users={activeTab === 'admins' ? admins : 
-                              activeTab === 'employees' ? employees : 
-                              activeTab === 'groups' ? allUsers : 
-                              groups}
+                        users={activeTab === 'admins' ? admins :
+                            activeTab === 'employees' ? employees :
+                                activeTab === 'groups' ? allUsers :
+                                    groups}
+                        socket={socket}
                         selectedUser={selectedUser}
                         messages={messages.map(msg => ({
                             ...msg,

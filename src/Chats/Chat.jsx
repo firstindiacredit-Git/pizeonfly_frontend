@@ -15,66 +15,80 @@ const Chat = () => {
   const [clients, setClients] = useState([]);
   const [activeTab, setActiveTab] = useState('employees');
   const messagesEndRef = useRef(null);
-  const socket = useRef();
+  const socket = useRef(null);
   const currentUser = JSON.parse(localStorage.getItem('user'));
   const [selectedFile, setSelectedFile] = useState(null);
   const [showFilePreview, setShowFilePreview] = useState(false);
   const [groups, setGroups] = useState([]);
 
   useEffect(() => {
-    // Socket connection
+    // Initialize socket connection
     socket.current = io(import.meta.env.VITE_BASE_URL);
 
-    // Join personal chat room
-    socket.current.emit('join_chat', currentUser._id);
+    const currentUser = JSON.parse(localStorage.getItem('user')) ||
+      JSON.parse(localStorage.getItem('emp_user')) ||
+      JSON.parse(localStorage.getItem('client_user'));
 
-    // Listen for received messages
-    socket.current.on('receive_message', (message) => {
-      setMessages(prev => {
-        // Avoid duplicate messages
-        if (!prev.some(m => m._id === message._id)) {
-          return [...prev, message];
-        }
-        return prev;
+    if (socket.current) {
+      socket.current.emit('user_connected', {
+        userId: currentUser._id,
+        userType: currentUser.role === 'admin' ? 'AdminUser' :
+          currentUser.role === 'employee' ? 'Employee' : 'Client'
       });
-    });
 
-    // Listen for sent message confirmations
-    socket.current.on('message_sent', (message) => {
-      setMessages(prev => {
-        // Avoid duplicate messages
-        if (!prev.some(m => m._id === message._id)) {
-          return [...prev, message];
-        }
-        return prev;
+      // Join personal chat room
+      socket.current.emit('join_chat', currentUser._id);
+
+      // Listen for received messages
+      socket.current.on('receive_message', (message) => {
+        setMessages(prev => {
+          // Avoid duplicate messages
+          if (!prev.some(m => m._id === message._id)) {
+            return [...prev, message];
+          }
+          return prev;
+        });
       });
-    });
 
-    // Listen for message updates
-    socket.current.on('message_updated', (updatedMessage) => {
-      setMessages(prev => prev.map(msg =>
-        msg._id === updatedMessage._id ? updatedMessage : msg
-      ));
-    });
+      // Listen for sent message confirmations
+      socket.current.on('message_sent', (message) => {
+        setMessages(prev => {
+          // Avoid duplicate messages
+          if (!prev.some(m => m._id === message._id)) {
+            return [...prev, message];
+          }
+          return prev;
+        });
+      });
 
-    // Listen for message deletions
-    socket.current.on('message_deleted', (deletedMessage) => {
-      setMessages(prev => prev.map(msg =>
-        msg._id === deletedMessage._id ? deletedMessage : msg
-      ));
-    });
+      // Listen for message updates
+      socket.current.on('message_updated', (updatedMessage) => {
+        setMessages(prev => prev.map(msg =>
+          msg._id === updatedMessage._id ? updatedMessage : msg
+        ));
+      });
 
-    // Listen for group messages
-    socket.current.on('receive_group_message', (message) => {
-      setMessages(prev => [...prev, message]);
-    });
+      // Listen for message deletions
+      socket.current.on('message_deleted', (deletedMessage) => {
+        setMessages(prev => prev.map(msg =>
+          msg._id === deletedMessage._id ? deletedMessage : msg
+        ));
+      });
 
-    // Fetch users
-    fetchUsers();
-    fetchGroups();
+      // Listen for group messages
+      socket.current.on('receive_group_message', (message) => {
+        setMessages(prev => [...prev, message]);
+      });
+
+      // Fetch users
+      fetchUsers();
+      fetchGroups();
+    }
 
     return () => {
-      socket.current.disconnect();
+      if (socket.current) {
+        socket.current.disconnect();
+      }
     };
   }, []);
 
@@ -324,10 +338,11 @@ const Chat = () => {
           {/* <Header /> */}
           <div className="body d-flex py-lg-3 py-md-2">
             <ChatLayout
-              users={activeTab === 'groups' ? allUsers : 
-                     activeTab === 'admins' ? admins :
-                     activeTab === 'employees' ? employees :
-                     clients}
+              users={activeTab === 'groups' ? allUsers :
+                activeTab === 'admins' ? admins :
+                  activeTab === 'employees' ? employees :
+                    clients}
+              socket={socket}
               selectedUser={selectedUser}
               messages={messages.map(msg => ({
                 ...msg,
