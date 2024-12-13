@@ -232,39 +232,39 @@ const UpdateInvoice = () => {
               <div className="p-3 rounded" style={{ backgroundColor: "lavender", height: "16.3rem" }}>
                 <h2 className="h5 text-primary mb-2" style={{ backgroundColor: "lavender" }}>Billed To</h2>
                 <div style={{ backgroundColor: "lavender" }}>
-                  <input
-                    style={{ backgroundColor: "lavender", border: "none" }}
+                  <textarea
+                    style={{ backgroundColor: "lavender", border: "none", height: "25px" }}
                     className="fw-bold"
                     name="clientDetail.businessName"
                     value={updatedInvoice.clientDetail.businessName}
                     onChange={handleChange}
                   /><br />
                   <textarea
-                    style={{ backgroundColor: "lavender", border: "none" }}
+                    style={{ backgroundColor: "lavender", border: "none", height: "25px" }}
                     className="mt-3 fw-bold"
                     name="clientDetail.clientAddress"
                     value={updatedInvoice.clientDetail.clientAddress}
                     onChange={handleChange}
                   />
                   <br />
-                  <input
-                    style={{ backgroundColor: "lavender", border: "none" }}
+                  <textarea
+                    style={{ backgroundColor: "lavender", border: "none", height: "25px" }}
                     className="mt-3 fw-bold"
                     name="clientDetail.clientGst"
                     value={updatedInvoice.clientDetail.clientGst}
                     onChange={handleChange}
                   />
                   <p />
-                  <input
-                    style={{ backgroundColor: "lavender", border: "none" }}
+                  <textarea
+                    style={{ backgroundColor: "lavender", border: "none", height: "25px" }}
                     className="fw-bold"
                     name="clientDetail.clientPhone"
                     value={updatedInvoice.clientDetail.clientPhone}
                     onChange={handleChange}
                   />
                   <p />
-                  <input
-                    style={{ backgroundColor: "lavender", border: "none" }}
+                  <textarea
+                    style={{ backgroundColor: "lavender", border: "none", height: "25px" }}
                     className="fw-bold"
                     name="clientDetail.clientEmail"
                     value={updatedInvoice.clientDetail.clientEmail}

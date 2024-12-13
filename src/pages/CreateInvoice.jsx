@@ -49,97 +49,31 @@ const CreateInvoice = () => {
     termsConditions: '1. Please quote invoice number when remitting funds'
   });
 
-  // Add new state for field errors
-  const [errors, setErrors] = useState({
-    invoiceNumber: '',
-    invoiceDate: '',
-    invoiceDueDate: '',
-    clientDetail: '',
-    country: '',
-    state: '',
-    table: [],
-    bankDetails: {
-      accountName: '',
-      accountNumber: '',
-      ifsc: '',
-      accountType: '',
-      bankName: ''
-    }
-  });
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Reset errors
-    setErrors({
-      invoiceNumber: '',
-      invoiceDate: '',
-      invoiceDueDate: '',
-      clientDetail: '',
-      country: '',
-      state: '',
-      table: [],
-      bankDetails: {
-        accountName: '',
-        accountNumber: '',
-        ifsc: '',
-        accountType: '',
-        bankName: ''
+
+    // Check if any required field is empty
+    const requiredFields = ['invoiceDate', 'invoiceDueDate', 'clientDetail', 'country', 'state', 'table', 'amount'];
+    const isEmpty = requiredFields.some(field => {
+      if (field === 'table') {
+        // Check if any table row is empty
+        return formData.table.some(row => Object.values(row).some(value => value === ''));
+      } else {
+        return formData[field] === '';
       }
     });
 
-    // Validate fields
-    let hasErrors = false;
-    let newErrors = { ...errors };
+    // if (isEmpty) {
+    //   // Display error toast
+    //   toast.error("Please fill all required fields!", {
+    //     style: {
+    //       backgroundColor: "#4c3575",
+    //       color: "white",
+    //     },
+    //   });
+    //   return;
+    // }
 
-    // Check required fields
-    if (!formData.invoiceNumber) {
-      newErrors.invoiceNumber = 'Invoice number is required';
-      hasErrors = true;
-    }
-    if (!formData.invoiceDate) {
-      newErrors.invoiceDate = 'Invoice date is required';
-      hasErrors = true;
-    }
-    if (!formData.invoiceDueDate) {
-      newErrors.invoiceDueDate = 'Due date is required';
-      hasErrors = true;
-    }
-    if (!formData.clientDetail) {
-      newErrors.clientDetail = 'Client details are required';
-      hasErrors = true;
-    }
-    if (!formData.country) {
-      newErrors.country = 'Country is required';
-      hasErrors = true;
-    }
-    if (!formData.state) {
-      newErrors.state = 'State is required';
-      hasErrors = true;
-    }
-
-    // Validate table rows
-    const tableErrors = formData.table.map(row => {
-      const rowErrors = {};
-      if (!row.item) rowErrors.item = 'Item is required';
-      if (!row.description) rowErrors.description = 'Description is required';
-      if (!row.rate) rowErrors.rate = 'Rate is required';
-      if (!row.quantity) rowErrors.quantity = 'Quantity is required';
-      if (!row.gstPercentage) rowErrors.gstPercentage = 'GST % is required';
-      return rowErrors;
-    });
-
-    if (tableErrors.some(row => Object.keys(row).length > 0)) {
-      newErrors.table = tableErrors;
-      hasErrors = true;
-    }
-
-    if (hasErrors) {
-      setErrors(newErrors);
-      return;
-    }
-
-    // Continue with existing submit logic
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/invoices`, formData);
       console.log('Invoice created:', response.data);
@@ -149,7 +83,7 @@ const CreateInvoice = () => {
       const currentDate = new Date();
       setInvoiceDate(currentDate);
       setInvoiceDueDate(currentDate);
-
+      
       setFormData({
         invoiceNumber: '',
         invoiceDate: currentDate, // Set to current date instead of empty string
@@ -203,6 +137,13 @@ const CreateInvoice = () => {
       }
     }
   };
+
+
+
+
+
+
+
 
 
   //Invoice Number
@@ -438,6 +379,16 @@ const CreateInvoice = () => {
   };
 
 
+
+
+
+
+
+
+
+
+
+
   return (
     <>
       <div id="mytask-layout">
@@ -478,19 +429,17 @@ const CreateInvoice = () => {
                     <div className="d-flex">
                       <span className="fw-bold text-muted">Invoice No # : </span>
                       <input
-                        className={`${errors.invoiceNumber ? 'is-invalid' : ''}`}
+                        className=""
                         style={{ marginLeft: "0.8rem", border: "none" }}
                         name="invoiceNumber"
                         value={invoiceNumber}
                         onChange={handleInvoiceNumberChange}
+                        required
                       />
-                      {errors.invoiceNumber && (
-                        <div className="invalid-feedback">{errors.invoiceNumber}</div>
-                      )}
                     </div>
                     <div className="d-flex">
                       <span className="fw-bold text-muted"> Invoice Date : </span>
-                      <DatePicker
+                      <DatePicker 
                         className="date1"
                         selected={invoiceDate}
                         onChange={handleInvoiceDateChange}
@@ -499,6 +448,7 @@ const CreateInvoice = () => {
                         showYearDropdown
                         dropdownMode="select"
                         placeholderText="Select a date"
+                        required
                       />
                       <div style={{ marginLeft: "10px" }}>
                         {invoiceDate ? format(invoiceDate, 'MMMM dd, yyyy') : ''}
@@ -506,7 +456,7 @@ const CreateInvoice = () => {
                     </div>
                     <div className="d-flex">
                       <span className="fw-bold text-muted">Due Date : </span>
-                      <DatePicker
+                      <DatePicker 
                         className="date2"
                         selected={invoiceDueDate}
                         onChange={handleInvoiceDueDateChange}
@@ -515,6 +465,7 @@ const CreateInvoice = () => {
                         showYearDropdown
                         dropdownMode="select"
                         placeholderText="Select a date"
+                        required
                       />
                       <div style={{ marginLeft: "32px" }}>
                         {invoiceDueDate ? format(invoiceDueDate, 'MMMM dd, yyyy') : ''}
@@ -616,16 +567,7 @@ const CreateInvoice = () => {
                             <tr key={index} className="item-row ">
                               <td className="item-name border-secondary">
                                 <div className="delete-wpr ">
-                                  <textarea 
-                                    rows="2" 
-                                    style={{ border: "none" }} 
-                                    value={row.item} 
-                                    onChange={(e) => handleInputChange(e, index, 'item')}
-                                    className={`${errors.table?.[index]?.item ? 'is-invalid' : ''}`}
-                                  />
-                                  {errors.table?.[index]?.item && (
-                                    <div className="invalid-feedback">{errors.table[index].item}</div>
-                                  )}
+                                  <textarea rows="2" style={{ border: "none" }} value={row.item} onChange={(e) => handleInputChange(e, index, 'item')} />
                                   <a className="delete" href="javascript:;" onClick={() => handleDeleteRow(index)} title="Remove row">X</a>
                                 </div>
                               </td>
