@@ -21,85 +21,13 @@ const Chat = () => {
   const [showFilePreview, setShowFilePreview] = useState(false);
   const [groups, setGroups] = useState([]);
 
-  useEffect(() => {
-    // Initialize socket connection
-    socket.current = io(import.meta.env.VITE_BASE_URL);
-
-    const currentUser = JSON.parse(localStorage.getItem('user')) ||
-      JSON.parse(localStorage.getItem('emp_user')) ||
-      JSON.parse(localStorage.getItem('client_user'));
-
-    if (socket.current) {
-      socket.current.emit('user_connected', {
-        userId: currentUser._id,
-        userType: currentUser.role === 'admin' ? 'AdminUser' :
-          currentUser.role === 'employee' ? 'Employee' : 'Client'
-      });
-
-      // Join personal chat room
-      socket.current.emit('join_chat', currentUser._id);
-
-      // Listen for received messages
-      socket.current.on('receive_message', (message) => {
-        setMessages(prev => {
-          // Avoid duplicate messages
-          if (!prev.some(m => m._id === message._id)) {
-            return [...prev, message];
-          }
-          return prev;
-        });
-      });
-
-      // Listen for sent message confirmations
-      socket.current.on('message_sent', (message) => {
-        setMessages(prev => {
-          // Avoid duplicate messages
-          if (!prev.some(m => m._id === message._id)) {
-            return [...prev, message];
-          }
-          return prev;
-        });
-      });
-
-      // Listen for message updates
-      socket.current.on('message_updated', (updatedMessage) => {
-        setMessages(prev => prev.map(msg =>
-          msg._id === updatedMessage._id ? updatedMessage : msg
-        ));
-      });
-
-      // Listen for message deletions
-      socket.current.on('message_deleted', (deletedMessage) => {
-        setMessages(prev => prev.map(msg =>
-          msg._id === deletedMessage._id ? deletedMessage : msg
-        ));
-      });
-
-      // Listen for group messages
-      socket.current.on('receive_group_message', (message) => {
-        setMessages(prev => [...prev, message]);
-      });
-
-      // Fetch users
-      fetchUsers();
-      fetchGroups();
-    }
-
-    return () => {
-      if (socket.current) {
-        socket.current.disconnect();
-      }
-    };
-  }, []);
-
   const fetchUsers = async () => {
     try {
-      // Fetch employees
-      const empResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}api/employees`);
-      setEmployees(empResponse.data);
-
-      // Fetch clients
-      const clientResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}api/clients`);
+      const [employeeResponse, clientResponse] = await Promise.all([
+        axios.get(`${import.meta.env.VITE_BASE_URL}api/employees`),
+        axios.get(`${import.meta.env.VITE_BASE_URL}api/clients`)
+      ]);
+      setEmployees(employeeResponse.data);
       setClients(clientResponse.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -129,12 +57,92 @@ const Chat = () => {
     }
   };
 
-  const handleUserSelect = (user, userType) => {
-    setSelectedUser({ ...user, userType });
-    fetchMessages(user._id);
+  const fetchGroupMessages = async (groupId) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}api/getGroupMessages/${groupId}`
+      );
+      setMessages(response.data);
+    } catch (error) {
+      console.error('Error fetching group messages:', error);
+      toast.error('Error loading group messages');
+    }
   };
 
-  // Helper function to map user role to correct sender type
+  useEffect(() => {
+    socket.current = io(import.meta.env.VITE_BASE_URL);
+
+    const currentUser = JSON.parse(localStorage.getItem('user')) ||
+      JSON.parse(localStorage.getItem('emp_user')) ||
+      JSON.parse(localStorage.getItem('client_user'));
+
+    if (socket.current) {
+      socket.current.emit('user_connected', {
+        userId: currentUser._id,
+        userType: currentUser.role === 'admin' ? 'AdminUser' :
+          currentUser.role === 'employee' ? 'Employee' : 'Client'
+      });
+
+      socket.current.emit('join_chat', currentUser._id);
+
+      socket.current.on('receive_message', (message) => {
+        setMessages(prev => {
+          if (!prev.some(m => m._id === message._id)) {
+            return [...prev, message];
+          }
+          return prev;
+        });
+      });
+
+      socket.current.on('message_sent', (message) => {
+        setMessages(prev => {
+          if (!prev.some(m => m._id === message._id)) {
+            return [...prev, message];
+          }
+          return prev;
+        });
+      });
+
+      socket.current.on('message_updated', (updatedMessage) => {
+        setMessages(prev => prev.map(msg =>
+          msg._id === updatedMessage._id ? updatedMessage : msg
+        ));
+      });
+
+      socket.current.on('message_deleted', (deletedMessage) => {
+        setMessages(prev => prev.map(msg =>
+          msg._id === deletedMessage._id ? deletedMessage : msg
+        ));
+      });
+
+      socket.current.on('receive_group_message', (message) => {
+        setMessages(prev => [...prev, message]);
+      });
+
+      fetchUsers();
+      fetchGroups();
+    }
+
+    return () => {
+      if (socket.current) {
+        socket.current.disconnect();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
+  const handleUserSelect = (user, userType) => {
+    setSelectedUser({ ...user, userType });
+    if (userType === 'Group') {
+      fetchGroupMessages(user._id);
+    } else {
+      fetchMessages(user._id);
+    }
+  };
+
   const mapRoleToType = (role) => {
     switch (role.toLowerCase()) {
       case 'employee':
@@ -159,14 +167,12 @@ const Chat = () => {
         message: newMessage
       };
 
-      setNewMessage(''); // Clear message input immediately for better UX
+      setNewMessage('');
 
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}api/createChat`,
         messageData
       );
-
-      // Socket emit is now handled by backend
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error('Error sending message');
@@ -210,15 +216,13 @@ const Chat = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     const fileType = file.type.split('/')[0];
     if (!['image', 'video', 'audio'].includes(fileType)) {
       toast.error('Unsupported file type');
       return;
     }
 
-    // Validate file size (15MB)
-    const maxSize = 15 * 1024 * 1024; // 15MB in bytes
+    const maxSize = 15 * 1024 * 1024;
     if (file.size > maxSize) {
       toast.error('File size should be less than 10MB');
       return;
@@ -231,14 +235,12 @@ const Chat = () => {
   const handleFileSend = async (file) => {
     const formData = new FormData();
 
-    // Add message data to formData
     formData.append('senderId', currentUser._id);
     formData.append('senderType', mapRoleToType(currentUser.role));
     formData.append('receiverId', selectedUser._id);
     formData.append('receiverType', selectedUser.userType);
-    formData.append('message', ''); // Empty message for file uploads
+    formData.append('message', '');
 
-    // Determine file type and append accordingly
     const fileType = file.type.split('/')[0];
     if (fileType === 'image') {
       formData.append('images', file);
@@ -273,14 +275,12 @@ const Chat = () => {
   const handleVoiceRecordingComplete = async (blob) => {
     const formData = new FormData();
 
-    // Add message data
     formData.append('senderId', currentUser._id);
     formData.append('senderType', mapRoleToType(currentUser.role));
     formData.append('receiverId', selectedUser._id);
     formData.append('receiverType', selectedUser.userType);
     formData.append('message', '');
 
-    // Add the recording file
     formData.append('recording', blob, 'recording.webm');
 
     try {
@@ -342,6 +342,7 @@ const Chat = () => {
                 activeTab === 'admins' ? admins :
                   activeTab === 'employees' ? employees :
                     clients}
+              groups={groups}
               socket={socket}
               selectedUser={selectedUser}
               messages={messages.map(msg => ({

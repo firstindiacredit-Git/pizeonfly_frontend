@@ -26,7 +26,8 @@ const ChatLayout = ({
     onMessageDelete,
     fetchMessages,
     onGroupCreate,
-    socket
+    socket,
+    groups
 }) => {
     const [showUserModal, setShowUserModal] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -262,7 +263,7 @@ const ChatLayout = ({
             formData.append('otherUserId', selectedUser._id);
             formData.append('userType', currentUser.role === 'admin' ? 'AdminUser' :
                 currentUser.role === 'employee' ? 'Employee' : 'Client');
-            
+
             // If color and file are null, set default background color and remove image
             if (color === null && file === null) {
                 formData.append('backgroundColor', '#efeae2'); // Default WhatsApp background color
@@ -294,7 +295,7 @@ const ChatLayout = ({
                     setBackgroundImage(response.data.backgroundImage);
                 }
             }
-            
+
             setShowBackgroundSettings(false);
             setShowColorPicker(false);
         } catch (error) {
@@ -378,37 +379,57 @@ const ChatLayout = ({
                                 <div className="d-flex align-items-center justify-content-between">
                                     <div className="d-flex align-items-center">
                                         <div onClick={() => setShowUserModal(true)} style={{ cursor: 'pointer' }}>
-                                            {selectedUser.userType === 'AdminUser' ? (
-                                                <img
-                                                    src={`${import.meta.env.VITE_BASE_URL}${selectedUser.profileImage.replace('uploads/', '')}`}
-                                                    className="avatar rounded-circle"
-                                                    alt={selectedUser.username}
-                                                    style={{ width: '40px', height: '40px', objectFit: 'contain' }}
-                                                />
-                                            ) : (
-                                                <img
-                                                    src={`${import.meta.env.VITE_BASE_URL}${selectedUser.userType === 'Employee'
-                                                        ? selectedUser.employeeImage.replace('uploads/', '')
-                                                        : selectedUser.clientImage.replace('uploads/', '')
-                                                        }`}
-                                                    className="avatar rounded-circle"
-                                                    alt={selectedUser.employeeName || selectedUser.clientName}
-                                                    style={{ width: '40px', height: '40px', objectFit: 'contain' }}
-                                                />
+                                            {selectedUser && (
+                                                selectedUser.userType === 'Group' ? (
+                                                    // Group Avatar
+                                                    <div className="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                                                        style={{ width: '40px', height: '40px' }}>
+                                                        {selectedUser.name?.[0]?.toUpperCase()}
+                                                    </div>
+                                                ) : selectedUser.userType === 'AdminUser' ? (
+                                                    // Admin Avatar
+                                                    <img
+                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.profileImage?.replace('uploads/', '') || 'default-avatar.png'}`}
+                                                        className="avatar rounded-circle"
+                                                        alt={selectedUser.username}
+                                                        style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                                                    />
+                                                ) : selectedUser.userType === 'Employee' ? (
+                                                    // Employee Avatar
+                                                    <img
+                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.employeeImage?.replace('uploads/', '') || 'default-avatar.png'}`}
+                                                        className="avatar rounded-circle"
+                                                        alt={selectedUser.employeeName}
+                                                        style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                                                    />
+                                                ) : (
+                                                    // Client Avatar
+                                                    <img
+                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.clientImage?.replace('uploads/', '') || 'default-avatar.png'}`}
+                                                        className="avatar rounded-circle"
+                                                        alt={selectedUser.clientName}
+                                                        style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                                                    />
+                                                )
                                             )}
                                         </div>
                                         <div className="flex-fill ms-3">
                                             <h6 className="mb-0 fw-bold">
-                                                {selectedUser.employeeName || selectedUser.clientName || selectedUser.username}
+                                                {selectedUser?.name || // For groups
+                                                    selectedUser?.employeeName ||
+                                                    selectedUser?.clientName ||
+                                                    selectedUser?.username ||
+                                                    'Unknown User'}
                                             </h6>
                                             <small className="text-white-50">
-                                                {selectedUser.userType} {userStatuses[selectedUser._id]?.isOnline
-                                                    ? 'online'
-                                                    : userStatuses[selectedUser._id]?.lastSeen
-                                                        ? formatLastSeen(userStatuses[selectedUser._id].lastSeen)
-                                                        : ''}
+                                                {selectedUser?.userType === 'Group' ?
+                                                    `${selectedUser.members?.length || 0} members` :
+                                                    selectedUser?.userType} {userStatuses[selectedUser?._id]?.isOnline
+                                                        ? 'online'
+                                                        : userStatuses[selectedUser?._id]?.lastSeen
+                                                            ? formatLastSeen(userStatuses[selectedUser?._id].lastSeen)
+                                                            : ''}
                                             </small>
-
                                         </div>
                                     </div>
 
@@ -435,7 +456,7 @@ const ChatLayout = ({
                                     overflowY: 'auto',
                                     backgroundColor: backgroundColor,
                                     ...(backgroundImage && {
-                                        backgroundImage: `url("${import.meta.env.VITE_BASE_URL}${backgroundImage.replace('uploads/', '')}")`,
+                                        backgroundImage: `url("${import.meta.env.VITE_BASE_URL}${backgroundImage?.replace('uploads/', '') || ''}")`,
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
                                         backgroundRepeat: 'no-repeat',
@@ -505,12 +526,12 @@ const ChatLayout = ({
                                                     {msg.imageUrls && msg.imageUrls.map((url, i) => (
                                                         <img
                                                             key={i}
-                                                            src={`${import.meta.env.VITE_BASE_URL}${url.replace('uploads/', '')}`}
+                                                            src={`${import.meta.env.VITE_BASE_URL}${url?.replace('uploads/', '') || ''}`}
                                                             alt="Shared image"
                                                             className="img-fluid rounded mb-1 py-2"
                                                             style={{ maxHeight: '200px', cursor: 'pointer' }}
                                                             onClick={() => {
-                                                                setSelectedImage(`${import.meta.env.VITE_BASE_URL}${url.replace('uploads/', '')}`);
+                                                                setSelectedImage(`${import.meta.env.VITE_BASE_URL}${url?.replace('uploads/', '') || ''}`);
                                                             }}
                                                         />
                                                     ))}
@@ -522,7 +543,7 @@ const ChatLayout = ({
                                                             className="img-fluid rounded mb-1 py-2"
                                                             style={{ maxHeight: '200px' }}
                                                         >
-                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.videoUrl.replace('uploads/', '')}`} type="video/mp4" />
+                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.videoUrl?.replace('uploads/', '') || ''}`} type="video/mp4" />
                                                             Your browser does not support the video tag.
                                                         </video>
                                                     )}
@@ -530,7 +551,7 @@ const ChatLayout = ({
                                                     {/* Audio */}
                                                     {msg.audioUrl && (
                                                         <audio controls className="w-100 mb-1">
-                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.audioUrl.replace('uploads/', '')}`} type="audio/mpeg" />
+                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.audioUrl?.replace('uploads/', '') || ''}`} type="audio/mpeg" />
                                                             Your browser does not support the audio element.
                                                         </audio>
                                                     )}
@@ -538,7 +559,7 @@ const ChatLayout = ({
                                                     {/* Voice Recording */}
                                                     {msg.recordingUrl && (
                                                         <audio controls className="mb-1 py-2">
-                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.recordingUrl.replace('uploads/', '')}`} type="audio/webm" style={{ backgroundColor: 'black' }} />
+                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.recordingUrl?.replace('uploads/', '') || ''}`} type="audio/webm" style={{ backgroundColor: 'black' }} />
                                                             Your browser does not support the audio element.
                                                         </audio>
                                                     )}
@@ -720,20 +741,35 @@ const ChatLayout = ({
                                 <div className="tab-pane fade show active">
                                     <ul className="list-unstyled list-group list-group-custom list-group-flush mb-0" style={{ cursor: 'pointer' }}>
                                         {activeTab === 'groups' ? (
-                                            <div className="p-3">
-                                                <button
-                                                    className="btn btn-primary w-100"
-                                                    style={{
-                                                        backgroundColor: '#128C7E',
-                                                        border: 'none',
-                                                        padding: '10px',
-                                                        borderRadius: '5px',
-                                                        fontSize: '16px'
-                                                    }}
-                                                    onClick={() => setShowCreateGroupModal(true)}
-                                                >
-                                                    + Create Group
-                                                </button>
+                                            <div>
+                                                <div className="p-3">
+                                                    <button
+                                                        className="btn btn-success w-100 mb-3"
+                                                        onClick={() => setShowCreateGroupModal(true)}
+                                                    >
+                                                        + Create Group
+                                                    </button>
+                                                </div>
+                                                <ul className="list-unstyled">
+                                                    {groups.map(group => (
+                                                        <li
+                                                            key={group._id}
+                                                            className={`list-group-item ${selectedUser?._id === group._id ? 'active' : ''}`}
+                                                            style={{ backgroundColor: selectedUser?._id === group._id ? '#80808069' : '' }}
+                                                            onClick={() => onUserSelect(group, 'Group')}
+                                                        >
+                                                            <div className="d-flex align-items-center">
+                                                                <div className="avatar rounded-circle" style={{ backgroundColor: '#128C7E', color: 'white', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    {group.name[0].toUpperCase()}
+                                                                </div>
+                                                                <div className="flex-fill ms-3">
+                                                                    <h6 className="mb-0">{group.name}</h6>
+                                                                    <small>{group.members.length} members</small>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
                                             </div>
                                         ) : (
                                             users.map(user => renderUserItem(user, selectedUser, onUserSelect))
@@ -745,6 +781,8 @@ const ChatLayout = ({
                     </div>
                 </div>
             </div>
+
+            {/* User Details Modal */}
             <Modal show={showUserModal} onHide={() => setShowUserModal(false)} centered>
                 <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
                     <Modal.Title>{selectedUser?.employeeName || selectedUser?.clientName || selectedUser?.username}
@@ -754,29 +792,54 @@ const ChatLayout = ({
                     <div className="text-center mb-4">
                         <img
                             src={`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
-                                ? selectedUser?.employeeImage.replace('uploads/', '')
+                                ? selectedUser?.employeeImage?.replace('uploads/', '') || 'default-avatar.png'
                                 : selectedUser?.userType === 'AdminUser'
-                                    ? selectedUser?.profileImage.replace('uploads/', '')
-                                    : selectedUser?.clientImage.replace('uploads/', '')
+                                    ? selectedUser?.profileImage?.replace('uploads/', '') || 'default-avatar.png'
+                                    : selectedUser?.clientImage?.replace('uploads/', '') || 'default-avatar.png'
                                 }`}
                             className="rounded-circle"
                             alt="Profile"
                             style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
                             onClick={() => handleProfileImageClick(`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
-                                ? selectedUser?.employeeImage.replace('uploads/', '')
+                                ? selectedUser?.employeeImage?.replace('uploads/', '') || 'default-avatar.png'
                                 : selectedUser?.userType === 'AdminUser'
-                                    ? selectedUser?.profileImage.replace('uploads/', '')
-                                    : selectedUser?.clientImage.replace('uploads/', '')
+                                    ? selectedUser?.profileImage?.replace('uploads/', '') || 'default-avatar.png'
+                                    : selectedUser?.clientImage?.replace('uploads/', '') || 'default-avatar.png'
                                 }`)}
                         />
                     </div>
+                    {/* Group Details */}
                     <div className="user-details">
                         <h5 className="text-center mb-3">
                             {selectedUser?.employeeName || selectedUser?.clientName || selectedUser?.username}
                         </h5>
                         <div className="info-item mb-2">
-                            <strong>Type:</strong> {selectedUser?.userType}
+                            {selectedUser?.userType === 'Group' && (
+                                <>
+                                    <div className="info-item mb-2">
+                                        <strong>Type:</strong> {selectedUser?.userType}
+                                    </div>
+                                    <div className="info-item mb-2">
+                                        <strong>Total Members:</strong> {selectedUser?.members?.length || 0}
+                                    </div>
+                                    <div className="info-item mb-2">
+                                        <strong>Members:</strong>
+                                        {selectedUser?.members?.map(member => (
+                                            <div key={member.userId._id}>
+                                                {member.name} ({member.userType})
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="info-item mb-2">
+                                        <strong>Created At:</strong> {new Date(selectedUser?.createdAt).toLocaleDateString()}
+                                    </div>
+                                    <div className="info-item mb-2">
+                                        <strong>Last Message:</strong> {selectedUser?.lastMessage || 'No messages yet'}
+                                    </div>
+                                </>
+                            )}
                         </div>
+                        {/* Admin User Details */}
                         {selectedUser?.userType === 'AdminUser' && (
                             <>
                                 <div className="info-item mb-2">
@@ -789,10 +852,15 @@ const ChatLayout = ({
                                     <strong>Role:</strong> {selectedUser?.role}
                                 </div>
                                 <div className="info-item mb-2">
-                                    <strong>Status:</strong> {selectedUser?.status}
+                                    <strong>Status:</strong> {userStatuses[selectedUser._id]?.isOnline
+                                        ? 'online'
+                                        : userStatuses[selectedUser._id]?.lastSeen
+                                            ? formatLastSeen(userStatuses[selectedUser._id].lastSeen)
+                                            : ''}
                                 </div>
                             </>
                         )}
+                        {/* Employee User Details */}
                         {selectedUser?.userType === 'Employee' && (
                             <>
                                 <div className="info-item mb-2">
@@ -814,10 +882,15 @@ const ChatLayout = ({
                                     <strong>Join Date:</strong> {new Date(selectedUser?.joiningDate).toLocaleDateString()}
                                 </div>
                                 <div className="info-item mb-2">
-                                    <strong>Status:</strong> {selectedUser?.status}
+                                    <strong>Status:</strong> {userStatuses[selectedUser._id]?.isOnline
+                                        ? 'online'
+                                        : userStatuses[selectedUser._id]?.lastSeen
+                                            ? formatLastSeen(userStatuses[selectedUser._id].lastSeen)
+                                            : ''}
                                 </div>
                             </>
                         )}
+                        {/* Client User Details */}
                         {selectedUser?.userType === 'Client' && (
                             <>
                                 <div className="info-item mb-2">
@@ -842,7 +915,11 @@ const ChatLayout = ({
                                     <strong>Address:</strong> {selectedUser?.clientAddress}
                                 </div>
                                 <div className="info-item mb-2">
-                                    <strong>Status:</strong> {selectedUser?.clientStatus}
+                                    <strong>Status:</strong> {userStatuses[selectedUser._id]?.isOnline
+                                        ? 'online'
+                                        : userStatuses[selectedUser._id]?.lastSeen
+                                            ? formatLastSeen(userStatuses[selectedUser._id].lastSeen)
+                                            : ''}
                                 </div>
                             </>
                         )}
@@ -850,8 +927,7 @@ const ChatLayout = ({
                 </Modal.Body>
             </Modal>
 
-
-
+            {/* Clear Chat Modal */}
             <Modal show={showClearChatModal} onHide={() => setShowClearChatModal(false)} centered>
                 <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
                     <Modal.Title>Clear Chat</Modal.Title>
@@ -869,6 +945,7 @@ const ChatLayout = ({
                 </Modal.Footer>
             </Modal>
 
+            {/* Background Settings Modal */}
             <Modal show={showBackgroundSettings} onHide={() => setShowBackgroundSettings(false)}>
                 <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
                     <Modal.Title>Chat Background</Modal.Title>

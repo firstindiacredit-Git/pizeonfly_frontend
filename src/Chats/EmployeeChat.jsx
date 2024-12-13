@@ -23,7 +23,7 @@ const EmployeeChat = () => {
 
   useEffect(() => {
     socket.current = io(import.meta.env.VITE_BASE_URL);
-    
+
     if (socket.current) {
       socket.current.emit('join_chat', currentEmployee._id);
 
@@ -98,12 +98,38 @@ const EmployeeChat = () => {
     }
   };
 
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
   const fetchGroups = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groups`);
       setGroups(response.data);
     } catch (error) {
       toast.error('Error loading groups');
+    }
+  };
+
+  // Modify handleUserSelect
+  const handleUserSelect = (user, userType) => {
+    setSelectedUser({ ...user, userType });
+    if (userType === 'Group') {
+      fetchGroupMessages(user._id);
+    } else {
+      fetchMessages(user._id);
+    }
+  };
+
+  // Add group message fetching
+  const fetchGroupMessages = async (groupId) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}api/getGroupMessages/${groupId}`
+      );
+      setMessages(response.data);
+    } catch (error) {
+      toast.error('Error loading group messages');
     }
   };
 
@@ -118,11 +144,6 @@ const EmployeeChat = () => {
     }
   };
 
-  const handleUserSelect = (user, userType) => {
-    const correctedUserType = userType === 'Admin' ? 'AdminUser' : userType;
-    setSelectedUser({ ...user, userType: correctedUserType });
-    fetchMessages(user._id);
-  };
 
   const handleMessageChange = (e) => {
     setNewMessage(e.target.value);
@@ -324,6 +345,7 @@ const EmployeeChat = () => {
               activeTab === 'clients' ? clients :
                 activeTab === 'groups' ? allUsers :
                   groups}
+            groups={groups}
             socket={socket}
             selectedUser={selectedUser}
             messages={messages.map(msg => ({
