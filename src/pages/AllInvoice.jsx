@@ -83,9 +83,9 @@ const AllInvoice = () => {
                       <th>S.No.</th>
                       <th>Invoice No.</th>
                       <th>Invoice Date</th>
-                      <th>Client Name</th>
+                      <th>Client Business</th>
                       <th>Total Amount</th>
-                      <th>View</th>
+                      <th>Edit</th>
                       <th>Delete Invoice</th>
                     </tr>
                   </thead>
@@ -95,11 +95,11 @@ const AllInvoice = () => {
                         <td>{index + 1}</td>
                         <td>{invoice.invoiceNumber}</td>
                         <td>{formatDateToMonthYear(invoice.invoiceDate)}</td>
-                        <td>{invoice.clientDetail?.clientName || 'N/A'}</td>
+                        <td>{invoice.clientDetail?.split('\n')[0] || 'N/A'}</td>
                         <td>{invoice.total}</td>
                         <td>
                           <Link to="/update-invoice" state={{ invoice }}>
-                            <i className="bi bi-eye-fill fs-6" />
+                            <i className="bi bi-pencil-square fs-6 text-success" />
                           </Link>
                         </td>
                         <td>

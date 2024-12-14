@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import DatePicker from "react-datepicker";
@@ -36,6 +36,42 @@ const UpdateInvoice = () => {
 
   const isHaryanaState = updatedInvoice.state === 'HR';
 
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(updatedInvoice.country || 'IN');
+  const [selectedState, setSelectedState] = useState(updatedInvoice.state || 'DL');
+
+  useEffect(() => {
+    fetch("https://api.countrystatecity.in/v1/countries", {
+      method: 'GET',
+      headers: {
+        'X-CSCAPI-KEY': 'eUNnUGVIam1VVXVqOFdKWWtzc0I1REM5cFVnZWtaTEEyM1l5ZE1JMw=='
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        setCountries(data);
+      })
+      .catch(error => console.error('Error fetching countries:', error));
+  }, []);
+
+  useEffect(() => {
+    if (selectedCountry) {
+      fetch(`https://api.countrystatecity.in/v1/countries/${selectedCountry}/states`, {
+        method: 'GET',
+        headers: {
+          'X-CSCAPI-KEY': 'eUNnUGVIam1VVXVqOFdKWWtzc0I1REM5cFVnZWtaTEEyM1l5ZE1JMw=='
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          setStates(data);
+        })
+        .catch(error => console.error('Error fetching states:', error));
+    } else {
+      setStates([]);
+    }
+  }, [selectedCountry]);
 
   const formatNumber = (number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -170,6 +206,26 @@ const UpdateInvoice = () => {
     window.print();
   };
 
+  const handleCountryChange = (event) => {
+    const country = event.target.value || 'IN';
+    setSelectedCountry(country);
+    setSelectedState('DL');
+    setUpdatedInvoice(prevState => ({
+      ...prevState,
+      country: country,
+      state: 'DL'
+    }));
+  };
+
+  const handleStateChange = (event) => {
+    const state = event.target.value || 'DL';
+    setSelectedState(state);
+    setUpdatedInvoice(prevState => ({
+      ...prevState,
+      state: state
+    }));
+  };
+
   return (
     <div id="mytask-layout">
       <Sidebar />
@@ -197,8 +253,16 @@ const UpdateInvoice = () => {
                   className="date1"
                   selected={new Date(updatedInvoice.invoiceDate)}
                   onChange={(date) => handleDateChange(date, 'invoiceDate')}
+                  dateFormat="MMMM dd, yyyy"
+                  showMonthDropdown
+                  showYearDropdown
+                  dropdownMode="select"
+                  placeholderText="Select a date"
+                  value={updatedInvoice.invoiceDate ? format(new Date(updatedInvoice.invoiceDate), 'MMMM dd, yyyy') : format(new Date(), 'MMMM dd, yyyy')}
                 />
-                <div style={{ marginLeft: "12px" }}>{format(new Date(updatedInvoice.invoiceDate), 'MMMM dd, yyyy')}</div>
+                <div style={{ marginLeft: "10px" }}>
+                  {updatedInvoice.invoiceDate ? format(new Date(updatedInvoice.invoiceDate), 'MMMM dd, yyyy') : ''}
+                </div>
               </div>
               <div className="d-flex">
                 <span className="fw-bold text-muted">Due Date : </span>
@@ -206,8 +270,16 @@ const UpdateInvoice = () => {
                   className="date2"
                   selected={new Date(updatedInvoice.invoiceDueDate)}
                   onChange={(date) => handleDateChange(date, 'invoiceDueDate')}
+                  dateFormat="MMMM dd, yyyy"
+                  showMonthDropdown
+                  showYearDropdown
+                  dropdownMode="select"
+                  placeholderText="Select a date"
+                  value={updatedInvoice.invoiceDueDate ? format(new Date(updatedInvoice.invoiceDueDate), 'MMMM dd, yyyy') : format(new Date(), 'MMMM dd, yyyy')}
                 />
-                <div style={{ marginLeft: "32px" }}>{format(new Date(updatedInvoice.invoiceDueDate), 'MMMM dd, yyyy')}</div>
+                <div style={{ marginLeft: "32px" }}>
+                  {updatedInvoice.invoiceDueDate ? format(new Date(updatedInvoice.invoiceDueDate), 'MMMM dd, yyyy') : ''}
+                </div>
               </div>
             </div>
             <img id="image" style={{ width: "13rem", height: "2.5rem" }} src="Images/icon.png" alt="logo" />
@@ -227,67 +299,37 @@ const UpdateInvoice = () => {
                 />
               </div>
             </div>
-
             <div style={{ width: "49%" }}>
-              <div className="p-3 rounded" style={{ backgroundColor: "lavender", height: "16.3rem" }}>
+              <div className="p-3 rounded" style={{ backgroundColor: "lavender" }}>
                 <h2 className="h5 text-primary mb-2" style={{ backgroundColor: "lavender" }}>Billed To</h2>
-                <div style={{ backgroundColor: "lavender" }}>
-                  <textarea
-                    style={{ backgroundColor: "lavender", border: "none", height: "25px" }}
-                    className="fw-bold"
-                    name="clientDetail.businessName"
-                    value={updatedInvoice.clientDetail.businessName}
-                    onChange={handleChange}
-                  /><br />
-                  <textarea
-                    style={{ backgroundColor: "lavender", border: "none", height: "25px" }}
-                    className="mt-3 fw-bold"
-                    name="clientDetail.clientAddress"
-                    value={updatedInvoice.clientDetail.clientAddress}
-                    onChange={handleChange}
-                  />
-                  <br />
-                  <textarea
-                    style={{ backgroundColor: "lavender", border: "none", height: "25px" }}
-                    className="mt-3 fw-bold"
-                    name="clientDetail.clientGst"
-                    value={updatedInvoice.clientDetail.clientGst}
-                    onChange={handleChange}
-                  />
-                  <p />
-                  <textarea
-                    style={{ backgroundColor: "lavender", border: "none", height: "25px" }}
-                    className="fw-bold"
-                    name="clientDetail.clientPhone"
-                    value={updatedInvoice.clientDetail.clientPhone}
-                    onChange={handleChange}
-                  />
-                  <p />
-                  <textarea
-                    style={{ backgroundColor: "lavender", border: "none", height: "25px" }}
-                    className="fw-bold"
-                    name="clientDetail.clientEmail"
-                    value={updatedInvoice.clientDetail.clientEmail}
-                    onChange={handleChange}
-                  />
-                </div>
+                <textarea
+                  className="fw-semibold"
+                  name="clientDetail"
+                  style={{ backgroundColor: "lavender", border: "none" }}
+                  rows="9"
+                  value={updatedInvoice.clientDetail}
+                  onChange={handleChange}
+                />
               </div>
             </div>
           </div>
 
-          <div className="d-flex justify-content-around mt-2 ">
+          <div className="d-flex justify-content-around mt-2">
             <div className="d-flex">
               <span className="fw-bold" style={{ textWrap: "nowrap", padding: "8px" }}>Country of Supply :</span>
               <select
                 id="country-select"
                 className="form-control"
-                name="country"
-                value={updatedInvoice.country}
-                onChange={handleChange}
                 style={{ backgroundColor: "white", border: "none" }}
+                value={selectedCountry}
+                onChange={handleCountryChange}
               >
-                <option value="">Select Country</option>
-                <option value={updatedInvoice.country}>{updatedInvoice.country}</option>
+                <option value="IN">India</option>
+                {countries.map(country => (
+                  <option key={country.iso2} value={country.iso2}>
+                    {country.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="d-flex">
@@ -295,13 +337,16 @@ const UpdateInvoice = () => {
               <select
                 id="state-select"
                 className="form-control"
-                name="state"
-                value={updatedInvoice.state}
-                onChange={handleChange}
                 style={{ backgroundColor: "white", border: "none" }}
+                value={selectedState}
+                onChange={handleStateChange}
               >
-                <option value="">Select State</option>
-                <option value={updatedInvoice.state}>{updatedInvoice.state}</option>
+                <option value="DL">Delhi</option>
+                {states.map(state => (
+                  <option key={state.iso2} value={state.iso2}>
+                    {state.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

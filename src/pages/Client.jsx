@@ -722,7 +722,7 @@ const Client = () => {
                                                     Phone
                                                 </label>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     className="form-control"
                                                     id="exampleFormControlInput777"
                                                     placeholder="Phone Number"
@@ -977,7 +977,7 @@ const Client = () => {
                                             <div className="col">
                                                 <label htmlFor="exampleFormControlInput777" className="form-label">Phone</label>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     className="form-control"
                                                     id="exampleFormControlInput777"
                                                     placeholder="Phone Number"

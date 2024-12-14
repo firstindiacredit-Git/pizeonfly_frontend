@@ -20,12 +20,12 @@ const CreateInvoice = () => {
   // Create a Invoice
   const [formData, setFormData] = useState({
     invoiceNumber: '',
-    invoiceDate: '',
-    invoiceDueDate: '',
+    invoiceDate: new Date(),
+    invoiceDueDate: new Date(),
     billedBy: 'First India Credit \n\n88,Sant Nagar,Near India Post Office, \nEast of Kailash, New Delhi, Delhi, \nIndia - 110065  \n\nGSTIN: 06AATFG8894M1Z8 \nPAN: AATFG8894M \nEmail:fzal9000i@gmail.com',
     clientDetail: '',
-    country: '',
-    state: '',
+    country: 'IN',
+    state: 'DL',
     table: [{
       item: '',
       description: '',
@@ -51,6 +51,34 @@ const CreateInvoice = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Ensure country and state are set
+    if (!formData.country) {
+      setFormData(prev => ({
+        ...prev,
+        country: 'IN'
+      }));
+    }
+    if (!formData.state) {
+      setFormData(prev => ({
+        ...prev,
+        state: 'DL'
+      }));
+    }
+
+    // Ensure dates are set
+    if (!formData.invoiceDate) {
+      setFormData(prev => ({
+        ...prev,
+        invoiceDate: new Date()
+      }));
+    }
+    if (!formData.invoiceDueDate) {
+      setFormData(prev => ({
+        ...prev,
+        invoiceDueDate: new Date()
+      }));
+    }
 
     // Check if any required field is empty
     const requiredFields = ['invoiceDate', 'invoiceDueDate', 'clientDetail', 'country', 'state', 'table', 'amount'];
@@ -79,19 +107,19 @@ const CreateInvoice = () => {
       console.log('Invoice created:', response.data);
       window.print();
 
-      // Reset form with valid initial dates
+      // Reset form with current dates
       const currentDate = new Date();
       setInvoiceDate(currentDate);
       setInvoiceDueDate(currentDate);
-      
+
       setFormData({
         invoiceNumber: '',
-        invoiceDate: currentDate, // Set to current date instead of empty string
-        invoiceDueDate: currentDate, // Set to current date instead of empty string
+        invoiceDate: currentDate,
+        invoiceDueDate: currentDate,
         billedBy: 'First India Credit \n\n88,Sant Nagar,Near India Post Office, \nEast of Kailash, New Delhi, Delhi \nIndia - 110065 \n\nGSTIN: 06AATFG8894M1Z8 \nPAN: AATFG8894M \nEmail:afzal9000i@gmail.com',
         clientDetail: '',
-        country: '',
-        state: '',
+        country: 'IN',
+        state: 'DL',
         table: [{
           item: '',
           description: '',
@@ -159,20 +187,21 @@ const CreateInvoice = () => {
   const [invoiceDate, setInvoiceDate] = useState(new Date());
   const [invoiceDueDate, setInvoiceDueDate] = useState(new Date());
   const handleInvoiceDateChange = (date) => {
-    setInvoiceDate(date);
+    const selectedDate = date || new Date(); // Use current date if no date selected
+    setInvoiceDate(selectedDate);
     setFormData(prevFormData => ({
       ...prevFormData,
-      invoiceDate: date
+      invoiceDate: selectedDate
     }));
-    // console.log(formData);
   };
+
   const handleInvoiceDueDateChange = (date) => {
-    setInvoiceDueDate(date);
+    const selectedDate = date || new Date(); // Use current date if no date selected
+    setInvoiceDueDate(selectedDate);
     setFormData(prevFormData => ({
       ...prevFormData,
-      invoiceDueDate: date
+      invoiceDueDate: selectedDate
     }));
-    // console.log(formData);
   };
 
 
@@ -186,38 +215,11 @@ const CreateInvoice = () => {
     // console.log(formData);
   };
 
-  //Get a client by Name
-  const [clients, setClients] = useState([]);
-  const [selectedClient, setSelectedClient] = useState('');
-  useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/clients`);
-        setClients(response.data);
-      } catch (error) {
-        console.error('Error fetching clients:', error);
-      }
-    };
-
-    fetchClients();
-  }, []);
-  const handleClientChange = (event) => {
-    const selectedClientId = event.target.value;
-    const selectedClientData = clients.find(client => client.clientName === selectedClientId);
-    setSelectedClient(selectedClientData);
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      clientDetail: selectedClientData
-    }));
-    console.log(formData);
-  };
-
-
   //Country & State
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedState, setSelectedState] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('IN');
+  const [selectedState, setSelectedState] = useState('DL');
   useEffect(() => {
     fetch("https://api.countrystatecity.in/v1/countries", {
       method: 'GET',
@@ -242,7 +244,12 @@ const CreateInvoice = () => {
         .then(response => response.json())
         .then(data => {
           setStates(data);
-
+          // Set default state in formData
+          setFormData(prev => ({
+            ...prev,
+            country: selectedCountry,
+            state: selectedState
+          }));
         })
         .catch(error => console.error('Error fetching states:', error));
     } else {
@@ -250,24 +257,22 @@ const CreateInvoice = () => {
     }
   }, [selectedCountry]);
   const handleCountryChange = (event) => {
-    const selectedCountry = event.target.value;
-    setSelectedCountry(selectedCountry);
-    setSelectedState('');
+    const country = event.target.value || 'IN';  // Default to IN if empty
+    setSelectedCountry(country);
+    setSelectedState('DL');  // Reset to Delhi when country changes
     setFormData((prevFormData) => ({
       ...prevFormData,
-      country: selectedCountry,
-      state: ''
+      country: country,
+      state: 'DL'
     }));
-    // console.log(formData);
   };
   const handleStateChange = (event) => {
-    const selectedState = event.target.value;
-    setSelectedState(selectedState);
+    const state = event.target.value || 'DL';  // Default to DL if empty
+    setSelectedState(state);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      state: selectedState
+      state: state
     }));
-    // console.log(formData);
   };
 
 
@@ -378,7 +383,20 @@ const CreateInvoice = () => {
     // console.log(formData);
   };
 
+  const [clients, setClients] = useState([]);
 
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/clients`);
+        setClients(response.data);
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+      }
+    };
+
+    fetchClients();
+  }, []);
 
 
 
@@ -439,7 +457,7 @@ const CreateInvoice = () => {
                     </div>
                     <div className="d-flex">
                       <span className="fw-bold text-muted"> Invoice Date : </span>
-                      <DatePicker 
+                      <DatePicker
                         className="date1"
                         selected={invoiceDate}
                         onChange={handleInvoiceDateChange}
@@ -448,7 +466,7 @@ const CreateInvoice = () => {
                         showYearDropdown
                         dropdownMode="select"
                         placeholderText="Select a date"
-                        required
+                        value={invoiceDate ? format(invoiceDate, 'MMMM dd, yyyy') : format(new Date(), 'MMMM dd, yyyy')}
                       />
                       <div style={{ marginLeft: "10px" }}>
                         {invoiceDate ? format(invoiceDate, 'MMMM dd, yyyy') : ''}
@@ -456,7 +474,7 @@ const CreateInvoice = () => {
                     </div>
                     <div className="d-flex">
                       <span className="fw-bold text-muted">Due Date : </span>
-                      <DatePicker 
+                      <DatePicker
                         className="date2"
                         selected={invoiceDueDate}
                         onChange={handleInvoiceDueDateChange}
@@ -465,7 +483,7 @@ const CreateInvoice = () => {
                         showYearDropdown
                         dropdownMode="select"
                         placeholderText="Select a date"
-                        required
+                        value={invoiceDueDate ? format(invoiceDueDate, 'MMMM dd, yyyy') : format(new Date(), 'MMMM dd, yyyy')}
                       />
                       <div style={{ marginLeft: "32px" }}>
                         {invoiceDueDate ? format(invoiceDueDate, 'MMMM dd, yyyy') : ''}
@@ -478,35 +496,79 @@ const CreateInvoice = () => {
 
                 <div className="d-flex  justify-content-between">
                   <div style={{ width: "49%" }}>
-                    <div className="p-3 rounded" style={{ backgroundColor: "lavender" }}>
+                    <div className="p-3 rounded" style={{ backgroundColor: "lavender", height: "16.3rem" }}>
                       <h2 className="h5 text-primary mb-2" style={{ backgroundColor: "lavender" }}>Billed By</h2>
                       <textarea className="fw-semibold" style={{ backgroundColor: "lavender", border: "none" }} rows="9" onChange={handleBilledByChange} defaultValue={"First India Credit \n\n88,Sant Nagar,Near India Post Office, \nEast of Kailash, New Delhi, Delhi \nIndia - 110065 \n\nGSTIN: 06AATFG8894M1Z8 \nPAN: AATFG8894M \nEmail:afzal9000i@gmail.com"} />
                     </div>
                   </div>
 
+                  {/* clients detail in select option */}
+                  {/* <div style={{ width: "49%" }}>
+                    <div className="p-3 rounded" style={{ backgroundColor: "lavender", height: "16.3rem" }}>
+                      <h2 className="h5 text-primary mb-2" style={{ backgroundColor: "lavender" }}>Billed To</h2>
+                      <textarea
+                        className="fw-semibold"
+                        style={{
+                          backgroundColor: "lavender",
+                          border: "none",
+                          width: "100%",
+                          height: "80%"
+                        }}
+                        rows="8"
+                        placeholder="Enter client details here..."
+                        value={formData.clientDetail}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          clientDetail: e.target.value
+                        }))}
+                      />
+                    </div>
+                  </div> */}
 
                   <div style={{ width: "49%" }}>
-                    <div className="mb-1 client-search" style={{ marginTop: "-2rem" }}>
-                      <select className="form-select" aria-label="Default select Project Category" onChange={handleClientChange}>
-                        <option value="" selected>Search Client</option>
-                        {clients.map(client => (
-                          <option key={client._id} value={client.clientName}>{client.clientName}</option>
-                        ))}
-                      </select>
-                    </div>
+                    {/* Client Selection Dropdown */}
+                    <select
+                      className="form-select mb-2 no-print"
+                      onChange={(e) => {
+                        const selectedClient = clients.find(client => client._id === e.target.value);
+                        if (selectedClient) {
+                          setFormData(prev => ({
+                            ...prev,
+                            clientId: selectedClient._id,
+                            clientDetail: `${selectedClient.businessName}\n\n${selectedClient.clientAddress}\n\nGSTIN: ${selectedClient.clientGst}\nPhone: ${selectedClient.clientPhone}\nEmail: ${selectedClient.clientEmail}`
+                          }));
+                        }
+                      }}
+                    >
+                      <option value="">Select Client</option>
+                      {clients.map(client => (
+                        <option key={client._id} value={client._id}>
+                          {client.clientName}
+                        </option>
+                      ))}
+                    </select>
                     <div className="p-3 rounded" style={{ backgroundColor: "lavender", height: "16.3rem" }}>
                       <h2 className="h5 text-primary mb-2" style={{ backgroundColor: "lavender" }}>Billed To</h2>
 
-                      {selectedClient && (
-                        <div style={{ backgroundColor: "lavender" }}>
-                          {/* <div>Client Name - {selectedClient.clientName}</div> */}
-                          <p style={{ backgroundColor: "lavender" }} className="fw-bold">{selectedClient.businessName}</p>
-                          <p style={{ backgroundColor: "lavender" }} className="mt-3 fw-bold">{selectedClient.clientAddress}</p>
-                          <p style={{ backgroundColor: "lavender" }} className="mt-3 fw-bold">GSTIN : {selectedClient.clientGst}</p>
-                          <p style={{ backgroundColor: "lavender" }} className="fw-bold">Phone No. : {selectedClient.clientPhone}</p>
-                          <p style={{ backgroundColor: "lavender" }} className="fw-bold">Email : {selectedClient.clientEmail}</p>
-                        </div>
-                      )}
+
+
+                      {/* Display Selected Client Details */}
+                      <textarea
+                        className="fw-semibold"
+                        style={{
+                          backgroundColor: "lavender",
+                          border: "none",
+                          width: "100%",
+                          height: "75%"
+                        }}
+                        rows="7"
+                        value={formData.clientDetail}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          clientDetail: e.target.value
+                        }))}
+
+                      />
                     </div>
                   </div>
 
@@ -518,10 +580,10 @@ const CreateInvoice = () => {
                       id="country-select"
                       className="form-control"
                       style={{ backgroundColor: "white", border: "none" }}
-                      value={selectedCountry}
+                      value={selectedCountry || 'IN'}
                       onChange={handleCountryChange}
                     >
-                      <option value="">Select Country</option>
+                      <option value="IN">India</option>
                       {countries.map(country => (
                         <option key={country.iso2} value={country.iso2}>
                           {country.name}
@@ -535,10 +597,10 @@ const CreateInvoice = () => {
                       id="state-select"
                       className="form-control"
                       style={{ backgroundColor: "white", border: "none" }}
-                      value={selectedState}
+                      value={selectedState || 'DL'}
                       onChange={handleStateChange}
                     >
-                      <option value="">Select State</option>
+                      <option value="DL">Delhi</option>
                       {states.map(state => (
                         <option key={state.iso2} value={state.iso2}>
                           {state.name}
