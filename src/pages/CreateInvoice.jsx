@@ -22,6 +22,7 @@ const CreateInvoice = () => {
     invoiceNumber: '',
     invoiceDate: new Date(),
     invoiceDueDate: new Date(),
+    logo: null,
     billedBy: 'First India Credit \n\n88,Sant Nagar,Near India Post Office, \nEast of Kailash, New Delhi, Delhi, \nIndia - 110065  \n\nGSTIN: 06AATFG8894M1Z8 \nPAN: AATFG8894M \nEmail:fzal9000i@gmail.com',
     clientDetail: '',
     country: 'IN',
@@ -48,62 +49,46 @@ const CreateInvoice = () => {
     },
     termsConditions: '1. Please quote invoice number when remitting funds'
   });
+  const [logo, setLogo] = useState('');
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    setFormData(prev => ({
+      ...prev,
+      logo: file // Store the file in formData
+    }));
+    setLogo(URL.createObjectURL(file));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure country and state are set
-    if (!formData.country) {
-      setFormData(prev => ({
-        ...prev,
-        country: 'IN'
-      }));
-    }
-    if (!formData.state) {
-      setFormData(prev => ({
-        ...prev,
-        state: 'DL'
-      }));
-    }
-
-    // Ensure dates are set
-    if (!formData.invoiceDate) {
-      setFormData(prev => ({
-        ...prev,
-        invoiceDate: new Date()
-      }));
-    }
-    if (!formData.invoiceDueDate) {
-      setFormData(prev => ({
-        ...prev,
-        invoiceDueDate: new Date()
-      }));
-    }
-
-    // Check if any required field is empty
-    const requiredFields = ['invoiceDate', 'invoiceDueDate', 'clientDetail', 'country', 'state', 'table', 'amount'];
-    const isEmpty = requiredFields.some(field => {
-      if (field === 'table') {
-        // Check if any table row is empty
-        return formData.table.some(row => Object.values(row).some(value => value === ''));
-      } else {
-        return formData[field] === '';
-      }
-    });
-
-    // if (isEmpty) {
-    //   // Display error toast
-    //   toast.error("Please fill all required fields!", {
-    //     style: {
-    //       backgroundColor: "#4c3575",
-    //       color: "white",
-    //     },
-    //   });
-    //   return;
-    // }
-
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/invoices`, formData);
+      // Create FormData object
+      const formDataToSend = new FormData();
+
+      // Append the logo file if it exists
+      if (formData.logo) {
+        formDataToSend.append('logo', formData.logo);
+      }
+
+      // Create a copy of formData without the logo
+      const formDataWithoutLogo = { ...formData };
+      delete formDataWithoutLogo.logo;
+
+      // Append other form data as a JSON string
+      formDataToSend.append('data', JSON.stringify(formDataWithoutLogo));
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}api/invoices`, 
+        formDataToSend,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
       console.log('Invoice created:', response.data);
       window.print();
 
@@ -116,6 +101,7 @@ const CreateInvoice = () => {
         invoiceNumber: '',
         invoiceDate: currentDate,
         invoiceDueDate: currentDate,
+        logo: null,
         billedBy: 'First India Credit \n\n88,Sant Nagar,Near India Post Office, \nEast of Kailash, New Delhi, Delhi \nIndia - 110065 \n\nGSTIN: 06AATFG8894M1Z8 \nPAN: AATFG8894M \nEmail:afzal9000i@gmail.com',
         clientDetail: '',
         country: 'IN',
@@ -398,13 +384,9 @@ const CreateInvoice = () => {
     fetchClients();
   }, []);
 
-  const [selectedLogo, setSelectedLogo] = useState("Images/a2zlogo.png");
 
-  const logoOptions = [
-    { value: "Images/a2zlogo.png", label: "A2Z Logo" },
-    { value: "Images/icon.png", label: "Pizeonfly" },
-    { value: "Images/ficlogo.jpg", label: "FIC" },
-  ];
+
+
 
 
 
@@ -448,7 +430,7 @@ const CreateInvoice = () => {
               {/* <!-- Row end  --> */}
               <div className="print_invoice" style={{ marginTop: "-4px" }}>
                 <div className="" style={{ borderBottom: "1px solid #A9A9A9" }}>
-                  <h5 className="card-title mb-0 fw-bold">INVOICE</h5>
+                  <h5 className="card-title mb-0 fw-bold text-center mb-2">INVOICE</h5>
                 </div>
                 <div className=" d-flex justify-content-between mb-2" style={{ marginTop: "5px" }}>
                   <div className="">
@@ -498,28 +480,25 @@ const CreateInvoice = () => {
                       </div>
                     </div>
                   </div>
+                  {/* logo */}
                   <div className="d-flex flex-column align-items-end">
                     <div className="d-flex mb-2 no-print">
-                      <input type="file"/>
-                      <select
-                        className="form-select"
-                        style={{ width: "13rem" }}
-                        onChange={(e) => setSelectedLogo(e.target.value)}
-                        value={selectedLogo}
-                      >
-                        {logoOptions.map((logo) => (
-                          <option key={logo.value} value={logo.value}>
-                            {logo.label}
-                          </option>
-                        ))}
-                      </select>
+                      <input
+                        type="file"
+                        name="logo"
+                        onChange={handleLogoChange}
+                        accept="image/*"
+                        className="form-control"
+                        style={{ maxWidth: '250px' }}
+                      />
                     </div>
-                    <img
-                      id="image"
-                      style={{ width: "10rem" }}
-                      src={selectedLogo}
-                      alt="Selected logo"
-                    />
+                    {logo && (
+                      <img
+                        style={{ width: "10rem", objectFit: "contain" }}
+                        src={logo}
+                        alt="logo"
+                      />
+                    )}
                   </div>
                 </div>
 

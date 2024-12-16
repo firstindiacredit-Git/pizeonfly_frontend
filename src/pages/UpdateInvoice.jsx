@@ -282,8 +282,21 @@ const UpdateInvoice = () => {
                 </div>
               </div>
             </div>
-            <img id="image" style={{ width: "13rem", height: "2.5rem" }} src="Images/icon.png" alt="logo" />
-          </div>
+            {invoice.logo ? (
+              <img
+                id="image"
+                style={{ width: "10rem", objectFit: "contain" }}
+                src={`${import.meta.env.VITE_BASE_URL}${invoice.logo?.replace(/\\/g, '/').replace('uploads/', '')}`}
+                alt="logo"
+              />
+            ) : (
+              <img
+                id="image"
+                style={{ width: "13rem", height: "2.5rem" }}
+                src="Images/icon.png"
+                alt="default logo"
+              />
+            )}       </div>
 
           <div className="d-flex justify-content-between">
             <div style={{ width: "49%" }}>
