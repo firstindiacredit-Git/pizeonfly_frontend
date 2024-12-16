@@ -68,6 +68,9 @@ const AllInvoice = () => {
                 <div className="border-1 mb-4">
                   <div className="card-header py-3 no-bg bg-transparent d-flex align-items-center px-0 justify-content-between border-bottom flex-wrap">
                     <h3 className="fw-bold mb-0">ALL Invoices</h3>
+                    <Link to="/create-invoice">
+                      <button className="btn btn-lg btn-primary"><i className="icofont-plus-circle me-1" /> New Invoices</button>
+                    </Link>
                   </div>
                 </div>
               </div>

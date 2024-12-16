@@ -233,7 +233,7 @@ const UpdateInvoice = () => {
         <Header />
         <div className="print_invoice" style={{ marginTop: "-4px" }}>
           <div className="" style={{ borderBottom: "1px solid #A9A9A9" }}>
-            <h5 className="card-title mb-0 fw-bold">INVOICE</h5>
+            <h5 className="card-title mb-0 fw-bold text-center mb-2">INVOICE</h5>
           </div>
           <div className="d-flex justify-content-between mb-2" style={{ marginTop: "5px" }}>
             <div className="">

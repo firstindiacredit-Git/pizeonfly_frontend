@@ -398,6 +398,14 @@ const CreateInvoice = () => {
     fetchClients();
   }, []);
 
+  const [selectedLogo, setSelectedLogo] = useState("Images/a2zlogo.png");
+
+  const logoOptions = [
+    { value: "Images/a2zlogo.png", label: "A2Z Logo" },
+    { value: "Images/icon.png", label: "Pizeonfly" },
+    { value: "Images/ficlogo.jpg", label: "FIC" },
+  ];
+
 
 
 
@@ -490,7 +498,29 @@ const CreateInvoice = () => {
                       </div>
                     </div>
                   </div>
-                  <img id="image" style={{ width: "13rem", height: "2.5rem" }} src="Images/icon.png" alt="logo" />
+                  <div className="d-flex flex-column align-items-end">
+                    <div className="d-flex mb-2 no-print">
+                      <input type="file"/>
+                      <select
+                        className="form-select"
+                        style={{ width: "13rem" }}
+                        onChange={(e) => setSelectedLogo(e.target.value)}
+                        value={selectedLogo}
+                      >
+                        {logoOptions.map((logo) => (
+                          <option key={logo.value} value={logo.value}>
+                            {logo.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <img
+                      id="image"
+                      style={{ width: "10rem" }}
+                      src={selectedLogo}
+                      alt="Selected logo"
+                    />
+                  </div>
                 </div>
 
 
@@ -501,29 +531,6 @@ const CreateInvoice = () => {
                       <textarea className="fw-semibold" style={{ backgroundColor: "lavender", border: "none" }} rows="9" onChange={handleBilledByChange} defaultValue={"First India Credit \n\n88,Sant Nagar,Near India Post Office, \nEast of Kailash, New Delhi, Delhi \nIndia - 110065 \n\nGSTIN: 06AATFG8894M1Z8 \nPAN: AATFG8894M \nEmail:afzal9000i@gmail.com"} />
                     </div>
                   </div>
-
-                  {/* clients detail in select option */}
-                  {/* <div style={{ width: "49%" }}>
-                    <div className="p-3 rounded" style={{ backgroundColor: "lavender", height: "16.3rem" }}>
-                      <h2 className="h5 text-primary mb-2" style={{ backgroundColor: "lavender" }}>Billed To</h2>
-                      <textarea
-                        className="fw-semibold"
-                        style={{
-                          backgroundColor: "lavender",
-                          border: "none",
-                          width: "100%",
-                          height: "80%"
-                        }}
-                        rows="8"
-                        placeholder="Enter client details here..."
-                        value={formData.clientDetail}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          clientDetail: e.target.value
-                        }))}
-                      />
-                    </div>
-                  </div> */}
 
                   <div style={{ width: "49%" }}>
                     {/* Client Selection Dropdown */}
