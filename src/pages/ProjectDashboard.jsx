@@ -1250,7 +1250,7 @@ const ProjectDashboard = () => {
               <div className="text-center">
                 <div style={{ height: isMobile ? "6rem" : "9rem" }}>
                   <img
-                    src="Images/icon.png"
+                    src="Images/pizeonflylogo.png"
                     className="img-fluid"
                     alt="No Data"
                     style={{

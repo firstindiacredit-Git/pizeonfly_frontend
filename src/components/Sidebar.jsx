@@ -204,7 +204,7 @@ const Sidebar = () => {
             <span className="logo-text fs-3" style={{ color: "#4989fd" }}>pizeon</span>
             <span className="logo-text fs-3" style={{ marginLeft: "-0.9rem", color: "#0c117b" }}>fly</span>
           </div> */}
-          <img src='../Images/icon.png' style={{ height: "2.7rem" }} alt="Pizeonfly Logo" />
+          <img src='../Images/pizeonflylogo.png' style={{ height: "2.7rem" }} alt="Pizeonfly Logo" />
         </div>
 
         {/* Menu: main ul */}

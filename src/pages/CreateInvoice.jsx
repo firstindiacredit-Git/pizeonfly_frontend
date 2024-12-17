@@ -64,19 +64,19 @@ const CreateInvoice = () => {
     e.preventDefault();
 
     try {
-      // Create FormData object
       const formDataToSend = new FormData();
 
-      // Append the logo file if it exists
-      if (formData.logo) {
-        formDataToSend.append('logo', formData.logo);
-      }
-
-      // Create a copy of formData without the logo
+      // Create a clean copy of formData without the File object
       const formDataWithoutLogo = { ...formData };
-      delete formDataWithoutLogo.logo;
+      
+      if (formData.logo instanceof File) {
+        // If it's a new file upload
+        formDataToSend.append('logo', formData.logo);
+        delete formDataWithoutLogo.logo; // Remove logo from JSON data
+      }
+      // If it's an existing logo path, keep it in the JSON data
 
-      // Append other form data as a JSON string
+      // Append the clean data as a single JSON string
       formDataToSend.append('data', JSON.stringify(formDataWithoutLogo));
 
       const response = await axios.post(
@@ -142,9 +142,11 @@ const CreateInvoice = () => {
       }, 5000);
 
     } catch (error) {
-      if (error.response) {
-        console.error('Server Error:', error.response.data);
-      } else if (error.request) {
+      console.error('Submission error:', error);
+      if (error.response?.data) {
+        console.error('Server error:', error.response.data);
+      }
+      if (error.request) {
         console.error('No Response Received:', error.request);
       } else {
         console.error('Request Setup Error:', error.message);
@@ -403,11 +405,30 @@ const CreateInvoice = () => {
 
   // Add function to handle logo selection from dropdown
   const handleStoredLogoSelect = (logoPath) => {
-    setLogo(`${import.meta.env.VITE_BASE_URL}${logoPath}`);
-    setFormData(prev => ({
-      ...prev,
-      logo: logoPath
-    }));
+    if (logoPath) {
+      setLogo(`${import.meta.env.VITE_BASE_URL}${logoPath}`);
+      setFormData(prev => ({
+        ...prev,
+        logo: logoPath // Store just the path for existing logos
+      }));
+    }
+  };
+
+  // Add this function to get a friendly name for the logo
+  const getLogoDisplayName = (logoPath) => {
+    const defaultLogoNames = {
+      'uploads/a2zlogo.png': 'A2Z Logo',
+      'uploads/ficlogo.png': 'FIC Logo',
+      'uploads/pizeonflylogo.png': 'Pizeonfly Logo'
+    };
+
+    // If it's a default logo, return its friendly name
+    if (defaultLogoNames[logoPath]) {
+      return defaultLogoNames[logoPath];
+    }
+
+    // For other logos, use the existing logic
+    return decodeURIComponent(logoPath.split('-').pop().split('.')[0]);
   };
 
 
@@ -518,7 +539,7 @@ const CreateInvoice = () => {
                         <option value="">Select Existing Logo</option>
                         {Array.isArray(storedLogos) && storedLogos.map((logoPath, index) => (
                           <option key={index} value={logoPath}>
-                            {decodeURIComponent(logoPath.split('-').pop().split('.')[0])}
+                            {getLogoDisplayName(logoPath)}
                           </option>
                         ))}
                       </select>
