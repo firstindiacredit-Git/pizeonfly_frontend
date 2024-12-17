@@ -80,7 +80,7 @@ const CreateInvoice = () => {
       formDataToSend.append('data', JSON.stringify(formDataWithoutLogo));
 
       const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}api/invoices`, 
+        `${import.meta.env.VITE_BASE_URL}api/invoices`,
         formDataToSend,
         {
           headers: {
@@ -384,6 +384,32 @@ const CreateInvoice = () => {
     fetchClients();
   }, []);
 
+  // Add new state for stored logos
+  const [storedLogos, setStoredLogos] = useState([]);
+
+  // Add useEffect to fetch logos when component mounts
+  useEffect(() => {
+    const fetchLogos = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/invoice-logos`);
+        setStoredLogos(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error('Error fetching logos:', error);
+        setStoredLogos([]);
+      }
+    };
+    fetchLogos();
+  }, []);
+
+  // Add function to handle logo selection from dropdown
+  const handleStoredLogoSelect = (logoPath) => {
+    setLogo(`${import.meta.env.VITE_BASE_URL}${logoPath}`);
+    setFormData(prev => ({
+      ...prev,
+      logo: logoPath
+    }));
+  };
+
 
 
 
@@ -483,6 +509,21 @@ const CreateInvoice = () => {
                   {/* logo */}
                   <div className="d-flex flex-column align-items-end">
                     <div className="d-flex mb-2 no-print">
+                      {/* Add logo dropdown */}
+                      <select
+                        className="form-select me-2"
+                        onChange={(e) => handleStoredLogoSelect(e.target.value)}
+                        style={{ maxWidth: '200px' }}
+                      >
+                        <option value="">Select Existing Logo</option>
+                        {Array.isArray(storedLogos) && storedLogos.map((logoPath, index) => (
+                          <option key={index} value={logoPath}>
+                            {decodeURIComponent(logoPath.split('-').pop().split('.')[0])}
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* Existing file input */}
                       <input
                         type="file"
                         name="logo"
@@ -495,7 +536,7 @@ const CreateInvoice = () => {
                     {logo && (
                       <img
                         style={{ width: "10rem", objectFit: "contain" }}
-                        src={logo}
+                        src={logo.replace(/\\/g, '/').replace('uploads/', '')}
                         alt="logo"
                       />
                     )}
