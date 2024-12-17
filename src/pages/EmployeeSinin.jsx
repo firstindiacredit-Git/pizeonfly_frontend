@@ -83,7 +83,7 @@ const Signin = () => {
               <div className="col-lg-6 d-none d-lg-flex justify-content-center align-items-center rounded-lg auth-h100">
                 <div style={{ maxWidth: "25rem" }}>
                   <img
-                    src="../Images/icon.png"
+                    src="../Images/pizeonflylogo.png"
                     className="mb-4"
                     style={{ width: "-webkit-fill-available" }}
                   />

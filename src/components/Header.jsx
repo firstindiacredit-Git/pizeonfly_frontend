@@ -19,7 +19,7 @@ const Header = () => {
   const [user, setUser] = useState(null);
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return "Images/superadminimg.jpg";
+    if (!imagePath) return "Images/user.jpeg";
 
     // Remove any backslashes and replace with forward slashes
     const cleanPath = imagePath.replace(/\\/g, '/');

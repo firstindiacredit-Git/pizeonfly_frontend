@@ -88,6 +88,8 @@ const ProjectDashboard = () => {
   const [columnWidths, setColumnWidths] = useState({});
   const [rowHeights, setRowHeights] = useState({});
   const [resizing, setResizing] = useState(null);
+  const [excelSheetColors, setExcelSheetColors] = useState({});
+  const [showTableColorPicker, setShowTableColorPicker] = useState(null);
 
   const notePadRef = useRef(null);
   const colorPickerRef = useRef(null);
@@ -262,7 +264,7 @@ const ProjectDashboard = () => {
 
         setNotepadColor(data.notepadColor || '#fff3cd');
         setTodoColor(data.todoColor || '#fff3cd');
-        setExcelSheetColor(data.excelSheetColor || '#d4edda');
+        setExcelSheetColors(data.excelSheetColors || {});
       } catch (error) {
         console.error("Error fetching colors:", error);
         toast.error("Failed to fetch colors");
@@ -504,7 +506,7 @@ const ProjectDashboard = () => {
   };
 
 
-  const updateColors = async (type, color) => {
+  const updateColors = async (type, color, tableId = null) => {
     try {
       const userData = JSON.parse(localStorage.getItem('user'));
       const email = userData.email;
@@ -513,8 +515,11 @@ const ProjectDashboard = () => {
         setNotepadColor(color);
       } else if (type === 'todo') {
         setTodoColor(color);
-      } else if (type === 'excel') {
-        setExcelSheetColor(color);
+      } else if (type === 'excel-table') {
+        setExcelSheetColors(prev => ({
+          ...prev,
+          [tableId]: color
+        }));
       }
 
       await fetch(`${import.meta.env.VITE_BASE_URL}api/adminColors/${email}`, {
@@ -525,7 +530,9 @@ const ProjectDashboard = () => {
         body: JSON.stringify({
           notepadColor: type === 'notepad' ? color : notepadColor,
           todoColor: type === 'todo' ? color : todoColor,
-          excelSheetColor: type === 'excel' ? color : excelSheetColor
+          excelSheetColors: type === 'excel-table' ?
+            { ...excelSheetColors, [tableId]: color } :
+            excelSheetColors
         }),
       });
     } catch (error) {
@@ -1003,7 +1010,7 @@ const ProjectDashboard = () => {
             .fill()
             .map(() => Array(newTables[deleteAction.index].cols).fill(''));
           setTables(newTables);
-          
+
           // Add backend update for cleared table
           await fetch(`${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`, {
             method: 'PUT',
@@ -1094,37 +1101,37 @@ const ProjectDashboard = () => {
     try {
       const newTables = [...tables];
       const currentCell = newTables[tableIndex].data[rowIndex][colIndex];
-      const formulaValue = typeof currentCell === 'object' ? 
-        currentCell.formula : 
+      const formulaValue = typeof currentCell === 'object' ?
+        currentCell.formula :
         currentCell;
-  
+
       if (formulaValue.startsWith('=')) {
         const result = evaluateFormula(formulaValue, newTables[tableIndex].data);
         newTables[tableIndex].data[rowIndex][colIndex] = {
           formula: formulaValue,
           value: result
         };
-  
+
         setTables(newTables);
-  
+
         const userData = JSON.parse(localStorage.getItem('user'));
         const email = userData.email;
-  
+
         const url = excelSheetId
           ? `${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`
           : `${import.meta.env.VITE_BASE_URL}api/adminExcelSheet`;
-  
+
         const method = excelSheetId ? 'PUT' : 'POST';
-  
+
         const response = await fetch(url, {
           method,
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             tables: newTables.map(table => ({
               ...table,
-              data: table.data.map(row => 
+              data: table.data.map(row =>
                 row.map(cell => {
                   if (cell && typeof cell === 'object' && 'formula' in cell) {
                     return cell;
@@ -1132,15 +1139,15 @@ const ProjectDashboard = () => {
                   return cell;
                 })
               )
-            })), 
-            email 
+            })),
+            email
           }),
         });
-  
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-  
+
         const data = await response.json();
         if (data._id) {
           setExcelSheetId(data._id);
@@ -1716,29 +1723,37 @@ const ProjectDashboard = () => {
                         ) : (
                           <>
                             {tables.map((table, tableIndex) => (
-                              <div key={table.id} className="">
+                              <div key={table.id} className="card mb-4" style={{
+                                backgroundColor: excelSheetColors[table.id] || '#d4edda',
+                                borderRadius: '8px',
+                                padding: '15px'
+                              }}>
+                                {/* Table Name Input */}
                                 <div className="d-flex justify-content-center align-items-center mb-3">
                                   <input
                                     type="text"
                                     value={table.name || `Table ${tableIndex + 1}`}
                                     onChange={(e) => handleTableNameChange(tableIndex, e.target.value)}
-                                    className="form-control text-center"
+                                    className="form-control text-center w-full"
                                     style={{
                                       border: 'none',
                                       backgroundColor: 'transparent',
                                       fontSize: '1.1rem',
                                       fontWeight: 'bold',
-                                      width: 'auto'
+                                      // width: 'auto',
+                                      color: isLightColor(excelSheetColors[table.id] || '#d4edda') ? '#000' : '#fff'
                                     }}
                                   />
                                 </div>
+
+                                {/* Table Content */}
                                 <div className="table-responsive mb-3" style={{
                                   maxHeight: table.rows > 10 ? '400px' : 'auto',
                                   overflowY: table.rows > 10 ? 'auto' : 'visible',
                                   overflowX: 'auto',
-                                  msOverflowStyle: 'none',  // Hide scrollbar in IE/Edge
-                                  scrollbarWidth: 'none',   // Hide scrollbar in Firefox
-                                  '&::-webkit-scrollbar': { // Hide scrollbar in Chrome/Safari/Newer Edge
+                                  msOverflowStyle: 'none',
+                                  scrollbarWidth: 'none',
+                                  '&::-webkit-scrollbar': {
                                     display: 'none'
                                   }
                                 }}>
@@ -1763,7 +1778,7 @@ const ProjectDashboard = () => {
                                             padding: '2px',
                                             fontSize: '12px',
                                             width: '80px',
-                                            color: isLightColor(excelSheetColor) ? '#000' : '#fff'
+                                            color: isLightColor(excelSheetColors[table.id] || '#d4edda') ? '#000' : '#fff'
                                           }}>
                                             {getColumnLabel(colIndex)}
                                             <button
@@ -1835,7 +1850,7 @@ const ProjectDashboard = () => {
                                                     resize: 'none',
                                                     overflow: 'hidden',
                                                     fontSize: '12px',
-                                                    color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColor) ? '#000' : '#fff'),
+                                                    color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColors[table.id] || '#d4edda') ? '#000' : '#fff'),
                                                     textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
                                                   }}
                                                 />
@@ -1859,10 +1874,10 @@ const ProjectDashboard = () => {
                                                     table.data[rowIndex][colIndex]?.formula)) &&
                                                   (table.data[rowIndex][colIndex]?.formula?.startsWith('=') ||
                                                     (typeof table.data[rowIndex][colIndex] === 'string' &&
-                                                      table.data[rowIndex][colIndex].startsWith('='))) && 
+                                                      table.data[rowIndex][colIndex].startsWith('='))) &&
                                                   // Only show button if it's a string (not yet applied) or if we're actively editing
-                                                  (typeof table.data[rowIndex][colIndex] === 'string' || 
-                                                   document.activeElement === document.querySelector(`[data-cell="${tableIndex}-${rowIndex}-${colIndex}"]`)) && (
+                                                  (typeof table.data[rowIndex][colIndex] === 'string' ||
+                                                    document.activeElement === document.querySelector(`[data-cell="${tableIndex}-${rowIndex}-${colIndex}"]`)) && (
                                                     <button
                                                       className="btn btn-sm btn-success"
                                                       style={{
@@ -1912,8 +1927,8 @@ const ProjectDashboard = () => {
                                   <div className="position-relative btn-group">
                                     <button
                                       className="btn btn-secondary me-1"
-                                      onClick={() => setShowExcelPicker(!showExcelPicker)}
-                                      title='Color The Sheet'
+                                      onClick={() => setShowTableColorPicker(table.id)}
+                                      title='Color The Table'
                                     >
                                       <i className="bi bi-palette-fill"></i>
                                       <span className="ms-1">Color</span>
@@ -1926,11 +1941,11 @@ const ProjectDashboard = () => {
                                       <i className="bi bi-download"></i>
                                       <span className="ms-1">Excel</span>
                                     </button>
-                                    {showExcelPicker && (
+                                    {showTableColorPicker === table.id && (
                                       <CustomColorPicker
-                                        color={excelSheetColor}
-                                        onChange={(color) => updateColors('excel', color)}
-                                        onClose={() => setShowExcelPicker(false)}
+                                        color={excelSheetColors[table.id] || '#d4edda'}
+                                        onChange={(color) => updateColors('excel-table', color, table.id)}
+                                        onClose={() => setShowTableColorPicker(null)}
                                       />
                                     )}
                                   </div>
@@ -1983,7 +1998,9 @@ const ProjectDashboard = () => {
                                     )}
                                   </div>
                                 </div>
-                                <hr className="my-4" />
+                                {/* <hr className="my-4" style={{
+                                  borderColor: isLightColor(excelSheetColors[table.id] || '#d4edda') ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'
+                                }} /> */}
                               </div>
                             ))}
                           </>

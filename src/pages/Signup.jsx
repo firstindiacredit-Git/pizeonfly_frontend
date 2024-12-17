@@ -79,7 +79,7 @@ const Signup = () => {
                 <div className="col-lg-6 d-none d-lg-flex justify-content-center align-items-center rounded-lg auth-h100">
                   <div style={{ maxWidth: "25rem" }}>
                     <img
-                      src="../Images/icon.png"
+                      src="../Images/pizeonflylogo.png"
                       className="mb-4"
                       style={{ width: "-webkit-fill-available" }}
                     />
@@ -101,7 +101,7 @@ const Signup = () => {
                 </div>
                 <div className="col-lg-6 d-flex justify-content-center align-items-center border-0 rounded-lg auth-h100">
                   <div className="w-100 p-3 p-md-5 card border-0 bg-dark text-light" style={{ maxWidth: "32rem" }}>
-                    
+
                     {!showSignupForm ? (
                       // Security PIN Form
                       <form onSubmit={verifySecurityPin} className="row g-1 p-3 p-md-4">
@@ -215,7 +215,7 @@ const Signup = () => {
                         {error && <p>{error}</p>}
                       </form>
                     )}
-                    
+
                     <div className="col-12 text-center mt-4">
                       <span className="text-muted">
                         Already have an account?{" "}
