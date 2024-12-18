@@ -2,6 +2,38 @@ export const evaluateFormula = (formula, tableData) => {
   // Remove the '=' sign and trim whitespace
   const cleanFormula = formula.substring(1).trim().toUpperCase();
 
+  // Date functions
+  if (cleanFormula === 'TODAY()') {
+    return new Date().toLocaleDateString();
+  }
+
+  if (cleanFormula === 'NOW()') {
+    return new Date().toLocaleString();
+  }
+
+  if (cleanFormula.startsWith('DATE(')) {
+    try {
+      const params = cleanFormula.match(/DATE\((.*)\)/)[1].split(',').map(x => parseInt(x.trim()));
+      const date = new Date(params[0], params[1] - 1, params[2]);
+      return date.toLocaleDateString();
+    } catch (error) {
+      return '#ERROR!';
+    }
+  }
+
+  // Date series function
+  if (cleanFormula.startsWith('DATESERIES(')) {
+    try {
+      const params = cleanFormula.match(/DATESERIES\((.*)\)/)[1].split(',').map(x => x.trim());
+      const startDate = new Date(params[0]);
+      const count = parseInt(params[1]) || 1;
+      const increment = parseInt(params[2]) || 1;
+      return generateDateSeries(startDate, count, increment)[0]; // Return first date for single cell
+    } catch (error) {
+      return '#ERROR!';
+    }
+  }
+
   // Basic arithmetic operations
   if (cleanFormula.match(/^[\d\s+\-*/().]+$/)) {
     try {
@@ -110,4 +142,16 @@ const cellToIndices = (cell) => {
 const indicesToCell = (row, col) => {
   const colStr = String.fromCharCode('A'.charCodeAt(0) + col);
   return `${colStr}${row + 1}`;
+}; 
+
+export const generateDateSeries = (startDate, count, increment = 1) => {
+  const dates = [];
+  let currentDate = new Date(startDate);
+
+  for (let i = 0; i < count; i++) {
+    dates.push(currentDate.toLocaleDateString());
+    currentDate.setDate(currentDate.getDate() + increment);
+  }
+
+  return dates;
 }; 

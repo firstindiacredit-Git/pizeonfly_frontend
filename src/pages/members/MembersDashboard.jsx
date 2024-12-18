@@ -13,6 +13,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import CustomColorPicker, { isLightColor } from "../colorpicker/CustomColorPicker";
 import FloatingMenu from '../../Chats/FloatingMenu'
 import { evaluateFormula } from '../../utils/excelFormulas';
+import { toast } from 'react-toastify';
 
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
@@ -1568,6 +1569,179 @@ const MemberDashboard = () => {
         }
     };
 
+    // Add these new state variables after the existing ones
+    const [selectedCells, setSelectedCells] = useState({ start: null, end: null });
+    const [copiedData, setCopiedData] = useState(null);
+    const [isSelecting, setIsSelecting] = useState(false);
+
+    // Add these new functions before the return statement
+    const handleCellMouseDown = (tableIndex, rowIndex, colIndex) => {
+      setIsSelecting(true);
+      setSelectedCells({
+        start: { tableIndex, rowIndex, colIndex },
+        end: { tableIndex, rowIndex, colIndex }
+      });
+    };
+
+    const handleCellMouseEnter = (tableIndex, rowIndex, colIndex) => {
+      if (isSelecting) {
+        setSelectedCells(prev => ({
+          ...prev,
+          end: { tableIndex, rowIndex, colIndex }
+        }));
+      }
+    };
+
+    const handleCellMouseUp = () => {
+      setIsSelecting(false);
+    };
+
+    const isCellSelected = (tableIndex, rowIndex, colIndex) => {
+      if (!selectedCells.start || !selectedCells.end) return false;
+      if (selectedCells.start.tableIndex !== tableIndex) return false;
+
+      const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+      const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+      const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
+      const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
+
+      return rowIndex >= startRow && rowIndex <= endRow && 
+             colIndex >= startCol && colIndex <= endCol;
+    };
+
+    const handleCopy = (e) => {
+      if (e.key === 'c' && (e.ctrlKey || e.metaKey) && selectedCells.start && selectedCells.end) {
+        const tableIndex = selectedCells.start.tableIndex;
+        const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+        const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+        const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
+        const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
+
+        const copiedData = [];
+        for (let i = startRow; i <= endRow; i++) {
+          const row = [];
+          for (let j = startCol; j <= endCol; j++) {
+            const cellData = tables[tableIndex].data[i][j];
+            row.push(typeof cellData === 'object' ? cellData.value : cellData);
+          }
+          copiedData.push(row);
+        }
+        setCopiedData(copiedData);
+      }
+    };
+
+    const handlePaste = (e) => {
+      if (e.key === 'v' && (e.ctrlKey || e.metaKey) && copiedData && selectedCells.start) {
+        const tableIndex = selectedCells.start.tableIndex;
+        const startRow = selectedCells.start.rowIndex;
+        const startCol = selectedCells.start.colIndex;
+
+        const newTables = [...tables];
+        copiedData.forEach((row, rowIndex) => {
+          if (startRow + rowIndex < tables[tableIndex].rows) {
+            row.forEach((cell, colIndex) => {
+              if (startCol + colIndex < tables[tableIndex].cols) {
+                newTables[tableIndex].data[startRow + rowIndex][startCol + colIndex] = cell;
+              }
+            });
+          }
+        });
+
+        setTables(newTables);
+
+        // Save to backend
+        handleSaveExcelSheet(newTables);
+      }
+    };
+
+    const handleSaveExcelSheet = async (newTables) => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const email = userData.email;
+
+        const url = dashboardIds.excelSheet
+          ? `${import.meta.env.VITE_BASE_URL}api/memberExcelSheet/${dashboardIds.excelSheet}`
+          : `${import.meta.env.VITE_BASE_URL}api/memberExcelSheet`;
+
+        const method = dashboardIds.excelSheet ? 'PUT' : 'POST';
+
+        await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ tables: newTables, email }),
+        });
+      } catch (error) {
+        console.error("Error saving excel sheet:", error);
+        toast.error("Failed to save changes");
+      }
+    };
+
+    // Add useEffect for keyboard events
+    useEffect(() => {
+      const handleKeyDown = (e) => {
+        // Existing copy/paste handlers
+        if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+          handleCopy(e);
+        } else if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+          handlePaste(e);
+        }
+        // Add formula application shortcut
+        else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && selectedCells.start) {
+          e.preventDefault();
+          handleApplyFormulaToSelection(selectedCells.start.tableIndex);
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('mouseup', handleCellMouseUp);
+
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+        document.removeEventListener('mouseup', handleCellMouseUp);
+      };
+    }, [selectedCells, copiedData, tables]);
+
+    const handleApplyFormulaToSelection = async (tableIndex) => {
+      if (!selectedCells.start || !selectedCells.end) return;
+
+      try {
+        const newTables = [...tables];
+        const startCell = newTables[tableIndex].data[selectedCells.start.rowIndex][selectedCells.start.colIndex];
+        
+        // Check if the first cell contains a DATESERIES formula
+        if (typeof startCell === 'string' && startCell.startsWith('=DATESERIES')) {
+          const params = startCell.match(/DATESERIES\((.*)\)/i)[1].split(',').map(x => x.trim());
+          const startDate = new Date(params[0]);
+          const count = Math.abs(selectedCells.end.rowIndex - selectedCells.start.rowIndex + 1) *
+                        Math.abs(selectedCells.end.colIndex - selectedCells.start.colIndex + 1);
+          const increment = parseInt(params[2]) || 1;
+          
+          const dates = generateDateSeries(startDate, count, increment);
+          let dateIndex = 0;
+
+          // Apply dates to selected range
+          const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+          const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+          const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
+          const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
+
+          for (let row = startRow; row <= endRow; row++) {
+            for (let col = startCol; col <= endCol; col++) {
+              newTables[tableIndex].data[row][col] = dates[dateIndex++];
+            }
+          }
+
+          setTables(newTables);
+          await handleSaveExcelSheet(newTables);
+        }
+      } catch (error) {
+        console.error("Error applying date series:", error);
+        toast.error("Failed to apply date series");
+      }
+    };
+
     return (
         <>
             <div id="mytask-layout">
@@ -2630,8 +2804,9 @@ const MemberDashboard = () => {
                                                                                                                     : (table.data[rowIndex][colIndex] || '')}
                                                                                                                 onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
                                                                                                                 onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
-                                                                                                                className="cell-input"
-                                                                                                                tabIndex={0}
+                                                                                                                onMouseDown={() => handleCellMouseDown(tableIndex, rowIndex, colIndex)}
+                                                                                                                onMouseEnter={() => handleCellMouseEnter(tableIndex, rowIndex, colIndex)}
+                                                                                                                className={`cell-input ${isCellSelected(tableIndex, rowIndex, colIndex) ? 'selected-cell' : ''}`}
                                                                                                                 style={{
                                                                                                                     width: '100%',
                                                                                                                     height: '100%',
@@ -2642,7 +2817,8 @@ const MemberDashboard = () => {
                                                                                                                     overflow: 'hidden',
                                                                                                                     fontSize: '12px',
                                                                                                                     color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColor) ? '#000' : '#fff'),
-                                                                                                                    textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
+                                                                                                                    textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none',
+                                                                                                                    backgroundColor: isCellSelected(tableIndex, rowIndex, colIndex) ? 'rgba(0, 123, 255, 0.1)' : 'transparent',
                                                                                                                 }}
                                                                                                             />
 
@@ -3189,6 +3365,23 @@ const MemberDashboard = () => {
                     onClick={() => setShowDeleteModal(false)}
                 ></div>
             )}
+
+            {/* Add this CSS style block at the bottom of your component, just before the closing tag */}
+            <style>
+                {`
+                    .selected-cell {
+                        background-color: rgba(0, 123, 255, 0.1) !important;
+                    }
+
+                    .cell-input {
+                        user-select: none;
+                    }
+
+                    .cell-input:focus {
+                        outline: 2px solid #007bff;
+                    }
+                `}
+            </style>
         </>
     )
 }

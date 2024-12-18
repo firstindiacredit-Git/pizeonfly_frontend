@@ -90,6 +90,9 @@ const ProjectDashboard = () => {
   const [resizing, setResizing] = useState(null);
   const [excelSheetColors, setExcelSheetColors] = useState({});
   const [showTableColorPicker, setShowTableColorPicker] = useState(null);
+  const [selectedCells, setSelectedCells] = useState({ start: null, end: null });
+  const [copiedData, setCopiedData] = useState(null);
+  const [isSelecting, setIsSelecting] = useState(false);
 
   const notePadRef = useRef(null);
   const colorPickerRef = useRef(null);
@@ -686,15 +689,34 @@ const ProjectDashboard = () => {
     try {
       const newTables = [...tables];
 
-      // Check if the value starts with '=' for formula
-      if (value.startsWith('=')) {
+      // Check if this is a formula being dragged (ends with drag indicator)
+      if (value.startsWith('=') && value.endsWith('++')) {
+        // Remove the drag indicator
+        value = value.slice(0, -2);
+        
+        // If it's a DATESERIES formula, handle it specially
+        if (value.toUpperCase().startsWith('=DATESERIES')) {
+          const params = value.match(/DATESERIES\((.*)\)/i)[1].split(',').map(x => x.trim());
+          const startDate = new Date(params[0]);
+          const increment = parseInt(params[2]) || 1;
+          
+          // Calculate the offset from the original cell
+          const dateOffset = increment * (rowIndex + colIndex);
+          const newDate = new Date(startDate);
+          newDate.setDate(newDate.getDate() + dateOffset);
+          
+          newTables[tableIndex].data[rowIndex][colIndex] = newDate.toLocaleDateString();
+        } else {
+          // Handle other formula types if needed
+          newTables[tableIndex].data[rowIndex][colIndex] = value;
+        }
+      } else if (value.startsWith('=')) {
         const result = evaluateFormula(value, newTables[tableIndex].data);
         newTables[tableIndex].data[rowIndex][colIndex] = {
           formula: value,
           value: result
         };
       } else {
-        // For non-formula values, store the value directly
         newTables[tableIndex].data[rowIndex][colIndex] = value;
       }
 
@@ -720,11 +742,9 @@ const ProjectDashboard = () => {
             ...table,
             data: table.data.map(row =>
               row.map(cell => {
-                // If cell is an object with formula and value
                 if (cell && typeof cell === 'object' && 'formula' in cell) {
                   return cell;
                 }
-                // Otherwise return the cell value directly
                 return cell;
               })
             )
@@ -745,6 +765,27 @@ const ProjectDashboard = () => {
       console.error("Error saving cell:", error);
       toast.error("Failed to save changes");
     }
+  };
+
+  // Add this new function to handle cell dragging
+  const handleCellDragStart = (e, tableIndex, rowIndex, colIndex) => {
+    const cell = tables[tableIndex].data[rowIndex][colIndex];
+    if (typeof cell === 'object' && cell.formula) {
+      // Add ++ to indicate this is a drag operation
+      e.dataTransfer.setData('text/plain', cell.formula + '++');
+    } else {
+      e.dataTransfer.setData('text/plain', cell + '++');
+    }
+  };
+
+  const handleCellDrop = (e, tableIndex, rowIndex, colIndex) => {
+    e.preventDefault();
+    const value = e.dataTransfer.getData('text/plain');
+    handleCellChange(tableIndex, rowIndex, colIndex, value);
+  };
+
+  const handleCellDragOver = (e) => {
+    e.preventDefault();
   };
 
   const addTable = () => {
@@ -1245,6 +1286,185 @@ const ProjectDashboard = () => {
       document.head.removeChild(styleSheet);
     };
   }, []);
+
+  const handleCellMouseDown = (tableIndex, rowIndex, colIndex) => {
+    setIsSelecting(true);
+    setSelectedCells({
+      start: { tableIndex, rowIndex, colIndex },
+      end: { tableIndex, rowIndex, colIndex }
+    });
+  };
+
+  const handleCellMouseEnter = (tableIndex, rowIndex, colIndex) => {
+    if (isSelecting) {
+      setSelectedCells(prev => ({
+        ...prev,
+        end: { tableIndex, rowIndex, colIndex }
+      }));
+    }
+  };
+
+  const handleCellMouseUp = () => {
+    setIsSelecting(false);
+  };
+
+  const isCellSelected = (tableIndex, rowIndex, colIndex) => {
+    if (!selectedCells.start || !selectedCells.end) return false;
+    if (selectedCells.start.tableIndex !== tableIndex) return false;
+
+    const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+    const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+    const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
+    const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
+
+    return rowIndex >= startRow && rowIndex <= endRow && 
+           colIndex >= startCol && colIndex <= endCol;
+  };
+
+  const handleCopy = (e) => {
+    if (e.key === 'c' && (e.ctrlKey || e.metaKey) && selectedCells.start && selectedCells.end) {
+      const tableIndex = selectedCells.start.tableIndex;
+      const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+      const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+      const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
+      const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
+
+      const copiedData = [];
+      for (let i = startRow; i <= endRow; i++) {
+        const row = [];
+        for (let j = startCol; j <= endCol; j++) {
+          const cellData = tables[tableIndex].data[i][j];
+          row.push(typeof cellData === 'object' ? cellData.value : cellData);
+        }
+        copiedData.push(row);
+      }
+      setCopiedData(copiedData);
+      // toast.success('Cells copied!');
+    }
+  };
+
+  const handlePaste = (e) => {
+    if (e.key === 'v' && (e.ctrlKey || e.metaKey) && copiedData && selectedCells.start) {
+      const tableIndex = selectedCells.start.tableIndex;
+      const startRow = selectedCells.start.rowIndex;
+      const startCol = selectedCells.start.colIndex;
+
+      const newTables = [...tables];
+      copiedData.forEach((row, rowIndex) => {
+        if (startRow + rowIndex < tables[tableIndex].rows) {
+          row.forEach((cell, colIndex) => {
+            if (startCol + colIndex < tables[tableIndex].cols) {
+              newTables[tableIndex].data[startRow + rowIndex][startCol + colIndex] = cell;
+            }
+          });
+        }
+      });
+
+      setTables(newTables);
+      // toast.success('Cells pasted!');
+
+      // Save to backend
+      handleSaveExcelSheet(newTables);
+    }
+  };
+
+  // Add this new function to save Excel sheet
+  const handleSaveExcelSheet = async (newTables) => {
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const email = userData.email;
+
+      const url = excelSheetId
+        ? `${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`
+        : `${import.meta.env.VITE_BASE_URL}api/adminExcelSheet`;
+
+      const method = excelSheetId ? 'PUT' : 'POST';
+
+      await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tables: newTables, email }),
+      });
+    } catch (error) {
+      console.error("Error saving excel sheet:", error);
+      toast.error("Failed to save changes");
+    }
+  };
+
+  // Add useEffect for keyboard events
+  useEffect(() => {
+    document.addEventListener('keydown', handleCopy);
+    document.addEventListener('keydown', handlePaste);
+    document.addEventListener('mouseup', handleCellMouseUp);
+
+    return () => {
+      document.removeEventListener('keydown', handleCopy);
+      document.removeEventListener('keydown', handlePaste);
+      document.removeEventListener('mouseup', handleCellMouseUp);
+    };
+  }, [selectedCells, copiedData, tables]);
+
+  // Add this function after handleApplyFormula
+  const handleApplyFormulaToSelection = async (tableIndex) => {
+    if (!selectedCells.start || !selectedCells.end) return;
+
+    try {
+      const newTables = [...tables];
+      const startCell = newTables[tableIndex].data[selectedCells.start.rowIndex][selectedCells.start.colIndex];
+      
+      // Check if the first cell contains a DATESERIES formula
+      if (typeof startCell === 'string' && startCell.startsWith('=DATESERIES')) {
+        const params = startCell.match(/DATESERIES\((.*)\)/i)[1].split(',').map(x => x.trim());
+        const startDate = new Date(params[0]);
+        const count = Math.abs(selectedCells.end.rowIndex - selectedCells.start.rowIndex + 1) *
+                      Math.abs(selectedCells.end.colIndex - selectedCells.start.colIndex + 1);
+        const increment = parseInt(params[2]) || 1;
+        
+        const dates = generateDateSeries(startDate, count, increment);
+        let dateIndex = 0;
+
+        // Apply dates to selected range
+        const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+        const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+        const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
+        const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
+
+        for (let row = startRow; row <= endRow; row++) {
+          for (let col = startCol; col <= endCol; col++) {
+            newTables[tableIndex].data[row][col] = dates[dateIndex++];
+          }
+        }
+
+        setTables(newTables);
+        await handleSaveExcelSheet(newTables);
+      }
+    } catch (error) {
+      console.error("Error applying date series:", error);
+      toast.error("Failed to apply date series");
+    }
+  };
+
+  // Add a keyboard shortcut handler for applying formulas
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Handle existing copy/paste shortcuts
+      if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+        handleCopy(e);
+      } else if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+        handlePaste(e);
+      }
+      // Add new shortcut for applying formulas (Ctrl/Cmd + Enter)
+      else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && selectedCells.start) {
+        e.preventDefault();
+        handleApplyFormulaToSelection(selectedCells.start.tableIndex);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedCells, tables]);
 
   return (
     <>
@@ -1839,8 +2059,13 @@ const ProjectDashboard = () => {
                                                     : (table.data[rowIndex][colIndex] || '')}
                                                   onChange={(e) => handleCellChange(tableIndex, rowIndex, colIndex, e.target.value)}
                                                   onKeyDown={(e) => handleCellKeyDown(e, tableIndex, rowIndex, colIndex)}
-                                                  className="cell-input"
-                                                  tabIndex={0}
+                                                  onMouseDown={() => handleCellMouseDown(tableIndex, rowIndex, colIndex)}
+                                                  onMouseEnter={() => handleCellMouseEnter(tableIndex, rowIndex, colIndex)}
+                                                  draggable="true"
+                                                  onDragStart={(e) => handleCellDragStart(e, tableIndex, rowIndex, colIndex)}
+                                                  onDrop={(e) => handleCellDrop(e, tableIndex, rowIndex, colIndex)}
+                                                  onDragOver={handleCellDragOver}
+                                                  className={`cell-input ${isCellSelected(tableIndex, rowIndex, colIndex) ? 'selected-cell' : ''}`}
                                                   style={{
                                                     width: '100%',
                                                     height: '100%',
@@ -1851,7 +2076,8 @@ const ProjectDashboard = () => {
                                                     overflow: 'hidden',
                                                     fontSize: '12px',
                                                     color: isValidUrl(table.data[rowIndex][colIndex]) ? '#0d6efd' : (isLightColor(excelSheetColors[table.id] || '#d4edda') ? '#000' : '#fff'),
-                                                    textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none'
+                                                    textDecoration: isValidUrl(table.data[rowIndex][colIndex]) ? 'underline' : 'none',
+                                                    backgroundColor: isCellSelected(tableIndex, rowIndex, colIndex) ? 'rgba(0, 123, 255, 0.1)' : 'transparent',
                                                   }}
                                                 />
 
@@ -2169,8 +2395,25 @@ const ProjectDashboard = () => {
           </div>
         </div>
       </div>
+      <style>
+                {`
+                    .selected-cell {
+                        background-color: rgba(0, 123, 255, 0.1) !important;
+                    }
+
+                    .cell-input {
+                        user-select: none;
+                    }
+
+                    .cell-input:focus {
+                        outline: 2px solid #007bff;
+                    }
+                `}
+            </style>
     </>
   );
 };
 
 export default ProjectDashboard;
+
+
