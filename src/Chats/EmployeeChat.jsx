@@ -348,6 +348,7 @@ const EmployeeChat = () => {
             groups={groups}
             socket={socket}
             selectedUser={selectedUser}
+            setSelectedUser={setSelectedUser}
             messages={messages.map(msg => ({
               ...msg,
               isCurrentUser: msg.senderId === currentEmployee._id

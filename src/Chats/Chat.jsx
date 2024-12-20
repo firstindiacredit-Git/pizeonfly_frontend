@@ -367,6 +367,7 @@ const Chat = () => {
               onMessageEdit={handleMessageEdit}
               onMessageDelete={handleMessageDelete}
               fetchMessages={fetchMessages}
+              setSelectedUser={setSelectedUser}
             />
             <FilePreview
               show={showFilePreview}

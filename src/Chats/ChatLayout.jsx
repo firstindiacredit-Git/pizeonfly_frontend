@@ -27,7 +27,8 @@ const ChatLayout = ({
     fetchMessages,
     onGroupCreate,
     socket,
-    groups
+    groups,
+    setSelectedUser
 }) => {
     const [showUserModal, setShowUserModal] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -362,6 +363,51 @@ const ChatLayout = ({
         return `last seen ${lastSeen.toLocaleDateString()}`;
     };
 
+    // Add newate variables
+    const [showAddMembersModal, setShowAddMembersModal] = useState(false);
+    const [newMembers, setNewMembers] = useState([]);
+    // Add this function to handle adding members
+    const handleAddMembers = async () => {
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/addGroupMembers`, {
+                groupId: selectedUser._id,
+                newMembers: newMembers.map(member => ({
+                    userId: member.value,
+                    type: member.type
+                }))
+            });
+            
+            if (typeof fetchMessages === 'function') {
+                fetchMessages(selectedUser._id);
+            }
+            
+            // Update the selected user with the new group data
+            setSelectedUser(response.data);
+            
+            setShowAddMembersModal(false);
+            setNewMembers([]);
+            toast.success('Members added successfully');
+        } catch (error) {
+            console.error('Error adding members:', error);
+            toast.error('Error adding members');
+        }
+    };
+    // Add this function to handle removing members
+    const handleRemoveMember = async (memberId) => {
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/removeGroupMember`, {
+                groupId: selectedUser._id,
+                memberId: memberId
+            });
+            // Refresh the group details
+            const updatedGroup = response.data;
+            setSelectedUser(updatedGroup);
+            toast.success('Member removed successfully');
+        } catch (error) {
+            console.error('Error removing member:', error);
+            toast.error('Error removing member');
+        }
+    };
 
 
 
@@ -389,7 +435,7 @@ const ChatLayout = ({
                                                 ) : selectedUser.userType === 'AdminUser' ? (
                                                     // Admin Avatar
                                                     <img
-                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.profileImage?.replace('uploads/', '') || 'default-avatar.png'}`}
+                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.profileImage?.replace('uploads/', '') }`}
                                                         className="avatar rounded-circle"
                                                         alt={selectedUser.username}
                                                         style={{ width: '40px', height: '40px', objectFit: 'contain' }}
@@ -397,7 +443,7 @@ const ChatLayout = ({
                                                 ) : selectedUser.userType === 'Employee' ? (
                                                     // Employee Avatar
                                                     <img
-                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.employeeImage?.replace('uploads/', '') || 'default-avatar.png'}`}
+                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.employeeImage?.replace('uploads/', '') }`}
                                                         className="avatar rounded-circle"
                                                         alt={selectedUser.employeeName}
                                                         style={{ width: '40px', height: '40px', objectFit: 'contain' }}
@@ -405,7 +451,7 @@ const ChatLayout = ({
                                                 ) : (
                                                     // Client Avatar
                                                     <img
-                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.clientImage?.replace('uploads/', '') || 'default-avatar.png'}`}
+                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.clientImage?.replace('uploads/', '') }`}
                                                         className="avatar rounded-circle"
                                                         alt={selectedUser.clientName}
                                                         style={{ width: '40px', height: '40px', objectFit: 'contain' }}
@@ -792,19 +838,19 @@ const ChatLayout = ({
                     <div className="text-center mb-4">
                         <img
                             src={`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
-                                ? selectedUser?.employeeImage?.replace('uploads/', '') || 'default-avatar.png'
+                                ? selectedUser?.employeeImage?.replace('uploads/', '') 
                                 : selectedUser?.userType === 'AdminUser'
-                                    ? selectedUser?.profileImage?.replace('uploads/', '') || 'default-avatar.png'
-                                    : selectedUser?.clientImage?.replace('uploads/', '') || 'default-avatar.png'
+                                    ? selectedUser?.profileImage?.replace('uploads/', '') 
+                                    : selectedUser?.clientImage?.replace('uploads/', '') 
                                 }`}
                             className="rounded-circle"
                             alt="Profile"
                             style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
                             onClick={() => handleProfileImageClick(`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
-                                ? selectedUser?.employeeImage?.replace('uploads/', '') || 'default-avatar.png'
+                                ? selectedUser?.employeeImage?.replace('uploads/', '') 
                                 : selectedUser?.userType === 'AdminUser'
-                                    ? selectedUser?.profileImage?.replace('uploads/', '') || 'default-avatar.png'
-                                    : selectedUser?.clientImage?.replace('uploads/', '') || 'default-avatar.png'
+                                    ? selectedUser?.profileImage?.replace('uploads/', '') 
+                                    : selectedUser?.clientImage?.replace('uploads/', '') 
                                 }`)}
                         />
                     </div>
@@ -823,12 +869,69 @@ const ChatLayout = ({
                                         <strong>Total Members:</strong> {selectedUser?.members?.length || 0}
                                     </div>
                                     <div className="info-item mb-2">
-                                        <strong>Members:</strong>
-                                        {selectedUser?.members?.map(member => (
-                                            <div key={member.userId._id}>
-                                                {member.name} ({member.userType})
-                                            </div>
-                                        ))}
+                                        <div className="d-flex justify-content-between align-items-center"> <strong className="">Members List</strong>
+                                            <button
+                                                className="btn btn-sm btn-success ms-2"
+                                                onClick={() => setShowAddMembersModal(true)}
+                                            >
+                                                + Add Member
+                                            </button></div>
+                                        {selectedUser?.members?.map(member => {
+                                            // console.log('Member data:', member);
+
+                                            let imagePath;
+                                            if (member.userType === 'Employee') {
+                                                imagePath = member.employeeImage?.replace('uploads/', '');
+                                            } else if (member.userType === 'AdminUser') {
+                                                imagePath = member.profileImage?.replace('uploads/', '');
+                                            } else if (member.userType === 'Client') {
+                                                imagePath = member.image?.replace('uploads/', '');
+                                            }
+                                            return (
+                                                <div key={member.userId} className="d-flex align-items-center mb-1 py-1 rounded-3 border-bottom">
+                                                    <i className="bi bi-dot me-1 fs-4 text-success" />
+                                                    <img
+                                                        src={`${import.meta.env.VITE_BASE_URL}${imagePath}`}
+                                                        className="avatar rounded-circle me-2"
+                                                        alt={member.name}
+                                                        style={{ width: '30px', height: '30px', objectFit: 'contain' }}
+                                                    />
+                                                    <div className=''>
+                                                        <span
+                                                            className="fw-semibold me-1"
+                                                            style={{ cursor: 'pointer' }}
+                                                            onClick={() => {
+                                                                // Find the user in the users array
+                                                                const userToChat = users.find(u => u._id === member.userId);
+                                                                if (userToChat) {
+                                                                    // Switch to appropriate tab based on user type
+                                                                    if (member.userType === 'Employee') {
+                                                                        onTabChange('employees');
+                                                                    } else if (member.userType === 'Client') {
+                                                                        onTabChange('clients');
+                                                                    } else if (member.userType === 'AdminUser') {
+                                                                        onTabChange('admins');
+                                                                    }
+
+                                                                    // Small delay to ensure tab change is complete
+                                                                    setTimeout(() => {
+                                                                        onUserSelect(userToChat, member.userType);
+                                                                        setShowUserModal(false); // Close the modal
+                                                                    }, 100);
+                                                                }
+                                                            }}
+                                                        >
+                                                            {member.name}
+                                                        </span>
+                                                        <span className="text-muted">({member.userType})</span>
+                                                    </div>
+                                                    <i
+                                                        className="bi bi-trash text-danger text-end ms-auto"
+                                                        style={{ cursor: 'pointer' }}
+                                                        onClick={() => handleRemoveMember(member.userId)}
+                                                    />                                                </div>
+                                            );
+                                        })}
                                     </div>
                                     <div className="info-item mb-2">
                                         <strong>Created At:</strong> {new Date(selectedUser?.createdAt).toLocaleDateString()}
@@ -1047,6 +1150,65 @@ const ChatLayout = ({
                 </Modal.Footer>
             </Modal>
 
+            {/* Add Members Modal */}
+            <Modal show={showAddMembersModal} onHide={() => setShowAddMembersModal(false)}>
+                <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
+                    <Modal.Title>Add Members to Group</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="mb-3">
+                        <label className="form-label">Select Members</label>
+                        <MultiSelect
+                            options={users
+                                .filter(user => {
+                                    // Check if selectedUser and members exist before filtering
+                                    if (!selectedUser || !selectedUser.members) return true;
+                                    
+                                    // Filter out users who are already members of the group
+                                    return !selectedUser.members.some(
+                                        member => member.userId === user._id
+                                    );
+                                })
+                                .map(user => {
+                                    let userType;
+                                    if (user.employeeName) userType = 'Employee';
+                                    else if (user.clientName) userType = 'Client';
+                                    else if (user.username) userType = 'AdminUser';
+
+                                    return {
+                                        label: user.employeeName || user.clientName || user.username,
+                                        value: user._id,
+                                        type: userType
+                                    };
+                                })}
+                            value={newMembers}
+                            onChange={setNewMembers}
+                            labelledBy="Select members"
+                            hasSelectAll={true}
+                            disableSearch={false}
+                            overrideStrings={{
+                                selectSomeItems: "Select members...",
+                                allItemsAreSelected: "All members selected",
+                                selectAll: "Select All",
+                                search: "Search members"
+                            }}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowAddMembersModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={handleAddMembers}
+                        style={{ backgroundColor: '#075E54', border: 'none' }}
+                    >
+                        Add Members
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
             {/* Add new Image Modal */}
             <Modal
                 show={showImageModal}
@@ -1061,6 +1223,65 @@ const ChatLayout = ({
                         style={{ maxWidth: '100%', maxHeight: '80vh' }}
                     />
                 </Modal.Body>
+            </Modal>
+
+            {/* Add the new modal for adding members */}
+            <Modal show={showAddMembersModal} onHide={() => setShowAddMembersModal(false)}>
+                <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
+                    <Modal.Title>Add Members to Group</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="mb-3">
+                        <label className="form-label">Select Members</label>
+                        <MultiSelect
+                            options={users
+                                .filter(user => {
+                                    // Check if selectedUser and members exist before filtering
+                                    if (!selectedUser || !selectedUser.members) return true;
+                                    
+                                    // Filter out users who are already members of the group
+                                    return !selectedUser.members.some(
+                                        member => member.userId === user._id
+                                    );
+                                })
+                                .map(user => {
+                                    let userType;
+                                    if (user.employeeName) userType = 'Employee';
+                                    else if (user.clientName) userType = 'Client';
+                                    else if (user.username) userType = 'AdminUser';
+
+                                    return {
+                                        label: user.employeeName || user.clientName || user.username,
+                                        value: user._id,
+                                        type: userType
+                                    };
+                                })}
+                            value={newMembers}
+                            onChange={setNewMembers}
+                            labelledBy="Select members"
+                            hasSelectAll={true}
+                            disableSearch={false}
+                            overrideStrings={{
+                                selectSomeItems: "Select members...",
+                                allItemsAreSelected: "All members selected",
+                                selectAll: "Select All",
+                                search: "Search members"
+                            }}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowAddMembersModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={handleAddMembers}
+                        style={{ backgroundColor: '#075E54', border: 'none' }}
+                    >
+                        Add Members
+                    </Button>
+                </Modal.Footer>
             </Modal>
         </div>
     );

@@ -362,6 +362,7 @@ const ClientChat = () => {
                         groups={groups}
                         socket={socket}
                         selectedUser={selectedUser}
+                        setSelectedUser={setSelectedUser}
                         messages={messages.map(msg => ({
                             ...msg,
                             isCurrentUser: msg.senderId === currentClient._id
