@@ -1971,11 +1971,11 @@ const ProjectDashboard = () => {
                                   maxHeight: table.rows > 10 ? '400px' : 'auto',
                                   overflowY: table.rows > 10 ? 'auto' : 'visible',
                                   overflowX: 'auto',
-                                  msOverflowStyle: 'none',
-                                  scrollbarWidth: 'none',
-                                  '&::-webkit-scrollbar': {
-                                    display: 'none'
-                                  }
+                                  // msOverflowStyle: 'none',
+                                  // scrollbarWidth: 'none',
+                                  // '&::-webkit-scrollbar': {
+                                  //   display: 'none'
+                                  // }
                                 }}>
                                   <table className="table table-bordered" style={darkModeStyles.table}>
                                     <thead style={{
