@@ -45,10 +45,14 @@ const ChatLayout = ({
     const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
     const [groupName, setGroupName] = useState('');
     const [selectedMembers, setSelectedMembers] = useState([]);
+    const [showDeleteMembersModal, setShowDeleteMembersModal] = useState(false);
+
     const [showImageModal, setShowImageModal] = useState(false);
     const [modalImage, setModalImage] = useState('');
     const [userStatuses, setUserStatuses] = useState({});
 
+    // Add this new state for controlling members display
+    const [showAllMembers, setShowAllMembers] = useState(false);
 
     // Modified userOptions mapping with debug logs
     const userOptions = Array.isArray(users) ? users.map(user => {
@@ -100,6 +104,11 @@ const ChatLayout = ({
             if (typeof onGroupCreate === 'function') {
                 onGroupCreate();
             }
+            // Reload the page after 5 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 5000);
+
         } catch (error) {
             console.error('Error creating group:', error);
             toast.error('Error creating group');
@@ -376,17 +385,22 @@ const ChatLayout = ({
                     type: member.type
                 }))
             });
-            
+
             if (typeof fetchMessages === 'function') {
                 fetchMessages(selectedUser._id);
             }
-            
+
             // Update the selected user with the new group data
             setSelectedUser(response.data);
-            
+
             setShowAddMembersModal(false);
             setNewMembers([]);
             toast.success('Members added successfully');
+            // Reload the page after 5 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 5000);
+
         } catch (error) {
             console.error('Error adding members:', error);
             toast.error('Error adding members');
@@ -403,12 +417,38 @@ const ChatLayout = ({
             const updatedGroup = response.data;
             setSelectedUser(updatedGroup);
             toast.success('Member removed successfully');
+            // Reload the page after 5 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 5000);
+
         } catch (error) {
             console.error('Error removing member:', error);
             toast.error('Error removing member');
         }
     };
 
+    const handleRemoveSelectedMembers = async () => {
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/removeGroupMembers`, {
+                groupId: selectedUser._id,
+                memberIds: selectedMembers
+            });
+            // Update the selected user with the new group data
+            setSelectedUser(response.data);
+            setSelectedMembers([]);
+            setShowDeleteMembersModal(false);
+            toast.success('Members removed successfully');
+
+            // Reload the page after 5 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 5000);
+        } catch (error) {
+            console.error('Error removing members:', error);
+            toast.error('Error removing members');
+        }
+    };
 
 
     return (
@@ -435,7 +475,7 @@ const ChatLayout = ({
                                                 ) : selectedUser.userType === 'AdminUser' ? (
                                                     // Admin Avatar
                                                     <img
-                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.profileImage?.replace('uploads/', '') }`}
+                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.profileImage?.replace('uploads/', '')}`}
                                                         className="avatar rounded-circle"
                                                         alt={selectedUser.username}
                                                         style={{ width: '40px', height: '40px', objectFit: 'contain' }}
@@ -443,7 +483,7 @@ const ChatLayout = ({
                                                 ) : selectedUser.userType === 'Employee' ? (
                                                     // Employee Avatar
                                                     <img
-                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.employeeImage?.replace('uploads/', '') }`}
+                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.employeeImage?.replace('uploads/', '')}`}
                                                         className="avatar rounded-circle"
                                                         alt={selectedUser.employeeName}
                                                         style={{ width: '40px', height: '40px', objectFit: 'contain' }}
@@ -451,7 +491,7 @@ const ChatLayout = ({
                                                 ) : (
                                                     // Client Avatar
                                                     <img
-                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.clientImage?.replace('uploads/', '') }`}
+                                                        src={`${import.meta.env.VITE_BASE_URL}${selectedUser.clientImage?.replace('uploads/', '')}`}
                                                         className="avatar rounded-circle"
                                                         alt={selectedUser.clientName}
                                                         style={{ width: '40px', height: '40px', objectFit: 'contain' }}
@@ -790,7 +830,8 @@ const ChatLayout = ({
                                             <div>
                                                 <div className="p-3">
                                                     <button
-                                                        className="btn btn-success w-100 mb-3"
+                                                        className="btn w-100 mb-3 text-white"
+                                                        style={{ backgroundColor: '#128c7e', border: 'none' }}
                                                         onClick={() => setShowCreateGroupModal(true)}
                                                     >
                                                         + Create Group
@@ -838,19 +879,19 @@ const ChatLayout = ({
                     <div className="text-center mb-4">
                         <img
                             src={`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
-                                ? selectedUser?.employeeImage?.replace('uploads/', '') 
+                                ? selectedUser?.employeeImage?.replace('uploads/', '')
                                 : selectedUser?.userType === 'AdminUser'
-                                    ? selectedUser?.profileImage?.replace('uploads/', '') 
-                                    : selectedUser?.clientImage?.replace('uploads/', '') 
+                                    ? selectedUser?.profileImage?.replace('uploads/', '')
+                                    : selectedUser?.clientImage?.replace('uploads/', '')
                                 }`}
                             className="rounded-circle"
                             alt="Profile"
                             style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
                             onClick={() => handleProfileImageClick(`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
-                                ? selectedUser?.employeeImage?.replace('uploads/', '') 
+                                ? selectedUser?.employeeImage?.replace('uploads/', '')
                                 : selectedUser?.userType === 'AdminUser'
-                                    ? selectedUser?.profileImage?.replace('uploads/', '') 
-                                    : selectedUser?.clientImage?.replace('uploads/', '') 
+                                    ? selectedUser?.profileImage?.replace('uploads/', '')
+                                    : selectedUser?.clientImage?.replace('uploads/', '')
                                 }`)}
                         />
                     </div>
@@ -870,68 +911,102 @@ const ChatLayout = ({
                                     </div>
                                     <div className="info-item mb-2">
                                         <div className="d-flex justify-content-between align-items-center"> <strong className="">Members List</strong>
+                                        <div>
+                                        {selectedMembers.length > 0 && (
+                                                <button
+                                                    className="btn btn-sm btn-danger text-white"
+                                                    onClick={() => setShowDeleteMembersModal(true)}
+                                                >
+                                                    Delete Selected
+                                                </button>
+                                            )}
                                             <button
-                                                className="btn btn-sm btn-success ms-2"
+                                                className="btn btn-sm ms-2 text-white"
+                                                style={{ backgroundColor: '#128c7e', border: 'none' }}
                                                 onClick={() => setShowAddMembersModal(true)}
                                             >
-                                                + Add Member
-                                            </button></div>
-                                        {selectedUser?.members?.map(member => {
-                                            // console.log('Member data:', member);
-
-                                            let imagePath;
-                                            if (member.userType === 'Employee') {
-                                                imagePath = member.employeeImage?.replace('uploads/', '');
-                                            } else if (member.userType === 'AdminUser') {
-                                                imagePath = member.profileImage?.replace('uploads/', '');
-                                            } else if (member.userType === 'Client') {
-                                                imagePath = member.image?.replace('uploads/', '');
-                                            }
-                                            return (
-                                                <div key={member.userId} className="d-flex align-items-center mb-1 py-1 rounded-3 border-bottom">
-                                                    <i className="bi bi-dot me-1 fs-4 text-success" />
-                                                    <img
-                                                        src={`${import.meta.env.VITE_BASE_URL}${imagePath}`}
-                                                        className="avatar rounded-circle me-2"
-                                                        alt={member.name}
-                                                        style={{ width: '30px', height: '30px', objectFit: 'contain' }}
-                                                    />
-                                                    <div className=''>
-                                                        <span
-                                                            className="fw-semibold me-1"
-                                                            style={{ cursor: 'pointer' }}
-                                                            onClick={() => {
-                                                                // Find the user in the users array
-                                                                const userToChat = users.find(u => u._id === member.userId);
-                                                                if (userToChat) {
-                                                                    // Switch to appropriate tab based on user type
-                                                                    if (member.userType === 'Employee') {
-                                                                        onTabChange('employees');
-                                                                    } else if (member.userType === 'Client') {
-                                                                        onTabChange('clients');
-                                                                    } else if (member.userType === 'AdminUser') {
-                                                                        onTabChange('admins');
-                                                                    }
-
-                                                                    // Small delay to ensure tab change is complete
-                                                                    setTimeout(() => {
-                                                                        onUserSelect(userToChat, member.userType);
-                                                                        setShowUserModal(false); // Close the modal
-                                                                    }, 100);
+                                                    + Add Member
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {selectedUser?.members
+                                            ?.slice(0, showAllMembers ? undefined : 5)
+                                            .map(member => {
+                                                let imagePath;
+                                                if (member.userType === 'Employee') {
+                                                    imagePath = member.employeeImage?.replace('uploads/', '');
+                                                } else if (member.userType === 'AdminUser') {
+                                                    imagePath = member.profileImage?.replace('uploads/', '');
+                                                } else if (member.userType === 'Client') {
+                                                    imagePath = member.image?.replace('uploads/', '');
+                                                }
+                                                return (
+                                                    <div key={member.userId} className="d-flex align-items-center mb-1 py-1 rounded-3 border-bottom">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="me-2"
+                                                            checked={selectedMembers.includes(member.userId)}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    setSelectedMembers([...selectedMembers, member.userId]);
+                                                                } else {
+                                                                    setSelectedMembers(selectedMembers.filter(id => id !== member.userId));
                                                                 }
                                                             }}
-                                                        >
-                                                            {member.name}
-                                                        </span>
-                                                        <span className="text-muted">({member.userType})</span>
-                                                    </div>
-                                                    <i
-                                                        className="bi bi-trash text-danger text-end ms-auto"
-                                                        style={{ cursor: 'pointer' }}
-                                                        onClick={() => handleRemoveMember(member.userId)}
-                                                    />                                                </div>
-                                            );
-                                        })}
+                                                        />
+                                                        {/* <i className="bi bi-dot me-1 fs-4 text-success" /> */}
+                                                        <img
+                                                            src={`${import.meta.env.VITE_BASE_URL}${imagePath}`}
+                                                            className="avatar rounded-circle me-2"
+                                                            alt={member.name}
+                                                            style={{ width: '30px', height: '30px', objectFit: 'contain' }}
+                                                        />
+                                                        <div className=''>
+                                                            <span
+                                                                className="fw-semibold me-1"
+                                                                style={{ cursor: 'pointer' }}
+                                                                onClick={() => {
+                                                                    // Find the user in the users array
+                                                                    const userToChat = users.find(u => u._id === member.userId);
+                                                                    if (userToChat) {
+                                                                        // Switch to appropriate tab based on user type
+                                                                        if (member.userType === 'Employee') {
+                                                                            onTabChange('employees');
+                                                                        } else if (member.userType === 'Client') {
+                                                                            onTabChange('clients');
+                                                                        } else if (member.userType === 'AdminUser') {
+                                                                            onTabChange('admins');
+                                                                        }
+
+                                                                        // Small delay to ensure tab change is complete
+                                                                        setTimeout(() => {
+                                                                            onUserSelect(userToChat, member.userType);
+                                                                            setShowUserModal(false); // Close the modal
+                                                                        }, 100);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {member.name}
+                                                            </span>
+                                                            <span className="text-muted">({member.userType})</span>
+                                                        </div>
+                                                        <i
+                                                            className="bi bi-trash text-danger text-end ms-auto"
+                                                            style={{ cursor: 'pointer' }}
+                                                            onClick={() => handleRemoveMember(member.userId)}
+                                                        />                                                </div>
+                                                );
+                                            })}
+                                        
+                                        {/* Show All button */}
+                                        {selectedUser?.members?.length > 5 && (
+                                            <button
+                                                className="btn btn-link text-primary w-100 mt-2"
+                                                onClick={() => setShowAllMembers(!showAllMembers)}
+                                            >
+                                                {showAllMembers ? 'Show Less' : `Show All (${selectedUser.members.length})`}
+                                            </button>
+                                        )}
                                     </div>
                                     <div className="info-item mb-2">
                                         <strong>Created At:</strong> {new Date(selectedUser?.createdAt).toLocaleDateString()}
@@ -1151,7 +1226,7 @@ const ChatLayout = ({
             </Modal>
 
             {/* Add Members Modal */}
-            <Modal show={showAddMembersModal} onHide={() => setShowAddMembersModal(false)}>
+            <Modal show={showAddMembersModal} onHide={() => setShowAddMembersModal(false)} style={{ backgroundColor: '#080808a1'}}>
                 <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
                     <Modal.Title>Add Members to Group</Modal.Title>
                 </Modal.Header>
@@ -1163,7 +1238,7 @@ const ChatLayout = ({
                                 .filter(user => {
                                     // Check if selectedUser and members exist before filtering
                                     if (!selectedUser || !selectedUser.members) return true;
-                                    
+
                                     // Filter out users who are already members of the group
                                     return !selectedUser.members.some(
                                         member => member.userId === user._id
@@ -1238,7 +1313,7 @@ const ChatLayout = ({
                                 .filter(user => {
                                     // Check if selectedUser and members exist before filtering
                                     if (!selectedUser || !selectedUser.members) return true;
-                                    
+
                                     // Filter out users who are already members of the group
                                     return !selectedUser.members.some(
                                         member => member.userId === user._id
@@ -1280,6 +1355,24 @@ const ChatLayout = ({
                         style={{ backgroundColor: '#075E54', border: 'none' }}
                     >
                         Add Members
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Add Delete Members Confirmation Modal */}
+            <Modal show={showDeleteMembersModal} onHide={() => setShowDeleteMembersModal(false)} centered style={{ backgroundColor: '#080808a1'}}>
+                <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
+                    <Modal.Title>Delete Selected Members</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Are you sure you want to remove {selectedMembers.length} member(s) from the group?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteMembersModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button className="text-white" variant="danger" onClick={handleRemoveSelectedMembers}>
+                        Delete Members
                     </Button>
                 </Modal.Footer>
             </Modal>
