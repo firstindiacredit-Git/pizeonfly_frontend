@@ -102,7 +102,7 @@ const Tasks = () => {
 
       toast.success("Task Created Successfully!", {
         style: {
-          backgroundColor: "#4c3575",
+          backgroundColor: "#0d6efd",
           color: "white",
         },
       });
@@ -279,7 +279,7 @@ const Tasks = () => {
       );
       toast.success("Task Updated Successfully!", {
         style: {
-          backgroundColor: "#4c3575",
+          backgroundColor: "#0d6efd",
           color: "white",
         },
       });
@@ -357,7 +357,7 @@ const Tasks = () => {
       // Display toast notification
       toast.error("Task Deleted Successfully!", {
         style: {
-          backgroundColor: "#4c3575",
+          backgroundColor: "#0d6efd",
           color: "white",
         },
       });

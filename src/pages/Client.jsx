@@ -97,7 +97,7 @@ const Client = () => {
 
             toast.success("Client Added Successfully!", {
                 style: {
-                    backgroundColor: "#4c3575",
+                    backgroundColor: "#0d6efd",
                     color: "white",
                 },
             });
@@ -245,7 +245,7 @@ const Client = () => {
 
             toast.success("Client Updated", {
                 style: {
-                    backgroundColor: "#4c3575",
+                    backgroundColor: "#0d6efd",
                     color: "white",
                 },
             });
@@ -279,7 +279,7 @@ const Client = () => {
 
             toast.error("Client Deleted Successfully!", {
                 style: {
-                    backgroundColor: "#4c3575",
+                    backgroundColor: "#0d6efd",
                     color: "white",
                 },
             });

@@ -132,7 +132,7 @@ const CreateInvoice = () => {
       // Toast
       toast.success("Invoice Added Successfully!", {
         style: {
-          backgroundColor: "#4c3575",
+          backgroundColor: "#0d6efd",
           color: "white",
         },
       });

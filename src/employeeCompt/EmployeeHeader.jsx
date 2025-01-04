@@ -258,7 +258,7 @@ const Header = () => {
       if (user && (!user.aadhaarCard || !user.panCard || !user.resume)) {
         toast.error("Please update your profile with missing documents.", {
           style: {
-            backgroundColor: "#4c3575",
+            backgroundColor: "#0d6efd",
             color: "white",
           },
         });

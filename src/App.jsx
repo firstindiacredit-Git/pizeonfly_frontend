@@ -22,6 +22,8 @@ import Calander from './pages/Calander'
 import CreateInvoice from './pages/CreateInvoice'
 import AllInvoice from './pages/AllInvoice'
 import UpdateInvoice from './pages/UpdateInvoice'
+import CreateMeeting from './pages/CreateMeeting'
+import AllMeetings from './pages/AllMeetings'
 
 import UrlShortner from './pages/tools/UrlShortner'
 import QrCodeGenerate from './pages/tools/QrCodeGenerate'
@@ -94,6 +96,8 @@ function AppContent() {
           <Route path='/create-invoice' element={<CreateInvoice />}></Route>
           <Route path='/all-invoice' element={<AllInvoice />}></Route>
           <Route path='/update-invoice' element={<UpdateInvoice />}></Route>
+          <Route path='/create-meeting' element={<CreateMeeting />}></Route>
+          <Route path='/all-meetings' element={<AllMeetings />}></Route>
 
 
           <Route path='/urlShortner' element={<UrlShortner />}></Route>

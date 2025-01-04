@@ -129,7 +129,7 @@ const Sidebar = () => {
 
       toast.success("Password change Successfully!", {
         style: {
-          backgroundColor: "#4c3575",
+          backgroundColor: "#0d6efd",
           color: "white",
         },
       });
@@ -171,7 +171,7 @@ const Sidebar = () => {
 
       toast.success("Profile updated successfully!", {
         style: {
-          backgroundColor: "#4c3575",
+          backgroundColor: "#0d6efd",
           color: "white",
         },
       });
@@ -359,6 +359,30 @@ const Sidebar = () => {
                 <li>
                   <Link className="ms-link" to="/all-invoice">
                     <span>All Invoice</span>
+                  </Link>
+                </li>
+              </ul>
+            </li>
+
+            <li className="collapsed">
+              <a
+                className={`m-link ${textColorClass}`}
+                data-bs-toggle="collapse"
+                data-bs-target="#meetings-Components"
+                href="#"
+              >
+                <i className={`icofont-meeting-add ${textColorClass}`} /> <span>Meetings Scheduler</span>{" "}
+                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
+              </a>
+              <ul className="sub-menu collapse" id="meetings-Components">
+                <li>
+                  <Link className="ms-link" to="/create-meeting">
+                    <span>Create Meeting</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link className="ms-link" to="/all-meetings">
+                    <span>All Meetings</span>
                   </Link>
                 </li>
               </ul>

@@ -86,7 +86,7 @@ const Header = () => {
 
       toast.success("Password change Successfully!", {
         style: {
-          backgroundColor: "#4c3575",
+          backgroundColor: "#0d6efd",
           color: "white",
         },
       });
@@ -158,7 +158,7 @@ const Header = () => {
 
       toast.success("Profile updated successfully!", {
         style: {
-          backgroundColor: "#4c3575",
+          backgroundColor: "#0d6efd",
           color: "white",
         },
       });

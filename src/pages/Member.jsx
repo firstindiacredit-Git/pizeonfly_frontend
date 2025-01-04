@@ -168,7 +168,7 @@ const Member = () => {
 
       toast.success("Employee Added Successfully!", {
         style: {
-          backgroundColor: "#4c3575",
+          backgroundColor: "#0d6efd",
           color: "white",
         },
       });
@@ -222,9 +222,12 @@ const Member = () => {
 
         let lastOldId = 1;
         response.data.forEach((d) => {
-          const newId = parseInt(d.employeeId.slice(2), 10);
-          if (!Number.isNaN(newId) && newId > lastOldId) {
-            lastOldId = newId;
+          // Add null check and ensure employeeId exists and has the expected format
+          if (d && d.employeeId && typeof d.employeeId === 'string') {
+            const newId = parseInt(d.employeeId.slice(2), 10);
+            if (!Number.isNaN(newId) && newId > lastOldId) {
+              lastOldId = newId;
+            }
           }
         });
 
@@ -233,12 +236,11 @@ const Member = () => {
           ...prevFormData,
           employeeId: newId,
         }));
-        console.log(response.data);
 
         // Save the fetched employees
         const modifiedEmployees = response.data.map(employee => ({
           ...employee,
-          employeeImage: employee.employeeImage.replace('uploads/', '') // Remove 'uploads/' from the image path
+          employeeImage: employee.employeeImage ? employee.employeeImage.replace('uploads/', '') : ''
         }));
 
         // Fetch both project and task counts for each employee
@@ -290,7 +292,7 @@ const Member = () => {
 
       toast.error("Employee Deleted Successfully!", {
         style: {
-          backgroundColor: "#4c3575",
+          backgroundColor: "#0d6efd",
           color: "white",
         },
       });
@@ -450,7 +452,7 @@ const Member = () => {
       // Save the fetched employees
       const modifiedEmployees = response.data.map(employee => ({
         ...employee,
-        employeeImage: employee.employeeImage.replace('uploads/', '') // Remove 'uploads/' from the image path
+        employeeImage: employee.employeeImage ? employee.employeeImage.replace('uploads/', '') : ''
       }));
 
       // Fetch both project and task counts for each employee
@@ -547,7 +549,7 @@ const Member = () => {
       if (response.status === 200) {
         toast.success('Employee updated successfully!', {
           style: {
-            backgroundColor: "#4c3575",
+            backgroundColor: "#0d6efd",
             color: "white",
           },
         });
@@ -710,7 +712,7 @@ const Member = () => {
 
         toast.success('Document deleted successfully!', {
           style: {
-            backgroundColor: "#4c3575",
+            backgroundColor: "#0d6efd",
             color: "white",
           },
         });
