@@ -17,6 +17,7 @@ const Header = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
   const [user, setUser] = useState(null);
+  const [notifications, setNotifications] = useState([]);
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "Images/user.jpeg";
@@ -33,7 +34,31 @@ const Header = () => {
     return imageUrl;
   };
 
+  // Function to fetch meetings for today and tomorrow
+  const fetchMeetingsForNotification = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/meetings`);
+      const today = new Date();
+      const tomorrow = new Date();
+      tomorrow.setDate(today.getDate() + 1);
+
+      const upcomingMeetings = response.data.meetings.filter(meeting => {
+        const meetingDate = new Date(meeting.date);
+        const isUpcoming = meetingDate.toDateString() === today.toDateString() ||
+          meetingDate.toDateString() === tomorrow.toDateString();
+        const isNotCompletedOrPostponedOrCancelled = !['completed', 'postponed', 'cancelled'].includes(meeting.status.toLowerCase());
+
+        return isUpcoming && isNotCompletedOrPostponedOrCancelled;
+      });
+
+      setNotifications(upcomingMeetings);
+    } catch (error) {
+      console.error('Error fetching meetings for notifications:', error);
+    }
+  };
+
   useEffect(() => {
+    fetchMeetingsForNotification();
     const token = localStorage.getItem("token");
     const userData = JSON.parse(localStorage.getItem("user"));
 
@@ -176,9 +201,11 @@ const Header = () => {
 
   return (
     <>
-      <div className="header">
+      <div className="header border-bottom">
+
         <nav className="navbar py-4">
           <div className="container-xxl">
+
             {/* header rightbar icon */}
             <div className="h-right d-flex gap-3 align-items-center mr-5 mr-lg-0 order-1">
               <button onClick={toggleTheme} className="border-0 bg-transparent">
@@ -261,18 +288,50 @@ const Header = () => {
                 </div>
               </div>
             </div>
-            <button
-              className="navbar-toggler p-0 border-0 menu-toggle order-3"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#mainHeader"
-            >
-              <span className="fa fa-bars" />
-            </button>
-            <div className="order-0 col-lg-4 col-md-4 col-sm-12 col-12 mb-3 mb-md-0 ">
+            <div className="">
+              {/* Notification display */}
+              {notifications.length > 0 ? (
+                <div className="notification">
+                  <marquee behavior="scroll" direction="left">
+                    <p>
+                      You have {notifications.length} meeting(s) scheduled: | {" "}
+                      <strong>Today:</strong> 
+                      {notifications.filter(meeting => {
+                        const meetingDate = new Date(meeting.date);
+                        return meetingDate.toDateString() === new Date().toDateString();
+                      }).map((meeting, index) => (
+                        <span key={meeting._id}>
+                          <strong>{index + 1}. {meeting.title}</strong> at {meeting.startTime}
+                          {index < notifications.length - 1 ? ' , ' : ''}
+                        </span>
+                      ))}
+                      | {" "}
+                      <strong>Tomorrow:</strong>
+                      {notifications.filter(meeting => {
+                        const meetingDate = new Date(meeting.date);
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        return meetingDate.toDateString() === tomorrow.toDateString();
+                      }).map((meeting, index) => (
+                        <span key={meeting._id}>
+                          <strong>{index + 1}. {meeting.title}</strong> at {meeting.startTime}
+                          {index < notifications.length - 1 ? ' , ' : ''}
+                        </span>
+                      ))}
+                    </p>
+                  </marquee>
+                </div>
+              ) : (
+                <div className="notification">
+                  <p>No meetings scheduled</p>
+                </div>
+              )}
             </div>
           </div>
+
         </nav>
+
+
 
         {/* Password Change Modal */}
         <div

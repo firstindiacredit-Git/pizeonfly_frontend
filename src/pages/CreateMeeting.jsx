@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import FloatingMenu from '../Chats/FloatingMenu'
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const CreateMeeting = () => {
   // Get admin user ID from localStorage
@@ -37,6 +38,18 @@ const CreateMeeting = () => {
     "12:00pm", "12:30pm", "1:00pm"
   ]);
   const [selectedTime, setSelectedTime] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const location = useLocation();
+  const { isRescheduling, meetingData: reschedulingData } = location.state || {};
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isRescheduling && reschedulingData) {
+      // Pre-fill the form with existing meeting data
+      setMeetingData(reschedulingData);
+    }
+  }, [isRescheduling, reschedulingData]);
 
   const handleNextStep = () => {
     if (selectedTime) {
@@ -65,47 +78,40 @@ const CreateMeeting = () => {
       return;
     }
 
-    try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/create-meeting`, {
-        ...meetingData,
-        date: selectedDate.toISOString().split('T')[0],
-        startTime: selectedTime,
-      });
-      toast.success("Meeting scheduled successfully!");
-      
-      // Reset form data
-      setMeetingData({
-        title: "Consultation Call",
-        description: "",
-        date: "",
-        startTime: "",
-        duration: 30,
-        guestName: "",
-        guestEmail: "",
-        guestPhone: "",
-        additionalGuests: [],
-        currentRevenue: "",
-        revenueGoal: "",
-        businessStruggle: "",
-        confirmAttendance: false,
-        organizer: currentAdminUserId,
-        agreedToTerms: false
-      });
-      
-      // Reset date and time selections
-      setSelectedDate(null);
-      setSelectedTime(null);
-      
-      // Return to step 1
-      setStep(1);
+    // Ensure date and startTime are set before submitting
+    if (selectedDate) {
+        meetingData.date = selectedDate;
+    }
+    if (selectedTime) {
+        meetingData.startTime = selectedTime;
+    }
 
-      // Reload the page after 5 seconds
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000);
-      
+    // Set loading to true before API call
+    setIsLoading(true);
+
+    try {
+      let response;
+      if (isRescheduling) {
+        response = await axios.put(
+          `${import.meta.env.VITE_BASE_URL}api/meetings/${meetingData._id}`,
+          meetingData
+        );
+      } else {
+        response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}api/create-meeting`,
+          meetingData
+        );
+      }
+
+      if (response.data.success) {
+        toast.success(isRescheduling ? "Meeting rescheduled successfully!" : "Meeting created successfully!");
+        navigate('/all-meetings');
+      }
     } catch (error) {
-      toast.error("Failed to schedule meeting");
+      toast.error(error.response?.data?.error || "An error occurred");
+    } finally {
+      // Set loading to false after API call completes
+      setIsLoading(false);
     }
   };
 
@@ -117,9 +123,15 @@ const CreateMeeting = () => {
           <Header />
           <div className="body d-flex py-lg-3 py-md-2">
             <div className="container-xxl">
+              <div className="border-0 mb-3">
+                <div className="card-header py-3 no-bg bg-transparent d-flex align-items-center px-0 justify-content-between border-bottom flex-wrap">
+                  <h3 className="fw-bold mb-0">Schedule Meeting</h3>
+                </div>
+              </div>
+
               <div className=" mb-3">
                 <div className="">
-                  <h3 className="mb-4">
+                  <h5 className="mb-4">
                     {step === 1 ? "Select a Date & Time" : (
 
                       <div className="">
@@ -134,7 +146,7 @@ const CreateMeeting = () => {
                       </div>
 
                     )}
-                  </h3>
+                  </h5>
                 </div>
                 <div className="card-body">
                   {step === 1 ? (
@@ -200,6 +212,37 @@ const CreateMeeting = () => {
                     </>
                   ) : (
                     <form onSubmit={handleSubmit} className="px-4">
+                      <div className="row">
+                        <div className="col-md-6 mb-3">
+                          <label className="form-label">Meeting Title *</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            name="title"
+                            value={meetingData.title}
+                            onChange={handleInputChange}
+                            placeholder="e.g., Consultation Call"
+                            required
+                          />
+                        </div>
+
+                        <div className="col-md-6 mb-3">
+                          <label className="form-label">Duration (minutes) *</label>
+                          <select
+                            className="form-select"
+                            name="duration"
+                            value={meetingData.duration}
+                            onChange={handleInputChange}
+                            required
+                          >
+                            <option value="15">15 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60">60 minutes</option>
+                          </select>
+                        </div>
+                      </div>
+
                       <div className="mb-3">
                         <label className="form-label">Name *</label>
                         <input
@@ -318,8 +361,17 @@ const CreateMeeting = () => {
                         </label>
                       </div>
 
-                      <button type="submit" className="btn btn-primary w-25 btn-lg fs-6">
-                        Schedule Event
+                      <button 
+                        type="submit" 
+                        className="btn btn-primary w-25 btn-lg fs-6"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <div className="spinner-border spinner-border-sm me-2" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        ) : null}
+                        {isLoading ? 'Scheduling...' : 'Schedule Event'}
                       </button>
                     </form>
                   )}
