@@ -201,7 +201,7 @@ const Header = () => {
 
   return (
     <>
-      <div className="header border-bottom">
+      <div className="header">
 
         <nav className="navbar py-4">
           <div className="container-xxl">

@@ -124,9 +124,16 @@ const Chat = () => {
       socket.current.on('receive_group_message', (message) => {
         setMessages(prev => {
           if (!prev.some(m => m._id === message._id)) {
-            if (selectedUser?.userType === 'Group' && selectedUser._id === message.receiverId) {
-              return [...prev, message];
-            }
+            return [...prev, message];
+          }
+          return prev;
+        });
+      });
+
+      socket.current.on('group_message_sent', (message) => {
+        setMessages(prev => {
+          if (!prev.some(m => m._id === message._id)) {
+            return [...prev, message];
           }
           return prev;
         });
@@ -149,7 +156,7 @@ const Chat = () => {
         socket.current.disconnect();
       }
     };
-  }, [selectedUser]);
+  }, []);
 
   useEffect(() => {
     fetchGroups();
@@ -198,7 +205,13 @@ const Chat = () => {
       if (selectedUser.userType === 'Group') {
         socket.current.emit('group_message', {
           ...response.data,
-          groupId: selectedUser._id
+          groupId: selectedUser._id,
+          members: selectedUser.members
+        });
+      } else {
+        socket.current.emit('private_message', {
+          receiverId: selectedUser._id,
+          message: response.data
         });
       }
     } catch (error) {
@@ -357,6 +370,16 @@ const Chat = () => {
   };
 
   const allUsers = [...employees, ...clients].filter(Boolean);
+
+  useEffect(() => {
+    if (selectedUser?.userType === 'Group') {
+      const interval = setInterval(() => {
+        fetchGroupMessages(selectedUser._id);
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [selectedUser]);
 
   return (
     <>

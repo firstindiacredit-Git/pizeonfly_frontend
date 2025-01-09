@@ -90,9 +90,16 @@ const EmployeeChat = () => {
       socket.current.on('receive_group_message', (message) => {
         setMessages(prev => {
           if (!prev.some(m => m._id === message._id)) {
-            if (selectedUser?.userType === 'Group' && selectedUser._id === message.receiverId) {
-              return [...prev, message];
-            }
+            return [...prev, message];
+          }
+          return prev;
+        });
+      });
+
+      socket.current.on('group_message_sent', (message) => {
+        setMessages(prev => {
+          if (!prev.some(m => m._id === message._id)) {
+            return [...prev, message];
           }
           return prev;
         });
@@ -107,7 +114,7 @@ const EmployeeChat = () => {
         }
       };
     }
-  }, [selectedUser]);
+  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -186,18 +193,23 @@ const EmployeeChat = () => {
         message: newMessage
       };
 
-      setNewMessage(''); // Clear message input immediately
+      setNewMessage('');
 
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}api/createChat`,
         messageData
       );
 
-      // Emit socket event for group messages
       if (selectedUser.userType === 'Group') {
         socket.current.emit('group_message', {
           ...response.data,
-          groupId: selectedUser._id
+          groupId: selectedUser._id,
+          members: selectedUser.members
+        });
+      } else {
+        socket.current.emit('private_message', {
+          receiverId: selectedUser._id,
+          message: response.data
         });
       }
     } catch (error) {
@@ -363,6 +375,16 @@ const EmployeeChat = () => {
   };
 
   const allUsers = [...admins, ...clients].filter(Boolean);
+
+  useEffect(() => {
+    if (selectedUser?.userType === 'Group') {
+      const interval = setInterval(() => {
+        fetchGroupMessages(selectedUser._id);
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [selectedUser]);
 
   return (
     <div id="mytask-layout">

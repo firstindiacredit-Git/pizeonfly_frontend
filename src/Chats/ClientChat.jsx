@@ -89,9 +89,16 @@ const ClientChat = () => {
             socket.current.on('receive_group_message', (message) => {
                 setMessages(prev => {
                     if (!prev.some(m => m._id === message._id)) {
-                        if (selectedUser?.userType === 'Group' && selectedUser._id === message.receiverId) {
-                            return [...prev, message];
-                        }
+                        return [...prev, message];
+                    }
+                    return prev;
+                });
+            });
+
+            socket.current.on('group_message_sent', (message) => {
+                setMessages(prev => {
+                    if (!prev.some(m => m._id === message._id)) {
+                        return [...prev, message];
                     }
                     return prev;
                 });
@@ -149,18 +156,18 @@ const ClientChat = () => {
                 message: newMessage
             };
 
-            setNewMessage(''); // Clear message input immediately
+            setNewMessage('');
 
             const response = await axios.post(
                 `${import.meta.env.VITE_BASE_URL}api/createChat`,
                 messageData
             );
 
-            // Emit socket event for group messages
             if (selectedUser.userType === 'Group') {
                 socket.current.emit('group_message', {
                     ...response.data,
-                    groupId: selectedUser._id
+                    groupId: selectedUser._id,
+                    members: selectedUser.members
                 });
             }
         } catch (error) {
