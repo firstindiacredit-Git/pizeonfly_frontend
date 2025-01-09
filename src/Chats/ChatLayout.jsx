@@ -467,10 +467,66 @@ const ChatLayout = ({
                                         <div onClick={() => setShowUserModal(true)} style={{ cursor: 'pointer' }}>
                                             {selectedUser && (
                                                 selectedUser.userType === 'Group' ? (
-                                                    // Group Avatar
-                                                    <div className="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                                                        style={{ width: '40px', height: '40px' }}>
-                                                        {selectedUser.name?.[0]?.toUpperCase()}
+                                                    // Group Avatar Grid
+                                                    <div className="avatar rounded-circle d-flex align-items-center justify-content-center"
+                                                        style={{ 
+                                                            backgroundColor: '#128C7E', 
+                                                            width: '40px', 
+                                                            height: '40px',
+                                                            position: 'relative',
+                                                            overflow: 'hidden'
+                                                        }}>
+                                                        <div className="group-avatar-grid" style={{ 
+                                                            display: 'grid',
+                                                            gridTemplateColumns: 'repeat(2, 1fr)',
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            gap: '1px'
+                                                        }}>
+                                                            {selectedUser.members?.slice(0, 4).map((member, idx) => {
+                                                                let imagePath;
+                                                                if (member.userType === 'Employee') {
+                                                                    imagePath = member.employeeImage?.replace('uploads/', '');
+                                                                } else if (member.userType === 'AdminUser') {
+                                                                    imagePath = member.profileImage?.replace('uploads/', '');
+                                                                } else if (member.userType === 'Client') {
+                                                                    imagePath = member.image?.replace('uploads/', '');
+                                                                }
+                                                                
+                                                                return (
+                                                                    <div key={idx} style={{ 
+                                                                        width: '100%', 
+                                                                        height: '100%', 
+                                                                        backgroundColor: '#f0f0f0'
+                                                                    }}>
+                                                                        {imagePath ? (
+                                                                            <img
+                                                                                src={`${import.meta.env.VITE_BASE_URL}${imagePath}`}
+                                                                                alt=""
+                                                                                style={{
+                                                                                    width: '100%',
+                                                                                    height: '100%',
+                                                                                    objectFit: 'cover'
+                                                                                }}
+                                                                            />
+                                                                        ) : (
+                                                                            <div style={{
+                                                                                width: '100%',
+                                                                                height: '100%',
+                                                                                backgroundColor: '#128C7E',
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                justifyContent: 'center',
+                                                                                color: 'white',
+                                                                                fontSize: '10px'
+                                                                            }}>
+                                                                                {member.name?.[0]?.toUpperCase()}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
                                                     </div>
                                                 ) : selectedUser.userType === 'AdminUser' ? (
                                                     // Admin Avatar
@@ -508,13 +564,20 @@ const ChatLayout = ({
                                                     'Unknown User'}
                                             </h6>
                                             <small className="text-white-50">
-                                                {selectedUser?.userType === 'Group' ?
-                                                    `${selectedUser.members?.length || 0} members` :
-                                                    selectedUser?.userType} {userStatuses[selectedUser?._id]?.isOnline
+                                                {selectedUser?.userType === 'Group' ? (
+                                                    <span>
+                                                        {selectedUser.members?.map(member => 
+                                                            member.name || member.employeeName || member.clientName || member.username
+                                                        ).slice(0, 3).join(', ')}
+                                                        {selectedUser.members?.length > 3 ? `, +${selectedUser.members.length - 3} others` : ''}
+                                                    </span>
+                                                ) : (
+                                                    `${selectedUser?.userType} ${userStatuses[selectedUser?._id]?.isOnline
                                                         ? 'online'
                                                         : userStatuses[selectedUser?._id]?.lastSeen
                                                             ? formatLastSeen(userStatuses[selectedUser?._id].lastSeen)
-                                                            : ''}
+                                                            : ''}`
+                                                )}
                                             </small>
                                         </div>
                                     </div>
@@ -524,6 +587,16 @@ const ChatLayout = ({
                                             <i className="bi bi-three-dots-vertical"></i>
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
+                                            {selectedUser?.userType === 'Group' && (
+                                                <>
+                                                    <Dropdown.Item onClick={() => setShowAddMembersModal(true)}>
+                                                        <i className="bi bi-person-plus me-2"></i>Add Members
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => setShowUserModal(true)}>
+                                                        <i className="bi bi-people me-2"></i>Group Info
+                                                    </Dropdown.Item>
+                                                </>
+                                            )}
                                             <Dropdown.Item onClick={() => setShowClearChatModal(true)}>
                                                 <i className="bi bi-trash me-2"></i>Clear Chat
                                             </Dropdown.Item>
@@ -552,12 +625,24 @@ const ChatLayout = ({
                                     '&::-webkit-scrollbar': { display: 'none' }
                                 }}>
                                 {messages.map((msg, index) => (
-                                    <div key={index}
+                                    <div key={msg._id || index}
                                         className={`chat-message d-flex ${msg.isCurrentUser ? 'justify-content-end' : 'justify-content-start'} mb-3`}>
+                                        {!msg.isCurrentUser && selectedUser?.userType === 'Group' && (
+                                            <div className="sender-info me-2">
+                                                <img
+                                                    src={`${import.meta.env.VITE_BASE_URL}${msg.senderDetails?.image?.replace('uploads/', '')}`}
+                                                    className="avatar rounded-circle"
+                                                    style={{ width: '30px', height: '30px', objectFit: 'cover' }}
+                                                    alt={msg.senderDetails?.name}
+                                                />
+                                                <small className="d-block text-muted" style={{ fontSize: '0.75rem' }}>
+                                                    {msg.senderDetails?.name}
+                                                </small>
+                                            </div>
+                                        )}
                                         <div className={`message-bubble px-2 rounded-1 ${msg.isCurrentUser ? 'text-white' : 'bg-white'}`}
                                             style={{
                                                 maxWidth: '75%',
-                                                maxHeight: '75%',
                                                 position: 'relative',
                                                 backgroundColor: msg.isCurrentUser ? '#075E54' : '#ffffff',
                                                 borderRadius: '7.5px'
@@ -842,16 +927,98 @@ const ChatLayout = ({
                                                         <li
                                                             key={group._id}
                                                             className={`list-group-item ${selectedUser?._id === group._id ? 'active' : ''}`}
-                                                            style={{ backgroundColor: selectedUser?._id === group._id ? '#80808069' : '' }}
+                                                            style={{ 
+                                                                backgroundColor: selectedUser?._id === group._id ? '#80808069' : '',
+                                                                padding: '10px 15px'
+                                                            }}
                                                             onClick={() => onUserSelect(group, 'Group')}
                                                         >
                                                             <div className="d-flex align-items-center">
-                                                                <div className="avatar rounded-circle" style={{ backgroundColor: '#128C7E', color: 'white', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                                    {group.name[0].toUpperCase()}
+                                                                <div className="avatar rounded-circle d-flex align-items-center justify-content-center" 
+                                                                    style={{ 
+                                                                        backgroundColor: '#128C7E', 
+                                                                        width: '45px', 
+                                                                        height: '45px',
+                                                                        position: 'relative',
+                                                                        overflow: 'hidden'
+                                                                    }}>
+                                                                    {/* Group members mini avatars */}
+                                                                    <div className="group-avatar-grid" style={{ 
+                                                                        display: 'grid',
+                                                                        gridTemplateColumns: 'repeat(2, 1fr)',
+                                                                        width: '100%',
+                                                                        height: '100%',
+                                                                        gap: '1px'
+                                                                    }}>
+                                                                        {group.members.slice(0, 4).map((member, idx) => {
+                                                                            let imagePath;
+                                                                            if (member.userType === 'Employee') {
+                                                                                imagePath = member.employeeImage?.replace('uploads/', '');
+                                                                            } else if (member.userType === 'AdminUser') {
+                                                                                imagePath = member.profileImage?.replace('uploads/', '');
+                                                                            } else if (member.userType === 'Client') {
+                                                                                imagePath = member.image?.replace('uploads/', '');
+                                                                            }
+                                                                            
+                                                                            return (
+                                                                                <div key={idx} style={{ 
+                                                                                    width: '100%', 
+                                                                                    height: '100%', 
+                                                                                    backgroundColor: '#f0f0f0'
+                                                                                }}>
+                                                                                    {imagePath ? (
+                                                                                        <img
+                                                                                            src={`${import.meta.env.VITE_BASE_URL}${imagePath}`}
+                                                                                            alt=""
+                                                                                            style={{
+                                                                                                width: '100%',
+                                                                                                height: '100%',
+                                                                                                objectFit: 'cover'
+                                                                                            }}
+                                                                                        />
+                                                                                    ) : (
+                                                                                        <div style={{
+                                                                                            width: '100%',
+                                                                                            height: '100%',
+                                                                                            backgroundColor: '#128C7E',
+                                                                                            display: 'flex',
+                                                                                            alignItems: 'center',
+                                                                                            justifyContent: 'center',
+                                                                                            color: 'white',
+                                                                                            fontSize: '10px'
+                                                                                        }}>
+                                                                                            {member.name?.[0]?.toUpperCase()}
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
                                                                 </div>
                                                                 <div className="flex-fill ms-3">
-                                                                    <h6 className="mb-0">{group.name}</h6>
-                                                                    <small>{group.members.length} members</small>
+                                                                    <div className="d-flex justify-content-between align-items-center">
+                                                                        <h6 className="mb-0">{group.name}</h6>
+                                                                        {group.lastMessage && (
+                                                                            <small className="text-muted">
+                                                                                {new Date(group.lastMessage.timestamp).toLocaleTimeString([], { 
+                                                                                    hour: '2-digit', 
+                                                                                    minute: '2-digit' 
+                                                                                })}
+                                                                            </small>
+                                                                        )}
+                                                                    </div>
+                                                                    <small className="text-muted d-block">
+                                                                        {group.lastMessage ? (
+                                                                            <span>
+                                                                                <strong>{group.lastMessage.sender?.name}: </strong>
+                                                                                {group.lastMessage.message?.length > 30 
+                                                                                    ? group.lastMessage.message.substring(0, 30) + '...' 
+                                                                                    : group.lastMessage.message}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span>{group.members.length} members</span>
+                                                                        )}
+                                                                    </small>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -877,23 +1044,87 @@ const ChatLayout = ({
                 </Modal.Header>
                 <Modal.Body>
                     <div className="text-center mb-4">
-                        <img
-                            src={`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
-                                ? selectedUser?.employeeImage?.replace('uploads/', '')
-                                : selectedUser?.userType === 'AdminUser'
-                                    ? selectedUser?.profileImage?.replace('uploads/', '')
-                                    : selectedUser?.clientImage?.replace('uploads/', '')
-                                }`}
-                            className="rounded-circle"
-                            alt="Profile"
-                            style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
-                            onClick={() => handleProfileImageClick(`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
-                                ? selectedUser?.employeeImage?.replace('uploads/', '')
-                                : selectedUser?.userType === 'AdminUser'
-                                    ? selectedUser?.profileImage?.replace('uploads/', '')
-                                    : selectedUser?.clientImage?.replace('uploads/', '')
-                                }`)}
-                        />
+                        {selectedUser?.userType === 'Group' ? (
+                            <div className="avatar rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                                style={{ 
+                                    backgroundColor: '#128C7E', 
+                                    width: '100px', 
+                                    height: '100px',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    cursor: 'pointer'
+                                }}>
+                                <div className="group-avatar-grid" style={{ 
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(2, 1fr)',
+                                    width: '100%',
+                                    height: '100%',
+                                    gap: '1px'
+                                }}>
+                                    {selectedUser.members?.slice(0, 4).map((member, idx) => {
+                                        let imagePath;
+                                        if (member.userType === 'Employee') {
+                                            imagePath = member.employeeImage?.replace('uploads/', '');
+                                        } else if (member.userType === 'AdminUser') {
+                                            imagePath = member.profileImage?.replace('uploads/', '');
+                                        } else if (member.userType === 'Client') {
+                                            imagePath = member.image?.replace('uploads/', '');
+                                        }
+                                        
+                                        return (
+                                            <div key={idx} style={{ 
+                                                width: '100%', 
+                                                height: '100%', 
+                                                backgroundColor: '#f0f0f0'
+                                            }}>
+                                                {imagePath ? (
+                                                    <img
+                                                        src={`${import.meta.env.VITE_BASE_URL}${imagePath}`}
+                                                        alt=""
+                                                        style={{
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            objectFit: 'cover'
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        backgroundColor: '#128C7E',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: 'white',
+                                                        fontSize: '20px'
+                                                    }}>
+                                                        {member.name?.[0]?.toUpperCase()}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ) : (
+                            <img
+                                src={`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
+                                    ? selectedUser?.employeeImage?.replace('uploads/', '')
+                                    : selectedUser?.userType === 'AdminUser'
+                                        ? selectedUser?.profileImage?.replace('uploads/', '')
+                                        : selectedUser?.clientImage?.replace('uploads/', '')
+                                    }`}
+                                className="rounded-circle"
+                                alt="Profile"
+                                style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
+                                onClick={() => handleProfileImageClick(`${import.meta.env.VITE_BASE_URL}${selectedUser?.userType === 'Employee'
+                                    ? selectedUser?.employeeImage?.replace('uploads/', '')
+                                    : selectedUser?.userType === 'AdminUser'
+                                        ? selectedUser?.profileImage?.replace('uploads/', '')
+                                        : selectedUser?.clientImage?.replace('uploads/', '')
+                                    }`)}
+                            />
+                        )}
                     </div>
                     {/* Group Details */}
                     <div className="user-details">
@@ -910,25 +1141,27 @@ const ChatLayout = ({
                                         <strong>Total Members:</strong> {selectedUser?.members?.length || 0}
                                     </div>
                                     <div className="info-item mb-2">
-                                        <div className="d-flex justify-content-between align-items-center"> <strong className="">Members List</strong>
-                                        <div>
-                                        {selectedMembers.length > 0 && (
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <strong className="">Members List</strong>
+                                            <div>
+                                                {selectedMembers.length > 0 && (
+                                                    <button
+                                                        className="btn btn-sm btn-danger text-white"
+                                                        onClick={() => setShowDeleteMembersModal(true)}
+                                                    >
+                                                        Delete Selected
+                                                    </button>
+                                                )}
                                                 <button
-                                                    className="btn btn-sm btn-danger text-white"
-                                                    onClick={() => setShowDeleteMembersModal(true)}
+                                                    className="btn btn-sm ms-2 text-white"
+                                                    style={{ backgroundColor: '#128c7e', border: 'none' }}
+                                                    onClick={() => setShowAddMembersModal(true)}
                                                 >
-                                                    Delete Selected
-                                                </button>
-                                            )}
-                                            <button
-                                                className="btn btn-sm ms-2 text-white"
-                                                style={{ backgroundColor: '#128c7e', border: 'none' }}
-                                                onClick={() => setShowAddMembersModal(true)}
-                                            >
                                                     + Add Member
                                                 </button>
                                             </div>
                                         </div>
+                                        {/* Members List */}
                                         {selectedUser?.members
                                             ?.slice(0, showAllMembers ? undefined : 5)
                                             .map(member => {
@@ -954,7 +1187,6 @@ const ChatLayout = ({
                                                                 }
                                                             }}
                                                         />
-                                                        {/* <i className="bi bi-dot me-1 fs-4 text-success" /> */}
                                                         <img
                                                             src={`${import.meta.env.VITE_BASE_URL}${imagePath}`}
                                                             className="avatar rounded-circle me-2"
@@ -962,39 +1194,15 @@ const ChatLayout = ({
                                                             style={{ width: '30px', height: '30px', objectFit: 'contain' }}
                                                         />
                                                         <div className=''>
-                                                            <span
-                                                                className="fw-semibold me-1"
-                                                                style={{ cursor: 'pointer' }}
-                                                                onClick={() => {
-                                                                    // Find the user in the users array
-                                                                    const userToChat = users.find(u => u._id === member.userId);
-                                                                    if (userToChat) {
-                                                                        // Switch to appropriate tab based on user type
-                                                                        if (member.userType === 'Employee') {
-                                                                            onTabChange('employees');
-                                                                        } else if (member.userType === 'Client') {
-                                                                            onTabChange('clients');
-                                                                        } else if (member.userType === 'AdminUser') {
-                                                                            onTabChange('admins');
-                                                                        }
-
-                                                                        // Small delay to ensure tab change is complete
-                                                                        setTimeout(() => {
-                                                                            onUserSelect(userToChat, member.userType);
-                                                                            setShowUserModal(false); // Close the modal
-                                                                        }, 100);
-                                                                    }
-                                                                }}
-                                                            >
-                                                                {member.name}
-                                                            </span>
+                                                            <span className="fw-semibold me-1">{member.name}</span>
                                                             <span className="text-muted">({member.userType})</span>
                                                         </div>
                                                         <i
                                                             className="bi bi-trash text-danger text-end ms-auto"
                                                             style={{ cursor: 'pointer' }}
                                                             onClick={() => handleRemoveMember(member.userId)}
-                                                        />                                                </div>
+                                                        />
+                                                    </div>
                                                 );
                                             })}
                                         
@@ -1009,10 +1217,10 @@ const ChatLayout = ({
                                         )}
                                     </div>
                                     <div className="info-item mb-2">
-                                        <strong>Created At:</strong> {new Date(selectedUser?.createdAt).toLocaleDateString()}
+                                        <strong>Created At:</strong> {selectedUser?.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString() : 'N/A'}
                                     </div>
                                     <div className="info-item mb-2">
-                                        <strong>Last Message:</strong> {selectedUser?.lastMessage || 'No messages yet'}
+                                        <strong>Last Message:</strong> {typeof selectedUser?.lastMessage === 'string' ? selectedUser.lastMessage : 'No messages yet'}
                                     </div>
                                 </>
                             )}

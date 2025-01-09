@@ -88,7 +88,13 @@ const Chat = () => {
       socket.current.on('receive_message', (message) => {
         setMessages(prev => {
           if (!prev.some(m => m._id === message._id)) {
-            return [...prev, message];
+            if (selectedUser?.userType === 'Group' && message.receiverId === selectedUser._id) {
+              return [...prev, message];
+            }
+            else if (selectedUser && 
+              (message.senderId === selectedUser._id || message.receiverId === selectedUser._id)) {
+              return [...prev, message];
+            }
           }
           return prev;
         });
@@ -116,7 +122,22 @@ const Chat = () => {
       });
 
       socket.current.on('receive_group_message', (message) => {
-        setMessages(prev => [...prev, message]);
+        setMessages(prev => {
+          if (!prev.some(m => m._id === message._id)) {
+            if (selectedUser?.userType === 'Group' && selectedUser._id === message.receiverId) {
+              return [...prev, message];
+            }
+          }
+          return prev;
+        });
+      });
+
+      socket.current.on('group_updated', (updatedGroup) => {
+        setGroups(prevGroups => 
+            prevGroups.map(group => 
+                group._id === updatedGroup._id ? updatedGroup : group
+            )
+        );
       });
 
       fetchUsers();
@@ -128,7 +149,7 @@ const Chat = () => {
         socket.current.disconnect();
       }
     };
-  }, []);
+  }, [selectedUser]);
 
   useEffect(() => {
     fetchGroups();
@@ -173,6 +194,13 @@ const Chat = () => {
         `${import.meta.env.VITE_BASE_URL}api/createChat`,
         messageData
       );
+
+      if (selectedUser.userType === 'Group') {
+        socket.current.emit('group_message', {
+          ...response.data,
+          groupId: selectedUser._id
+        });
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error('Error sending message');
