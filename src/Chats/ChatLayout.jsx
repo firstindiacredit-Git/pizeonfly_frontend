@@ -82,36 +82,80 @@ const ChatLayout = ({
 
     // Handle group creation
     const handleCreateGroup = async () => {
-        if (!groupName.trim() || selectedMembers.length === 0) {
-            toast.error('Please enter group name and select members');
-            return;
-        }
-
         try {
+            if (!groupName.trim()) {
+                toast.error('Please enter a group name');
+                return;
+            }
+
+            // Get current user from localStorage
+            const currentUser = JSON.parse(localStorage.getItem('user')) ||
+                JSON.parse(localStorage.getItem('emp_user')) ||
+                JSON.parse(localStorage.getItem('client_user'));
+
+            // Determine creator's user type and name based on role
+            let creatorType, creatorName;
+            if (currentUser.role === 'superadmin' || currentUser.role === 'admin') {
+                creatorType = 'AdminUser';
+                creatorName = currentUser.username;
+            } else if (currentUser.role === 'employee') {
+                creatorType = 'Employee';
+                creatorName = currentUser.employeeName;
+            } else {
+                creatorType = 'Client';
+                creatorName = currentUser.clientName;
+            }
+
+            // Create creator member object with full details
+            const creatorMember = {
+                userId: currentUser._id,
+                type: creatorType,
+                name: creatorName
+            };
+
+            // Convert selected members to the correct format
+            const formattedSelectedMembers = selectedMembers.map(member => ({
+                userId: member.value,
+                type: member.type,
+                name: member.label
+            }));
+
+            // Combine creator with selected members
+            const allMembers = [creatorMember, ...formattedSelectedMembers];
+
+            // Remove duplicates while preserving all member information
+            const uniqueMembers = allMembers.filter((member, index, self) =>
+                index === self.findIndex((m) => m.userId === member.userId)
+            );
+
+            console.log('Creating group with members:', uniqueMembers);
+
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/createGroup`, {
                 name: groupName,
-                members: selectedMembers.map(member => ({
-                    userId: member.value,
-                    userType: member.type
-                }))
+                members: uniqueMembers,
+                createdBy: {
+                    userId: currentUser._id,
+                    type: creatorType,
+                    name: creatorName
+                }
             });
 
-            toast.success('Group created successfully');
             setShowCreateGroupModal(false);
             setGroupName('');
             setSelectedMembers([]);
-            // Refresh groups list if needed
-            if (typeof onGroupCreate === 'function') {
-                onGroupCreate();
+            toast.success('Group created successfully');
+
+            // Emit socket event for group creation
+            if (socket.current) {
+                socket.current.emit('group_created', response.data);
             }
-            // Reload the page after 5 seconds
-            setTimeout(() => {
-                window.location.reload();
-            }, 5000);
+
+            // Fetch updated groups list
+            fetchGroups();
 
         } catch (error) {
             console.error('Error creating group:', error);
-            toast.error('Error creating group');
+            toast.error(error.response?.data?.error || 'Error creating group');
         }
     };
 

@@ -136,7 +136,11 @@ const EmployeeChat = () => {
   const fetchGroups = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groups`);
-      setGroups(response.data);
+      // Filter groups where current employee is a member
+      const userGroups = response.data.filter(group => 
+        group.members.some(member => member.userId === currentEmployee._id)
+      );
+      setGroups(userGroups);
     } catch (error) {
       toast.error('Error loading groups');
     }
