@@ -192,7 +192,9 @@ const Chat = () => {
     try {
       const messageData = {
         senderId: currentUser._id,
-        senderType: mapRoleToType(currentUser.role),
+        senderType: 'AdminUser',
+        senderName: currentUser.username,
+        senderImage: currentUser.profileImage,
         receiverId: selectedUser._id,
         receiverType: selectedUser.userType,
         message: newMessage
@@ -280,7 +282,9 @@ const Chat = () => {
     const formData = new FormData();
 
     formData.append('senderId', currentUser._id);
-    formData.append('senderType', mapRoleToType(currentUser.role));
+    formData.append('senderType', 'AdminUser');
+    formData.append('senderName', currentUser.username);
+    formData.append('senderImage', currentUser.profileImage);
     formData.append('receiverId', selectedUser._id);
     formData.append('receiverType', selectedUser.userType);
     formData.append('message', '');
@@ -320,7 +324,9 @@ const Chat = () => {
     const formData = new FormData();
 
     formData.append('senderId', currentUser._id);
-    formData.append('senderType', mapRoleToType(currentUser.role));
+    formData.append('senderType', 'AdminUser');
+    formData.append('senderName', currentUser.username);
+    formData.append('senderImage', currentUser.profileImage);
     formData.append('receiverId', selectedUser._id);
     formData.append('receiverType', selectedUser.userType);
     formData.append('message', '');
