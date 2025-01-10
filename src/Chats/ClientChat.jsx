@@ -87,15 +87,19 @@ const ClientChat = () => {
             });
 
             socket.current.on('receive_group_message', (message) => {
+                console.log('Client/Employee received group message:', message); // Debug log
                 setMessages(prev => {
                     if (!prev.some(m => m._id === message._id)) {
-                        return [...prev, message];
+                        if (selectedUser?.userType === 'Group' && message.receiverId === selectedUser._id) {
+                            return [...prev, message];
+                        }
                     }
                     return prev;
                 });
             });
 
             socket.current.on('group_message_sent', (message) => {
+                console.log('Client/Employee group message sent confirmation:', message); // Debug log
                 setMessages(prev => {
                     if (!prev.some(m => m._id === message._id)) {
                         return [...prev, message];
@@ -110,8 +114,20 @@ const ClientChat = () => {
             return () => {
                 if (socket.current) {
                     socket.current.disconnect();
+                    socket.current.off('receive_group_message');
+                    socket.current.off('group_message_sent');
                 }
             };
+        }
+    }, [selectedUser]);
+
+    useEffect(() => {
+        if (selectedUser?.userType === 'Group') {
+            const interval = setInterval(() => {
+                fetchGroupMessages(selectedUser._id);
+            }, 3000);
+
+            return () => clearInterval(interval);
         }
     }, [selectedUser]);
 
@@ -355,11 +371,7 @@ const ClientChat = () => {
     const fetchGroups = async () => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groups`);
-            // Filter groups where current client is a member
-            const userGroups = response.data.filter(group => 
-                group.members.some(member => member.userId === currentClient._id)
-            );
-            setGroups(userGroups);
+            setGroups(response.data);
         } catch (error) {
             toast.error('Error loading groups');
         }

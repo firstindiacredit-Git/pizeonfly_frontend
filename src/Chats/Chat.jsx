@@ -125,15 +125,20 @@ const Chat = () => {
       });
 
       socket.current.on('receive_group_message', (message) => {
+        console.log('Received group message:', message);
         setMessages(prev => {
           if (!prev.some(m => m._id === message._id)) {
-            return [...prev, message];
+            if (selectedUser?.userType === 'Group' && message.receiverId === selectedUser._id) {
+              console.log('Adding new group message to state');
+              return [...prev, message];
+            }
           }
           return prev;
         });
       });
 
       socket.current.on('group_message_sent', (message) => {
+        console.log('Group message sent confirmation:', message);
         setMessages(prev => {
           if (!prev.some(m => m._id === message._id)) {
             return [...prev, message];
@@ -200,6 +205,8 @@ const Chat = () => {
         message: newMessage
       };
 
+      console.log('Admin sending message:', messageData);
+
       setNewMessage('');
 
       const response = await axios.post(
@@ -208,17 +215,29 @@ const Chat = () => {
       );
 
       if (selectedUser.userType === 'Group') {
-        socket.current.emit('group_message', {
+        const groupMessageData = {
           ...response.data,
           groupId: selectedUser._id,
-          members: selectedUser.members
-        });
+          members: selectedUser.members,
+          senderDetails: {
+            name: currentUser.username,
+            email: currentUser.email,
+            image: currentUser.profileImage,
+            type: 'AdminUser'
+          }
+        };
+        
+        console.log('Emitting group message:', groupMessageData);
+        socket.current.emit('group_message', groupMessageData);
       } else {
         socket.current.emit('private_message', {
           receiverId: selectedUser._id,
           message: response.data
         });
       }
+
+      setMessages(prev => [...prev, response.data]);
+
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error('Error sending message');
@@ -282,9 +301,7 @@ const Chat = () => {
     const formData = new FormData();
 
     formData.append('senderId', currentUser._id);
-    formData.append('senderType', 'AdminUser');
-    formData.append('senderName', currentUser.username);
-    formData.append('senderImage', currentUser.profileImage);
+    formData.append('senderType', mapRoleToType(currentUser.role));
     formData.append('receiverId', selectedUser._id);
     formData.append('receiverType', selectedUser.userType);
     formData.append('message', '');
@@ -324,9 +341,7 @@ const Chat = () => {
     const formData = new FormData();
 
     formData.append('senderId', currentUser._id);
-    formData.append('senderType', 'AdminUser');
-    formData.append('senderName', currentUser.username);
-    formData.append('senderImage', currentUser.profileImage);
+    formData.append('senderType', mapRoleToType(currentUser.role));
     formData.append('receiverId', selectedUser._id);
     formData.append('receiverType', selectedUser.userType);
     formData.append('message', '');
@@ -384,7 +399,49 @@ const Chat = () => {
     if (selectedUser?.userType === 'Group') {
       const interval = setInterval(() => {
         fetchGroupMessages(selectedUser._id);
-      }, 5000);
+      }, 3000);
+
+      return () => clearInterval(interval);
+    }
+  }, [selectedUser]);
+
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on('receive_group_message', (message) => {
+        console.log('Received group message:', message);
+        setMessages(prev => {
+          if (!prev.some(m => m._id === message._id)) {
+            if (selectedUser?.userType === 'Group' && message.receiverId === selectedUser._id) {
+              console.log('Adding new group message to state');
+              return [...prev, message];
+            }
+          }
+          return prev;
+        });
+      });
+
+      socket.current.on('group_message_sent', (message) => {
+        console.log('Group message sent confirmation:', message);
+        setMessages(prev => {
+          if (!prev.some(m => m._id === message._id)) {
+            return [...prev, message];
+          }
+          return prev;
+        });
+      });
+
+      return () => {
+        socket.current.off('receive_group_message');
+        socket.current.off('group_message_sent');
+      };
+    }
+  }, [selectedUser]);
+
+  useEffect(() => {
+    if (selectedUser?.userType === 'Group') {
+      const interval = setInterval(() => {
+        fetchGroupMessages(selectedUser._id);
+      }, 3000);
 
       return () => clearInterval(interval);
     }

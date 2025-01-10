@@ -677,11 +677,9 @@ const ChatLayout = ({
                                                     src={`${import.meta.env.VITE_BASE_URL}${msg.senderDetails?.image?.replace('uploads/', '')}`}
                                                     className="avatar rounded-circle"
                                                     style={{ width: '30px', height: '30px', objectFit: 'cover' }}
-                                                    alt={msg.senderDetails?.name}
+                                                    // alt="{msg.senderDetails?.name}"
+                                                    alt="photo"
                                                 />
-                                                <small className="d-block text-muted" style={{ fontSize: '0.75rem' }}>
-                                                    {msg.senderDetails?.name}
-                                                </small>
                                             </div>
                                         )}
                                         <div className={`message-bubble px-2 rounded-1 ${msg.isCurrentUser ? 'text-white' : 'bg-white'}`}
@@ -691,6 +689,16 @@ const ChatLayout = ({
                                                 backgroundColor: msg.isCurrentUser ? '#075E54' : '#ffffff',
                                                 borderRadius: '7.5px'
                                             }}>
+                                            {!msg.isCurrentUser && selectedUser?.userType === 'Group' && (
+                                                <div className="sender-name fw-bold" style={{ 
+                                                    fontSize: '0.8rem', 
+                                                    color: '#128c7e',
+                                                    fontWeight: '500',
+                                                    marginBottom: '2px'
+                                                }}>
+                                                    {msg.senderDetails?.name}
+                                                </div>
+                                            )}
                                             <div className="d-flex justify-content-between align-items-start">
                                                 <div className="message-content pe-2">
                                                     {msg.isDeleted ? (

@@ -88,15 +88,20 @@ const EmployeeChat = () => {
 
       // Listen for group messages
       socket.current.on('receive_group_message', (message) => {
+        console.log('Employee received group message:', message); // Debug log
         setMessages(prev => {
           if (!prev.some(m => m._id === message._id)) {
-            return [...prev, message];
+            if (selectedUser?.userType === 'Group' && message.receiverId === selectedUser._id) {
+              console.log('Adding new group message to state'); // Debug log
+              return [...prev, message];
+            }
           }
           return prev;
         });
       });
 
       socket.current.on('group_message_sent', (message) => {
+        console.log('Group message sent confirmation:', message); // Debug log
         setMessages(prev => {
           if (!prev.some(m => m._id === message._id)) {
             return [...prev, message];
@@ -111,10 +116,17 @@ const EmployeeChat = () => {
       return () => {
         if (socket.current) {
           socket.current.disconnect();
+          socket.current.off('receive_group_message');
+          socket.current.off('group_message_sent');
+          socket.current.off('group_updated');
+          socket.current.off('receive_message');
+          socket.current.off('message_sent');
+          socket.current.off('message_updated');
+          socket.current.off('message_deleted');
         }
       };
     }
-  }, []);
+  }, [selectedUser]);
 
   const fetchUsers = async () => {
     try {
@@ -189,36 +201,53 @@ const EmployeeChat = () => {
     if (!newMessage.trim() || !selectedUser) return;
 
     try {
-      const messageData = {
-        senderId: currentEmployee._id,
-        senderType: 'Employee',
-        receiverId: selectedUser._id,
-        receiverType: selectedUser.userType,
-        message: newMessage
-      };
+        const messageData = {
+            senderId: currentEmployee._id,
+            senderType: 'Employee',
+            senderName: currentEmployee.employeeName,
+            senderImage: currentEmployee.employeeImage,
+            receiverId: selectedUser._id,
+            receiverType: selectedUser.userType,
+            message: newMessage
+        };
 
-      setNewMessage('');
+        console.log('Employee sending message:', messageData); // Debug log
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}api/createChat`,
-        messageData
-      );
+        setNewMessage('');
 
-      if (selectedUser.userType === 'Group') {
-        socket.current.emit('group_message', {
-          ...response.data,
-          groupId: selectedUser._id,
-          members: selectedUser.members
-        });
-      } else {
-        socket.current.emit('private_message', {
-          receiverId: selectedUser._id,
-          message: response.data
-        });
-      }
+        const response = await axios.post(
+            `${import.meta.env.VITE_BASE_URL}api/createChat`,
+            messageData
+        );
+
+        if (selectedUser.userType === 'Group') {
+            const groupMessageData = {
+                ...response.data,
+                groupId: selectedUser._id,
+                members: selectedUser.members,
+                senderDetails: {
+                    name: currentEmployee.employeeName,
+                    email: currentEmployee.emailid,
+                    image: currentEmployee.employeeImage,
+                    type: 'Employee'
+                }
+            };
+            
+            console.log('Emitting group message:', groupMessageData); // Debug log
+            socket.current.emit('group_message', groupMessageData);
+        } else {
+            socket.current.emit('private_message', {
+                receiverId: selectedUser._id,
+                message: response.data
+            });
+        }
+
+        // Add message locally immediately
+        setMessages(prev => [...prev, response.data]);
+
     } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Error sending message');
+        console.error('Error sending message:', error);
+        toast.error('Error sending message');
     }
   };
 
@@ -382,11 +411,11 @@ const EmployeeChat = () => {
 
   useEffect(() => {
     if (selectedUser?.userType === 'Group') {
-      const interval = setInterval(() => {
-        fetchGroupMessages(selectedUser._id);
-      }, 5000);
+        const interval = setInterval(() => {
+            fetchGroupMessages(selectedUser._id);
+        }, 3000);
 
-      return () => clearInterval(interval);
+        return () => clearInterval(interval);
     }
   }, [selectedUser]);
 
@@ -444,4 +473,4 @@ const EmployeeChat = () => {
   );
 };
 
-export default EmployeeChat; 
+export default EmployeeChat;                    
