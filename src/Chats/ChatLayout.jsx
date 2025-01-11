@@ -502,6 +502,14 @@ const ChatLayout = ({
         }
     };
 
+    const isGroupCreator = () => {
+        const currentUser = JSON.parse(localStorage.getItem('user')) ||
+            JSON.parse(localStorage.getItem('emp_user')) ||
+            JSON.parse(localStorage.getItem('client_user'));
+
+        return selectedUser?.createdBy?.userId === currentUser._id;
+    };
+
 
     return (
         <div className="container-fluid mt-2" style={{}}>
@@ -521,14 +529,14 @@ const ChatLayout = ({
                                                 selectedUser.userType === 'Group' ? (
                                                     // Group Avatar Grid
                                                     <div className="avatar rounded-circle d-flex align-items-center justify-content-center"
-                                                        style={{ 
-                                                            backgroundColor: '#128C7E', 
-                                                            width: '40px', 
+                                                        style={{
+                                                            backgroundColor: '#128C7E',
+                                                            width: '40px',
                                                             height: '40px',
                                                             position: 'relative',
                                                             overflow: 'hidden'
                                                         }}>
-                                                        <div className="group-avatar-grid" style={{ 
+                                                        <div className="group-avatar-grid" style={{
                                                             display: 'grid',
                                                             gridTemplateColumns: 'repeat(2, 1fr)',
                                                             width: '100%',
@@ -544,11 +552,11 @@ const ChatLayout = ({
                                                                 } else if (member.userType === 'Client') {
                                                                     imagePath = member.image?.replace('uploads/', '');
                                                                 }
-                                                                
+
                                                                 return (
-                                                                    <div key={idx} style={{ 
-                                                                        width: '100%', 
-                                                                        height: '100%', 
+                                                                    <div key={idx} style={{
+                                                                        width: '100%',
+                                                                        height: '100%',
                                                                         backgroundColor: '#f0f0f0'
                                                                     }}>
                                                                         {imagePath ? (
@@ -618,7 +626,7 @@ const ChatLayout = ({
                                             <small className="text-white-50">
                                                 {selectedUser?.userType === 'Group' ? (
                                                     <span>
-                                                        {selectedUser.members?.map(member => 
+                                                        {selectedUser.members?.map(member =>
                                                             member.name || member.employeeName || member.clientName || member.username
                                                         ).slice(0, 3).join(', ')}
                                                         {selectedUser.members?.length > 3 ? `, +${selectedUser.members.length - 3} others` : ''}
@@ -698,8 +706,8 @@ const ChatLayout = ({
                                                 borderRadius: '7.5px'
                                             }}>
                                             {!msg.isCurrentUser && selectedUser?.userType === 'Group' && (
-                                                <div className="sender-name fw-bold" style={{ 
-                                                    fontSize: '0.8rem', 
+                                                <div className="sender-name fw-bold" style={{
+                                                    fontSize: '0.8rem',
                                                     color: '#128c7e',
                                                     fontWeight: '500',
                                                     marginBottom: '2px'
@@ -987,23 +995,23 @@ const ChatLayout = ({
                                                         <li
                                                             key={group._id}
                                                             className={`list-group-item ${selectedUser?._id === group._id ? 'active' : ''}`}
-                                                            style={{ 
+                                                            style={{
                                                                 backgroundColor: selectedUser?._id === group._id ? '#80808069' : '',
                                                                 padding: '10px 15px'
                                                             }}
                                                             onClick={() => onUserSelect(group, 'Group')}
                                                         >
                                                             <div className="d-flex align-items-center">
-                                                                <div className="avatar rounded-circle d-flex align-items-center justify-content-center" 
-                                                                    style={{ 
-                                                                        backgroundColor: '#128C7E', 
-                                                                        width: '45px', 
+                                                                <div className="avatar rounded-circle d-flex align-items-center justify-content-center"
+                                                                    style={{
+                                                                        backgroundColor: '#128C7E',
+                                                                        width: '45px',
                                                                         height: '45px',
                                                                         position: 'relative',
                                                                         overflow: 'hidden'
                                                                     }}>
                                                                     {/* Group members mini avatars */}
-                                                                    <div className="group-avatar-grid" style={{ 
+                                                                    <div className="group-avatar-grid" style={{
                                                                         display: 'grid',
                                                                         gridTemplateColumns: 'repeat(2, 1fr)',
                                                                         width: '100%',
@@ -1019,11 +1027,11 @@ const ChatLayout = ({
                                                                             } else if (member.userType === 'Client') {
                                                                                 imagePath = member.image?.replace('uploads/', '');
                                                                             }
-                                                                            
+
                                                                             return (
-                                                                                <div key={idx} style={{ 
-                                                                                    width: '100%', 
-                                                                                    height: '100%', 
+                                                                                <div key={idx} style={{
+                                                                                    width: '100%',
+                                                                                    height: '100%',
                                                                                     backgroundColor: '#f0f0f0'
                                                                                 }}>
                                                                                     {imagePath ? (
@@ -1060,9 +1068,9 @@ const ChatLayout = ({
                                                                         <h6 className="mb-0">{group.name}</h6>
                                                                         {group.lastMessage && (
                                                                             <small className="text-muted">
-                                                                                {new Date(group.lastMessage.timestamp).toLocaleTimeString([], { 
-                                                                                    hour: '2-digit', 
-                                                                                    minute: '2-digit' 
+                                                                                {new Date(group.lastMessage.timestamp).toLocaleTimeString([], {
+                                                                                    hour: '2-digit',
+                                                                                    minute: '2-digit'
                                                                                 })}
                                                                             </small>
                                                                         )}
@@ -1071,8 +1079,8 @@ const ChatLayout = ({
                                                                         {group.lastMessage ? (
                                                                             <span>
                                                                                 <strong>{group.lastMessage.sender?.name}: </strong>
-                                                                                {group.lastMessage.message?.length > 30 
-                                                                                    ? group.lastMessage.message.substring(0, 30) + '...' 
+                                                                                {group.lastMessage.message?.length > 30
+                                                                                    ? group.lastMessage.message.substring(0, 30) + '...'
                                                                                     : group.lastMessage.message}
                                                                             </span>
                                                                         ) : (
@@ -1106,15 +1114,15 @@ const ChatLayout = ({
                     <div className="text-center mb-4">
                         {selectedUser?.userType === 'Group' ? (
                             <div className="avatar rounded-circle d-flex align-items-center justify-content-center mx-auto"
-                                style={{ 
-                                    backgroundColor: '#128C7E', 
-                                    width: '100px', 
+                                style={{
+                                    backgroundColor: '#128C7E',
+                                    width: '100px',
                                     height: '100px',
                                     position: 'relative',
                                     overflow: 'hidden',
                                     cursor: 'pointer'
                                 }}>
-                                <div className="group-avatar-grid" style={{ 
+                                <div className="group-avatar-grid" style={{
                                     display: 'grid',
                                     gridTemplateColumns: 'repeat(2, 1fr)',
                                     width: '100%',
@@ -1130,11 +1138,11 @@ const ChatLayout = ({
                                         } else if (member.userType === 'Client') {
                                             imagePath = member.image?.replace('uploads/', '');
                                         }
-                                        
+
                                         return (
-                                            <div key={idx} style={{ 
-                                                width: '100%', 
-                                                height: '100%', 
+                                            <div key={idx} style={{
+                                                width: '100%',
+                                                height: '100%',
                                                 backgroundColor: '#f0f0f0'
                                             }}>
                                                 {imagePath ? (
@@ -1204,7 +1212,7 @@ const ChatLayout = ({
                                         <div className="d-flex justify-content-between align-items-center">
                                             <strong className="">Members List</strong>
                                             <div>
-                                                {selectedMembers.length > 0 && (
+                                                {isGroupCreator() && selectedMembers.length > 0 && (
                                                     <button
                                                         className="btn btn-sm btn-danger text-white"
                                                         onClick={() => setShowDeleteMembersModal(true)}
@@ -1212,13 +1220,15 @@ const ChatLayout = ({
                                                         Delete Selected
                                                     </button>
                                                 )}
-                                                <button
-                                                    className="btn btn-sm ms-2 text-white"
-                                                    style={{ backgroundColor: '#128c7e', border: 'none' }}
-                                                    onClick={() => setShowAddMembersModal(true)}
-                                                >
-                                                    + Add Member
-                                                </button>
+                                                {isGroupCreator() && (
+                                                    <button
+                                                        className="btn btn-sm ms-2 text-white"
+                                                        style={{ backgroundColor: '#128c7e', border: 'none' }}
+                                                        onClick={() => setShowAddMembersModal(true)}
+                                                    >
+                                                        + Add Member
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                         {/* Members List */}
@@ -1235,18 +1245,20 @@ const ChatLayout = ({
                                                 }
                                                 return (
                                                     <div key={member.userId} className="d-flex align-items-center mb-1 py-1 rounded-3 border-bottom">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="me-2"
-                                                            checked={selectedMembers.includes(member.userId)}
-                                                            onChange={(e) => {
-                                                                if (e.target.checked) {
-                                                                    setSelectedMembers([...selectedMembers, member.userId]);
-                                                                } else {
-                                                                    setSelectedMembers(selectedMembers.filter(id => id !== member.userId));
-                                                                }
-                                                            }}
-                                                        />
+                                                        {isGroupCreator() && (
+                                                            <input
+                                                                type="checkbox"
+                                                                className="me-2"
+                                                                checked={selectedMembers.includes(member.userId)}
+                                                                onChange={(e) => {
+                                                                    if (e.target.checked) {
+                                                                        setSelectedMembers([...selectedMembers, member.userId]);
+                                                                    } else {
+                                                                        setSelectedMembers(selectedMembers.filter(id => id !== member.userId));
+                                                                    }
+                                                                }}
+                                                            />
+                                                        )}
                                                         <img
                                                             src={`${import.meta.env.VITE_BASE_URL}${imagePath}`}
                                                             className="avatar rounded-circle me-2"
@@ -1257,15 +1269,17 @@ const ChatLayout = ({
                                                             <span className="fw-semibold me-1">{member.name}</span>
                                                             <span className="text-muted">({member.userType})</span>
                                                         </div>
-                                                        <i
-                                                            className="bi bi-trash text-danger text-end ms-auto"
-                                                            style={{ cursor: 'pointer' }}
-                                                            onClick={() => handleRemoveMember(member.userId)}
-                                                        />
+                                                        {isGroupCreator() && (
+                                                            <i
+                                                                className="bi bi-trash text-danger text-end ms-auto"
+                                                                style={{ cursor: 'pointer' }}
+                                                                onClick={() => handleRemoveMember(member.userId)}
+                                                            />
+                                                        )}
                                                     </div>
                                                 );
                                             })}
-                                        
+
                                         {/* Show All button */}
                                         {selectedUser?.members?.length > 5 && (
                                             <button
@@ -1494,7 +1508,7 @@ const ChatLayout = ({
             </Modal>
 
             {/* Add Members Modal */}
-            <Modal show={showAddMembersModal} onHide={() => setShowAddMembersModal(false)} style={{ backgroundColor: '#080808a1'}}>
+            <Modal show={showAddMembersModal} onHide={() => setShowAddMembersModal(false)} style={{ backgroundColor: '#080808a1' }}>
                 <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
                     <Modal.Title>Add Members to Group</Modal.Title>
                 </Modal.Header>
@@ -1628,7 +1642,7 @@ const ChatLayout = ({
             </Modal>
 
             {/* Add Delete Members Confirmation Modal */}
-            <Modal show={showDeleteMembersModal} onHide={() => setShowDeleteMembersModal(false)} centered style={{ backgroundColor: '#080808a1'}}>
+            <Modal show={showDeleteMembersModal} onHide={() => setShowDeleteMembersModal(false)} centered style={{ backgroundColor: '#080808a1' }}>
                 <Modal.Header closeButton style={{ backgroundColor: '#075E54', color: 'white' }}>
                     <Modal.Title>Delete Selected Members</Modal.Title>
                 </Modal.Header>
