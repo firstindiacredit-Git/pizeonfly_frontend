@@ -111,11 +111,44 @@ const ClientChat = () => {
             fetchUsers();
             fetchGroups();
 
+            // Add listener for member removal
+            socket.current.on('member_removed_from_group', (data) => {
+                if (currentClient._id === data.memberId) {
+                    // Remove the group from the local state if current client is removed
+                    setGroups(prevGroups => prevGroups.filter(group => group._id !== data.groupId));
+                    
+                    // If the removed group is currently selected, clear the selection
+                    if (selectedUser && selectedUser._id === data.groupId) {
+                        setSelectedUser(null);
+                        setMessages([]);
+                    }
+                } else {
+                    // Update the group's member list in local state
+                    setGroups(prevGroups => 
+                        prevGroups.map(group => {
+                            if (group._id === data.groupId) {
+                                return {
+                                    ...group,
+                                    members: group.members.map(member => {
+                                        if (member.userId === data.memberId) {
+                                            return { ...member, isRemoved: true };
+                                        }
+                                        return member;
+                                    })
+                                };
+                            }
+                            return group;
+                        })
+                    );
+                }
+            });
+
             return () => {
                 if (socket.current) {
                     socket.current.disconnect();
                     socket.current.off('receive_group_message');
                     socket.current.off('group_message_sent');
+                    socket.current.off('member_removed_from_group');
                 }
             };
         }
@@ -381,11 +414,11 @@ const ClientChat = () => {
     const fetchGroups = async () => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groups`);
-            // Filter groups where current client is a member
             const userGroups = response.data.filter(group => 
                 group.members.some(member => 
                     member.userId === currentClient._id && 
-                    member.userType === 'Client'
+                    member.userType === 'Client' && 
+                    !member.isRemoved
                 )
             );
             setGroups(userGroups);
@@ -402,6 +435,7 @@ const ClientChat = () => {
             fetchGroupMessages(user._id);
         } else {
             fetchMessages(user._id);
+            fetchChatSettings(user._id);
         }
     };
 
@@ -418,6 +452,23 @@ const ClientChat = () => {
     };
 
     const allUsers = [...admins, ...employees].filter(Boolean);
+
+    const fetchChatSettings = async (otherUserId) => {
+        try {
+            // Only fetch if we have valid IDs
+            if (!currentClient?._id || !otherUserId) {
+                console.log('Missing user IDs for chat settings');
+                return;
+            }
+
+            const response = await axios.get(
+                `${import.meta.env.VITE_BASE_URL}api/getChatSettings/${currentClient._id}/${otherUserId}`
+            );
+            // Handle the settings...
+        } catch (error) {
+            console.error('Error fetching chat settings:', error);
+        }
+    };
 
     return (
         <div id="mytask-layout">
@@ -457,6 +508,7 @@ const ClientChat = () => {
                         onMessageDelete={handleMessageDelete}
                         fetchMessages={fetchMessages}
                         onClearChat={handleClearChat}
+                        fetchChatSettings={fetchChatSettings}
                     />
                     <FilePreview
                         show={showFilePreview}

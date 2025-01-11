@@ -28,7 +28,8 @@ const ChatLayout = ({
     onGroupCreate,
     socket,
     groups,
-    setSelectedUser
+    setSelectedUser,
+    fetchChatSettings
 }) => {
     const [showUserModal, setShowUserModal] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -510,6 +511,11 @@ const ChatLayout = ({
         return selectedUser?.createdBy?.userId === currentUser._id;
     };
 
+    useEffect(() => {
+        if (selectedUser && selectedUser.userType !== 'Group') {
+            fetchChatSettings(selectedUser._id);
+        }
+    }, [selectedUser]);
 
     return (
         <div className="container-fluid mt-2" style={{}}>

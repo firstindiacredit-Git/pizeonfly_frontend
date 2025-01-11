@@ -110,6 +110,38 @@ const EmployeeChat = () => {
         });
       });
 
+      // Add listener for member removal
+      socket.current.on('member_removed_from_group', (data) => {
+        if (currentEmployee._id === data.memberId) {
+          // Remove the group from the local state if current employee is removed
+          setGroups(prevGroups => prevGroups.filter(group => group._id !== data.groupId));
+          
+          // If the removed group is currently selected, clear the selection
+          if (selectedUser && selectedUser._id === data.groupId) {
+            setSelectedUser(null);
+            setMessages([]);
+          }
+        } else {
+          // Update the group's member list in local state
+          setGroups(prevGroups => 
+            prevGroups.map(group => {
+              if (group._id === data.groupId) {
+                return {
+                  ...group,
+                  members: group.members.map(member => {
+                    if (member.userId === data.memberId) {
+                      return { ...member, isRemoved: true };
+                    }
+                    return member;
+                  })
+                };
+              }
+              return group;
+            })
+          );
+        }
+      });
+
       fetchUsers();
       fetchGroups();
 
@@ -123,6 +155,7 @@ const EmployeeChat = () => {
           socket.current.off('message_sent');
           socket.current.off('message_updated');
           socket.current.off('message_deleted');
+          socket.current.off('member_removed_from_group');
         }
       };
     }
@@ -148,12 +181,15 @@ const EmployeeChat = () => {
   const fetchGroups = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groups`);
-      // Filter groups where current employee is a member
       const userGroups = response.data.filter(group => 
-        group.members.some(member => member.userId === currentEmployee._id)
+        group.members.some(member => 
+          member.userId === currentEmployee._id && 
+          !member.isRemoved
+        )
       );
       setGroups(userGroups);
     } catch (error) {
+      console.error('Error fetching groups:', error);
       toast.error('Error loading groups');
     }
   };
@@ -165,6 +201,7 @@ const EmployeeChat = () => {
       fetchGroupMessages(user._id);
     } else {
       fetchMessages(user._id);
+      fetchChatSettings(user._id);
     }
   };
 
@@ -419,6 +456,23 @@ const EmployeeChat = () => {
     }
   }, [selectedUser]);
 
+  const fetchChatSettings = async (otherUserId) => {
+    try {
+        // Only fetch if we have valid IDs
+        if (!currentEmployee?._id || !otherUserId) {
+            console.log('Missing user IDs for chat settings');
+            return;
+        }
+
+        const response = await axios.get(
+            `${import.meta.env.VITE_BASE_URL}api/getChatSettings/${currentEmployee._id}/${otherUserId}`
+        );
+        // Handle the settings...
+    } catch (error) {
+        console.error('Error fetching chat settings:', error);
+    }
+  };
+
   return (
     <div id="mytask-layout">
       <Sidebar />
@@ -457,6 +511,7 @@ const EmployeeChat = () => {
             onMessageEdit={handleMessageEdit}
             onMessageDelete={handleMessageDelete}
             fetchMessages={fetchMessages}
+            fetchChatSettings={fetchChatSettings}
           />
           <FilePreview
             show={showFilePreview}

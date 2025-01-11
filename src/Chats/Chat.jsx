@@ -39,7 +39,10 @@ const Chat = () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groups`);
       const userGroups = response.data.filter(group => 
-        group.members.some(member => member.userId === currentUser._id)
+        group.members.some(member => 
+          member.userId === currentUser._id && 
+          !member.isRemoved
+        )
       );
       setGroups(userGroups);
     } catch (error) {
@@ -158,6 +161,34 @@ const Chat = () => {
         );
       });
 
+      socket.current.on('member_removed_from_group', (data) => {
+        if (currentUser._id === data.memberId) {
+          setGroups(prevGroups => prevGroups.filter(group => group._id !== data.groupId));
+          
+          if (selectedUser && selectedUser._id === data.groupId) {
+            setSelectedUser(null);
+            setMessages([]);
+          }
+        } else {
+          setGroups(prevGroups => 
+              prevGroups.map(group => {
+                  if (group._id === data.groupId) {
+                      return {
+                          ...group,
+                          members: group.members.map(member => {
+                              if (member.userId === data.memberId) {
+                                  return { ...member, isRemoved: true };
+                              }
+                              return member;
+                          })
+                      };
+                  }
+                  return group;
+              })
+          );
+        }
+      });
+
       fetchUsers();
       fetchGroups();
     }
@@ -179,6 +210,7 @@ const Chat = () => {
       fetchGroupMessages(user._id);
     } else {
       fetchMessages(user._id);
+      fetchChatSettings(user._id);
     }
   };
 
@@ -436,6 +468,7 @@ const Chat = () => {
       return () => {
         socket.current.off('receive_group_message');
         socket.current.off('group_message_sent');
+        socket.current.off('member_removed_from_group');
       };
     }
   }, [selectedUser]);
@@ -449,6 +482,23 @@ const Chat = () => {
       return () => clearInterval(interval);
     }
   }, [selectedUser]);
+
+  const fetchChatSettings = async (otherUserId) => {
+    try {
+      // Only fetch if we have valid IDs
+      if (!currentUser?._id || !otherUserId) {
+        console.log('Missing user IDs for chat settings');
+        return;
+      }
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}api/getChatSettings/${currentUser._id}/${otherUserId}`
+      );
+      // Handle the settings...
+    } catch (error) {
+      console.error('Error fetching chat settings:', error);
+    }
+  };
 
   return (
     <>
@@ -488,6 +538,7 @@ const Chat = () => {
               onMessageDelete={handleMessageDelete}
               fetchMessages={fetchMessages}
               setSelectedUser={setSelectedUser}
+              fetchChatSettings={fetchChatSettings}
             />
             <FilePreview
               show={showFilePreview}
