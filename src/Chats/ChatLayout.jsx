@@ -483,23 +483,64 @@ const ChatLayout = ({
 
     const handleRemoveSelectedMembers = async () => {
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/removeGroupMembers`, {
-                groupId: selectedUser._id,
-                memberIds: selectedMembers
-            });
-            // Update the selected user with the new group data
-            setSelectedUser(response.data);
+
+            // Fetch the current group details to verify members
+            const groupResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groupDetails/${selectedUser._id}`);
+            const currentMembers = groupResponse.data.members;
+
+
+            await Promise.all(selectedMembers.map(async (memberId) => {
+                // Initialize memberName
+                let memberName = 'Unknown Member';
+
+                // Check if the member exists in the current members
+                const memberExists = currentMembers.some(m => m.userId.toString() === memberId);
+                if (!memberExists) {
+                    // Find the member object to get the name for the error message
+                    const memberToRemove = currentMembers.find(m => m.userId.toString() === memberId);
+                    if (memberToRemove) {
+                        memberName = memberToRemove.name; // Set memberName if found
+                    }
+                    throw new Error(`Member not found in group: ${memberName}`);
+                } else {
+                    // If the member exists, find their name for the system message
+                    const memberToRemove = currentMembers.find(m => m.userId.toString() === memberId);
+                    if (memberToRemove) {
+                        memberName = memberToRemove.name; // Set memberName if found
+                    }
+                }
+
+                // Call your API to remove the member
+                await axios.post(`${import.meta.env.VITE_BASE_URL}api/removeGroupMember`, {
+                    groupId: selectedUser._id,
+                    memberId: memberId
+                });
+
+                // Create a system message for each removed member
+                const systemMessage = {
+                    isSystemMessage: true,
+                    message: `${memberName} was removed`,
+                    senderId: null, // or the ID of the group creator
+                    senderType: 'System', // or the type of the group creator
+                    receiverId: selectedUser._id,
+                    receiverType: 'Group'
+                };
+
+                // Emit the system message to the group
+                socket.current.emit('receive_group_message', systemMessage);
+            }));
+
+            // Clear the selected members after removal
             setSelectedMembers([]);
             setShowDeleteMembersModal(false);
             toast.success('Members removed successfully');
-
             // Reload the page after 5 seconds
             setTimeout(() => {
                 window.location.reload();
             }, 5000);
         } catch (error) {
             console.error('Error removing members:', error);
-            toast.error('Error removing members');
+            toast.error(error.message || 'Error removing members');
         }
     };
 
@@ -516,6 +557,154 @@ const ChatLayout = ({
             fetchChatSettings(selectedUser._id);
         }
     }, [selectedUser]);
+
+    const renderMessage = (message) => {
+        if (message.isSystemMessage) {
+            return (
+                <div className="system-message text-center my-2">
+                    <span className="px-2 rounded-1" style={{ backgroundColor: '#453b3d69', color: 'white', fontSize: '0.8rem' }}>
+                        {message.message}
+                    </span>
+                </div>
+            );
+        }
+
+        return (
+            <div className={`chat-message d-flex ${message.isCurrentUser ? 'justify-content-end' : 'justify-content-start'} mb-3`}>
+                {!message.isCurrentUser && selectedUser?.userType === 'Group' && (
+                    <div className="sender-info me-2">
+                        <img
+                            src={`${import.meta.env.VITE_BASE_URL}${message.senderDetails?.image?.replace('uploads/', '')}`}
+                            className="avatar rounded-circle"
+                            style={{ width: '30px', height: '30px', objectFit: 'cover' }}
+                            // alt="{msg.senderDetails?.name}"
+                            alt="photo"
+                        />
+                    </div>
+                )}
+                <div className={`message-bubble px-2 rounded-1 ${message.isCurrentUser ? 'text-white' : 'bg-white'}`}
+                    style={{
+                        maxWidth: '75%',
+                        position: 'relative',
+                        backgroundColor: message.isCurrentUser ? '#075E54' : '#ffffff',
+                        borderRadius: '7.5px'
+                    }}>
+                    {!message.isCurrentUser && selectedUser?.userType === 'Group' && (
+                        <div className="sender-name fw-bold" style={{
+                            fontSize: '0.8rem',
+                            color: '#128c7e',
+                            fontWeight: '500',
+                            marginBottom: '2px'
+                        }}>
+                            {message.senderDetails?.name}
+                        </div>
+                    )}
+                    <div className="d-flex justify-content-between align-items-start">
+                        <div className="message-content pe-2">
+                            {message.isDeleted ? (
+                                <em className="text-muted" style={{ fontSize: '0.9em' }}>
+                                    {message.isCurrentUser ? 'You deleted this message' : 'This message was deleted'}
+                                </em>
+                            ) : editingMessageId === message._id ? (
+                                <form onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleEditSubmit(message._id, editMessage);
+                                }}>
+                                    <div className="input-group">
+                                        <input
+                                            type="text"
+                                            className="form-control form-control-sm"
+                                            value={editMessage}
+                                            onChange={(e) => setEditMessage(e.target.value)}
+                                            autoFocus
+                                        />
+                                        <button type="submit" className="btn btn-sm btn-success">
+                                            <i className="bi bi-check"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn btn-sm btn-secondary"
+                                            onClick={() => {
+                                                setEditingMessageId(null);
+                                                setEditMessage('');
+                                            }}
+                                        >
+                                            <i className="bi bi-x"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : (
+                                <>
+                                    {message.message}
+                                    {message.isEdited && <small className="text-muted ms-2">(edited)</small>}
+                                </>
+                            )}
+                        </div>
+                        {!message.isDeleted && message.isCurrentUser && <MessageActions message={message} />}
+                    </div>
+
+                    {!message.isDeleted && (
+                        <>
+                            {/* Images */}
+                            {message.imageUrls && message.imageUrls.map((url, i) => (
+                                <img
+                                    key={i}
+                                    src={`${import.meta.env.VITE_BASE_URL}${url?.replace('uploads/', '') || ''}`}
+                                    alt="Shared image"
+                                    className="img-fluid rounded mb-1 py-2"
+                                    style={{ maxHeight: '200px', cursor: 'pointer' }}
+                                    onClick={() => {
+                                        setSelectedImage(`${import.meta.env.VITE_BASE_URL}${url?.replace('uploads/', '') || ''}`);
+                                    }}
+                                />
+                            ))}
+
+                            {/* Video */}
+                            {message.videoUrl && (
+                                <video
+                                    controls
+                                    className="img-fluid rounded mb-1 py-2"
+                                    style={{ maxHeight: '200px' }}
+                                >
+                                    <source src={`${import.meta.env.VITE_BASE_URL}${message.videoUrl?.replace('uploads/', '') || ''}`} type="video/mp4" />
+                                    Your browser does not support the video tag.
+                                </video>
+                            )}
+
+                            {/* Audio */}
+                            {message.audioUrl && (
+                                <audio controls className="w-100 mb-1">
+                                    <source src={`${import.meta.env.VITE_BASE_URL}${message.audioUrl?.replace('uploads/', '') || ''}`} type="audio/mpeg" />
+                                    Your browser does not support the audio element.
+                                </audio>
+                            )}
+
+                            {/* Voice Recording */}
+                            {message.recordingUrl && (
+                                <audio controls className="mb-1 py-2">
+                                    <source src={`${import.meta.env.VITE_BASE_URL}${message.recordingUrl?.replace('uploads/', '') || ''}`} type="audio/webm" style={{ backgroundColor: 'black' }} />
+                                    Your browser does not support the audio element.
+                                </audio>
+                            )}
+                        </>
+                    )}
+
+                    {/* Timestamp */}
+                    <div className="message-footer">
+                        <small
+                            className={`d-block text-end ${message.isCurrentUser ? 'text-white-50' : 'text-muted'}`}
+                            style={{
+                                fontSize: '0.6rem',
+                                marginTop: '1px'
+                            }}
+                        >
+                            {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div className="container-fluid mt-2" style={{}}>
@@ -690,142 +879,7 @@ const ChatLayout = ({
                                     scrollbarWidth: 'none',
                                     '&::-webkit-scrollbar': { display: 'none' }
                                 }}>
-                                {messages.map((msg, index) => (
-                                    <div key={msg._id || index}
-                                        className={`chat-message d-flex ${msg.isCurrentUser ? 'justify-content-end' : 'justify-content-start'} mb-3`}>
-                                        {!msg.isCurrentUser && selectedUser?.userType === 'Group' && (
-                                            <div className="sender-info me-2">
-                                                <img
-                                                    src={`${import.meta.env.VITE_BASE_URL}${msg.senderDetails?.image?.replace('uploads/', '')}`}
-                                                    className="avatar rounded-circle"
-                                                    style={{ width: '30px', height: '30px', objectFit: 'cover' }}
-                                                    // alt="{msg.senderDetails?.name}"
-                                                    alt="photo"
-                                                />
-                                            </div>
-                                        )}
-                                        <div className={`message-bubble px-2 rounded-1 ${msg.isCurrentUser ? 'text-white' : 'bg-white'}`}
-                                            style={{
-                                                maxWidth: '75%',
-                                                position: 'relative',
-                                                backgroundColor: msg.isCurrentUser ? '#075E54' : '#ffffff',
-                                                borderRadius: '7.5px'
-                                            }}>
-                                            {!msg.isCurrentUser && selectedUser?.userType === 'Group' && (
-                                                <div className="sender-name fw-bold" style={{
-                                                    fontSize: '0.8rem',
-                                                    color: '#128c7e',
-                                                    fontWeight: '500',
-                                                    marginBottom: '2px'
-                                                }}>
-                                                    {msg.senderDetails?.name}
-                                                </div>
-                                            )}
-                                            <div className="d-flex justify-content-between align-items-start">
-                                                <div className="message-content pe-2">
-                                                    {msg.isDeleted ? (
-                                                        <em className="text-muted" style={{ fontSize: '0.9em' }}>
-                                                            {msg.isCurrentUser ? 'You deleted this message' : 'This message was deleted'}
-                                                        </em>
-                                                    ) : editingMessageId === msg._id ? (
-                                                        <form onSubmit={(e) => {
-                                                            e.preventDefault();
-                                                            handleEditSubmit(msg._id, editMessage);
-                                                        }}>
-                                                            <div className="input-group">
-                                                                <input
-                                                                    type="text"
-                                                                    className="form-control form-control-sm"
-                                                                    value={editMessage}
-                                                                    onChange={(e) => setEditMessage(e.target.value)}
-                                                                    autoFocus
-                                                                />
-                                                                <button type="submit" className="btn btn-sm btn-success">
-                                                                    <i className="bi bi-check"></i>
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn btn-sm btn-secondary"
-                                                                    onClick={() => {
-                                                                        setEditingMessageId(null);
-                                                                        setEditMessage('');
-                                                                    }}
-                                                                >
-                                                                    <i className="bi bi-x"></i>
-                                                                </button>
-                                                            </div>
-                                                        </form>
-                                                    ) : (
-                                                        <>
-                                                            {msg.message}
-                                                            {msg.isEdited && <small className="text-muted ms-2">(edited)</small>}
-                                                        </>
-                                                    )}
-                                                </div>
-                                                {!msg.isDeleted && msg.isCurrentUser && <MessageActions message={msg} />}
-                                            </div>
-
-                                            {!msg.isDeleted && (
-                                                <>
-                                                    {/* Images */}
-                                                    {msg.imageUrls && msg.imageUrls.map((url, i) => (
-                                                        <img
-                                                            key={i}
-                                                            src={`${import.meta.env.VITE_BASE_URL}${url?.replace('uploads/', '') || ''}`}
-                                                            alt="Shared image"
-                                                            className="img-fluid rounded mb-1 py-2"
-                                                            style={{ maxHeight: '200px', cursor: 'pointer' }}
-                                                            onClick={() => {
-                                                                setSelectedImage(`${import.meta.env.VITE_BASE_URL}${url?.replace('uploads/', '') || ''}`);
-                                                            }}
-                                                        />
-                                                    ))}
-
-                                                    {/* Video */}
-                                                    {msg.videoUrl && (
-                                                        <video
-                                                            controls
-                                                            className="img-fluid rounded mb-1 py-2"
-                                                            style={{ maxHeight: '200px' }}
-                                                        >
-                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.videoUrl?.replace('uploads/', '') || ''}`} type="video/mp4" />
-                                                            Your browser does not support the video tag.
-                                                        </video>
-                                                    )}
-
-                                                    {/* Audio */}
-                                                    {msg.audioUrl && (
-                                                        <audio controls className="w-100 mb-1">
-                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.audioUrl?.replace('uploads/', '') || ''}`} type="audio/mpeg" />
-                                                            Your browser does not support the audio element.
-                                                        </audio>
-                                                    )}
-
-                                                    {/* Voice Recording */}
-                                                    {msg.recordingUrl && (
-                                                        <audio controls className="mb-1 py-2">
-                                                            <source src={`${import.meta.env.VITE_BASE_URL}${msg.recordingUrl?.replace('uploads/', '') || ''}`} type="audio/webm" style={{ backgroundColor: 'black' }} />
-                                                            Your browser does not support the audio element.
-                                                        </audio>
-                                                    )}
-                                                </>
-                                            )}
-
-                                            {/* Timestamp */}
-                                            <div className="message-footer">
-                                                <small
-                                                    className={`d-block text-end ${msg.isCurrentUser ? 'text-white-50' : 'text-muted'}`}
-                                                    style={{
-                                                        fontSize: '0.6rem',
-                                                        marginTop: '1px'
-                                                    }}
-                                                >
-                                                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                {messages.map((msg, index) => renderMessage(msg))}
                                 <div ref={messagesEndRef} />
                             </div>
 
