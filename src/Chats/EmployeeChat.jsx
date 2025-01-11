@@ -243,7 +243,7 @@ const EmployeeChat = () => {
         }
 
         // Add message locally immediately
-        setMessages(prev => [...prev, response.data]);
+        // setMessages(prev => [...prev, response.data]);
 
     } catch (error) {
         console.error('Error sending message:', error);

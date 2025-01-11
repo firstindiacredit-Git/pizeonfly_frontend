@@ -89,13 +89,16 @@ const Chat = () => {
       socket.current.emit('join_chat', currentUser._id);
 
       socket.current.on('receive_message', (message) => {
+        console.log('Received message:', message);
         setMessages(prev => {
           if (!prev.some(m => m._id === message._id)) {
             if (selectedUser?.userType === 'Group' && message.receiverId === selectedUser._id) {
               return [...prev, message];
             }
-            else if (selectedUser && 
-              (message.senderId === selectedUser._id || message.receiverId === selectedUser._id)) {
+            else if (selectedUser && (
+              (message.senderId === selectedUser._id && message.receiverId === currentUser._id) ||
+              (message.senderId === currentUser._id && message.receiverId === selectedUser._id)
+            )) {
               return [...prev, message];
             }
           }
@@ -236,7 +239,7 @@ const Chat = () => {
         });
       }
 
-      setMessages(prev => [...prev, response.data]);
+      // setMessages(prev => [...prev, response.data]);
 
     } catch (error) {
       console.error('Error sending message:', error);
@@ -438,9 +441,9 @@ const Chat = () => {
   }, [selectedUser]);
 
   useEffect(() => {
-    if (selectedUser?.userType === 'Group') {
+    if (selectedUser && selectedUser.userType === 'Employee') {
       const interval = setInterval(() => {
-        fetchGroupMessages(selectedUser._id);
+        fetchMessages(selectedUser._id);
       }, 3000);
 
       return () => clearInterval(interval);

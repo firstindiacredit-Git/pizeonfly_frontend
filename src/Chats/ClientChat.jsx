@@ -131,6 +131,16 @@ const ClientChat = () => {
         }
     }, [selectedUser]);
 
+    useEffect(() => {
+        if (selectedUser && selectedUser.userType === 'AdminUser') {
+            const interval = setInterval(() => {
+                fetchMessages(selectedUser._id);
+            }, 3000); // Poll every 3 seconds
+
+            return () => clearInterval(interval);
+        }
+    }, [selectedUser]);
+
     const fetchUsers = async () => {
         try {
             const [adminResponse, employeeResponse] = await Promise.all([
