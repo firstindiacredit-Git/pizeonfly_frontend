@@ -381,8 +381,16 @@ const ClientChat = () => {
     const fetchGroups = async () => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/groups`);
-            setGroups(response.data);
+            // Filter groups where current client is a member
+            const userGroups = response.data.filter(group => 
+                group.members.some(member => 
+                    member.userId === currentClient._id && 
+                    member.userType === 'Client'
+                )
+            );
+            setGroups(userGroups);
         } catch (error) {
+            console.error('Error fetching groups:', error);
             toast.error('Error loading groups');
         }
     };
