@@ -128,8 +128,6 @@ const ChatLayout = ({
                 index === self.findIndex((m) => m.userId === member.userId)
             );
 
-            console.log('Creating group with members:', uniqueMembers);
-
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}api/createGroup`, {
                 name: groupName,
                 members: uniqueMembers,
@@ -140,18 +138,28 @@ const ChatLayout = ({
                 }
             });
 
-            setShowCreateGroupModal(false);
-            setGroupName('');
-            setSelectedMembers([]);
-            toast.success('Group created successfully');
+            // Only proceed if the response is successful
+            if (response.data) {
+                setShowCreateGroupModal(false);
+                setGroupName('');
+                setSelectedMembers([]);
+                toast.success('Group created successfully');
 
-            // Emit socket event for group creation
-            if (socket.current) {
-                socket.current.emit('group_created', response.data);
+                // Emit socket event for group creation
+                if (socket.current) {
+                    socket.current.emit('group_created', response.data);
+                }
+
+                // Fetch updated groups list
+                if (typeof fetchGroups === 'function') {
+                    fetchGroups();
+                }
             }
 
-            // Fetch updated groups list
-            fetchGroups();
+            // Reload the page after 5 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 5000);
 
         } catch (error) {
             console.error('Error creating group:', error);
