@@ -94,17 +94,48 @@ const ChatLayout = ({
                 JSON.parse(localStorage.getItem('emp_user')) ||
                 JSON.parse(localStorage.getItem('client_user'));
 
+            // Initialize creatorType and creatorName
+            let creatorType = 'Unknown'; // Default value
+            let creatorName = 'Unknown User'; // Default value
+
+            // Check if currentUser has a role
+            if (!currentUser) {
+                console.error('Current user is not defined');
+                return;
+            }
+
             // Determine creator's user type and name based on role
-            let creatorType, creatorName;
-            if (currentUser.role === 'superadmin' || currentUser.role === 'admin') {
-                creatorType = 'AdminUser';
-                creatorName = currentUser.username;
-            } else if (currentUser.role === 'employee') {
-                creatorType = 'Employee';
-                creatorName = currentUser.employeeName;
+            if (currentUser.role) {
+                if (currentUser.role === 'superadmin' || currentUser.role === 'admin') {
+                    creatorType = 'AdminUser';
+                    creatorName = currentUser.username;
+                } else if (currentUser.role === 'employee') {
+                    creatorType = 'Employee';
+                    creatorName = currentUser.employeeName;
+                } else if (currentUser.role === 'client') {
+                    creatorType = 'Client';
+                    creatorName = currentUser.clientName;
+                } else {
+                    console.error('Unknown user role:', currentUser.role);
+                }
             } else {
-                creatorType = 'Client';
-                creatorName = currentUser.clientName;
+                // Fallback logic if role is not available
+                if (currentUser.employeeName) {
+                    creatorType = 'Employee';
+                    creatorName = currentUser.employeeName;
+                } else if (currentUser.clientName) {
+                    creatorType = 'Client';
+                    creatorName = currentUser.clientName;
+                }
+            }
+
+            // console.log('Current User:', currentUser);
+            // console.log('Creator Type:', creatorType);
+
+            // Proceed with group creation logic
+            if (!groupName.trim()) {
+                toast.error('Please enter a group name');
+                return;
             }
 
             // Create creator member object with full details
