@@ -175,7 +175,7 @@ const ChatLayout = ({
                 setShowCreateGroupModal(false);
                 setGroupName('');
                 setSelectedMembers([]);
-                toast.success('Group created successfully');
+
 
                 // Emit socket event for group creation
                 if (socket.current) {
@@ -186,6 +186,7 @@ const ChatLayout = ({
                 if (typeof fetchGroups === 'function') {
                     fetchGroups();
                 }
+                toast.success('Group created successfully');
             }
 
             // Reload the page after 5 seconds
