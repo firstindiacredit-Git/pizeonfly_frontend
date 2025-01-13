@@ -1170,7 +1170,7 @@ const ChatLayout = ({
                                                                     <small className="text-muted d-block">
                                                                         {group.lastMessage ? (
                                                                             <span>
-                                                                                <strong>{group.lastMessage.sender?.name}: </strong>
+                                                                                <strong>{group.lastMessage.sender?.name} </strong>
                                                                                 {group.lastMessage.message?.length > 30
                                                                                     ? group.lastMessage.message.substring(0, 30) + '...'
                                                                                     : group.lastMessage.message}
