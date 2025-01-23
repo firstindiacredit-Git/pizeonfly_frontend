@@ -347,10 +347,11 @@ const Tasks = () => {
     }
   };
 
-  // Filter tasks based on activeTab state
-  const filteredTasks = tasks.filter(task => {
+  // Add new state for date filter
+  const [dateFilter, setDateFilter] = useState('');
 
-    // Apply search filter
+  // Modify the filteredTasks logic to include date filtering
+  const filteredTasks = tasks.filter(task => {
     const matchesSearch =
       task.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (task.taskAssignPerson && task.taskAssignPerson.employeeName.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -359,14 +360,22 @@ const Tasks = () => {
       task.taskStatus.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.assignedBy.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // Apply status filter
-    if (activeTab === 'All') {
-      return matchesSearch;
-    } else if (activeTab === 'Not Started') {
-      return task.taskStatus === 'Not Started' && matchesSearch;
-    } else {
-      return task.taskStatus === activeTab && matchesSearch;
-    }
+    // Convert task date to match the filter format
+    const formatTaskDate = (dateStr) => {
+      const [datePart] = dateStr.split(',');
+      const [day, month, year] = datePart.split('/');
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    };
+
+    const matchesDate = dateFilter
+      ? formatTaskDate(task.taskDate) === dateFilter
+      : true;
+
+    const matchesStatus = activeTab === 'All' 
+      ? true 
+      : task.taskStatus === activeTab;
+
+    return matchesSearch && matchesDate && matchesStatus;
   });
 
 
@@ -778,9 +787,19 @@ const Tasks = () => {
                       <input
                         className="form-control"
                         type="date"
-                        value=""
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                        placeholder="Select date"
                       />
-
+                      {dateFilter && (
+                        <button 
+                          className="btn btn-sm btn-outline-secondary" 
+                          onClick={() => setDateFilter('')}
+                          title="Clear date filter"
+                        >
+                          <i className="bi bi-x-lg"></i>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -808,7 +827,7 @@ const Tasks = () => {
                               <div className="custom-loader" style={{ margin: "20px auto" }}></div>
                             </td>
                           </tr>
-                        ) : (
+                        ) : currentTasks.length > 0 ? (
                           currentTasks.map((task, index) => {
                             const currentDate = new Date();
                             const taskEndDate = new Date(task.taskEndDate);
@@ -931,130 +950,153 @@ const Tasks = () => {
                               </tr>
                             );
                           })
+                        ) : (
+                          <tr>
+                            <td colSpan="8" className="text-center py-4">
+                              {dateFilter ? (
+                                <div className="alert alert-info mb-0">
+                                  No tasks assigned on {new Date(dateFilter).toLocaleDateString()}
+                                </div>
+                              ) : (
+                                <div className="alert alert-info mb-0">
+                                  No tasks found
+                                </div>
+                              )}
+                            </td>
+                          </tr>
                         )}
                       </tbody>
-
-
-
                     </table>
                   </div>
                 ) : (
                   <div className="row">
-                    {currentTasks.map((task, index) => {
-                      const currentDate = new Date();
-                      const taskEndDate = new Date(task.taskEndDate);
-                      const isOverdue = taskEndDate < currentDate && task.taskStatus !== 'Completed';
+                    {currentTasks.length > 0 ? (
+                      currentTasks.map((task, index) => {
+                        const currentDate = new Date();
+                        const taskEndDate = new Date(task.taskEndDate);
+                        const isOverdue = taskEndDate < currentDate && task.taskStatus !== 'Completed';
 
-                      let backgroundColor = '';
-                      if (isOverdue) {
-                        backgroundColor = '#f6c8b7';
-                      }
+                        let backgroundColor = '';
+                        if (isOverdue) {
+                          backgroundColor = '#f6c8b7';
+                        }
 
-                      return (
-                        <div key={task._id} className="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
-                          <div className="card task-card h-100" style={{ backgroundColor }}>
-                            <div className="card-body">
-                              <div className="d-flex justify-content-between align-items-center mb-2">
-                                <span className="fw-bold fs-6">{index + 1}. </span>
-                                <h5 className="fw-bold mb-0">{task.projectName}</h5>
+                        return (
+                          <div key={task._id} className="col-12 col-sm-6 col-md-4 col-lg-4 mb-4">
+                            <div className="card task-card h-100" style={{ backgroundColor }}>
+                              <div className="card-body">
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                  <span className="fw-bold fs-6">{index + 1}. </span>
+                                  <h5 className="fw-bold mb-0">{task.projectName}</h5>
 
-                                <Link
-                                  to="/images"
-                                  state={{
-                                    images: task.taskImages,
-                                    projectName: task.projectName,
+                                  <Link
+                                    to="/images"
+                                    state={{
+                                      images: task.taskImages,
+                                      projectName: task.projectName,
+                                    }}
+                                  >
+                                    <i className="bi-paperclip fs-6" />
+                                  </Link>
+                                </div>
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  name="taskTitle"
+                                  placeholder="Task Title"
+                                  value={task.taskTitle}
+                                  onChange={(e) => taskHandleChange(e, task._id)}
+                                  style={{
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    fontWeight: 'bold',
+                                    width: '80%'
                                   }}
+                                />
+                                <textarea
+                                  className="form-control mb-2"
+                                  rows="3"
+                                  name="description"
+                                  value={task.description}
+                                  onChange={(e) => taskHandleChange(e, task._id)}
+                                  style={{ resize: 'none' }}
+                                />
+                                <p className="mb-1">Assigned to: {task.taskAssignPerson && task.taskAssignPerson.employeeName ? task.taskAssignPerson.employeeName : 'Unassigned'}</p>
+                                <p className="mb-1">By: {task.assignedBy}</p>
+                                <input
+                                  type="date"
+                                  className="form-control mb-2"
+                                  name="taskEndDate"
+                                  value={task.taskEndDate}
+                                  onChange={(e) => taskHandleChange(e, task._id)}
+                                />
+                                <select
+                                  className="form-select mb-2"
+                                  name="taskPriority"
+                                  value={task.taskPriority}
+                                  onChange={(e) => taskHandleChange(e, task._id)}
                                 >
-                                  <i className="bi-paperclip fs-6" />
-                                </Link>
-                              </div>
-                              <input
-                                className="form-control"
-                                type="text"
-                                name="taskTitle"
-                                placeholder="Task Title"
-                                value={task.taskTitle}
-                                onChange={(e) => taskHandleChange(e, task._id)}
-                                style={{
-                                  backgroundColor: 'transparent',
-                                  border: 'none',
-                                  fontWeight: 'bold',
-                                  width: '80%'
-                                }}
-                              />
-                              <textarea
-                                className="form-control mb-2"
-                                rows="3"
-                                name="description"
-                                value={task.description}
-                                onChange={(e) => taskHandleChange(e, task._id)}
-                                style={{ resize: 'none' }}
-                              />
-                              <p className="mb-1">Assigned to: {task.taskAssignPerson && task.taskAssignPerson.employeeName ? task.taskAssignPerson.employeeName : 'Unassigned'}</p>
-                              <p className="mb-1">By: {task.assignedBy}</p>
-                              <input
-                                type="date"
-                                className="form-control mb-2"
-                                name="taskEndDate"
-                                value={task.taskEndDate}
-                                onChange={(e) => taskHandleChange(e, task._id)}
-                              />
-                              <select
-                                className="form-select mb-2"
-                                name="taskPriority"
-                                value={task.taskPriority}
-                                onChange={(e) => taskHandleChange(e, task._id)}
-                              >
-                                <option value="">Set Priority</option>
-                                <option value="Highest">Highest</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Lowest">Lowest</option>
-                              </select>
-                              <div className="d-flex justify-content-between align-items-center mb-2">
-                                <button
-                                  onClick={() => taskHandleSubmit(task._id)}
-                                  className="btn btn-sm btn-primary"
-                                >
-                                  <i className="bi bi-check2"></i> Update
-                                </button>
-                                <button
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#dremovetask"
-                                  onClick={() => setDeletableId(task._id)}
-                                  className="btn btn-sm btn-danger text-white"
-                                >
-                                  <i className="bi bi-trash"></i> Delete
-                                </button>
-                              </div>
-                              <div className="d-flex justify-content-between align-items-center">
-                                {task.taskStatus === 'Not Started' && (
-                                  <span className="badge bg-warning text-dark">Not Started</span>
-                                )}
-                                {task.taskStatus === 'In Progress' && (
-                                  <span className="badge bg-info text-dark">In Progress</span>
-                                )}
-                                {task.taskStatus === 'Completed' && (
-                                  <span className="badge bg-success">Completed</span>
-                                )}
-                                <button
-                                  className="btn btn-sm position-relative"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#taskMessage"
-                                  onClick={() => handleOpenMessages(task)}
-                                >
-                                  <i className="bi bi-chat-left-dots"></i>
-                                  {notifications[task._id] > 0 && (
-                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                      {notifications[task._id]}
-                                    </span>
+                                  <option value="">Set Priority</option>
+                                  <option value="Highest">Highest</option>
+                                  <option value="Medium">Medium</option>
+                                  <option value="Lowest">Lowest</option>
+                                </select>
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                  <button
+                                    onClick={() => taskHandleSubmit(task._id)}
+                                    className="btn btn-sm btn-primary"
+                                  >
+                                    <i className="bi bi-check2"></i> Update
+                                  </button>
+                                  <button
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#dremovetask"
+                                    onClick={() => setDeletableId(task._id)}
+                                    className="btn btn-sm btn-danger text-white"
+                                  >
+                                    <i className="bi bi-trash"></i> Delete
+                                  </button>
+                                </div>
+                                <div className="d-flex justify-content-between align-items-center">
+                                  {task.taskStatus === 'Not Started' && (
+                                    <span className="badge bg-warning text-dark">Not Started</span>
                                   )}
-                                </button>
+                                  {task.taskStatus === 'In Progress' && (
+                                    <span className="badge bg-info text-dark">In Progress</span>
+                                  )}
+                                  {task.taskStatus === 'Completed' && (
+                                    <span className="badge bg-success">Completed</span>
+                                  )}
+                                  <button
+                                    className="btn btn-sm position-relative"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#taskMessage"
+                                    onClick={() => handleOpenMessages(task)}
+                                  >
+                                    <i className="bi bi-chat-left-dots"></i>
+                                    {notifications[task._id] > 0 && (
+                                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {notifications[task._id]}
+                                      </span>
+                                    )}
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
+                        );
+                      })
+                    ) : (
+                      <div className="col-12">
+                        <div className="alert alert-info text-center">
+                          {dateFilter ? (
+                            <>No tasks assigned on {new Date(dateFilter).toLocaleDateString()}</>
+                          ) : (
+                            <>No tasks found</>
+                          )}
                         </div>
-                      );
-                    })}
+                      </div>
+                    )}
                   </div>
                 )}
 
