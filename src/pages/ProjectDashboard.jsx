@@ -111,7 +111,7 @@ const ProjectDashboard = () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/totalProjects`);
         const data = await response.json();
-        console.log("Total Projects:", data);
+        // console.log("Total Projects:", data);
         setTotalProjects(data.totalProjects);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -129,7 +129,7 @@ const ProjectDashboard = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Total Clients:", data);
+        // console.log("Total Clients:", data);
         setTotalClients(data.totalClients);
       } catch (error) {
         console.error("Error fetching clients:", error);
@@ -146,7 +146,7 @@ const ProjectDashboard = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Total Employees:", data);
+        // console.log("Total Employees:", data);
         setTotalEmployees(data.totalEmployees);
       } catch (error) {
         console.error("Error fetching employees:", error);
@@ -176,7 +176,7 @@ const ProjectDashboard = () => {
       try {
         const userData = JSON.parse(localStorage.getItem('user'));
         const email = userData.email;
-        console.log("Email:", email);
+        // console.log("Email:", email);
 
         const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/adminNotePad/${email}`);
         if (!response.ok) {

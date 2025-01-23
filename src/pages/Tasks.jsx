@@ -144,7 +144,6 @@ const Tasks = () => {
 
   const [taskStatuses, setTaskStatuses] = useState({});
   const [activeTab, setActiveTab] = useState('All'); // State for active tab filter
-  const [filterDate, setFilterDate] = useState(''); // Date for date filter
   const [currentPage, setCurrentPage] = useState(1); // State for current page
   const [tasksPerPage, setTasksPerPage] = useState(10); // Default to 10 tasks per page
   const [selectedTaskId, setSelectedTaskId] = useState(null);
@@ -256,13 +255,62 @@ const Tasks = () => {
     try {
       const taskToUpdate = tasks.find((task) => task._id === taskId);
       const formDataToSend = new FormData();
-      delete taskToUpdate.taskAssignPerson;
-      for (const key in taskToUpdate) {
-        formDataToSend.append(key, taskToUpdate[key]);
+
+      // Create a copy of the task data to modify
+      const taskData = { ...taskToUpdate };
+      delete taskData.taskAssignPerson;
+
+      // Format the taskDate to ISO string if it exists
+      if (taskData.taskDate) {
+        try {
+          // First try to parse the date string
+          const [datePart, timePart] = taskData.taskDate.split(', ');
+          const [day, month, year] = datePart.split('/');
+
+          // Convert time to 24-hour format
+          let [time, period] = timePart.split(' ');
+          let [hours, minutes] = time.split(':');
+
+          if (period.toLowerCase() === 'pm' && hours !== '12') {
+            hours = parseInt(hours) + 12;
+          }
+          if (period.toLowerCase() === 'am' && hours === '12') {
+            hours = '00';
+          }
+
+          // Create date in ISO format
+          const formattedDate = new Date(
+            parseInt(year),
+            parseInt(month) - 1, // Months are 0-based in JavaScript
+            parseInt(day),
+            parseInt(hours),
+            parseInt(minutes)
+          );
+
+          // Verify it's a valid date before setting
+          if (!isNaN(formattedDate.getTime())) {
+            taskData.taskDate = formattedDate.toISOString();
+          } else {
+            delete taskData.taskDate; // Remove invalid date
+          }
+        } catch (error) {
+          console.error('Error parsing date:', error);
+          delete taskData.taskDate; // Remove invalid date
+        }
       }
+
+      // Add all task data to FormData
+      for (const key in taskData) {
+        if (taskData[key] !== undefined && taskData[key] !== null) {
+          formDataToSend.append(key, taskData[key]);
+        }
+      }
+
+      // Add selected employees
       selectedEmployees.forEach((obj) => {
         formDataToSend.append("taskAssignPerson", obj.value);
       });
+
       const response = await axios.put(
         `${import.meta.env.VITE_BASE_URL}api/tasks/${taskId}`,
         formDataToSend,
@@ -272,31 +320,37 @@ const Tasks = () => {
           },
         }
       );
+
       const updatedTask = response.data;
-      console.log(updatedTask);
       setTasks((prevState) =>
         prevState.map((task) => (task._id === taskId ? updatedTask : task))
       );
+
       toast.success("Task Updated Successfully!", {
         style: {
           backgroundColor: "#0d6efd",
           color: "white",
         },
       });
+
       setTimeout(() => {
         window.location.reload();
       }, 5000);
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Failed to update task. Please try again.", {
+        style: {
+          backgroundColor: "#dc3545",
+          color: "white",
+        },
+      });
     }
   };
 
-  // Filter tasks based on activeTab state and filterDate
+  // Filter tasks based on activeTab state
   const filteredTasks = tasks.filter(task => {
-    const taskDate = new Date(task.taskDate);
-    const selectedDate = new Date(filterDate);
-    const isSameDate = filterDate === '' || taskDate.toISOString().split('T')[0] === selectedDate.toISOString().split('T')[0];
 
+    // Apply search filter
     const matchesSearch =
       task.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (task.taskAssignPerson && task.taskAssignPerson.employeeName.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -305,12 +359,13 @@ const Tasks = () => {
       task.taskStatus.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.assignedBy.toLowerCase().includes(searchTerm.toLowerCase());
 
+    // Apply status filter
     if (activeTab === 'All') {
-      return isSameDate && matchesSearch;
+      return matchesSearch;
     } else if (activeTab === 'Not Started') {
-      return task.taskStatus === 'Not Started' && isSameDate && matchesSearch;
+      return task.taskStatus === 'Not Started' && matchesSearch;
     } else {
-      return task.taskStatus === activeTab && isSameDate && matchesSearch;
+      return task.taskStatus === activeTab && matchesSearch;
     }
   });
 
@@ -507,7 +562,7 @@ const Tasks = () => {
       if (fileInput) {
         fileInput.value = '';
       }
-      
+
       // Add a small delay before scrolling
       setTimeout(() => {
         if (messageContainerRef.current) {
@@ -527,7 +582,7 @@ const Tasks = () => {
     setSelectTask(task);
     setSelectedTaskId(task._id);
     fetchTaskMessages(task._id);
-    
+
     // Add a small delay to ensure messages are loaded before scrolling
     setTimeout(() => {
       if (messageContainerRef.current) {
@@ -671,25 +726,25 @@ const Tasks = () => {
                 </div>{" "}
                 <div className="row g-3 mb-3">
                   <div className="col-12 col-md-4">
-                    <div className="d-flex">
-                      {viewMode === 'row' ? (
-                        <button
-                          className="btn btn-outline-primary"
-                          onClick={() => setViewMode('list')}
-                          title="Switch to List View"
-                        >
-                          <i className="bi bi-list-task"></i>
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-outline-primary"
-                          onClick={() => setViewMode('row')}
-                          title="Switch to Grid View"
-                        >
-                          <i className="bi bi-grid-3x3-gap-fill"></i>
-                        </button>
-                      )}
-                    </div>
+                  <div className="d-flex">
+                          {viewMode === 'row' ? (
+                            <button
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewMode('list')}
+                              title="Switch to List View"
+                            >
+                              <i className="bi bi-list-task"></i>
+                            </button>
+                          ) : (
+                            <button
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewMode('row')}
+                              title="Switch to Grid View"
+                            >
+                              <i className="bi bi-grid-3x3-gap-fill"></i>
+                            </button>
+                          )}
+                        </div>
                   </div>
 
                   <div className="col-12 col-md-4">
@@ -723,8 +778,7 @@ const Tasks = () => {
                       <input
                         className="form-control"
                         type="date"
-                        value={filterDate}
-                        onChange={(e) => setFilterDate(e.target.value)}
+                        value=""
                       />
 
                     </div>
