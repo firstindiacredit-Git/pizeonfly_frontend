@@ -367,11 +367,11 @@ const ProjectDashboard = () => {
   };
 
   const projectsChartData = createChartData('Projects', totalProjects, 'rgba(255, 99, 132, 0.6)');
-  const clientsChartData = createChartData('Clients', totalClients, 'rgba(54, 162, 235, 0.6)');
-  const employeesChartData = createChartData('Employees', totalEmployees, 'rgba(75, 192, 192, 0.6)');
+  const clientsChartData = createChartData('Team', totalClients, 'rgba(54, 162, 235, 0.6)');
+  const employeesChartData = createChartData('Associates', totalEmployees, 'rgba(75, 192, 192, 0.6)');
 
   const chartData = {
-    labels: ['Projects', 'Clients', 'Employees'],
+    labels: ['Projects', 'Team', 'Associates'],
     datasets: [
       {
         label: 'Total Count',
@@ -693,18 +693,18 @@ const ProjectDashboard = () => {
       if (value.startsWith('=') && value.endsWith('++')) {
         // Remove the drag indicator
         value = value.slice(0, -2);
-        
+
         // If it's a DATESERIES formula, handle it specially
         if (value.toUpperCase().startsWith('=DATESERIES')) {
           const params = value.match(/DATESERIES\((.*)\)/i)[1].split(',').map(x => x.trim());
           const startDate = new Date(params[0]);
           const increment = parseInt(params[2]) || 1;
-          
+
           // Calculate the offset from the original cell
           const dateOffset = increment * (rowIndex + colIndex);
           const newDate = new Date(startDate);
           newDate.setDate(newDate.getDate() + dateOffset);
-          
+
           newTables[tableIndex].data[rowIndex][colIndex] = newDate.toLocaleDateString();
         } else {
           // Handle other formula types if needed
@@ -1317,8 +1317,8 @@ const ProjectDashboard = () => {
     const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
     const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
 
-    return rowIndex >= startRow && rowIndex <= endRow && 
-           colIndex >= startCol && colIndex <= endCol;
+    return rowIndex >= startRow && rowIndex <= endRow &&
+      colIndex >= startCol && colIndex <= endCol;
   };
 
   const handleCopy = (e) => {
@@ -1413,15 +1413,15 @@ const ProjectDashboard = () => {
     try {
       const newTables = [...tables];
       const startCell = newTables[tableIndex].data[selectedCells.start.rowIndex][selectedCells.start.colIndex];
-      
+
       // Check if the first cell contains a DATESERIES formula
       if (typeof startCell === 'string' && startCell.startsWith('=DATESERIES')) {
         const params = startCell.match(/DATESERIES\((.*)\)/i)[1].split(',').map(x => x.trim());
         const startDate = new Date(params[0]);
         const count = Math.abs(selectedCells.end.rowIndex - selectedCells.start.rowIndex + 1) *
-                      Math.abs(selectedCells.end.colIndex - selectedCells.start.colIndex + 1);
+          Math.abs(selectedCells.end.colIndex - selectedCells.start.colIndex + 1);
         const increment = parseInt(params[2]) || 1;
-        
+
         const dates = generateDateSeries(startDate, count, increment);
         let dateIndex = 0;
 
@@ -1482,66 +1482,229 @@ const ProjectDashboard = () => {
                     alt="No Data"
                     style={{
                       height: isMobile ? "3rem" : "5rem",
-                      maxHeight: "100%",
-                      width: "auto"
+                      height: "80%",
+                      width: "50%"
                     }}
                   />
-                  <p className="fs-6" style={{ color: "#4989fd", fontSize: isMobile ? "0.8rem" : "1rem" }}>
-                    An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span>
-                  </p>
                 </div>
 
-                <div className="row justify-content-center mt-4">
+                <div className="row justify-content-center mt-5">
+                  {/* Projects Card */}
                   <div className="col-12 col-md-4 mb-4">
-                    <Link to="/projects">
-                      <div className="card shadow-lg" style={darkModeStyles.card}>
-                        <div className="card-body">
-                          <h5 className="card-title text-center">Projects</h5>
-                          <h2 className="text-center mb-4" style={{ color: 'rgba(255, 99, 132, 1)' }}>{totalProjects}</h2>
+                    <Link to="/projects" style={{ textDecoration: 'none' }}>
+                      <div className="card shadow-lg" style={{
+                        ...darkModeStyles.card,
+                        borderRadius: '16px',
+                        border: 'none',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                        cursor: 'pointer',
+                        height: '100%',
+                        background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
+                      }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-8px)';
+                          e.currentTarget.style.boxShadow = '0 16px 32px rgba(0,0,0,0.15)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '';
+                        }}>
+                        <div style={{ height: '6px', background: 'rgba(255, 99, 132, 1)' }}></div>
+                        <div className="card-body" style={{ padding: '1.5rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                            <div style={{
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '12px',
+                              background: 'rgba(255, 99, 132, 0.15)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginRight: '15px'
+                            }}>
+                              <i className="icofont-briefcase" style={{ color: 'rgba(255, 99, 132, 1)', fontSize: '22px' }}></i>
+                            </div>
+                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Projects</h5>
+                          </div>
+                          <h2 style={{
+                            fontSize: '42px',
+                            fontWeight: '700',
+                            marginBottom: '25px',
+                            color: 'rgba(255, 99, 132, 1)',
+                            textShadow: '0px 2px 4px rgba(255, 99, 132, 0.2)'
+                          }}>{totalProjects}</h2>
                           <Bar data={projectsChartData} options={chartOptions} />
                         </div>
                       </div>
                     </Link>
                   </div>
+
+                  {/* Team Card */}
                   <div className="col-12 col-md-4 mb-4">
-                    <Link to="/clients">
-                      <div className="card shadow-lg" style={darkModeStyles.card}>
-                        <div className="card-body">
-                          <h5 className="card-title text-center">Clients</h5>
-                          <h2 className="text-center mb-4" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalClients}</h2>
+                    <Link to="/clients" style={{ textDecoration: 'none' }}>
+                      <div className="card shadow-lg" style={{
+                        ...darkModeStyles.card,
+                        borderRadius: '16px',
+                        border: 'none',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                        cursor: 'pointer',
+                        height: '100%',
+                        background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
+                      }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-8px)';
+                          e.currentTarget.style.boxShadow = '0 16px 32px rgba(0,0,0,0.15)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '';
+                        }}>
+                        <div style={{ height: '6px', background: 'rgba(54, 162, 235, 1)' }}></div>
+                        <div className="card-body" style={{ padding: '1.5rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                            <div style={{
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '12px',
+                              background: 'rgba(54, 162, 235, 0.15)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginRight: '15px'
+                            }}>
+                              <i className="icofont-users-alt-5" style={{ color: 'rgba(54, 162, 235, 1)', fontSize: '22px' }}></i>
+                            </div>
+                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Team</h5>
+                          </div>
+                          <h2 style={{
+                            fontSize: '42px',
+                            fontWeight: '700',
+                            marginBottom: '25px',
+                            color: 'rgba(54, 162, 235, 1)',
+                            textShadow: '0px 2px 4px rgba(54, 162, 235, 0.2)'
+                          }}>{totalClients}</h2>
                           <Bar data={clientsChartData} options={chartOptions} />
                         </div>
                       </div>
                     </Link>
                   </div>
+
+                  {/* Associates Card */}
                   <div className="col-12 col-md-4 mb-4">
-                    <Link to="/members">
-                      <div className="card shadow-lg" style={darkModeStyles.card}>
-                        <div className="card-body">
-                          <h5 className="card-title text-center">Employees</h5>
-                          <h2 className="text-center mb-4" style={{ color: 'rgba(75, 192, 192, 1)' }}>{totalEmployees}</h2>
+                    <Link to="/members" style={{ textDecoration: 'none' }}>
+                      <div className="card shadow-lg" style={{
+                        ...darkModeStyles.card,
+                        borderRadius: '16px',
+                        border: 'none',
+                        overflow: 'hidden',
+                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                        cursor: 'pointer',
+                        height: '100%',
+                        background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
+                      }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-8px)';
+                          e.currentTarget.style.boxShadow = '0 16px 32px rgba(0,0,0,0.15)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '';
+                        }}>
+                        <div style={{ height: '6px', background: 'rgba(75, 192, 192, 1)' }}></div>
+                        <div className="card-body" style={{ padding: '1.5rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                            <div style={{
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '12px',
+                              background: 'rgba(75, 192, 192, 0.15)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginRight: '15px'
+                            }}>
+                              <i className="icofont-user-male" style={{ color: 'rgba(75, 192, 192, 1)', fontSize: '22px' }}></i>
+                            </div>
+                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Associates</h5>
+                          </div>
+                          <h2 style={{
+                            fontSize: '42px',
+                            fontWeight: '700',
+                            marginBottom: '25px',
+                            color: 'rgba(75, 192, 192, 1)',
+                            textShadow: '0px 2px 4px rgba(75, 192, 192, 0.2)'
+                          }}>{totalEmployees}</h2>
                           <Bar data={employeesChartData} options={chartOptions} />
                         </div>
                       </div>
                     </Link>
                   </div>
-
                 </div>
 
-                <div className="row justify-content-center">
+                <div className="row justify-content-center mt-4">
+                  {/* Overall Summary Card */}
                   <div className="col-12 col-md-8 mb-4">
-                    <div className="card shadow-lg" style={darkModeStyles.card}>
-                      <div className="card-body">
-                        <h5 className="card-title text-center mb-4">Overall Summary</h5>
-                        <Bar data={chartData} options={chartOptions} />
+                    <div className="card shadow-lg" style={{
+                      ...darkModeStyles.card,
+                      borderRadius: '16px',
+                      border: 'none',
+                      overflow: 'hidden',
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                      cursor: 'pointer',
+                      background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
+                    }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-5px)';
+                        e.currentTarget.style.boxShadow = '0 16px 30px rgba(0,0,0,0.15)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '';
+                      }}>
+                      <div style={{ height: '6px', background: 'linear-gradient(to right, rgba(255, 99, 132, 1), rgba(54, 162, 235, 1), rgba(75, 192, 192, 1))' }}></div>
+                      <div className="card-body" style={{ padding: '1.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'center' }}>
+
+                          <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Overall Summary</h5>
+                        </div>
+                        <div style={{ marginTop: '10px' }}>
+                          <Bar data={chartData} options={chartOptions} />
+                        </div>
                       </div>
                     </div>
                   </div>
+
+                  {/* Project Status Card */}
                   <div className="col-12 col-md-4 mb-4">
-                    <div className="card shadow-lg" style={darkModeStyles.card}>
-                      <div className="card-body">
-                        <h5 className="card-title text-center">Project Status</h5>
-                        <Doughnut data={projectStatusChartData} options={projectStatusChartOptions} />
+                    <div className="card shadow-lg" style={{
+                      ...darkModeStyles.card,
+                      borderRadius: '16px',
+                      border: 'none',
+                      overflow: 'hidden',
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                      cursor: 'pointer',
+                      height: '100%',
+                      background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
+                    }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-5px)';
+                        e.currentTarget.style.boxShadow = '0 16px 30px rgba(0,0,0,0.15)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '';
+                      }}>
+                      <div style={{ height: '6px', background: 'rgba(153, 102, 255, 1)' }}></div>
+                      <div className="card-body" style={{ padding: '1.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'center' }}>
+
+                          <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Project Status</h5>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100% - 60px)' }}>
+                          <Doughnut data={projectStatusChartData} options={projectStatusChartOptions} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2318,7 +2481,7 @@ const ProjectDashboard = () => {
 
                 <div className="mt-5 mb-4 text-center">
                   <Link
-                    to="https://pizeonfly.com/"
+                    to="https://indiaeducates.org/"
                     className="btn btn-outline-primary btn-lg position-relative"
                     style={{
                       borderRadius: '30px',
@@ -2396,7 +2559,7 @@ const ProjectDashboard = () => {
         </div>
       </div>
       <style>
-                {`
+        {`
                     .selected-cell {
                         background-color: rgba(0, 123, 255, 0.1) !important;
                     }
@@ -2409,11 +2572,10 @@ const ProjectDashboard = () => {
                         outline: 2px solid #007bff;
                     }
                 `}
-            </style>
+      </style>
     </>
   );
 };
 
 export default ProjectDashboard;
-
 
