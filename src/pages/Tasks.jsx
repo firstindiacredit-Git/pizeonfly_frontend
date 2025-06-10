@@ -1380,7 +1380,7 @@ const Tasks = () => {
                                                     padding: '2px 6px',
                                                     borderRadius: '4px',
                                                     fontWeight: '600'
-                                                  }}>Associate</span>
+                                                  }}>Employee</span>
                                                 </div>
                                               </div>
                                             </>
@@ -1413,7 +1413,7 @@ const Tasks = () => {
                                                     padding: '2px 6px',
                                                     borderRadius: '4px',
                                                     fontWeight: '600'
-                                                  }}>Team Member</span>
+                                                  }}>Client Member</span>
                                                 </div>
                                               </div>
                                             </>
@@ -1869,7 +1869,7 @@ const Tasks = () => {
                                               padding: '4px 8px',
                                               borderRadius: '4px',
                                             }}>
-                                              {task.taskAssignPerson && task.taskAssignPerson.employeeName ? 'Associate' : 'Team Member'}
+                                              {task.taskAssignPerson && task.taskAssignPerson.employeeName ? 'Employee' : 'Client Member'}
                                             </span>
                                           </p>
                                           <p className="mb-0" style={{ fontSize: '13px', color: '#666' }}>
@@ -2492,7 +2492,7 @@ const Tasks = () => {
                                 backgroundColor: 'white'
                               }}
                               >
-                                <option value="" disabled>Select Associates</option>
+                                <option value="" disabled>Select Employees</option>
                                 {assignEmployee.map((employee) => (
                                   <option key={employee.value} value={employee.value}>
                                     {employee.label}

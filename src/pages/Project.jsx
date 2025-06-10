@@ -1168,7 +1168,7 @@ const Project = () => {
                                     borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
                                     width: "6rem",
                                     fontSize: '14px'
-                                  }}>Team</th>
+                                  }}>Client</th>
                                   <th style={{
                                     padding: '16px 15px',
                                     fontWeight: '600',
@@ -1189,7 +1189,7 @@ const Project = () => {
                                     color: '#444',
                                     borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
                                     fontSize: '14px'
-                                  }}>Associates</th>
+                                  }}>Employees</th>
                                   <th style={{
                                     padding: '16px 15px',
                                     fontWeight: '600',
@@ -1382,7 +1382,7 @@ const Project = () => {
                                                 gap: '5px'
                                               }}
                                             >
-                                              <i className="icofont-team me-1"></i>
+                                              <i className="icofont-Client me-1"></i>
                                                ({project.clientAssignPerson.length})
                                             </button>
                                             <ul className="dropdown-menu" style={{
@@ -1405,7 +1405,7 @@ const Project = () => {
                                                   alignItems: 'center'
                                                 }}>
                                                   <i className="icofont-people me-2"></i>
-                                                  Team Members
+                                                  Client Members
                                         </div>
                                               </li>
                                               {project.clientAssignPerson?.map((client, idx) => (
@@ -1430,7 +1430,7 @@ const Project = () => {
                                             color: '#999',
                                             fontStyle: 'italic',
                                             fontSize: '13px'
-                                          }}>No team members</span>
+                                          }}>No Client members</span>
                                         )}
                                       </td>
                                       <td style={{
@@ -1514,7 +1514,7 @@ const Project = () => {
                                                   alignItems: 'center'
                                                 }}>
                                                   <i className="icofont-users-alt-2 me-2"></i>
-                                                  Associate Members
+                                                  Employee Members
                                                 </div>
                                               </li>
                                               {project.taskAssignPerson.map((member, idx) => (
@@ -1539,7 +1539,7 @@ const Project = () => {
                                             color: '#999',
                                             fontStyle: 'italic',
                                             fontSize: '13px'
-                                          }}>No associates</span>
+                                          }}>No Employees</span>
                                         )}
                                       </td>
                                       <td style={{
@@ -1764,10 +1764,10 @@ const Project = () => {
                                           </td>
                                           <td>
                                             <small>
-                                              <strong>Team:</strong> {project.clientAssignPerson?.map(client => client.clientName).join(", ")}<br />
+                                              <strong>Client:</strong> {project.clientAssignPerson?.map(client => client.clientName).join(", ")}<br />
                                               <strong>Start:</strong> {getFormattedDate(project.projectStartDate)}<br />
                                               <strong>End:</strong> {getFormattedDate(project.projectEndDate)}<br />
-                                              <strong>Associates:</strong> {project.taskAssignPerson.map(name => name.employeeName).join(", ")}<br />
+                                              <strong>Employees:</strong> {project.taskAssignPerson.map(name => name.employeeName).join(", ")}<br />
                                               <strong>Progress:</strong> {project.progress}%
                                             </small>
                                             <div className="progress mt-1" style={{ height: "10px" }}>
@@ -2007,9 +2007,9 @@ const Project = () => {
                                         </div>
                                       </div>
 
-                                      {/* Associates and Team row - placed side by side */}
+                                      {/* Employees and Client row - placed side by side */}
                                       <div className="d-flex mt-3 gap-2">
-                                        {/* Associates column */}
+                                        {/* Employees column */}
                                         <div style={{ flex: 1 }}>
                                         <div style={{
                                           display: 'flex',
@@ -2027,7 +2027,7 @@ const Project = () => {
                                             alignItems: 'center'
                                           }}>
                                             <i className="icofont-users-alt-2 me-1"></i>
-                                            Associates
+                                            Employees
                                           </span>
                                         </div>
                                         <div
@@ -2053,7 +2053,7 @@ const Project = () => {
                                         </div>
                                       </div>
 
-                                        {/* Team column */}
+                                        {/* Client column */}
                                         <div style={{ flex: 1 }}>
                                         <div style={{
                                           display: 'flex',
@@ -2071,7 +2071,7 @@ const Project = () => {
                                             alignItems: 'center'
                                           }}>
                                             <i className="icofont-people me-1"></i>
-                                            Team
+                                            Client
                                           </span>
                                         </div>
                                         <div
@@ -2516,7 +2516,7 @@ const Project = () => {
                               }}
                             >
                               <i className="icofont-users-alt-2" style={{ color: '#52b447' }}></i>
-                              Project Associates <span className="text-danger">*</span>
+                              Project Employees <span className="text-danger">*</span>
                             </label>
                             <div style={{
                               border: '1px solid rgba(82, 180, 71, 0.3)',
@@ -2548,8 +2548,8 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-team" style={{ color: '#ff5e00' }}></i>
-                              Project Team
+                              <i className="icofont-Client" style={{ color: '#ff5e00' }}></i>
+                              Project Client
                             </label>
                             <div style={{
                               border: '1px solid rgba(255, 94, 0, 0.3)',
@@ -3052,7 +3052,7 @@ const Project = () => {
                               }}
                             >
                               <i className="icofont-users-alt-2" style={{ color: '#52b447' }}></i>
-                              Project Associates
+                              Project Employees
                             </label>
                             <div style={{
                               border: '1px solid rgba(82, 180, 71, 0.3)',
@@ -3083,8 +3083,8 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-team" style={{ color: '#ff5e00' }}></i>
-                              Project Team
+                              <i className="icofont-Client" style={{ color: '#ff5e00' }}></i>
+                              Project Client
                             </label>
                             <div style={{
                               border: '1px solid rgba(255, 94, 0, 0.3)',

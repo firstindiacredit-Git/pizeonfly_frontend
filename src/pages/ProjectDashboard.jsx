@@ -367,11 +367,11 @@ const ProjectDashboard = () => {
   };
 
   const projectsChartData = createChartData('Projects', totalProjects, 'rgba(255, 99, 132, 0.6)');
-  const clientsChartData = createChartData('Team', totalClients, 'rgba(54, 162, 235, 0.6)');
-  const employeesChartData = createChartData('Associates', totalEmployees, 'rgba(75, 192, 192, 0.6)');
+  const clientsChartData = createChartData('Client', totalClients, 'rgba(54, 162, 235, 0.6)');
+  const employeesChartData = createChartData('Employees', totalEmployees, 'rgba(75, 192, 192, 0.6)');
 
   const chartData = {
-    labels: ['Projects', 'Team', 'Associates'],
+    labels: ['Projects', 'Client', 'Employees'],
     datasets: [
       {
         label: 'Total Count',
@@ -1540,7 +1540,7 @@ const ProjectDashboard = () => {
                     </Link>
                   </div>
 
-                  {/* Team Card */}
+                  {/* Client Card */}
                   <div className="col-12 col-md-4 mb-4">
                     <Link to="/clients" style={{ textDecoration: 'none' }}>
                       <div className="card shadow-lg" style={{
@@ -1576,7 +1576,7 @@ const ProjectDashboard = () => {
                             }}>
                               <i className="icofont-users-alt-5" style={{ color: 'rgba(54, 162, 235, 1)', fontSize: '22px' }}></i>
                             </div>
-                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Team</h5>
+                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Client</h5>
                           </div>
                           <h2 style={{
                             fontSize: '42px',
@@ -1591,7 +1591,7 @@ const ProjectDashboard = () => {
                     </Link>
                   </div>
 
-                  {/* Associates Card */}
+                  {/* Employees Card */}
                   <div className="col-12 col-md-4 mb-4">
                     <Link to="/members" style={{ textDecoration: 'none' }}>
                       <div className="card shadow-lg" style={{
@@ -1627,7 +1627,7 @@ const ProjectDashboard = () => {
                             }}>
                               <i className="icofont-user-male" style={{ color: 'rgba(75, 192, 192, 1)', fontSize: '22px' }}></i>
                             </div>
-                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Associates</h5>
+                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Employees</h5>
                           </div>
                           <h2 style={{
                             fontSize: '42px',

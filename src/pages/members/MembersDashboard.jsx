@@ -2121,7 +2121,7 @@ const MemberDashboard = () => {
                                                                     <tr>
                                                                         <th>SR.No</th>
                                                                         <th>Project Name</th>
-                                                                        <th>Team Size</th>
+                                                                        <th>Client Size</th>
                                                                         <th>Progress</th>
                                                                     </tr>
                                                                 </thead>

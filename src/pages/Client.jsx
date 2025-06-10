@@ -443,7 +443,7 @@ const Client = () => {
                                                         background: 'linear-gradient(to bottom, #ff8a00, #ff5e00)',
                                                         borderRadius: '3px'
                                                     }}></span>
-                                                    Team Members
+                                                    Clients
                                                 </h3>
                                                 <div className="col-auto d-flex">
                                                     <button
@@ -472,7 +472,7 @@ const Client = () => {
                                                         }}
                                                     >
                                                         <i className="icofont-plus-circle me-2" style={{ fontSize: '16px' }} />
-                                                        Add Team Member
+                                                        Add Client
                                                     </button>
                                                 </div>
                                             </div>
