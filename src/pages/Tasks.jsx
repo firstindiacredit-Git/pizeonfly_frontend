@@ -9,6 +9,8 @@ import "./Loading.css";
 import Select from 'react-select';
 import io from 'socket.io-client';
 import FloatingMenu from '../Chats/FloatingMenu'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Tasks = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -674,8 +676,13 @@ const Tasks = () => {
   const handleOpenTaskImages = (task) => {
     setSelectedTaskImages(task.taskImages);
     setSelectedTaskName(task.taskTitle);
-    const modal = new bootstrap.Modal(document.getElementById('taskImagesModal'));
-    modal.show();
+    const modalElement = document.getElementById('taskImagesModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    } else {
+      console.error('Modal element not found');
+    }
   };
 
   // Add this to your useEffect or create a new one
@@ -3466,6 +3473,115 @@ const Tasks = () => {
               </div>
             </>
           </>
+        </div>
+      </div>
+
+      {/* Task Images Modal */}
+      <div className="modal fade" id="taskImagesModal" tabIndex="-1" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content" style={{
+            borderRadius: '15px',
+            border: 'none',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+            overflow: 'hidden'
+          }}>
+            <div className="modal-header" style={{
+              background: 'linear-gradient(135deg, #52b447, #429938)',
+              borderBottom: 'none',
+              padding: '20px 25px',
+              position: 'relative'
+            }}>
+              <h5 
+                className="modal-title"
+                style={{
+                  color: 'white',
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  margin: 0
+                }}
+              >
+                {selectedTaskName}
+              </h5>
+              <button 
+                type="button" 
+                className="btn-close" 
+                data-bs-dismiss="modal" 
+                aria-label="Close"
+                style={{
+                  filter: 'brightness(0) invert(1)',
+                  opacity: '0.8'
+                }}
+              ></button>
+            </div>
+            <div className="modal-body" style={{
+              padding: '25px',
+              background: '#f8f9fa'
+            }}>
+              <div className="row g-4">
+                {selectedTaskImages && selectedTaskImages.map((image, index) => (
+                  <div key={index} className="col-md-4">
+                    <div style={{
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                      transition: 'transform 0.3s ease',
+                      cursor: 'pointer'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-5px)';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}>
+                      <img 
+                        src={image} 
+                        alt={`Task image ${index + 1}`} 
+                        className="img-fluid"
+                        style={{ 
+                          width: '100%', 
+                          height: '200px', 
+                          objectFit: 'cover',
+                          display: 'block'
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="modal-footer" style={{
+              borderTop: '1px solid rgba(0,0,0,0.1)',
+              padding: '20px 25px',
+              background: '#fff'
+            }}>
+              <button 
+                type="button" 
+                className="btn" 
+                data-bs-dismiss="modal"
+                style={{
+                  background: 'linear-gradient(135deg, #ff8a00, #ff5e00)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 25px',
+                  borderRadius: '8px',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 10px rgba(255, 138, 0, 0.2)'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 12px rgba(255, 138, 0, 0.3)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 10px rgba(255, 138, 0, 0.2)';
+                }}
+              >
+                <i className="icofont-close-circled me-2"></i>
+                Close Preview
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </>
