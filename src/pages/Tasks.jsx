@@ -3253,7 +3253,7 @@ const Tasks = () => {
                                     }}>
                                       {message.fileUrls.map((fileUrl, index) => {
                                   if (fileUrl) {
-                                    const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}${fileUrl}`;
+                                    const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}uploads${fileUrl}`;
                                     const fileExtension = cleanFileUrl.split('.').pop().toLowerCase();
                                           const fileName = cleanFileUrl.split('/').pop();
 
@@ -3497,10 +3497,13 @@ const Tasks = () => {
                   color: 'white',
                   fontSize: '18px',
                   fontWeight: '600',
-                  margin: 0
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
                 }}
               >
-                {selectedTaskName}
+                <i className="icofont-gallery" style={{ fontSize: '22px' }}></i>
+                {selectedTaskName} - Task Images
               </h5>
               <button 
                 type="button" 
@@ -3525,7 +3528,8 @@ const Tasks = () => {
                       overflow: 'hidden',
                       boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
                       transition: 'transform 0.3s ease',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      position: 'relative'
                     }}
                     onMouseOver={(e) => {
                       e.currentTarget.style.transform = 'translateY(-5px)';
@@ -3534,7 +3538,7 @@ const Tasks = () => {
                       e.currentTarget.style.transform = 'translateY(0)';
                     }}>
                       <img 
-                        src={image} 
+                        src={`${import.meta.env.VITE_BASE_URL}${image}`} 
                         alt={`Task image ${index + 1}`} 
                         className="img-fluid"
                         style={{ 
@@ -3543,7 +3547,52 @@ const Tasks = () => {
                           objectFit: 'cover',
                           display: 'block'
                         }}
+                        onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image}`, '_blank')}
                       />
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '0',
+                        left: '0',
+                        right: '0',
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)',
+                        padding: '20px 15px 10px 15px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <span style={{ 
+                          color: 'white',
+                          fontSize: '14px',
+                          fontWeight: '500'
+                        }}>
+                          Image {index + 1}
+                        </span>
+                        <button 
+                          onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image}`, '_blank')}
+                          style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '6px 10px',
+                            fontSize: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            cursor: 'pointer',
+                            transition: 'background 0.2s ease'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                          }}
+                        >
+                          <i className="icofont-external-link"></i>
+                          View Full Size
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
