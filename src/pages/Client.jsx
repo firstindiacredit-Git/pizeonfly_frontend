@@ -491,7 +491,7 @@ const Client = () => {
                                     <div className="col-md-12">
                                         <div className="card border-0 mb-2 no-bg">
                                             <div className="card-header py-4 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between" style={{
-                                                borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                                borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                                 backgroundColor: 'transparent',
                                                 padding: '0 0 20px 0'
                                             }}>
@@ -509,7 +509,7 @@ const Client = () => {
                                                         transform: 'translateY(-50%)',
                                                         width: '5px',
                                                         height: '24px',
-                                                        background: 'linear-gradient(to bottom, #ff8a00, #ff5e00)',
+                                                        background: 'linear-gradient(to bottom, #4169e1, #1e40af)',
                                                         borderRadius: '3px'
                                                     }}></span>
                                                     Clients
@@ -521,23 +521,23 @@ const Client = () => {
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#createproject"
                                                         style={{
-                                                            background: 'linear-gradient(135deg, #52b447, #429938)',
+                                                            background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
                                                             color: 'white',
                                                             border: 'none',
                                                             borderRadius: '8px',
                                                             padding: '10px 18px',
                                                             fontWeight: '600',
-                                                            boxShadow: '0 4px 10px rgba(82, 180, 71, 0.2)',
+                                                            boxShadow: '0 4px 10px rgba(65, 105, 225, 0.2)',
                                                             transition: 'all 0.2s ease',
                                                             fontSize: '14px'
                                                         }}
                                                         onMouseOver={(e) => {
                                                             e.currentTarget.style.transform = 'translateY(-2px)';
-                                                            e.currentTarget.style.boxShadow = '0 6px 12px rgba(82, 180, 71, 0.3)';
+                                                            e.currentTarget.style.boxShadow = '0 6px 12px rgba(65, 105, 225, 0.3)';
                                                         }}
                                                         onMouseOut={(e) => {
                                                             e.currentTarget.style.transform = 'translateY(0)';
-                                                            e.currentTarget.style.boxShadow = '0 4px 10px rgba(82, 180, 71, 0.2)';
+                                                            e.currentTarget.style.boxShadow = '0 4px 10px rgba(65, 105, 225, 0.2)';
                                                         }}
                                                     >
                                                         <i className="icofont-plus-circle me-2" style={{ fontSize: '16px' }} />
@@ -585,7 +585,7 @@ const Client = () => {
                                                             }}
                                                             placeholder="Enter Member Name"
                                                             style={{
-                                                                border: '1px solid rgba(82, 180, 71, 0.2)',
+                                                                border: '1px solid rgba(65, 105, 225, 0.2)',
                                                                 borderRight: 'none',
                                                                 padding: '10px 15px',
                                                                 fontSize: '14px',
@@ -599,7 +599,7 @@ const Client = () => {
                                                             id="addon-wrapping"
                                                             onClick={handleSearchSubmit}
                                                             style={{
-                                                                backgroundColor: '#52b447',
+                                                                backgroundColor: '#4169e1',
                                                                 border: 'none',
                                                                 color: 'white',
                                                                 padding: '0 15px',
@@ -651,7 +651,7 @@ const Client = () => {
                                                             left: 0,
                                                             right: 0,
                                                             height: '6px',
-                                                            background: 'linear-gradient(90deg, #2e7d32, #52b447, #ff8a00)',
+                                                            background: 'linear-gradient(90deg, #4169e1, #1e40af, #ff69b4)',
                                                             opacity: 0.9
                                                         }}></div>
 
@@ -661,7 +661,7 @@ const Client = () => {
                                                                 {/* Client Number & Image */}
                                                                 <div className="d-flex align-items-center gap-4">
                                                                     <span style={{
-                                                                        background: 'linear-gradient(135deg, #2e7d32, #52b447)',
+                                                                        background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                                                                         color: 'white',
                                                                         borderRadius: '12px',
                                                                         width: '40px',
@@ -671,7 +671,7 @@ const Client = () => {
                                                                         justifyContent: 'center',
                                                                         fontWeight: '600',
                                                                         fontSize: '16px',
-                                                                        boxShadow: '0 4px 15px rgba(82, 180, 71, 0.3)',
+                                                                        boxShadow: '0 4px 15px rgba(65, 105, 225, 0.3)',
                                                                         border: '2px solid rgba(255, 255, 255, 0.8)'
                                                                     }}>
                                                                         {index + 1}
@@ -682,9 +682,9 @@ const Client = () => {
                                                                         height: '60px',
                                                                         borderRadius: '16px',
                                                                         overflow: 'hidden',
-                                                                        border: '3px solid #52b447',
+                                                                        border: '3px solid #ff69b4',
                                                                         backgroundColor: 'white',
-                                                                        boxShadow: '0 4px 15px rgba(82, 180, 71, 0.2)'
+                                                                        boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)'
                                                                     }}>
                                                                         <img
                                                                             src={`${import.meta.env.VITE_BASE_URL}${client.clientImage}`}
@@ -733,8 +733,8 @@ const Client = () => {
                                                                             data-bs-target="#editproject"
                                                                             onClick={() => setToEdit(client._id)}
                                                                             style={{
-                                                                                backgroundColor: 'rgba(82, 180, 71, 0.08)',
-                                                                                color: '#2e7d32',
+                                                                                backgroundColor: 'rgba(65, 105, 225, 0.08)',
+                                                                                color: '#1e40af',
                                                                                 width: '38px',
                                                                                 height: '38px',
                                                                                 borderRadius: '12px',
@@ -745,11 +745,11 @@ const Client = () => {
                                                                                 transition: 'all 0.3s ease'
                                                                             }}
                                                                             onMouseOver={(e) => {
-                                                                                e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.15)';
+                                                                                e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.15)';
                                                                                 e.currentTarget.style.transform = 'translateY(-2px)';
                                                                             }}
                                                                             onMouseOut={(e) => {
-                                                                                e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.08)';
+                                                                                e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
                                                                                 e.currentTarget.style.transform = 'translateY(0)';
                                                                             }}
                                                                         >
@@ -763,8 +763,8 @@ const Client = () => {
                                                                             data-bs-target="#deleteproject"
                                                                             onClick={() => setDeletableId(client._id)}
                                                                             style={{
-                                                                                backgroundColor: 'rgba(255, 138, 0, 0.08)',
-                                                                                color: '#ff8a00',
+                                                                                backgroundColor: 'rgba(255, 105, 180, 0.08)',
+                                                                                color: '#ff69b4',
                                                                                 width: '38px',
                                                                                 height: '38px',
                                                                                 borderRadius: '12px',
@@ -775,11 +775,11 @@ const Client = () => {
                                                                                 transition: 'all 0.3s ease'
                                                                             }}
                                                                             onMouseOver={(e) => {
-                                                                                e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.15)';
+                                                                                e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.15)';
                                                                                 e.currentTarget.style.transform = 'translateY(-2px)';
                                                                             }}
                                                                             onMouseOut={(e) => {
-                                                                                e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.08)';
+                                                                                e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.08)';
                                                                                 e.currentTarget.style.transform = 'translateY(0)';
                                                                             }}
                                                                         >
@@ -795,16 +795,16 @@ const Client = () => {
                                                                     flex: 1,
                                                                     padding: '12px',
                                                                     borderRadius: '12px',
-                                                                    backgroundColor: 'rgba(82, 180, 71, 0.04)',
-                                                                    border: '1px solid rgba(82, 180, 71, 0.15)',
+                                                                    backgroundColor: 'rgba(65, 105, 225, 0.04)',
+                                                                    border: '1px solid rgba(65, 105, 225, 0.15)',
                                                                     transition: 'all 0.3s ease'
                                                                 }}
                                                                     onMouseOver={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.08)';
+                                                                        e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
                                                                         e.currentTarget.style.transform = 'translateY(-2px)';
                                                                     }}
                                                                     onMouseOut={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.04)';
+                                                                        e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.04)';
                                                                         e.currentTarget.style.transform = 'translateY(0)';
                                                                     }}>
                                                                     <div className="d-flex align-items-center">
@@ -812,13 +812,13 @@ const Client = () => {
                                                                             width: '32px',
                                                                             height: '32px',
                                                                             borderRadius: '8px',
-                                                                            backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                                                                            backgroundColor: 'rgba(65, 105, 225, 0.1)',
                                                                             display: 'flex',
                                                                             alignItems: 'center',
                                                                             justifyContent: 'center',
                                                                             marginRight: '10px'
                                                                         }}>
-                                                                            <i className="bi bi-telephone-fill" style={{ color: '#2e7d32', fontSize: '14px' }}></i>
+                                                                            <i className="bi bi-telephone-fill" style={{ color: '#1e40af', fontSize: '14px' }}></i>
                                                                         </div>
                                                                         <div style={{ minWidth: 0 }}> {/* Added minWidth: 0 for better text truncation */}
                                                                             <div style={{
@@ -844,16 +844,16 @@ const Client = () => {
                                                                     flex: 1,
                                                                     padding: '12px',
                                                                     borderRadius: '12px',
-                                                                    backgroundColor: 'rgba(255, 138, 0, 0.04)',
-                                                                    border: '1px solid rgba(255, 138, 0, 0.15)',
+                                                                    backgroundColor: 'rgba(255, 105, 180, 0.04)',
+                                                                    border: '1px solid rgba(255, 105, 180, 0.15)',
                                                                     transition: 'all 0.3s ease'
                                                                 }}
                                                                     onMouseOver={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.08)';
+                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.08)';
                                                                         e.currentTarget.style.transform = 'translateY(-2px)';
                                                                     }}
                                                                     onMouseOut={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.04)';
+                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.04)';
                                                                         e.currentTarget.style.transform = 'translateY(0)';
                                                                     }}>
                                                                     <div className="d-flex align-items-center">
@@ -861,13 +861,13 @@ const Client = () => {
                                                                             width: '32px',
                                                                             height: '32px',
                                                                             borderRadius: '8px',
-                                                                            backgroundColor: 'rgba(255, 138, 0, 0.1)',
+                                                                            backgroundColor: 'rgba(255, 105, 180, 0.1)',
                                                                             display: 'flex',
                                                                             alignItems: 'center',
                                                                             justifyContent: 'center',
                                                                             marginRight: '10px'
                                                                         }}>
-                                                                            <i className="bi bi-envelope-fill" style={{ color: '#ff8a00', fontSize: '14px' }}></i>
+                                                                            <i className="bi bi-envelope-fill" style={{ color: '#ff69b4', fontSize: '14px' }}></i>
                                                                         </div>
                                                                         <div style={{ minWidth: 0 }}> {/* Added minWidth: 0 for better text truncation */}
                                                                             <div style={{
@@ -899,8 +899,8 @@ const Client = () => {
                                                                     data-bs-target="#bankDetailsModal"
                                                                     onClick={() => setSelectedClient(client)}
                                                                     style={{
-                                                                        backgroundColor: 'rgba(82, 180, 71, 0.08)',
-                                                                        color: '#2e7d32',
+                                                                        backgroundColor: 'rgba(65, 105, 225, 0.08)',
+                                                                        color: '#1e40af',
                                                                         border: 'none',
                                                                         borderRadius: '12px',
                                                                         padding: '12px 20px',
@@ -909,11 +909,11 @@ const Client = () => {
                                                                         transition: 'all 0.3s ease'
                                                                     }}
                                                                     onMouseOver={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.15)';
+                                                                        e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.15)';
                                                                         e.currentTarget.style.transform = 'translateY(-2px)';
                                                                     }}
                                                                     onMouseOut={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.08)';
+                                                                        e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
                                                                         e.currentTarget.style.transform = 'translateY(0)';
                                                                     }}
                                                                 >
@@ -928,8 +928,8 @@ const Client = () => {
                                                                     data-bs-target="#documentsDetailsModal"
                                                                     onClick={() => setSelectedClient(client)}
                                                                     style={{
-                                                                        backgroundColor: 'rgba(255, 138, 0, 0.08)',
-                                                                        color: '#ff8a00',
+                                                                        backgroundColor: 'rgba(255, 105, 180, 0.08)',
+                                                                        color: '#ff69b4',
                                                                         border: 'none',
                                                                         borderRadius: '12px',
                                                                         padding: '12px 20px',
@@ -938,11 +938,11 @@ const Client = () => {
                                                                         transition: 'all 0.3s ease'
                                                                     }}
                                                                     onMouseOver={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.15)';
+                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.15)';
                                                                         e.currentTarget.style.transform = 'translateY(-2px)';
                                                                     }}
                                                                     onMouseOut={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.08)';
+                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.08)';
                                                                         e.currentTarget.style.transform = 'translateY(0)';
                                                                     }}
                                                                 >
@@ -972,7 +972,7 @@ const Client = () => {
                                                                         padding: '16px 15px',
                                                                         fontWeight: '600',
                                                                         color: '#444',
-                                                                        borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                                                        borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                                                         textAlign: 'center',
                                                                         fontSize: '14px'
                                                                     }}>Sr.No.</th>
@@ -980,28 +980,28 @@ const Client = () => {
                                                                         padding: '16px 15px',
                                                                         fontWeight: '600',
                                                                         color: '#444',
-                                                                        borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                                                        borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                                                         fontSize: '14px'
                                                                     }}>Client Name</th>
                                                                     <th style={{
                                                                         padding: '16px 15px',
                                                                         fontWeight: '600',
                                                                         color: '#444',
-                                                                        borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                                                        borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                                                         fontSize: '14px'
                                                                     }}>Contact Info</th>
                                                                     <th style={{
                                                                         padding: '16px 15px',
                                                                         fontWeight: '600',
                                                                         color: '#444',
-                                                                        borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                                                        borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                                                         fontSize: '14px'
                                                                     }}>Address</th>
                                                                     <th style={{
                                                                         padding: '16px 15px',
                                                                         fontWeight: '600',
                                                                         color: '#444',
-                                                                        borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                                                        borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                                                         textAlign: 'center',
                                                                         fontSize: '14px'
                                                                     }}>Actions</th>
@@ -1013,7 +1013,7 @@ const Client = () => {
                                                                         style={{
                                                                             transition: 'background 0.2s ease',
                                                                         }}
-                                                                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(82, 180, 71, 0.04)'}
+                                                                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(65, 105, 225, 0.04)'}
                                                                         onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                                                                     >
                                                                         <td style={{
@@ -1022,7 +1022,7 @@ const Client = () => {
                                                                             textAlign: 'center'
                                                                         }}>
                                                                             <span style={{
-                                                                                background: 'linear-gradient(135deg, #52b447, #2e7d32)',
+                                                                                background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                                                                                 color: 'white',
                                                                                 borderRadius: '50%',
                                                                                 width: '30px',
@@ -1032,7 +1032,7 @@ const Client = () => {
                                                                                 justifyContent: 'center',
                                                                                 fontWeight: '600',
                                                                                 fontSize: '14px',
-                                                                                boxShadow: '0 2px 5px rgba(82, 180, 71, 0.3)'
+                                                                                boxShadow: '0 2px 5px rgba(65, 105, 225, 0.3)'
                                                                             }}>
                                                                                 {index + 1}
                                                                             </span>
@@ -1050,7 +1050,7 @@ const Client = () => {
                                                                                         width: '40px',
                                                                                         height: '40px',
                                                                                         objectFit: 'cover',
-                                                                                        border: '2px solid #52b447',
+                                                                                        border: '2px solid #ff69b4',
                                                                                         padding: '2px'
                                                                                     }}
                                                                                 />
@@ -1074,7 +1074,7 @@ const Client = () => {
                                                                         }}>
                                                                             <div>
                                                                                 <div style={{
-                                                                                    backgroundColor: 'rgba(82, 180, 71, 0.08)',
+                                                                                    backgroundColor: 'rgba(65, 105, 225, 0.08)',
                                                                                     padding: '6px 12px',
                                                                                     borderRadius: '6px',
                                                                                     marginBottom: '6px',
@@ -1082,18 +1082,18 @@ const Client = () => {
                                                                                     alignItems: 'center',
                                                                                     gap: '8px'
                                                                                 }}>
-                                                                                    <i className="bi bi-telephone-fill" style={{ color: '#52b447', fontSize: '14px' }}></i>
+                                                                                    <i className="bi bi-telephone-fill" style={{ color: '#4169e1', fontSize: '14px' }}></i>
                                                                                     <span style={{ fontSize: '13px', color: '#333' }}>{client.clientPhone}</span>
                                                                                 </div>
                                                                                 <div style={{
-                                                                                    backgroundColor: 'rgba(255, 138, 0, 0.08)',
+                                                                                    backgroundColor: 'rgba(255, 105, 180, 0.08)',
                                                                                     padding: '6px 12px',
                                                                                     borderRadius: '6px',
                                                                                     display: 'flex',
                                                                                     alignItems: 'center',
                                                                                     gap: '8px'
                                                                                 }}>
-                                                                                    <i className="bi bi-envelope-fill" style={{ color: '#ff8a00', fontSize: '14px' }}></i>
+                                                                                    <i className="bi bi-envelope-fill" style={{ color: '#ff69b4', fontSize: '14px' }}></i>
                                                                                     <span style={{ fontSize: '13px', color: '#333' }}>{client.clientEmail}</span>
                                                                                 </div>
                                                                             </div>
@@ -1103,14 +1103,14 @@ const Client = () => {
                                                                             borderBottom: '1px solid rgba(0,0,0,0.05)'
                                                                         }}>
                                                                             <div style={{
-                                                                                backgroundColor: 'rgba(255, 94, 0, 0.08)',
+                                                                                backgroundColor: 'rgba(255, 105, 180, 0.08)',
                                                                                 padding: '6px 12px',
                                                                                 borderRadius: '6px',
                                                                                 display: 'flex',
                                                                                 alignItems: 'center',
                                                                                 gap: '8px'
                                                                             }}>
-                                                                                <i className="bi bi-geo-alt-fill" style={{ color: '#ff5e00', fontSize: '14px' }}></i>
+                                                                                <i className="bi bi-geo-alt-fill" style={{ color: '#ff1493', fontSize: '14px' }}></i>
                                                                                 <span style={{ fontSize: '13px', color: '#333' }}>{client.clientAddress}</span>
                                                                             </div>
                                                                         </td>
@@ -1127,8 +1127,8 @@ const Client = () => {
                                                                                     data-bs-target="#bankDetailsModal"
                                                                                     onClick={() => setSelectedClient(client)}
                                                                                     style={{
-                                                                                        backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                                                                        color: '#52b447',
+                                                                                        backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                                                                        color: '#1e40af',
                                                                                         width: '32px',
                                                                                         height: '32px',
                                                                                         borderRadius: '50%',
@@ -1140,10 +1140,10 @@ const Client = () => {
                                                                                         transition: 'all 0.2s ease'
                                                                                     }}
                                                                                     onMouseOver={(e) => {
-                                                                                        e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                                                                        e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)';
                                                                                     }}
                                                                                     onMouseOut={(e) => {
-                                                                                        e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                                                                        e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.1)';
                                                                                     }}
                                                                                 >
                                                                                     <i className="bi bi-bank"></i>
@@ -1156,8 +1156,8 @@ const Client = () => {
                                                                                     data-bs-target="#documentsDetailsModal"
                                                                                     onClick={() => setSelectedClient(client)}
                                                                                     style={{
-                                                                                        backgroundColor: 'rgba(255, 138, 0, 0.1)',
-                                                                                        color: '#ff8a00',
+                                                                                        backgroundColor: 'rgba(255, 105, 180, 0.1)',
+                                                                                        color: '#ff69b4',
                                                                                         width: '32px',
                                                                                         height: '32px',
                                                                                         borderRadius: '50%',
@@ -1169,10 +1169,10 @@ const Client = () => {
                                                                                         transition: 'all 0.2s ease'
                                                                                     }}
                                                                                     onMouseOver={(e) => {
-                                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.2)';
+                                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.2)';
                                                                                     }}
                                                                                     onMouseOut={(e) => {
-                                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.1)';
+                                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.1)';
                                                                                     }}
                                                                                 >
                                                                                     <i className="bi bi-file-earmark-text"></i>
@@ -1185,8 +1185,8 @@ const Client = () => {
                                                                                     data-bs-target="#editproject"
                                                                                     onClick={() => setToEdit(client._id)}
                                                                                     style={{
-                                                                                        backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                                                                        color: '#52b447',
+                                                                                        backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                                                                        color: '#1e40af',
                                                                                         width: '32px',
                                                                                         height: '32px',
                                                                                         borderRadius: '50%',
@@ -1198,10 +1198,10 @@ const Client = () => {
                                                                                         transition: 'all 0.2s ease'
                                                                                     }}
                                                                                     onMouseOver={(e) => {
-                                                                                        e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                                                                        e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)';
                                                                                     }}
                                                                                     onMouseOut={(e) => {
-                                                                                        e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                                                                        e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.1)';
                                                                                     }}
                                                                                 >
                                                                                     <i className="icofont-edit"></i>
@@ -1214,8 +1214,8 @@ const Client = () => {
                                                                                     data-bs-target="#deleteproject"
                                                                                     onClick={() => setDeletableId(client._id)}
                                                                                     style={{
-                                                                                        backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                                                                                        color: '#ff5e00',
+                                                                                        backgroundColor: 'rgba(255, 105, 180, 0.1)',
+                                                                                        color: '#ff69b4',
                                                                                         width: '32px',
                                                                                         height: '32px',
                                                                                         borderRadius: '50%',
@@ -1227,10 +1227,10 @@ const Client = () => {
                                                                                         transition: 'all 0.2s ease'
                                                                                     }}
                                                                                     onMouseOver={(e) => {
-                                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.2)';
+                                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.2)';
                                                                                     }}
                                                                                     onMouseOut={(e) => {
-                                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
+                                                                                        e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.1)';
                                                                                     }}
                                                                                 >
                                                                                     <i className="icofont-ui-delete"></i>
@@ -1334,7 +1334,7 @@ const Client = () => {
                                                 onChange={handleChange}
                                                 style={{
                                                     borderRadius: '8px',
-                                                    border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                    border: '1px solid rgba(65, 105, 225, 0.3)',
                                                     padding: '10px 15px',
                                                     color: '#333',
                                                     boxShadow: 'none'
@@ -1396,7 +1396,7 @@ const Client = () => {
                                                 onChange={handleChange}
                                                 style={{
                                                     borderRadius: '8px',
-                                                    border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                    border: '1px solid rgba(65, 105, 225, 0.3)',
                                                     padding: '10px 15px',
                                                     color: '#333',
                                                     boxShadow: 'none'
@@ -1428,7 +1428,7 @@ const Client = () => {
                                                     onChange={handleChange}
                                                     style={{
                                                         borderRadius: '8px',
-                                                        border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                        border: '1px solid rgba(65, 105, 225, 0.3)',
                                                         padding: '10px 15px',
                                                         color: '#333',
                                                         boxShadow: 'none'
@@ -1540,7 +1540,7 @@ const Client = () => {
                                                 onChange={handleChange}
                                                 style={{
                                                     borderRadius: '8px',
-                                                    border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                    border: '1px solid rgba(65, 105, 225, 0.3)',
                                                     padding: '10px 15px',
                                                     color: '#333',
                                                     boxShadow: 'none'
@@ -1571,7 +1571,7 @@ const Client = () => {
                                                 rows="3"
                                                 style={{
                                                     borderRadius: '8px',
-                                                    border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                    border: '1px solid rgba(65, 105, 225, 0.3)',
                                                     padding: '10px 15px',
                                                     color: '#333',
                                                     boxShadow: 'none'
@@ -1595,10 +1595,10 @@ const Client = () => {
                                                 Social Links
                                             </label>
                                             <div className="row g-3" style={{
-                                                backgroundColor: 'rgba(82, 180, 71, 0.03)',
+                                                backgroundColor: 'rgba(65, 105, 225, 0.03)',
                                                 padding: '15px',
                                                 borderRadius: '10px',
-                                                border: '1px solid rgba(82, 180, 71, 0.2)'
+                                                border: '1px solid rgba(65, 105, 225, 0.2)'
                                             }}>
                                                 <div className="col-md-6">
                                                     <input
@@ -1610,7 +1610,7 @@ const Client = () => {
                                                         onChange={handleChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -1627,7 +1627,7 @@ const Client = () => {
                                                         onChange={handleChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -1644,7 +1644,7 @@ const Client = () => {
                                                         onChange={handleChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -1661,7 +1661,7 @@ const Client = () => {
                                                         onChange={handleChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -1678,7 +1678,7 @@ const Client = () => {
                                                         onChange={handleChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -1695,7 +1695,7 @@ const Client = () => {
                                                         onChange={handleChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -1712,7 +1712,7 @@ const Client = () => {
                                                         onChange={handleChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -1729,7 +1729,7 @@ const Client = () => {
                                                         onChange={handleChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -1742,7 +1742,7 @@ const Client = () => {
 
                                     {/* Footer */}
                                     <div className="modal-footer" style={{
-                                        borderTop: '1px solid rgba(82, 180, 71, 0.1)',
+                                        borderTop: '1px solid rgba(65, 105, 225, 0.1)',
                                         padding: '16px 25px'
                                     }}>
                                         <button
@@ -1781,16 +1781,16 @@ const Client = () => {
                                                 padding: '8px 20px',
                                                 fontWeight: '600',
                                                 fontSize: '14px',
-                                                boxShadow: '0 4px 10px rgba(82, 180, 71, 0.2)',
+                                                boxShadow: '0 4px 10px rgba(65, 105, 225, 0.2)',
                                                 transition: 'all 0.2s ease'
                                             }}
                                             onMouseOver={(e) => {
                                                 e.currentTarget.style.transform = 'translateY(-2px)';
-                                                e.currentTarget.style.boxShadow = '0 6px 12px rgba(82, 180, 71, 0.3)';
+                                                e.currentTarget.style.boxShadow = '0 6px 12px rgba(65, 105, 225, 0.3)';
                                             }}
                                             onMouseOut={(e) => {
                                                 e.currentTarget.style.transform = 'translateY(0)';
-                                                e.currentTarget.style.boxShadow = '0 4px 10px rgba(82, 180, 71, 0.2)';
+                                                e.currentTarget.style.boxShadow = '0 4px 10px rgba(65, 105, 225, 0.2)';
                                             }}
                                         >
                                             <i className="icofont-check-circled me-2"></i>
@@ -1882,7 +1882,7 @@ const Client = () => {
                                                 onChange={updateChange}
                                                 style={{
                                                     borderRadius: '8px',
-                                                    border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                    border: '1px solid rgba(65, 105, 225, 0.3)',
                                                     padding: '10px 15px',
                                                     color: '#333',
                                                     boxShadow: 'none'
@@ -1943,7 +1943,7 @@ const Client = () => {
                                                 onChange={updateChange}
                                                 style={{
                                                     borderRadius: '8px',
-                                                    border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                    border: '1px solid rgba(65, 105, 225, 0.3)',
                                                     padding: '10px 15px',
                                                     color: '#333',
                                                     boxShadow: 'none'
@@ -1975,7 +1975,7 @@ const Client = () => {
                                                     onChange={updateChange}
                                                     style={{
                                                         borderRadius: '8px',
-                                                        border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                        border: '1px solid rgba(65, 105, 225, 0.3)',
                                                         padding: '10px 15px',
                                                         color: '#333',
                                                         boxShadow: 'none'
@@ -2054,7 +2054,7 @@ const Client = () => {
                                                 onChange={updateChange}
                                                 style={{
                                                     borderRadius: '8px',
-                                                    border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                    border: '1px solid rgba(65, 105, 225, 0.3)',
                                                     padding: '10px 15px',
                                                     color: '#333',
                                                     boxShadow: 'none'
@@ -2085,7 +2085,7 @@ const Client = () => {
                                                 onChange={updateChange}
                                                 style={{
                                                     borderRadius: '8px',
-                                                    border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                    border: '1px solid rgba(65, 105, 225, 0.3)',
                                                     padding: '10px 15px',
                                                     color: '#333',
                                                     boxShadow: 'none'
@@ -2116,7 +2116,7 @@ const Client = () => {
                                                 rows="3"
                                                 style={{
                                                     borderRadius: '8px',
-                                                    border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                    border: '1px solid rgba(65, 105, 225, 0.3)',
                                                     padding: '10px 15px',
                                                     color: '#333',
                                                     boxShadow: 'none'
@@ -2141,10 +2141,10 @@ const Client = () => {
                                                 Social Links
                                             </label>
                                             <div className="row g-3" style={{
-                                                backgroundColor: 'rgba(82, 180, 71, 0.03)',
+                                                backgroundColor: 'rgba(65, 105, 225, 0.03)',
                                                 padding: '15px',
                                                 borderRadius: '10px',
-                                                border: '1px solid rgba(82, 180, 71, 0.2)'
+                                                border: '1px solid rgba(65, 105, 225, 0.2)'
                                             }}>
                                                 <div className="col-md-6">
                                                     <input
@@ -2156,7 +2156,7 @@ const Client = () => {
                                                         onChange={updateChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -2173,7 +2173,7 @@ const Client = () => {
                                                         onChange={updateChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -2190,7 +2190,7 @@ const Client = () => {
                                                         onChange={updateChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -2207,7 +2207,7 @@ const Client = () => {
                                                         onChange={updateChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -2224,7 +2224,7 @@ const Client = () => {
                                                         onChange={updateChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -2241,7 +2241,7 @@ const Client = () => {
                                                         onChange={updateChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -2258,7 +2258,7 @@ const Client = () => {
                                                         onChange={updateChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -2275,7 +2275,7 @@ const Client = () => {
                                                         onChange={updateChange}
                                                         style={{
                                                             borderRadius: '8px',
-                                                            border: '1px solid rgba(82, 180, 71, 0.3)',
+                                                            border: '1px solid rgba(65, 105, 225, 0.3)',
                                                             padding: '10px 15px',
                                                             color: '#333',
                                                             boxShadow: 'none'
@@ -2289,7 +2289,7 @@ const Client = () => {
 
                                         {/* Footer */}
                                         <div className="modal-footer" style={{
-                                            borderTop: '1px solid rgba(82, 180, 71, 0.1)',
+                                            borderTop: '1px solid rgba(65, 105, 225, 0.1)',
                                             padding: '16px 25px'
                                         }}>
                                             <button
@@ -2328,16 +2328,16 @@ const Client = () => {
                                                     padding: '8px 20px',
                                                     fontWeight: '600',
                                                     fontSize: '14px',
-                                                    boxShadow: '0 4px 10px rgba(82, 180, 71, 0.2)',
+                                                    boxShadow: '0 4px 10px rgba(65, 105, 225, 0.2)',
                                                     transition: 'all 0.2s ease'
                                                 }}
                                                 onMouseOver={(e) => {
                                                     e.currentTarget.style.transform = 'translateY(-2px)';
-                                                    e.currentTarget.style.boxShadow = '0 6px 12px rgba(82, 180, 71, 0.3)';
+                                                    e.currentTarget.style.boxShadow = '0 6px 12px rgba(65, 105, 225, 0.3)';
                                                 }}
                                                 onMouseOut={(e) => {
                                                     e.currentTarget.style.transform = 'translateY(0)';
-                                                    e.currentTarget.style.boxShadow = '0 4px 10px rgba(82, 180, 71, 0.2)';
+                                                    e.currentTarget.style.boxShadow = '0 4px 10px rgba(65, 105, 225, 0.2)';
                                                 }}
                                             >
                                                 <i className="icofont-check-circled me-2"></i>
