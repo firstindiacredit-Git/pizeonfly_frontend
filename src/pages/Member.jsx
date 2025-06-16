@@ -420,6 +420,7 @@ const Member = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const handleEditClick = (employee) => {
+    console.log("Employee data being set:", employee); // Debug log
     setSelectedEmployee(employee); // Add this line
     setToEdit(employee._id);
     setEmployeeData({
@@ -580,10 +581,16 @@ const Member = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_URL}api/search?id=${searchQuery}`
         );
-        setEmployees(response.data);
+        // Check if response.data is an array, if not, set to empty array
+        if (Array.isArray(response.data)) {
+          setEmployees(response.data);
+        } else {
+          setEmployees([]);
+        }
       } catch (error) {
         console.error("Error:", error);
-        setEmployees(null);
+        // Set to empty array instead of null to prevent map error
+        setEmployees([]);
       }
     } else {
       const fetchData = async () => {
@@ -594,6 +601,7 @@ const Member = () => {
           setEmployees(response.data);
         } catch (error) {
           console.error("Error:", error);
+          setEmployees([]);
         }
       };
 
@@ -741,48 +749,64 @@ const Member = () => {
                 <div className="row clearfix">
                   <div className="col-md-12">
                     <div className="card border-0 mb-4 no-bg">
-                      <div className="card-header py-3 px-0 d-sm-flex align-items-center  justify-content-between border-bottom">
-                        <h3 className=" fw-bold flex-fill mb-0 mt-sm-0">
+                      <div className="card-header py-4 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between" style={{
+                        borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
+                        backgroundColor: 'transparent',
+                        padding: '0 0 20px 0'
+                      }}>
+                        <h3 className="flex-fill mb-3 mb-sm-0" style={{
+                          fontWeight: '700',
+                          color: '#333',
+                          fontSize: '24px',
+                          position: 'relative',
+                          paddingLeft: '15px'
+                        }}>
+                          <span style={{
+                            position: 'absolute',
+                            left: '0',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            width: '5px',
+                            height: '24px',
+                            background: 'linear-gradient(to bottom, #4169e1, #1e40af)',
+                            borderRadius: '3px'
+                          }}></span>
                           Employees
                         </h3>
-                        <button
-                          type="button"
-                          className="btn btn-dark me-1 mt-1 w-sm-100"
-                          data-bs-toggle="modal"
-                          data-bs-target="#createemp"
-                        >
-                          <i className="icofont-plus-circle me-2 fs-6" />
-                          Add Employee
-                        </button>
-                        <div className="order-0 col-lg-4 col-md-4 col-sm-12 col-12 mb-3 mb-md-0 ">
-                          <div className="input-group">
-                            <input
-                              type="search"
-                              className="form-control"
-                              aria-label="search"
-                              aria-describedby="addon-wrapping"
-                              value={searchQuery}
-                              onChange={(e) => {
-                                setSearchQuery(e.target.value);
-                                handleSearch(e.target.value);
-                              }}
-                              placeholder="Enter Employee Name"
-                            />
-                            <button
-                              type="button"
-                              className="input-group-text"
-                              id="addon-wrapping"
-                              onClick={handleSearch}
-                            >
-                              <i className="fa fa-search" />
-                            </button>
-                          </div>
+                        <div className="col-auto d-flex">
+                          <button
+                            type="button"
+                            className="btn mb-3 mb-sm-0 me-sm-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#createemp"
+                            style={{
+                              background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '10px 18px',
+                              fontWeight: '600',
+                              boxShadow: '0 4px 10px rgba(65, 105, 225, 0.2)',
+                              transition: 'all 0.2s ease',
+                              fontSize: '14px'
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.transform = 'translateY(-2px)';
+                              e.currentTarget.style.boxShadow = '0 6px 12px rgba(65, 105, 225, 0.3)';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.transform = 'translateY(0)';
+                              e.currentTarget.style.boxShadow = '0 4px 10px rgba(65, 105, 225, 0.2)';
+                            }}
+                          >
+                            <i className="icofont-plus-circle me-2" style={{ fontSize: '16px' }} />
+                            Add Employee
+                          </button>
                         </div>
                       </div>
 
-                      <div className="d-flex justify-content-between">
-                        <div></div>
-                        <div className="d-flex">
+                      <div className="d-flex justify-content-between mt-3 border-bottom">
+                        <div className="d-flex mb-3">
                           {viewMode === 'grid' ? (
                             <button
                               className="btn btn-outline-primary"
@@ -801,6 +825,49 @@ const Member = () => {
                             </button>
                           )}
                         </div>
+                        <div className="order-0">
+                          <div className="input-group" style={{
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                            borderRadius: '8px',
+                            overflow: 'hidden'
+                          }}>
+                            <input
+                              type="search"
+                              className="form-control"
+                              aria-label="search"
+                              aria-describedby="addon-wrapping"
+                              value={searchQuery}
+                              onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                handleSearch(e.target.value);
+                              }}
+                              placeholder="Enter Employee Name"
+                              style={{
+                                border: '1px solid rgba(65, 105, 225, 0.2)',
+                                borderRight: 'none',
+                                padding: '10px 15px',
+                                fontSize: '14px',
+                                color: '#333',
+                                minWidth: '220px'
+                              }}
+                            />
+                            <button
+                              type="button"
+                              className="input-group-text"
+                              id="addon-wrapping"
+                              onClick={handleSearch}
+                              style={{
+                                backgroundColor: '#4169e1',
+                                border: 'none',
+                                color: 'white',
+                                padding: '0 15px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <i className="fa fa-search" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -812,526 +879,965 @@ const Member = () => {
                 ) : (
                   viewMode === 'grid' ? (
                     <div className="row g-3 row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-2 row-deck py-1 pb-4">
-                      {employees.map((employee) => {
+                      {employees && employees.length > 0 ? employees.map((employee, index) => {
                         const newDate = new Date(employee?.joiningDate);
                         const date = newDate.getDate();
                         const month = newDate.getMonth() + 1; // months are 0-indexed
                         const year = newDate.getFullYear();
                         return (
                           <div className="col" key={employee.employeeId}>
-                            <div className="card teacher-card">
-                              <div className="card-body d-flex">
+                            <div className="card" style={{
+                              borderRadius: '20px',
+                              border: 'none',
+                              boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
+                              transition: 'all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)',
+                              overflow: 'hidden',
+                              position: 'relative',
+                              backgroundColor: '#ffffff'
+                            }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-10px)';
+                                e.currentTarget.style.boxShadow = '0 20px 35px rgba(0,0,0,0.1)';
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.05)';
+                              }}>
+                              {/* Gradient Border Effect */}
+                              <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                height: '6px',
+                                background: 'linear-gradient(90deg, #4169e1, #1e40af, #ff69b4)',
+                                opacity: 0.9
+                              }}></div>
 
-                                <div className="profile-av pe-xl-4 pe-md-2 pe-sm-4 pe-4 text-center w-75">
-                                  <div className="position-relative d-inline-block">
-                                    <img
-                                      src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
-                                      alt=""
-                                      className="avatar xl rounded-circle img-thumbnail shadow-sm"
-                                      style={{
-                                        transition: 'transform 0.3s ease-in-out',
-                                        cursor: 'pointer',
-                                        objectFit: 'cover',
-                                      }}
-                                      onMouseEnter={(e) => {
-                                        e.target.style.transform = 'scale(2.5)';
-                                        e.target.style.zIndex = '100';
-                                      }}
-                                      onMouseLeave={(e) => {
-                                        e.target.style.transform = 'scale(1)';
-                                        e.target.style.zIndex = '1';
-                                      }}
-                                      onClick={() => handleImageClick(
-                                        `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
-                                        employee.employeeName
-                                      )}
-                                    />
+                              <div className="card-body" style={{ padding: '28px' }}>
+                                {/* Header Section */}
+                                <div className="d-flex align-items-center gap-4 mb-4">
+                                  {/* Employee Number & Image */}
+                                  <div className="d-flex align-items-center gap-4">
+                                    <span style={{
+                                      background: 'linear-gradient(135deg, #4169e1, #1e40af)',
+                                      color: 'white',
+                                      borderRadius: '12px',
+                                      width: '40px',
+                                      height: '40px',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      fontWeight: '600',
+                                      fontSize: '16px',
+                                      boxShadow: '0 4px 15px rgba(65, 105, 225, 0.3)',
+                                      border: '2px solid rgba(255, 255, 255, 0.8)'
+                                    }}>
+                                      {index + 1}
+                                    </span>
+
+                                    <div style={{
+                                      width: '60px',
+                                      height: '60px',
+                                      borderRadius: '16px',
+                                      overflow: 'hidden',
+                                      border: '3px solid #ff69b4',
+                                      backgroundColor: 'white',
+                                      boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)'
+                                    }}>
+                                      <img
+                                        src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
+                                        alt={employee.employeeName}
+                                        style={{
+                                          width: '100%',
+                                          height: '100%',
+                                          objectFit: 'cover',
+                                          transition: 'transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1)',
+                                          cursor: 'pointer'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.target.style.transform = 'scale(1.2) rotate(3deg)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.target.style.transform = 'scale(1) rotate(0deg)';
+                                        }}
+                                        onClick={() => handleImageClick(
+                                          `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
+                                          employee.employeeName
+                                        )}
+                                      />
+                                    </div>
                                   </div>
 
-                                  <div className="about-info mt-3">
-                                    <div className="followers me-2">
-                                    </div>
-                                    <div className="own-video">
-                                      <i className="bi bi-telephone-fill text-success fs-6 me-2" />
-                                      <span>{employee.phone}</span>
-                                    </div>
-                                    <p className="rounded-1 d-inline-block fw-bold small-11 mb-1 d-flex justify-content-center">
-                                      <i className="bi bi-envelope-at-fill text-primary fs-6 me-1" />
-                                      {employee.emailid}
-                                    </p>
-                                  </div>
-
-                                  <div className="mt-2 text-start border-top pt-2">
-                                    {/* Aadhaar Card Row */}
-                                    <div className="row border-bottom pb-2 mb-2">
-                                      <div className="col-md-6 d-flex align-items-center">
-                                        <strong>Aadhaar -</strong>
-                                      </div>
-                                      <div className="col-md-6">
-                                        {employee.aadhaarCard ? (
-                                          <div className="row align-items-center g-2">
-                                            <div className="col-6">
-                                              {employee.aadhaarCard.toLowerCase().endsWith('.pdf') ? (
-                                                <a href="#" onClick={(e) => handleFileClick(
-                                                  e,
-                                                  `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`,
-                                                  'pdf',
-                                                  employee.employeeName
-                                                )}>View</a>
-                                              ) : (
-                                                <img
-                                                  src={`${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`}
-                                                  alt=""
-                                                  className="avatar sm img-thumbnail shadow-sm"
-                                                  onClick={(e) => handleFileClick(
-                                                    e,
-                                                    `${import.meta.env.VITE_BASE_URL}${employee.aadhaarCard.replace('uploads/', '')}`,
-                                                    'image',
-                                                    employee.employeeName
-                                                  )}
-                                                  style={{ cursor: 'pointer' }}
-                                                />
-                                              )}
-                                            </div>
-                                            <div className="col-3 text-center">
-                                              <i
-                                                className="bi bi-download text-primary"
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => handleDownload(employee.aadhaarCard, `${employee.employeeName}_aadhaar${employee.aadhaarCard.substr(employee.aadhaarCard.lastIndexOf('.'))}`)}
-                                                title="Download Aadhaar Card"
-                                              ></i>
-                                            </div>
-                                            <div className="col-3 text-center">
-                                              <i
-                                                className="bi bi-trash text-danger"
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => handleDocumentDelete(employee._id, 'aadhaarCard')}
-                                                title="Delete Aadhaar Card"
-                                              ></i>
-                                            </div>
-                                          </div>
-                                        ) : (
-                                          <i className="bi bi-x-lg text-danger"></i>
-                                        )}
-                                      </div>
-                                    </div>
-
-                                    {/* PAN Card Row */}
-                                    <div className="row border-bottom pb-2 mb-2">
-                                      <div className="col-md-6 d-flex align-items-center">
-                                        <strong>Pan -</strong>
-                                      </div>
-                                      <div className="col-md-6">
-                                        {employee.panCard ? (
-                                          <div className="row align-items-center g-2">
-                                            <div className="col-6">
-                                              {employee.panCard.toLowerCase().endsWith('.pdf') ? (
-                                                <a href="#" onClick={(e) => handleFileClick(
-                                                  e,
-                                                  `${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`,
-                                                  'pdf',
-                                                  employee.employeeName
-                                                )}>View</a>
-                                              ) : (
-                                                <img
-                                                  src={`${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`}
-                                                  alt=""
-                                                  className="avatar sm img-thumbnail shadow-sm"
-                                                  onClick={(e) => handleFileClick(
-                                                    e,
-                                                    `${import.meta.env.VITE_BASE_URL}${employee.panCard.replace('uploads/', '')}`,
-                                                    'image',
-                                                    employee.employeeName
-                                                  )}
-                                                  style={{ cursor: 'pointer' }}
-                                                />
-                                              )}
-                                            </div>
-                                            <div className="col-3 text-center">
-                                              <i
-                                                className="bi bi-download text-primary"
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => handleDownload(employee.panCard, `${employee.employeeName}_pan${employee.panCard.substr(employee.panCard.lastIndexOf('.'))}`)}
-                                                title="Download Pan Card"
-                                              ></i>
-                                            </div>
-                                            <div className="col-3 text-center">
-                                              <i
-                                                className="bi bi-trash text-danger"
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => handleDocumentDelete(employee._id, 'panCard')}
-                                                title="Delete Pan Card"
-                                              ></i>
-                                            </div>
-                                          </div>
-                                        ) : (
-                                          <i className="bi bi-x-lg text-danger"></i>
-                                        )}
-                                      </div>
-                                    </div>
-
-                                    {/* Resume Row */}
-                                    <div className="row border-bottom pb-2 mb-2">
-                                      <div className="col-md-6 d-flex align-items-center">
-                                        <strong>Resume -</strong>
-                                      </div>
-                                      <div className="col-md-6">
-                                        {employee.resume ? (
-                                          <div className="row align-items-center g-2">
-                                            <div className="col-6">
-                                              {employee.resume.toLowerCase().endsWith('.pdf') ? (
-                                                <a href="#" onClick={(e) => handleFileClick(
-                                                  e,
-                                                  `${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`,
-                                                  'pdf',
-                                                  employee.employeeName
-                                                )}><i className="bi bi-filetype-pdf"></i></a>
-                                              ) : (
-                                                <img
-                                                  src={`${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`}
-                                                  alt=""
-                                                  className="avatar sm img-thumbnail shadow-sm"
-                                                  onClick={(e) => handleFileClick(
-                                                    e,
-                                                    `${import.meta.env.VITE_BASE_URL}${employee.resume.replace('uploads/', '')}`,
-                                                    'image',
-                                                    employee.employeeName
-                                                  )}
-                                                  style={{ cursor: 'pointer' }}
-                                                />
-                                              )}
-                                            </div>
-                                            <div className="col-3 text-center">
-                                              <i
-                                                className="bi bi-download text-primary"
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => handleDownload(employee.resume, `${employee.employeeName}_resume${employee.resume.substr(employee.resume.lastIndexOf('.'))}`)}
-                                                title="Download Resume"
-                                              ></i>
-                                            </div>
-                                            <div className="col-3 text-center">
-                                              <i
-                                                className="bi bi-trash text-danger"
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => handleDocumentDelete(employee._id, 'resume')}
-                                                title="Delete Resume"
-                                              ></i>
-                                            </div>
-                                          </div>
-                                        ) : (
-                                          <i className="bi bi-x-lg text-danger"></i>
-                                        )}
-                                      </div>
-                                    </div>
-
-                                  </div>
-
-                                </div>
-
-                                <div className="teacher-info border-start ps-xl-4 ps-md-3 ps-sm-4 ps-4 w-100">
-                                  <div>
-                                    <div className="d-flex justify-content-between">
-
-                                      <div>
-                                        <h6
-                                          className="mb-0 mt-2 fw-bold d-block fs-6"
+                                  {/* Employee Name and Actions */}
+                                  <div className="d-flex justify-content-between align-items-center flex-grow-1">
+                                    <div>
+                                      <div className="d-flex align-items-center gap-2 mb-1">
+                                        <h5 className="mb-0" style={{
+                                          color: '#1a1a1a',
+                                          fontWeight: '700',
+                                          fontSize: '18px',
+                                          letterSpacing: '-0.3px',
+                                          cursor: 'pointer'
+                                        }}
                                           onClick={() => handleEmployeeClick(employee)}
-                                          style={{ cursor: 'pointer' }}
                                           title="Click to View Employee Dashboard"
                                         >
                                           {employee.employeeName}
-                                        </h6>
-                                        <div className="followers me-2">
-                                          <i className="bi bi-person-vcard-fill text-danger fs-6 me-2" />
-                                          <span>{employee.employeeId}</span>
-                                        </div>
-                                      </div>
-
-                                      <div>
-                                        <div
-                                          className="btn-group"
-                                          role="group"
-                                          aria-label="Basic outlined example"
-                                        >
+                                        </h5>
+                                        {/* Social Media Icon */}
+                                        {(employee.socialLinks?.linkedin || 
+                                          employee.socialLinks?.instagram || 
+                                          employee.socialLinks?.youtube || 
+                                          employee.socialLinks?.facebook || 
+                                          employee.socialLinks?.github || 
+                                          employee.socialLinks?.website || 
+                                          employee.socialLinks?.other) && (
                                           <button
                                             type="button"
-                                            className="btn btn-outline-secondary"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editemp"
-                                            onClick={() => handleEditClick(employee)}
-                                          >
-                                            <i className="icofont-edit text-success" />
-                                          </button>
-                                          <button
-                                            type="button"
-                                            className="btn btn-outline-secondary"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deleteproject"
+                                            className="btn p-0"
                                             onClick={() => {
-                                              setDeletableId(employee._id);
+                                              setSelectedEmployee(employee);
+                                              // Open modal programmatically after setting state
+                                              setTimeout(() => {
+                                                const modal = new window.bootstrap.Modal(document.getElementById('socialMediaModal'));
+                                                modal.show();
+                                              }, 100);
                                             }}
+                                            style={{
+                                              backgroundColor: 'transparent',
+                                              border: 'none',
+                                              padding: '0',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              transition: 'all 0.3s ease'
+                                            }}
+                                            title="View Social Media Links"
                                           >
-                                            <i className="icofont-ui-delete text-danger" />
+                                            <i className="bi bi-share-fill" style={{ 
+                                              color: '#ff69b4', 
+                                              fontSize: '16px',
+                                              transition: 'all 0.3s ease'
+                                            }}
+                                              onMouseOver={(e) => {
+                                                e.target.style.color = '#1e40af';
+                                                e.target.style.transform = 'scale(1.2)';
+                                              }}
+                                              onMouseOut={(e) => {
+                                                e.target.style.color = '#ff69b4';
+                                                e.target.style.transform = 'scale(1)';
+                                              }}
+                                            ></i>
                                           </button>
-                                        </div>
+                                        )}
                                       </div>
+                                      <span style={{
+                                        fontSize: '13px',
+                                        color: '#666',
+                                        fontWeight: '500'
+                                      }}>
+                                        Employee ID: {employee.employeeId}
+                                      </span>
                                     </div>
-                                    <div className="d-flex justify-content-between">
-                                      <span className="light-info-bg py-1 px-2 rounded-1 d-inline-block fw-bold small-11 mb-0 mt-1">
-                                        <i className="bi bi-calendar-check-fill text-primary fs-6 me-2" />
-                                        {date}/{month}/{year}
-                                      </span>
-                                      <span className="light-info-bg p-2 rounded-1 d-inline-block fw-bold small-11 mb-0 mt-1">
-                                        {employee.designation}
-                                      </span>
+
+                                    <div className="d-flex gap-2">
+                                      <button
+                                        type="button"
+                                        className="btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editemp"
+                                        onClick={() => handleEditClick(employee)}
+                                        style={{
+                                          backgroundColor: 'rgba(65, 105, 225, 0.08)',
+                                          color: '#1e40af',
+                                          width: '38px',
+                                          height: '38px',
+                                          borderRadius: '12px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          border: 'none',
+                                          transition: 'all 0.3s ease'
+                                        }}
+                                        onMouseOver={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.15)';
+                                          e.currentTarget.style.transform = 'translateY(-2px)';
+                                        }}
+                                        onMouseOut={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
+                                          e.currentTarget.style.transform = 'translateY(0)';
+                                        }}
+                                      >
+                                        <i className="icofont-edit" style={{ fontSize: '16px' }}></i>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        className="btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteproject"
+                                        onClick={() => {
+                                          setDeletableId(employee._id);
+                                        }}
+                                        style={{
+                                          backgroundColor: 'rgba(255, 105, 180, 0.08)',
+                                          color: '#ff69b4',
+                                          width: '38px',
+                                          height: '38px',
+                                          borderRadius: '12px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          border: 'none',
+                                          transition: 'all 0.3s ease'
+                                        }}
+                                        onMouseOver={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.15)';
+                                          e.currentTarget.style.transform = 'translateY(-2px)';
+                                        }}
+                                        onMouseOut={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.08)';
+                                          e.currentTarget.style.transform = 'translateY(0)';
+                                        }}
+                                      >
+                                        <i className="icofont-ui-delete" style={{ fontSize: '16px' }}></i>
+                                      </button>
                                     </div>
                                   </div>
-                                  <div className="video-setting-icon mt-2 pt-2 border-top">
-                                    <p>{employee.description}</p>
-                                  </div>
-                                  <div className="mt-2">
-                                    <div className="d-flex gap-2 fw-bold">
-                                      Projects :
-                                      <span className="text-primary">
-                                        {employeeProjects[employee._id] || 0}
-                                      </span>
-                                      <Link
-                                        to="/projects"
-                                        state={{ employeeName: employee.employeeName }}
-                                        className="arrow-link"
-                                        title={`Click to View Projects of ${employee.employeeName}`}
-                                      >
-                                        <i className="bi bi-arrow-right" />
-                                      </Link>
-                                    </div>
-                                    <div className="d-flex gap-2 fw-bold">
-                                      Tasks :
-                                      <span className="text-success">
-                                        {employeeTasks[employee._id] || 0}
-                                      </span>
-                                      <Link
-                                        to="/tasks"
-                                        state={{ employeeName: employee.employeeName }}
-                                        className="arrow-link"
-                                        title={`Click to View Tasks of ${employee.employeeName}`}
-                                      >
-                                        <i className="bi bi-arrow-right" />
-                                      </Link>
+                                </div>
+
+                                {/* Contact Info Cards - More Compact Design */}
+                                <div className="d-flex gap-3 mb-4">
+                                  <div style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    borderRadius: '12px',
+                                    backgroundColor: 'rgba(65, 105, 225, 0.04)',
+                                    border: '1px solid rgba(65, 105, 225, 0.15)',
+                                    transition: 'all 0.3s ease'
+                                  }}
+                                    onMouseOver={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
+                                      e.currentTarget.style.transform = 'translateY(-2px)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.04)';
+                                      e.currentTarget.style.transform = 'translateY(0)';
+                                    }}>
+                                    <div className="d-flex align-items-center">
+                                      <div style={{
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '8px',
+                                        backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginRight: '10px'
+                                      }}>
+                                        <i className="bi bi-telephone-fill" style={{ color: '#1e40af', fontSize: '14px' }}></i>
+                                      </div>
+                                      <div style={{ minWidth: 0 }}>
+                                        <div style={{
+                                          fontSize: '11px',
+                                          color: '#666',
+                                          marginBottom: '2px',
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.5px'
+                                        }}>Phone</div>
+                                        <div style={{
+                                          fontSize: '13px',
+                                          fontWeight: '600',
+                                          color: '#1a1a1a',
+                                          whiteSpace: 'nowrap',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis'
+                                        }}>{employee.phone}</div>
+                                      </div>
                                     </div>
                                   </div>
 
-                                  {/* bank details */}
+                                  <div style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    borderRadius: '12px',
+                                    backgroundColor: 'rgba(255, 105, 180, 0.04)',
+                                    border: '1px solid rgba(255, 105, 180, 0.15)',
+                                    transition: 'all 0.3s ease'
+                                  }}
+                                    onMouseOver={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.08)';
+                                      e.currentTarget.style.transform = 'translateY(-2px)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.04)';
+                                      e.currentTarget.style.transform = 'translateY(0)';
+                                    }}>
+                                    <div className="d-flex align-items-center">
+                                      <div style={{
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '8px',
+                                        backgroundColor: 'rgba(255, 105, 180, 0.1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginRight: '10px'
+                                      }}>
+                                        <i className="bi bi-envelope-fill" style={{ color: '#ff69b4', fontSize: '14px' }}></i>
+                                      </div>
+                                      <div style={{ minWidth: 0 }}>
+                                        <div style={{
+                                          fontSize: '11px',
+                                          color: '#666',
+                                          marginBottom: '2px',
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.5px'
+                                        }}>Email</div>
+                                        <div style={{
+                                          fontSize: '13px',
+                                          fontWeight: '600',
+                                          color: '#1a1a1a',
+                                          whiteSpace: 'nowrap',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis'
+                                        }}>{employee.emailid}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Department & Joining Date */}
+                                <div className="d-flex gap-3 mb-4">
+                                  <div style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    borderRadius: '12px',
+                                    backgroundColor: 'rgba(82, 180, 71, 0.04)',
+                                    border: '1px solid rgba(82, 180, 71, 0.15)',
+                                    transition: 'all 0.3s ease'
+                                  }}
+                                    onMouseOver={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.08)';
+                                      e.currentTarget.style.transform = 'translateY(-2px)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.04)';
+                                      e.currentTarget.style.transform = 'translateY(0)';
+                                    }}>
+                                    <div className="d-flex align-items-center">
+                                      <div style={{
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '8px',
+                                        backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginRight: '10px'
+                                      }}>
+                                        <i className="bi bi-building" style={{ color: '#52b447', fontSize: '14px' }}></i>
+                                      </div>
+                                      <div style={{ minWidth: 0 }}>
+                                        <div style={{
+                                          fontSize: '11px',
+                                          color: '#666',
+                                          marginBottom: '2px',
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.5px'
+                                        }}>Department</div>
+                                        <div style={{
+                                          fontSize: '13px',
+                                          fontWeight: '600',
+                                          color: '#1a1a1a',
+                                          whiteSpace: 'nowrap',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis'
+                                        }}>{employee.department}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    borderRadius: '12px',
+                                    backgroundColor: 'rgba(255, 94, 0, 0.04)',
+                                    border: '1px solid rgba(255, 94, 0, 0.15)',
+                                    transition: 'all 0.3s ease'
+                                  }}
+                                    onMouseOver={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.08)';
+                                      e.currentTarget.style.transform = 'translateY(-2px)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.04)';
+                                      e.currentTarget.style.transform = 'translateY(0)';
+                                    }}>
+                                    <div className="d-flex align-items-center">
+                                      <div style={{
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '8px',
+                                        backgroundColor: 'rgba(255, 94, 0, 0.1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginRight: '10px'
+                                      }}>
+                                        <i className="bi bi-calendar-check-fill" style={{ color: '#ff5e00', fontSize: '14px' }}></i>
+                                      </div>
+                                      <div style={{ minWidth: 0 }}>
+                                        <div style={{
+                                          fontSize: '11px',
+                                          color: '#666',
+                                          marginBottom: '2px',
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.5px'
+                                        }}>Joined</div>
+                                        <div style={{
+                                          fontSize: '13px',
+                                          fontWeight: '600',
+                                          color: '#1a1a1a',
+                                          whiteSpace: 'nowrap',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis'
+                                        }}>{date}/{month}/{year}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Projects & Tasks Stats */}
+                                <div className="d-flex gap-3 mb-4">
+                                  <div style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    borderRadius: '12px',
+                                    backgroundColor: 'rgba(65, 105, 225, 0.04)',
+                                    border: '1px solid rgba(65, 105, 225, 0.15)',
+                                    transition: 'all 0.3s ease',
+                                    cursor: 'pointer'
+                                  }}
+                                    onMouseOver={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
+                                      e.currentTarget.style.transform = 'translateY(-2px)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.04)';
+                                      e.currentTarget.style.transform = 'translateY(0)';
+                                    }}
+                                    onClick={() => navigate('/projects', { state: { employeeName: employee.employeeName } })}
+                                  >
+                                    <div className="d-flex align-items-center">
+                                      <div style={{
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '8px',
+                                        backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginRight: '10px'
+                                      }}>
+                                        <i className="bi bi-folder-fill" style={{ color: '#1e40af', fontSize: '14px' }}></i>
+                                      </div>
+                                      <div style={{ minWidth: 0 }}>
+                                        <div style={{
+                                          fontSize: '11px',
+                                          color: '#666',
+                                          marginBottom: '2px',
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.5px'
+                                        }}>Projects</div>
+                                        <div style={{
+                                          fontSize: '13px',
+                                          fontWeight: '600',
+                                          color: '#1a1a1a'
+                                        }}>{employeeProjects[employee._id] || 0}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    borderRadius: '12px',
+                                    backgroundColor: 'rgba(82, 180, 71, 0.04)',
+                                    border: '1px solid rgba(82, 180, 71, 0.15)',
+                                    transition: 'all 0.3s ease',
+                                    cursor: 'pointer'
+                                  }}
+                                    onMouseOver={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.08)';
+                                      e.currentTarget.style.transform = 'translateY(-2px)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.04)';
+                                      e.currentTarget.style.transform = 'translateY(0)';
+                                    }}
+                                    onClick={() => navigate('/tasks', { state: { employeeName: employee.employeeName } })}
+                                  >
+                                    <div className="d-flex align-items-center">
+                                      <div style={{
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '8px',
+                                        backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginRight: '10px'
+                                      }}>
+                                        <i className="bi bi-list-task" style={{ color: '#52b447', fontSize: '14px' }}></i>
+                                      </div>
+                                      <div style={{ minWidth: 0 }}>
+                                        <div style={{
+                                          fontSize: '11px',
+                                          color: '#666',
+                                          marginBottom: '2px',
+                                          textTransform: 'uppercase',
+                                          letterSpacing: '0.5px'
+                                        }}>Tasks</div>
+                                        <div style={{
+                                          fontSize: '13px',
+                                          fontWeight: '600',
+                                          color: '#1a1a1a'
+                                        }}>{employeeTasks[employee._id] || 0}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Bottom Actions */}
+                                <div className="d-flex gap-3">
                                   <button
-                                    className="btn btn-sm btn-outline-primary mt-2"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#bankDetailsModal"
-                                    onClick={() => setSelectedEmployee(employee)}
+                                    type="button"
+                                    className="btn flex-grow-1"
+                                    onClick={() => {
+                                      console.log("Bank Details button clicked for employee:", employee);
+                                      setSelectedEmployee(employee);
+                                      // Open modal programmatically after setting state
+                                      setTimeout(() => {
+                                        const modal = new window.bootstrap.Modal(document.getElementById('bankDetailsModal'));
+                                        modal.show();
+                                      }, 100);
+                                    }}
+                                    style={{
+                                      backgroundColor: 'rgba(65, 105, 225, 0.08)',
+                                      color: '#1e40af',
+                                      border: 'none',
+                                      borderRadius: '12px',
+                                      padding: '12px 20px',
+                                      fontSize: '14px',
+                                      fontWeight: '600',
+                                      transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseOver={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.15)';
+                                      e.currentTarget.style.transform = 'translateY(-2px)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
+                                      e.currentTarget.style.transform = 'translateY(0)';
+                                    }}
                                   >
                                     <i className="bi bi-bank me-2"></i>
-                                    View Bank Details
+                                    Bank Details
                                   </button>
 
-                                  {/* social links */}
-                                  <div className="social-links mt-3">
-                                    <div className="d-flex flex-wrap gap-2">
-                                      {employee.socialLinks?.linkedin && (
-                                        <a href={employee.socialLinks.linkedin} target="_blank" rel="noopener noreferrer"
-                                          className="btn btn-sm btn-outline-primary">
-                                          <i className="bi bi-linkedin"></i>
-                                        </a>
-                                      )}
-                                      {employee.socialLinks?.instagram && (
-                                        <a href={employee.socialLinks.instagram} target="_blank" rel="noopener noreferrer"
-                                          className="btn btn-sm btn-outline-danger">
-                                          <i className="bi bi-instagram"></i>
-                                        </a>
-                                      )}
-                                      {employee.socialLinks?.youtube && (
-                                        <a href={employee.socialLinks.youtube} target="_blank" rel="noopener noreferrer"
-                                          className="btn btn-sm btn-outline-danger">
-                                          <i className="bi bi-youtube"></i>
-                                        </a>
-                                      )}
-                                      {employee.socialLinks?.facebook && (
-                                        <a href={employee.socialLinks.facebook} target="_blank" rel="noopener noreferrer"
-                                          className="btn btn-sm btn-outline-primary">
-                                          <i className="bi bi-facebook"></i>
-                                        </a>
-                                      )}
-                                      {employee.socialLinks?.github && (
-                                        <a href={employee.socialLinks.github} target="_blank" rel="noopener noreferrer"
-                                          className="btn btn-sm btn-outline-dark">
-                                          <i className="bi bi-github"></i>
-                                        </a>
-                                      )}
-                                      {employee.socialLinks?.website && (
-                                        <a href={employee.socialLinks.website} target="_blank" rel="noopener noreferrer"
-                                          className="btn btn-sm btn-outline-info">
-                                          <i className="bi bi-globe"></i>
-                                        </a>
-                                      )}
-                                      {employee.socialLinks?.other && (
-                                        <a href={employee.socialLinks.other} target="_blank" rel="noopener noreferrer"
-                                          className="btn btn-sm btn-outline-secondary">
-                                          <i className="bi bi-link-45deg"></i>
-                                        </a>
-                                      )}
-                                    </div>
-                                  </div>
-
-
-
-                                  {/* <button
-                                    className="btn btn-sm btn-outline-secondary mt-2 ms-2"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#viewDocumentsModal"
-                                    onClick={() => setSelectedEmployee(employee)}
+                                  <button
+                                    type="button"
+                                    className="btn flex-grow-1"
+                                    onClick={() => {
+                                      console.log("Documents button clicked for employee:", employee);
+                                      setSelectedEmployee(employee);
+                                      // Open modal programmatically after setting state
+                                      setTimeout(() => {
+                                        const modal = new window.bootstrap.Modal(document.getElementById('viewDocumentsModal'));
+                                        modal.show();
+                                      }, 100);
+                                    }}
+                                    style={{
+                                      backgroundColor: 'rgba(255, 105, 180, 0.08)',
+                                      color: '#ff69b4',
+                                      border: 'none',
+                                      borderRadius: '12px',
+                                      padding: '12px 20px',
+                                      fontSize: '14px',
+                                      fontWeight: '600',
+                                      transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseOver={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.15)';
+                                      e.currentTarget.style.transform = 'translateY(-2px)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.08)';
+                                      e.currentTarget.style.transform = 'translateY(0)';
+                                    }}
                                   >
                                     <i className="bi bi-file-earmark-text me-2"></i>
-                                    View Documents
-                                  </button> */}
-
-
-
-
-
+                                    Documents
+                                  </button>
                                 </div>
                               </div>
                             </div>
                           </div>
                         );
-                      })}
+                      }) : (
+                        <div className="col-12 text-center py-5">
+                          <i className="bi bi-search display-1 text-muted mb-3"></i>
+                          <h4 className="text-muted">No employees found</h4>
+                          <p className="text-muted">Try adjusting your search criteria</p>
+                        </div>
+                      )}
                     </div>
                   ) : (
-                    <div className="row clearfix">
-                      <div className="col-md-12">
-                        <div className="card">
-                          <div className="card-body">
-                            <div className="table-responsive">
-                              <table className="table table-hover align-middle mb-0">
-                                <thead>
-                                  <tr>
-                                    <th>Employee</th>
-                                    <th>Contact</th>
-                                    <th>Department</th>
-                                    <th>Projects</th>
-                                    <th>Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {employees.map((employee) => {
-                                    const newDate = new Date(employee?.joiningDate);
-                                    const date = newDate.getDate();
-                                    const month = newDate.getMonth() + 1; // months are 0-indexed
-                                    const year = newDate.getFullYear();
-                                    return (
-                                      <tr key={employee.employeeId}>
-                                        <td>
-                                          <div className="d-flex align-items-center">
-                                            <img
-                                              src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
-                                              alt=""
-                                              className="avatar rounded-circle me-2"
-                                              style={{
-                                                width: '40px',
-                                                height: '40px',
-                                                objectFit: 'cover',
-                                                cursor: 'pointer'
-                                              }}
-                                              onClick={() => handleImageClick(
-                                                `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
-                                                employee.employeeName
-                                              )}
-                                            />
-                                            <div>
-                                              <h6 className="mb-0">{employee.employeeName}</h6>
-                                              <small>{employee.employeeId}</small>
-                                            </div>
+                    <div className="row clearfix g-3">
+                      <div className="col-sm-12">
+                        <div className="card mb-3">
+                          <div className="card-body" style={{ padding: '0' }}>
+                            <table className="table align-middle mb-0" style={{
+                              width: "100%",
+                              borderCollapse: 'separate',
+                              borderSpacing: '0'
+                            }}>
+                              <thead>
+                                <tr style={{ background: '#f8f9fa' }}>
+                                  <th style={{
+                                    padding: '16px 15px',
+                                    fontWeight: '600',
+                                    color: '#444',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
+                                    textAlign: 'center',
+                                    fontSize: '14px'
+                                  }}>Sr.No.</th>
+                                  <th style={{
+                                    padding: '16px 15px',
+                                    fontWeight: '600',
+                                    color: '#444',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
+                                    fontSize: '14px'
+                                  }}>Employee Name</th>
+                                  <th style={{
+                                    padding: '16px 15px',
+                                    fontWeight: '600',
+                                    color: '#444',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
+                                    fontSize: '14px'
+                                  }}>Contact Info</th>
+                                  <th style={{
+                                    padding: '16px 15px',
+                                    fontWeight: '600',
+                                    color: '#444',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
+                                    fontSize: '14px'
+                                  }}>Department</th>
+                                  <th style={{
+                                    padding: '16px 15px',
+                                    fontWeight: '600',
+                                    color: '#444',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
+                                    textAlign: 'center',
+                                    fontSize: '14px'
+                                  }}>Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {employees && employees.length > 0 ? employees.map((employee, index) => {
+                                  const newDate = new Date(employee?.joiningDate);
+                                  const date = newDate.getDate();
+                                  const month = newDate.getMonth() + 1;
+                                  const year = newDate.getFullYear();
+                                  return (
+                                    <tr key={employee.employeeId}
+                                      style={{
+                                        transition: 'background 0.2s ease',
+                                      }}
+                                      onMouseOver={(e) => e.currentTarget.style.background = 'rgba(65, 105, 225, 0.04)'}
+                                      onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                      <td style={{
+                                        padding: '16px 15px',
+                                        borderBottom: '1px solid rgba(0,0,0,0.05)',
+                                        textAlign: 'center'
+                                      }}>
+                                        <span style={{
+                                          background: 'linear-gradient(135deg, #4169e1, #1e40af)',
+                                          color: 'white',
+                                          borderRadius: '50%',
+                                          width: '30px',
+                                          height: '30px',
+                                          display: 'inline-flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          fontWeight: '600',
+                                          fontSize: '14px',
+                                          boxShadow: '0 2px 5px rgba(65, 105, 225, 0.3)'
+                                        }}>
+                                          {index + 1}
+                                        </span>
+                                      </td>
+                                      <td style={{
+                                        padding: '16px 15px',
+                                        borderBottom: '1px solid rgba(0,0,0,0.05)'
+                                      }}>
+                                        <div className="d-flex align-items-center gap-3">
+                                          <img
+                                            src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
+                                            alt={employee.employeeName}
+                                            className="rounded-circle"
+                                            style={{
+                                              width: '40px',
+                                              height: '40px',
+                                              objectFit: 'cover',
+                                              border: '2px solid #ff69b4',
+                                              padding: '2px',
+                                              cursor: 'pointer'
+                                            }}
+                                            onClick={() => handleImageClick(
+                                              `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
+                                              employee.employeeName
+                                            )}
+                                          />
+                                          <div>
+                                            <div style={{
+                                              fontWeight: '600',
+                                              color: '#333',
+                                              fontSize: '14px',
+                                              cursor: 'pointer'
+                                            }}
+                                              onClick={() => handleEmployeeClick(employee)}
+                                              title="Click to View Employee Dashboard"
+                                            >{employee.employeeName}</div>
+                                            <div style={{
+                                              fontSize: '12px',
+                                              color: '#666',
+                                              marginTop: '2px'
+                                            }}>ID: {employee.employeeId}</div>
                                           </div>
-                                        </td>
-                                        <td>
-                                          <div>{employee.phone}</div>
-                                          <small>{employee.emailid}</small>
-                                          <div> <i className="bi bi-calendar-check-fill text-primary fs-6 me-2" />
-                                            {date}/{month}/{year}</div>
-                                        </td>
-                                        <td>
-                                          <div>{employee.department}</div>
-                                          <small>{employee.designation}</small>
-                                        </td>
-                                        <td>
-                                          <div className="d-flex flex-column gap-1">
-                                            <Link
-                                              to="/projects"
-                                              state={{ employeeName: employee.employeeName }}
-                                              title={`Click to View Projects of ${employee.employeeName}`}
-                                            >
-                                              <span className="badge bg-primary px-3">
-                                                Projects: {employeeProjects[employee._id] || 0}
-                                              </span>
-                                            </Link>
-                                            <Link
-                                              to="/tasks"
-                                              state={{ employeeName: employee.employeeName }}
-                                              title={`Click to View Tasks of ${employee.employeeName}`}
-                                            >
-                                              <span className="badge bg-success px-3">
-                                                Tasks: {employeeTasks[employee._id] || 0}
-                                              </span>
-                                            </Link>
+                                        </div>
+                                      </td>
+                                      <td style={{
+                                        padding: '16px 15px',
+                                        borderBottom: '1px solid rgba(0,0,0,0.05)'
+                                      }}>
+                                        <div>
+                                          <div style={{
+                                            backgroundColor: 'rgba(65, 105, 225, 0.08)',
+                                            padding: '6px 12px',
+                                            borderRadius: '6px',
+                                            marginBottom: '6px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px'
+                                          }}>
+                                            <i className="bi bi-telephone-fill" style={{ color: '#4169e1', fontSize: '14px' }}></i>
+                                            <span style={{ fontSize: '13px', color: '#333' }}>{employee.phone}</span>
                                           </div>
-                                        </td>
-                                        <td>
-                                          <div className="btn-group" role="group">
-                                            <button
-                                              className="btn btn-sm btn-outline-secondary"
-                                              data-bs-toggle="modal"
-                                              data-bs-target="#editemp"
-                                              onClick={() => handleEditClick(employee)}
-                                            >
-                                              <i className="icofont-edit text-success"></i>
-                                            </button>
-                                            <button
-                                              className="btn btn-sm btn-outline-secondary"
-                                              data-bs-toggle="modal"
-                                              data-bs-target="#deleteproject"
-                                              onClick={() => setDeletableId(employee._id)}
-                                            >
-                                              <i className="icofont-ui-delete text-danger"></i>
-                                            </button>
+                                          <div style={{
+                                            backgroundColor: 'rgba(255, 105, 180, 0.08)',
+                                            padding: '6px 12px',
+                                            borderRadius: '6px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px'
+                                          }}>
+                                            <i className="bi bi-envelope-fill" style={{ color: '#ff69b4', fontSize: '14px' }}></i>
+                                            <span style={{ fontSize: '13px', color: '#333' }}>{employee.emailid}</span>
                                           </div>
-                                          <div className="mt-2">
-                                            <div className="btn-group" role="group">
-                                              {/* DOCUMENTS */}
-                                              <button
-                                                className="btn btn-sm btn-outline-secondary"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#viewDocumentsModal"
-                                                onClick={() => setSelectedEmployee(employee)}
-                                                title="Click to View Documents of Employee"
-                                              >
-                                                <i className="bi bi-file-earmark-text"></i>
+                                          <div style={{
+                                            backgroundColor: 'rgba(255, 94, 0, 0.08)',
+                                            padding: '6px 12px',
+                                            borderRadius: '6px',
+                                            marginTop: '6px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px'
+                                          }}>
+                                            <i className="bi bi-calendar-check-fill" style={{ color: '#ff5e00', fontSize: '14px' }}></i>
+                                            <span style={{ fontSize: '13px', color: '#333' }}>{date}/{month}/{year}</span>
+                                          </div>
+                                        </div>
+                                      </td>
+                                      <td style={{
+                                        padding: '16px 15px',
+                                        borderBottom: '1px solid rgba(0,0,0,0.05)'
+                                      }}>
+                                        <div style={{
+                                          backgroundColor: 'rgba(82, 180, 71, 0.08)',
+                                          padding: '6px 12px',
+                                          borderRadius: '6px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '8px',
+                                          marginBottom: '6px'
+                                        }}>
+                                          <i className="bi bi-building" style={{ color: '#52b447', fontSize: '14px' }}></i>
+                                          <span style={{ fontSize: '13px', color: '#333' }}>{employee.department}</span>
+                                        </div>
+                                        <div style={{
+                                          backgroundColor: 'rgba(65, 105, 225, 0.08)',
+                                          padding: '6px 12px',
+                                          borderRadius: '6px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '8px'
+                                        }}>
+                                          <i className="bi bi-person-badge" style={{ color: '#1e40af', fontSize: '14px' }}></i>
+                                          <span style={{ fontSize: '13px', color: '#333' }}>{employee.designation}</span>
+                                        </div>
+                                      </td>
+                                      <td style={{
+                                        padding: '16px 15px',
+                                        borderBottom: '1px solid rgba(0,0,0,0.05)',
+                                        textAlign: 'center'
+                                      }}>
+                                        <div className="d-flex gap-2 justify-content-center">
+                                          <button
+                                            type="button"
+                                            className="btn"
+                                            onClick={() => {
+                                              console.log("Bank Details button clicked for employee:", employee);
+                                              setSelectedEmployee(employee);
+                                              // Open modal programmatically after setting state
+                                              setTimeout(() => {
+                                                const modal = new window.bootstrap.Modal(document.getElementById('bankDetailsModal'));
+                                                modal.show();
+                                              }, 100);
+                                            }}
+                                            style={{
+                                              backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                              color: '#1e40af',
+                                              width: '32px',
+                                              height: '32px',
+                                              borderRadius: '50%',
+                                              padding: '0',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              border: 'none',
+                                              transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseOver={(e) => {
+                                              e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)';
+                                            }}
+                                            onMouseOut={(e) => {
+                                              e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.1)';
+                                            }}
+                                          >
+                                            <i className="bi bi-bank"></i>
+                                          </button>
 
-                                              </button>
-                                              {/* BANK DETAILS */}
-                                              <button
-                                                className="btn btn-sm btn-outline-secondary"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#bankDetailsModal"
-                                                onClick={() => setSelectedEmployee(employee)}
-                                                title="Click to View Bank Details of Employee"
-                                              >
-                                                <i className="bi bi-bank"></i>
-                                              </button>
-                                            </div>
-                                          </div>
-                                        </td>
-                                      </tr>
-                                    );
-                                  })}
-                                </tbody>
-                              </table>
-                            </div>
+                                          <button
+                                            type="button"
+                                            className="btn"
+                                            onClick={() => {
+                                              console.log("Documents button clicked for employee:", employee);
+                                              setSelectedEmployee(employee);
+                                              // Open modal programmatically after setting state
+                                              setTimeout(() => {
+                                                const modal = new window.bootstrap.Modal(document.getElementById('viewDocumentsModal'));
+                                                modal.show();
+                                              }, 100);
+                                            }}
+                                            style={{
+                                              backgroundColor: 'rgba(255, 105, 180, 0.1)',
+                                              color: '#ff69b4',
+                                              width: '32px',
+                                              height: '32px',
+                                              borderRadius: '50%',
+                                              padding: '0',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              border: 'none',
+                                              transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseOver={(e) => {
+                                              e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.2)';
+                                            }}
+                                            onMouseOut={(e) => {
+                                              e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.1)';
+                                            }}
+                                          >
+                                            <i className="bi bi-file-earmark-text"></i>
+                                          </button>
+
+                                          <button
+                                            type="button"
+                                            className="btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editemp"
+                                            onClick={() => handleEditClick(employee)}
+                                            style={{
+                                              backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                              color: '#1e40af',
+                                              width: '32px',
+                                              height: '32px',
+                                              borderRadius: '50%',
+                                              padding: '0',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              border: 'none',
+                                              transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseOver={(e) => {
+                                              e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)';
+                                            }}
+                                            onMouseOut={(e) => {
+                                              e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.1)';
+                                            }}
+                                          >
+                                            <i className="icofont-edit"></i>
+                                          </button>
+
+                                          <button
+                                            type="button"
+                                            className="btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteproject"
+                                            onClick={() => setDeletableId(employee._id)}
+                                            style={{
+                                              backgroundColor: 'rgba(255, 105, 180, 0.1)',
+                                              color: '#ff69b4',
+                                              width: '32px',
+                                              height: '32px',
+                                              borderRadius: '50%',
+                                              padding: '0',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              border: 'none',
+                                              transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseOver={(e) => {
+                                              e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.2)';
+                                            }}
+                                            onMouseOut={(e) => {
+                                              e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.1)';
+                                            }}
+                                          >
+                                            <i className="icofont-ui-delete"></i>
+                                          </button>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  );
+                                }) : (
+                                  <tr>
+                                    <td colSpan="5" className="text-center py-5">
+                                      <i className="bi bi-search display-4 text-muted mb-3"></i>
+                                      <h4 className="text-muted">No employees found</h4>
+                                      <p className="text-muted">Try adjusting your search criteria</p>
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       </div>
@@ -1349,13 +1855,20 @@ const Member = () => {
               aria-hidden="true"
             >
               <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5
-                      className="modal-title  fw-bold"
-                      id="createprojectlLabel"
-                    >
-                      {" "}
+                <div className="modal-content" style={{
+                  borderRadius: '15px',
+                  border: 'none',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                  overflow: 'hidden'
+                }}>
+                  <div className="modal-header" style={{
+                    background: 'linear-gradient(135deg, #52b447, #429938)',
+                    borderBottom: 'none',
+                    padding: '20px 25px',
+                    position: 'relative'
+                  }}>
+                    <h5 className="modal-title fw-bold" style={{ color: 'white', fontSize: '18px', fontWeight: 700 }}>
+                      <i className="icofont-edit me-2"></i>
                       Edit Employee
                     </h5>
                     <button
@@ -1363,482 +1876,687 @@ const Member = () => {
                       className="btn-close"
                       data-bs-dismiss="modal"
                       aria-label="Close"
+                      style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: '50%',
+                        padding: '8px',
+                        opacity: '1',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                        e.currentTarget.style.transform = 'rotate(90deg)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                        e.currentTarget.style.transform = 'rotate(0deg)';
+                      }}
                     />
                   </div>
-                  <div className="modal-body">
-                    <div className="mb-3">
-                      <label
-                        htmlFor="exampleFormControlInput877"
-                        className="form-label"
-                      >
-                        Employee Name
+                  <div className="modal-body" style={{ padding: '25px' }}>
+                    {/* Employee Name */}
+                    <div className="mb-4">
+                      <label className="form-label" style={{
+                        fontWeight: '600',
+                        color: '#444',
+                        fontSize: '14px',
+                        marginBottom: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}>
+                        <i className="icofont-user" style={{ color: '#52b447' }}></i>
+                        Employee Name <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
                         className="form-control"
-                        id="exampleFormControlInput877"
-                        placeholder="Explain what the Project Name"
+                        placeholder="Employee Name"
                         name="employeeName"
                         value={employeeData.employeeName}
                         onChange={updateChange}
+                        style={{
+                          borderRadius: '8px',
+                          border: '1px solid rgba(65, 105, 225, 0.3)',
+                          padding: '10px 15px',
+                          color: '#333',
+                          boxShadow: 'none'
+                        }}
                       />
                     </div>
-                    <div className="mb-3">
-                      <label
-                        htmlFor="updateEmployeeImage"
-                        className="form-label"
-                      >
-                        Employee Image
+
+                    {/* Profile Image */}
+                    <div className="mb-4">
+                      <label className="form-label" style={{
+                        fontWeight: '600',
+                        color: '#444',
+                        fontSize: '14px',
+                        marginBottom: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}>
+                        <i className="icofont-image" style={{ color: '#ff5e00' }}></i>
+                        Profile Image <span className="text-danger">*</span>
                       </label>
                       <input
-                        className="form-control"
                         type="file"
-                        id="updateEmployeeImage"
+                        className="form-control"
                         name="employeeImage"
                         onChange={updateChange}
+                        style={{
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255, 94, 0, 0.3)',
+                          padding: '10px 15px',
+                          color: '#333',
+                          boxShadow: 'none',
+                          backgroundColor: 'rgba(255, 94, 0, 0.03)'
+                        }}
                       />
                     </div>
-                    <div className="mb-3">
-                      <label
-                        htmlFor="updateResume"
-                        className="form-label"
-                      >
-                        Resume
+
+                    {/* Contact Information */}
+                    <div className="row g-3 mb-4">
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-email" style={{ color: '#52b447' }}></i>
+                          Email ID <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          className="form-control"
+                          placeholder="Email ID"
+                          name="emailid"
+                          value={employeeData.emailid}
+                          onChange={updateChange}
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(65, 105, 225, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none'
+                          }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-key" style={{ color: '#ff5e00' }}></i>
+                          Password <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          className="form-control"
+                          placeholder="Password"
+                          name="password"
+                          value={employeeData.password}
+                          onChange={updateChange}
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255, 94, 0, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none',
+                            backgroundColor: 'rgba(255, 94, 0, 0.03)'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Employee ID & Joining Date */}
+                    <div className="row g-3 mb-4">
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-id-card" style={{ color: '#52b447' }}></i>
+                          Employee ID <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Employee ID"
+                          name="employeeId"
+                          value={employeeData.employeeId}
+                          onChange={updateChange}
+                          disabled
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(65, 105, 225, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none',
+                            backgroundColor: 'rgba(65, 105, 225, 0.05)'
+                          }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-calendar" style={{ color: '#ff5e00' }}></i>
+                          Joining Date
+                        </label>
+                        <input
+                          type="date"
+                          className="form-control"
+                          name="joiningDate"
+                          value={employeeData.joiningDate}
+                          onChange={updateChange}
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255, 94, 0, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none',
+                            backgroundColor: 'rgba(255, 94, 0, 0.03)'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Phone */}
+                    <div className="mb-4">
+                      <label className="form-label" style={{
+                        fontWeight: '600',
+                        color: '#444',
+                        fontSize: '14px',
+                        marginBottom: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}>
+                        <i className="icofont-phone" style={{ color: '#ff5e00' }}></i>
+                        Phone Number
                       </label>
                       <input
+                        type="text"
                         className="form-control"
-                        type="file"
-                        id="updateResume"
-                        name="resume"
+                        placeholder="Enter phone number"
+                        maxLength={14}
+                        name="phone"
+                        value={employeeData.phone}
                         onChange={updateChange}
+                        style={{
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255, 94, 0, 0.3)',
+                          padding: '10px 15px',
+                          color: '#333',
+                          boxShadow: 'none',
+                          backgroundColor: 'rgba(255, 94, 0, 0.03)'
+                        }}
                       />
                     </div>
+
+                    {/* Department & Designation */}
+                    <div className="row g-3 mb-4">
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-building" style={{ color: '#52b447' }}></i>
+                          Department
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter department"
+                          name="department"
+                          value={employeeData.department}
+                          onChange={updateChange}
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(65, 105, 225, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none'
+                          }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-badge" style={{ color: '#ff5e00' }}></i>
+                          Designation
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter designation"
+                          name="designation"
+                          value={employeeData.designation}
+                          onChange={updateChange}
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(65, 105, 225, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Social Media & Website Links */}
                     <div className="mb-3">
-                      <label
-                        htmlFor="updateAadhaar"
-                        className="form-label"
-                      >
-                        Aadhaar Card
-                      </label>
-                      <input
-                        className="form-control"
-                        type="file"
-                        id="updateAadhaar"
-                        name="aadhaarCard"
-                        onChange={updateChange}
-                      />
+                      <label className="form-label">Social Media & Website Links</label>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-linkedin"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="LinkedIn Profile URL"
+                              name="linkedin"
+                              value={employeeData.linkedin || ''}
+                              onChange={updateChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-instagram"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="Instagram Profile URL"
+                              name="instagram"
+                              value={employeeData.instagram || ''}
+                              onChange={updateChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-youtube"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="YouTube Channel URL"
+                              name="youtube"
+                              value={employeeData.youtube || ''}
+                              onChange={updateChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-facebook"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="Facebook Profile URL"
+                              name="facebook"
+                              value={employeeData.facebook || ''}
+                              onChange={updateChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-github"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="GitHub Profile URL"
+                              name="github"
+                              value={employeeData.github || ''}
+                              onChange={updateChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-globe"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="Personal Website URL"
+                              name="website"
+                              value={employeeData.website || ''}
+                              onChange={updateChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-link-45deg"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="Other URL"
+                              name="other"
+                              value={employeeData.other || ''}
+                              onChange={updateChange}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Bank Details */}
                     <div className="mb-3">
-                      <label
-                        htmlFor="updatePan"
-                        className="form-label"
-                      >
-                        PAN Card
-                      </label>
-                      <input
-                        className="form-control"
-                        type="file"
-                        id="updatePan"
-                        name="panCard"
-                        onChange={updateChange}
-                      />
-                    </div>
-                    <div className="deadline-form">
-                      <form>
-                        <div className="row g-3 mb-3">
-                          <div className="col-sm-6">
-                            <label
-                              htmlFor="exampleFormControlInput1778"
-                              className="form-label"
-                            >
-                              Employee ID
-                            </label>
+                      <label className="form-label">Bank Details</label>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-bank"></i></span>
                             <input
                               type="text"
                               className="form-control"
-                              id="exampleFormControlInput1778"
-                              placeholder="User Name"
-                              name="employeeId"
-                              value={employeeData.employeeId}
-                              onChange={updateChange}
-                            />
-                          </div>
-                          <div className="col-sm-6">
-                            <label
-                              htmlFor="exampleFormControlInput2778"
-                              className="form-label"
-                            >
-                              Joining Date
-                            </label>
-                            <input
-                              type="date"
-                              className="form-control"
-                              id="exampleFormControlInput2778"
-                              name="joiningDate"
-                              value={employeeData.joiningDate}
+                              placeholder="Bank Name"
+                              name="bankName"
+                              value={employeeData.bankName || ''}
                               onChange={updateChange}
                             />
                           </div>
                         </div>
-                        <div className="row g-3 mb-3">
-                          <div className="col">
-                            <label
-                              htmlFor="exampleFormControlInput477"
-                              className="form-label"
-                            >
-                              Email ID
-                            </label>
-                            <input
-                              type="email"
-                              className="form-control"
-                              id="exampleFormControlInput477"
-                              placeholder="User Name"
-                              name="emailid"
-                              value={employeeData.emailid}
-                              onChange={updateChange}
-                            />
-                          </div>
-                          <div className="col">
-                            <label
-                              htmlFor="exampleFormControlInput277"
-                              className="form-label"
-                            >
-                              Password
-                            </label>
-                            <input
-                              type="Password"
-                              className="form-control"
-                              id="exampleFormControlInput277"
-                              placeholder="Password"
-                              name="password"
-                              value={employeeData.password}
-                              onChange={updateChange}
-                            />
-                          </div>
-                        </div>
-                        <div className="row g-3 mb-3">
-                          <div className="col">
-                            <label
-                              htmlFor="exampleFormControlInput777"
-                              className="form-label"
-                            >
-                              Phone
-                            </label>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-person"></i></span>
                             <input
                               type="text"
                               className="form-control"
-                              id="exampleFormControlInput777"
-                              placeholder="phone"
-                              maxLength={14}
-                              name="phone"
-                              value={employeeData.phone}
+                              placeholder="Account Holder Name"
+                              name="accountHolderName"
+                              value={employeeData.accountHolderName || ''}
                               onChange={updateChange}
                             />
                           </div>
                         </div>
-                        <div className="row g-3 mb-3">
-                          <div className="col">
-                            <label className="form-label">Department</label>
-                            <select
-                              className="form-select"
-                              aria-label="Default select Project Category"
-                              name="department"
-                              value={employeeData.department}
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-credit-card"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Account Number"
+                              name="accountNumber"
+                              value={employeeData.accountNumber || ''}
                               onChange={updateChange}
-                            >
-                              <option value={""}></option>
-                              <option value={"Web Development"}>
-                                Web Development
-                              </option>
-                              <option value={"It Management"}>
-                                It Management
-                              </option>
-                              <option value={"Marketing"}>Marketing</option>
-                              <option value={"Manager"}>Manager</option>
-                            </select>
+                            />
                           </div>
-                          <div className="col">
-                            <label className="form-label">Designation</label>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-building"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="IFSC Code"
+                              name="ifscCode"
+                              value={employeeData.ifscCode || ''}
+                              onChange={updateChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-wallet2"></i></span>
                             <select
                               className="form-select"
-                              aria-label="Default select Project Category"
-                              name="designation"
-                              value={employeeData.designation}
+                              name="accountType"
+                              value={employeeData.accountType || ''}
                               onChange={updateChange}
                             >
-                              <option value={""}></option>
-                              <option value={"UI/UX Design"}>
-                                UI/UX Design
-                              </option>
-                              <option value={"Website Design"}>
-                                Website Design
-                              </option>
-                              <option value={"App Development"}>
-                                App Development
-                              </option>
-                              <option value={"Quality Assurance"}>
-                                Quality Assurance
-                              </option>
-                              <option value={"Development"}>Development</option>
-                              <option value={"Backend Development"}>
-                                Backend Development
-                              </option>
-                              <option value={"Software Testing"}>
-                                Software Testing
-                              </option>
-                              <option value={"Website Design"}>
-                                Website Design
-                              </option>
-                              <option value={"Marketing"}>Marketing</option>
-                              <option value={"SEO"}>SEO</option>
-                              <option value={"Project Manager"}>
-                                Project Manager
-                              </option>
-                              <option value={"Other"}>Other</option>
+                              <option value="">Select Account Type</option>
+                              <option value="Savings">Savings</option>
+                              <option value="Current">Current</option>
+                              <option value="Salary">Salary</option>
                             </select>
                           </div>
                         </div>
-                        <div className="mb-3">
-                          <label className="form-label">Social Media & Website Links</label>
-                          <div className="row g-3">
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-linkedin"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="LinkedIn Profile URL"
-                                  name="linkedin"
-                                  value={employeeData.linkedin || ''}
-                                  onChange={updateChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-instagram"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="Instagram Profile URL"
-                                  name="instagram"
-                                  value={employeeData.instagram || employeeData.socialLinks?.instagram || ''}
-                                  onChange={updateChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-youtube"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="YouTube Channel URL"
-                                  name="youtube"
-                                  value={employeeData.youtube || employeeData.socialLinks?.youtube || ''}
-                                  onChange={updateChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-facebook"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="Facebook Profile URL"
-                                  name="facebook"
-                                  value={employeeData.facebook || employeeData.socialLinks?.facebook || ''}
-                                  onChange={updateChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-github"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="GitHub Profile URL"
-                                  name="github"
-                                  value={employeeData.github || employeeData.socialLinks?.github || ''}
-                                  onChange={updateChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-globe"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="Personal Website URL"
-                                  name="website"
-                                  value={employeeData.website || employeeData.socialLinks?.website || ''}
-                                  onChange={updateChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-link-45deg"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="Other URL"
-                                  name="other"
-                                  value={employeeData.other || employeeData.socialLinks?.other || ''}
-                                  onChange={updateChange}
-                                />
-                              </div>
-                            </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-phone"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="UPI ID"
+                              name="upiId"
+                              value={employeeData.upiId || ''}
+                              onChange={updateChange}
+                            />
                           </div>
                         </div>
-                        <div className="mb-3">
-                          <label className="form-label">Bank Details</label>
-                          <div className="row g-3">
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-bank"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Bank Name"
-                                  name="bankName"
-                                  value={employeeData.bankName || ''} // Use employeeData for edit form
-                                  onChange={updateChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-person"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Account Holder Name"
-                                  name="accountHolderName"
-                                  value={employeeData.accountHolderName || ''} // Use employeeData for edit form
-                                  onChange={updateChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-credit-card"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Account Number"
-                                  name="accountNumber"
-                                  value={employeeData.accountNumber || ''} // Use employeeData for edit form
-                                  onChange={updateChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-building"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="IFSC Code"
-                                  name="ifscCode"
-                                  value={employeeData.ifscCode || ''} // Use employeeData for edit form
-                                  onChange={updateChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-wallet2"></i></span>
-                                <select
-                                  className="form-select"
-                                  name="accountType"
-                                  value={employeeData.accountType || ''} // Use employeeData for edit form
-                                  onChange={updateChange} // Use updateChange for edit form
-                                >
-                                  <option value="">Select Account Type</option>
-                                  <option value="Savings">Savings</option>
-                                  <option value="Current">Current</option>
-                                  <option value="Salary">Salary</option>
-                                </select>
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-phone"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="UPI ID"
-                                  name="upiId"
-                                  value={employeeData.upiId || ''} // Use employeeData for edit form
-                                  onChange={updateChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-qr-code"></i></span>
-                                <input
-                                  type="file"
-                                  className="form-control"
-                                  name="qrCode"
-                                  onChange={updateChange} // Use updateChange for edit form
-                                  accept="image/*"
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-app"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Payment App (e.g., PayTM, PhonePe)"
-                                  name="paymentApp"
-                                  value={employeeData.paymentApp || ''} // Use employeeData for edit form
-                                  onChange={updateChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-qr-code"></i></span>
+                            <input
+                              type="file"
+                              className="form-control"
+                              name="qrCode"
+                              onChange={updateChange}
+                              accept="image/*"
+                            />
                           </div>
                         </div>
-                      </form>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-app"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Payment App (e.g., PayTM, PhonePe)"
+                              name="paymentApp"
+                              value={employeeData.paymentApp || ''}
+                              onChange={updateChange}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Description */}
                     <div className="mb-3">
-                      <label
-                        htmlFor="exampleFormControlTextarea78"
-                        className="form-label"
-                      >
-                        Description (optional)
-                      </label>
+                      <label className="form-label">Description (optional)</label>
                       <textarea
                         className="form-control"
-                        id="exampleFormControlTextarea78"
                         rows={3}
-                        placeholder="Add any extra details about the request"
-                        defaultValue={""}
+                        placeholder="Add any extra details about the employee"
+                        name="description"
+                        value={employeeData.description}
+                        onChange={updateChange}
+                      />
+                    </div>
+
+                    {/* Documents */}
+                    <div className="mb-3">
+                      <label className="form-label" style={{
+                        fontWeight: '600',
+                        color: '#444',
+                        fontSize: '16px',
+                        marginBottom: '15px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <i className="bi bi-file-earmark-text" style={{ color: '#52b447' }}></i>
+                        Documents
+                      </label>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text">
+                              <i className="bi bi-file-earmark-text"></i>
+                            </span>
+                            <input
+                              type="file"
+                              className="form-control"
+                              name="resume"
+                              onChange={updateChange}
+                              accept=".pdf,.doc,.docx"
+                              style={{
+                                borderRadius: '8px',
+                                border: '1px solid rgba(65, 105, 225, 0.3)',
+                                padding: '10px 15px',
+                                color: '#333',
+                                boxShadow: 'none',
+                                backgroundColor: 'rgba(65, 105, 225, 0.03)'
+                              }}
+                            />
+                          </div>
+                          <small className="text-muted">Resume (PDF, DOC, DOCX)</small>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text">
+                              <i className="bi bi-card-text"></i>
+                            </span>
+                            <input
+                              type="file"
+                              className="form-control"
+                              name="aadhaarCard"
+                              onChange={updateChange}
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              style={{
+                                borderRadius: '8px',
+                                border: '1px solid rgba(255, 105, 180, 0.3)',
+                                padding: '10px 15px',
+                                color: '#333',
+                                boxShadow: 'none',
+                                backgroundColor: 'rgba(255, 105, 180, 0.03)'
+                              }}
+                            />
+                          </div>
+                          <small className="text-muted">Aadhaar Card (PDF, JPG, PNG)</small>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text">
+                              <i className="bi bi-card-heading"></i>
+                            </span>
+                            <input
+                              type="file"
+                              className="form-control"
+                              name="panCard"
+                              onChange={updateChange}
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              style={{
+                                borderRadius: '8px',
+                                border: '1px solid rgba(82, 180, 71, 0.3)',
+                                padding: '10px 15px',
+                                color: '#333',
+                                boxShadow: 'none',
+                                backgroundColor: 'rgba(82, 180, 71, 0.03)'
+                              }}
+                            />
+                          </div>
+                          <small className="text-muted">PAN Card (PDF, JPG, PNG)</small>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="mb-3">
+                      <label className="form-label">Description (optional)</label>
+                      <textarea
+                        className="form-control"
+                        rows={3}
+                        placeholder="Add any extra details about the employee"
                         name="description"
                         value={employeeData.description}
                         onChange={updateChange}
                       />
                     </div>
                   </div>
-                  <div className="modal-footer">
+                  <div className="modal-footer" style={{
+                    borderTop: '1px solid rgba(65, 105, 225, 0.1)',
+                    padding: '16px 25px'
+                  }}>
                     <button
                       type="button"
-                      className="btn btn-secondary"
+                      className="btn"
                       data-bs-dismiss="modal"
+                      style={{
+                        backgroundColor: 'rgba(255, 94, 0, 0.1)',
+                        color: '#ff5e00',
+                        border: '1px solid rgba(255, 94, 0, 0.3)',
+                        borderRadius: '8px',
+                        padding: '8px 20px',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.2)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
+                      }}
                     >
+                      <i className="icofont-close-circled me-2"></i>
                       Done
                     </button>
                     <button
                       type="button"
-                      className="btn btn-primary"
+                      className="btn"
                       onClick={updateSubmit}
+                      style={{
+                        background: 'linear-gradient(135deg, #52b447, #429938)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '8px 20px',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        boxShadow: '0 4px 10px rgba(65, 105, 225, 0.2)',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 6px 12px rgba(65, 105, 225, 0.3)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 10px rgba(65, 105, 225, 0.2)';
+                      }}
                     >
+                      <i className="icofont-check-circled me-2"></i>
                       Update
                     </button>
                   </div>
@@ -1853,13 +2571,30 @@ const Member = () => {
               aria-hidden="true"
             >
               <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-                <div className="modal-content">
-                  <div className="modal-header">
+                <div className="modal-content" style={{
+                  borderRadius: '15px',
+                  border: 'none',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                  overflow: 'hidden'
+                }}>
+                  <div className="modal-header" style={{
+                    background: 'linear-gradient(135deg, #52b447, #429938)',
+                    borderBottom: 'none',
+                    padding: '20px 25px',
+                    position: 'relative'
+                  }}>
                     <h5
-                      className="modal-title  fw-bold"
+                      className="modal-title fw-bold"
                       id="createprojectlLabel"
+                      style={{
+                        color: 'white',
+                        fontSize: '18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px'
+                      }}
                     >
-                      {" "}
+                      <i className="icofont-plus-circle" style={{ fontSize: '22px' }}></i>
                       Add Employee
                     </h5>
                     <button
@@ -1867,530 +2602,623 @@ const Member = () => {
                       className="btn-close"
                       data-bs-dismiss="modal"
                       aria-label="Close"
+                      style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: '50%',
+                        padding: '8px',
+                        opacity: '1',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                        e.currentTarget.style.transform = 'rotate(90deg)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                        e.currentTarget.style.transform = 'rotate(0deg)';
+                      }}
                     />
                   </div>
-                  <div className="modal-body">
-                    <div className="mb-3">
-                      <label
-                        htmlFor="exampleFormControlInput877"
-                        className="form-label"
-                      >
+                  <div className="modal-body" style={{ padding: '25px' }}>
+                    {/* Employee Name */}
+                    <div className="mb-4">
+                      <label className="form-label" style={{
+                        fontWeight: '600',
+                        color: '#444',
+                        fontSize: '14px',
+                        marginBottom: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}>
+                        <i className="icofont-user" style={{ color: '#52b447' }}></i>
                         Employee Name <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
                         className="form-control"
-                        id="exampleFormControlInput877"
                         placeholder="Employee Name"
                         name="employeeName"
                         value={formData.employeeName}
                         onChange={handleChange}
+                        style={{
+                          borderRadius: '8px',
+                          border: '1px solid rgba(65, 105, 225, 0.3)',
+                          padding: '10px 15px',
+                          color: '#333',
+                          boxShadow: 'none'
+                        }}
                       />
                     </div>
-                    <div className="mb-3">
-                      <label
-                        htmlFor="formFileMultipleoneone"
-                        className="form-label"
-                      >
-                        Employee Image <span className="text-danger">*</span>
+
+                    {/* Profile Image */}
+                    <div className="mb-4">
+                      <label className="form-label" style={{
+                        fontWeight: '600',
+                        color: '#444',
+                        fontSize: '14px',
+                        marginBottom: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}>
+                        <i className="icofont-image" style={{ color: '#ff5e00' }}></i>
+                        Profile Image <span className="text-danger">*</span>
                       </label>
                       <input
-                        className="form-control"
                         type="file"
-                        id="formFileMultipleoneone"
+                        className="form-control"
                         name="employeeImage"
                         onChange={handleFileChange}
+                        style={{
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255, 94, 0, 0.3)',
+                          padding: '10px 15px',
+                          color: '#333',
+                          boxShadow: 'none',
+                          backgroundColor: 'rgba(255, 94, 0, 0.03)'
+                        }}
                       />
                     </div>
-                    <div className="mb-3">
-                      <label
-                        htmlFor="resumeUpload"
-                        className="form-label"
-                      >
-                        Resume
-                      </label>
-                      <input
-                        className="form-control"
-                        type="file"
-                        id="resumeUpload"
-                        name="resume"
-                        onChange={handleFileChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label
-                        htmlFor="aadhaarUpload"
-                        className="form-label"
-                      >
-                        Aadhaar Card
-                      </label>
-                      <input
-                        className="form-control"
-                        type="file"
-                        id="aadhaarUpload"
-                        name="aadhaarCard"
-                        onChange={handleFileChange}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label
-                        htmlFor="panUpload"
-                        className="form-label"
-                      >
-                        PAN Card
-                      </label>
-                      <input
-                        className="form-control"
-                        type="file"
-                        id="panUpload"
-                        name="panCard"
-                        onChange={handleFileChange}
-                      />
-                    </div>
-                    <div className="deadline-form">
-                      <form>
-                        <div className="row g-3 mb-3">
-                          <div className="col-sm-6">
-                            <label
-                              htmlFor="exampleFormControlInput1778"
-                              className="form-label"
-                            >
-                              Employee ID <span className="text-danger">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="exampleFormControlInput1778"
-                              placeholder="Employee ID"
-                              name="employeeId"
-                              value={formData.employeeId}
-                              onChange={handleChange}
-                              disabled
-                            />
-                          </div>
-                          <div className="col-sm-6">
-                            <label
-                              htmlFor="exampleFormControlInput2778"
-                              className="form-label"
-                            >
-                              Joining Date
-                            </label>
-                            <input
-                              type="date"
-                              className="form-control"
-                              id="exampleFormControlInput2778"
-                              name="joiningDate"
-                              value={formData.joiningDate}
-                              onChange={handleChange}
-                            />
-                          </div>
-                        </div>
-                        <div className="row g-3 mb-3">
 
-                          <div className="col">
-                            <label
-                              htmlFor="exampleFormControlInput477"
-                              className="form-label"
-                            >
-                              Email ID <span className="text-danger">*</span>
-                            </label>
+                    {/* Contact Information */}
+                    <div className="row g-3 mb-4">
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-email" style={{ color: '#52b447' }}></i>
+                          Email ID <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          className="form-control"
+                          placeholder="Email ID"
+                          name="emailid"
+                          value={formData.emailid}
+                          onChange={handleChange}
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(65, 105, 225, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none'
+                          }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-key" style={{ color: '#ff5e00' }}></i>
+                          Password <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          className="form-control"
+                          placeholder="Password"
+                          name="password"
+                          value={formData.password}
+                          onChange={handleChange}
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255, 94, 0, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none',
+                            backgroundColor: 'rgba(255, 94, 0, 0.03)'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Employee ID & Joining Date */}
+                    <div className="row g-3 mb-4">
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-id-card" style={{ color: '#52b447' }}></i>
+                          Employee ID <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Employee ID"
+                          name="employeeId"
+                          value={formData.employeeId}
+                          onChange={handleChange}
+                          disabled
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(65, 105, 225, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none',
+                            backgroundColor: 'rgba(65, 105, 225, 0.05)'
+                          }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-calendar" style={{ color: '#ff5e00' }}></i>
+                          Joining Date
+                        </label>
+                        <input
+                          type="date"
+                          className="form-control"
+                          name="joiningDate"
+                          value={formData.joiningDate}
+                          onChange={handleChange}
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255, 94, 0, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none',
+                            backgroundColor: 'rgba(255, 94, 0, 0.03)'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Phone */}
+                    <div className="mb-4">
+                      <label className="form-label" style={{
+                        fontWeight: '600',
+                        color: '#444',
+                        fontSize: '14px',
+                        marginBottom: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}>
+                        <i className="icofont-phone" style={{ color: '#ff5e00' }}></i>
+                        Phone Number
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter phone number"
+                        maxLength={14}
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        style={{
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255, 94, 0, 0.3)',
+                          padding: '10px 15px',
+                          color: '#333',
+                          boxShadow: 'none',
+                          backgroundColor: 'rgba(255, 94, 0, 0.03)'
+                        }}
+                      />
+                    </div>
+
+                    {/* Department & Designation */}
+                    <div className="row g-3 mb-4">
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-building" style={{ color: '#52b447' }}></i>
+                          Department
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter department"
+                          name="department"
+                          value={formData.department}
+                          onChange={handleChange}
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(65, 105, 225, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none'
+                          }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label" style={{
+                          fontWeight: '600',
+                          color: '#444',
+                          fontSize: '14px',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}>
+                          <i className="icofont-badge" style={{ color: '#ff5e00' }}></i>
+                          Designation
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter designation"
+                          name="designation"
+                          value={formData.designation}
+                          onChange={handleChange}
+                          style={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(65, 105, 225, 0.3)',
+                            padding: '10px 15px',
+                            color: '#333',
+                            boxShadow: 'none'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Social Media & Website Links */}
+                    <div className="mb-3">
+                      <label className="form-label">Social Media & Website Links</label>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-linkedin"></i></span>
                             <input
-                              type="email"
+                              type="url"
                               className="form-control"
-                              id="exampleFormControlInput477"
-                              placeholder="Email ID"
-                              name="emailid"
-                              value={formData.emailid}
-                              onChange={handleChange}
-                            />
-                          </div>
-                          <div className="col">
-                            <label
-                              htmlFor="exampleFormControlInput277"
-                              className="form-label"
-                            >
-                              Password <span className="text-danger">*</span>
-                            </label>
-                            <input
-                              type="Password"
-                              className="form-control"
-                              id="exampleFormControlInput277"
-                              placeholder="Password"
-                              name="password"
-                              value={formData.password}
+                              placeholder="LinkedIn Profile URL"
+                              name="linkedin"
+                              value={formData.linkedin || ''}
                               onChange={handleChange}
                             />
                           </div>
                         </div>
-                        <div className="row g-3 mb-3">
-                          <div className="col">
-                            <label
-                              htmlFor="exampleFormControlInput777"
-                              className="form-label"
-                            >
-                              Phone
-                            </label>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-instagram"></i></span>
                             <input
-                              type="text"
+                              type="url"
                               className="form-control"
-                              id="exampleFormControlInput777"
-                              placeholder="Phone"
-                              maxLength={14}
-                              name="phone"
-                              value={formData.phone}
+                              placeholder="Instagram Profile URL"
+                              name="instagram"
+                              value={formData.instagram || ''}
                               onChange={handleChange}
                             />
                           </div>
                         </div>
-                        <div className="row g-3 mb-3">
-                          <div className="col">
-                            <label className="form-label">Department</label>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-youtube"></i></span>
                             <input
-                              type="text"
+                              type="url"
                               className="form-control"
-                              placeholder="Enter department or select"
-                              name="department"
-                              value={formData.department}
+                              placeholder="YouTube Channel URL"
+                              name="youtube"
+                              value={formData.youtube || ''}
                               onChange={handleChange}
                             />
-                            {/* <select
-                              className="form-select mt-2"
-                              aria-label="Department options"
-                              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                            >
-                              <option value="">Select Department</option>
-                              <option value="Web Development">Web Development</option>
-                              <option value="IT Management">IT Management</option>
-                              <option value="Marketing">Marketing</option>
-                              <option value="Manager">Manager</option>
-                              <button>Add Department</button>
-                            </select> */}
                           </div>
-                          <div className="col">
-                            <label className="form-label">Designation</label>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-facebook"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="Facebook Profile URL"
+                              name="facebook"
+                              value={formData.facebook || ''}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-github"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="GitHub Profile URL"
+                              name="github"
+                              value={formData.github || ''}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-globe"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="Personal Website URL"
+                              name="website"
+                              value={formData.website || ''}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-link-45deg"></i></span>
+                            <input
+                              type="url"
+                              className="form-control"
+                              placeholder="Other URL"
+                              name="other"
+                              value={formData.other || ''}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bank Details */}
+                    <div className="mb-3">
+                      <label className="form-label">Bank Details</label>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-bank"></i></span>
                             <input
                               type="text"
                               className="form-control"
-                              placeholder="Enter designation"
-                              name="designation"
-                              value={formData.designation}
+                              placeholder="Bank Name"
+                              name="bankName"
+                              value={formData.bankName || ''}
                               onChange={handleChange}
                             />
-                            {/* <select
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-person"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Account Holder Name"
+                              name="accountHolderName"
+                              value={formData.accountHolderName || ''}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-credit-card"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Account Number"
+                              name="accountNumber"
+                              value={formData.accountNumber || ''}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-building"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="IFSC Code"
+                              name="ifscCode"
+                              value={formData.ifscCode || ''}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-wallet2"></i></span>
+                            <select
                               className="form-select"
-                              aria-label="Default select Project Category"
-                              name="designation"
-                              value={formData.designation}
+                              name="accountType"
+                              value={formData.accountType || ''}
                               onChange={handleChange}
                             >
-                              <option value={""}>Select Designation</option>
-                              <option value={"UI/UX Design"}>
-                                UI/UX Design
-                              </option>
-                              <option value={"Website Design"}>
-                                Web Design
-                              </option>
-                              <option value={"App Development"}>
-                                App Development
-                              </option>
-                              <option value={"Quality Assurance"}>
-                                Quality Assurance
-                              </option>
-                              <option value={"Fontend Development"}>Frontend Development</option>
-                              <option value={"Backend Development"}>
-                                Backend Development
-                              </option>
-                              <option value={"Software Testing"}>
-                                Software Testing
-                              </option>
-                              <option value={"Digital Marketing"}>Digital Marketing</option>
-                              <option value={"SEO"}>SEO</option>
-                              <option value={"Project Manager"}>
-                                Project Manager
-                              </option>
-                              <option value={"Other"}>Other</option>
-                            </select> */}
+                              <option value="">Select Account Type</option>
+                              <option value="Savings">Savings</option>
+                              <option value="Current">Current</option>
+                              <option value="Salary">Salary</option>
+                            </select>
                           </div>
                         </div>
-                        <div className="mb-3">
-                          <label className="form-label">Social Media & Website Links</label>
-                          <div className="row g-3">
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-linkedin"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="LinkedIn Profile URL"
-                                  name="linkedin"
-                                  value={formData.linkedin}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-instagram"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="Instagram Profile URL"
-                                  name="instagram"
-                                  value={formData.instagram}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-youtube"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="YouTube Channel URL"
-                                  name="youtube"
-                                  value={formData.youtube}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-facebook"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="Facebook Profile URL"
-                                  name="facebook"
-                                  value={formData.facebook}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-github"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="GitHub Profile URL"
-                                  name="github"
-                                  value={formData.github}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-globe"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="Personal Website URL"
-                                  name="website"
-                                  value={formData.website}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-link-45deg"></i></span>
-                                <input
-                                  type="url"
-                                  className="form-control"
-                                  placeholder="Other URL"
-                                  name="other"
-                                  value={formData.other}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                            </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-phone"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="UPI ID"
+                              name="upiId"
+                              value={formData.upiId || ''}
+                              onChange={handleChange}
+                            />
                           </div>
                         </div>
-
-                        <div className="mb-3">
-                          <label className="form-label">Bank Details</label>
-                          <div className="row g-3">
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-bank"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Bank Name"
-                                  name="bankName"
-                                  value={formData.bankName || ''} // Use employeeData for edit form
-                                  onChange={handleChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-person"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Account Holder Name"
-                                  name="accountHolderName"
-                                  value={formData.accountHolderName || ''} // Use employeeData for edit form
-                                  onChange={handleChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-credit-card"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Account Number"
-                                  name="accountNumber"
-                                  value={formData.accountNumber || ''} // Use employeeData for edit form
-                                  onChange={handleChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-building"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="IFSC Code"
-                                  name="ifscCode"
-                                  value={formData.ifscCode || ''} // Use employeeData for edit form
-                                  onChange={handleChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-wallet2"></i></span>
-                                <select
-                                  className="form-select"
-                                  name="accountType"
-                                  value={formData.accountType || ''} // Use employeeData for edit form
-                                  onChange={handleChange} // Use updateChange for edit form
-                                >
-                                  <option value="">Select Account Type</option>
-                                  <option value="Savings">Savings</option>
-                                  <option value="Current">Current</option>
-                                  <option value="Salary">Salary</option>
-                                </select>
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-phone"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="UPI ID"
-                                  name="upiId"
-                                  value={formData.upiId || ''} // Use employeeData for edit form
-                                  onChange={handleChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-qr-code"></i></span>
-                                <input
-                                  type="file"
-                                  className="form-control"
-                                  name="qrCode"
-                                  onChange={handleFileChange} // Use updateChange for edit form
-                                  accept="image/*"
-                                />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-group mb-3">
-                                <span className="input-group-text"><i className="bi bi-app"></i></span>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Payment App (e.g., PayTM, PhonePe)"
-                                  name="paymentApp"
-                                  value={formData.paymentApp || ''} // Use employeeData for edit form
-                                  onChange={handleChange} // Use updateChange for edit form
-                                />
-                              </div>
-                            </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-qr-code"></i></span>
+                            <input
+                              type="file"
+                              className="form-control"
+                              name="qrCode"
+                              onChange={handleFileChange}
+                              accept="image/*"
+                            />
                           </div>
                         </div>
-
-                      </form>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text"><i className="bi bi-app"></i></span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Payment App (e.g., PayTM, PhonePe)"
+                              name="paymentApp"
+                              value={formData.paymentApp || ''}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Description */}
                     <div className="mb-3">
-                      <label
-                        htmlFor="exampleFormControlTextarea78"
-                        className="form-label"
-                      >
-                        Description (optional)
-                      </label>
+                      <label className="form-label">Description (optional)</label>
                       <textarea
                         className="form-control"
-                        id="exampleFormControlTextarea78"
                         rows={3}
-                        placeholder="Add any extra details about the request"
-                        defaultValue={""}
+                        placeholder="Add any extra details about the employee"
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
                       />
                     </div>
+
+                    {/* Documents */}
+                    <div className="mb-3">
+                      <label className="form-label" style={{
+                        fontWeight: '600',
+                        color: '#444',
+                        fontSize: '16px',
+                        marginBottom: '15px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <i className="bi bi-file-earmark-text" style={{ color: '#52b447' }}></i>
+                        Documents
+                      </label>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text">
+                              <i className="bi bi-file-earmark-text"></i>
+                            </span>
+                            <input
+                              type="file"
+                              className="form-control"
+                              name="resume"
+                              onChange={handleFileChange}
+                              accept=".pdf,.doc,.docx"
+                              style={{
+                                borderRadius: '8px',
+                                border: '1px solid rgba(65, 105, 225, 0.3)',
+                                padding: '10px 15px',
+                                color: '#333',
+                                boxShadow: 'none',
+                                backgroundColor: 'rgba(65, 105, 225, 0.03)'
+                              }}
+                            />
+                          </div>
+                          <small className="text-muted">Resume (PDF, DOC, DOCX)</small>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text">
+                              <i className="bi bi-card-text"></i>
+                            </span>
+                            <input
+                              type="file"
+                              className="form-control"
+                              name="aadhaarCard"
+                              onChange={handleFileChange}
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              style={{
+                                borderRadius: '8px',
+                                border: '1px solid rgba(255, 105, 180, 0.3)',
+                                padding: '10px 15px',
+                                color: '#333',
+                                boxShadow: 'none',
+                                backgroundColor: 'rgba(255, 105, 180, 0.03)'
+                              }}
+                            />
+                          </div>
+                          <small className="text-muted">Aadhaar Card (PDF, JPG, PNG)</small>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="input-group mb-3">
+                            <span className="input-group-text">
+                              <i className="bi bi-card-heading"></i>
+                            </span>
+                            <input
+                              type="file"
+                              className="form-control"
+                              name="panCard"
+                              onChange={handleFileChange}
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              style={{
+                                borderRadius: '8px',
+                                border: '1px solid rgba(82, 180, 71, 0.3)',
+                                padding: '10px 15px',
+                                color: '#333',
+                                boxShadow: 'none',
+                                backgroundColor: 'rgba(82, 180, 71, 0.03)'
+                              }}
+                            />
+                          </div>
+                          <small className="text-muted">PAN Card (PDF, JPG, PNG)</small>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      data-bs-dismiss="modal"
-                    >
-                      Done
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={handleSubmit}
-                    >
-                      Create
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Modal  Delete Folder/ File*/}
-            <div
-              className="modal fade"
-              id="deleteproject"
-              tabIndex={-1}
-              aria-hidden="true"
-            >
-              <div className="modal-dialog modal-dialog-centered modal-md modal-dialog-scrollable">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5
-                      className="modal-title  fw-bold"
-                      id="deleteprojectLabel"
-                    >
-                      {" "}
-                      Delete item Permanently?
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    />
-                  </div>
-                  <div className="modal-body justify-content-center flex-column d-flex">
-                    <i className="icofont-ui-delete text-danger display-2 text-center mt-2" />
-                    <p className="mt-4 fs-5 text-center">
-                      You can only delete this item Permanently
-                    </p>
-                  </div>
+
+                  {/* Footer */}
                   <div className="modal-footer">
                     <button
                       type="button"
@@ -2401,463 +3229,1151 @@ const Member = () => {
                     </button>
                     <button
                       type="button"
-                      className="btn btn-danger color-fff"
-                      onClick={handleDelete}
+                      className="btn btn-primary"
+                      onClick={handleSubmit}
                     >
-                      Delete
+                      Create Employee
                     </button>
                   </div>
                 </div>
               </div>
             </div>
-            {/* PDF Viewer Modal */}
-            {pdfUrl && (
-              <div
-                className="modal"
-                style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}
-                onClick={handlePdfModalBackdropClick}
+          </>
+        </div>
+      </div>
+      <ToastContainer />
+      <FloatingMenu userType="admin" isMobile={isMobile} />
+      {/* Modal  Delete Folder/ File*/}
+      <div
+        className="modal fade"
+        id="deleteproject"
+        tabIndex={-1}
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-dialog-centered modal-md modal-dialog-scrollable">
+          <div className="modal-content" style={{
+            borderRadius: '15px',
+            border: 'none',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+            overflow: 'hidden'
+          }}>
+            <div className="modal-header" style={{
+              background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+              borderBottom: 'none',
+              padding: '20px 25px',
+              position: 'relative'
+            }}>
+              <h5
+                className="modal-title fw-bold"
+                id="deleteprojectLabel"
+                style={{ color: 'white', fontSize: '18px', fontWeight: 700 }}
               >
-                <div className="modal-dialog modal-dialog-centered modal-lg">
-                  <div className="modal-content">
-                    <div className="modal-header">
-                      <h5 className="modal-title">{selectedImageDetails.name}</h5>
-                      <button type="button" className="btn-close" onClick={closePdfViewer}></button>
-                    </div>
-                    <div className="modal-body">
-                      <iframe src={pdfUrl} style={{ width: '100%', height: '500px' }} title="PDF Viewer"></iframe>
+                <i className="icofont-ui-delete me-2"></i>
+                Delete item Permanently?
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  borderRadius: '50%',
+                  padding: '8px',
+                  opacity: '1',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                  e.currentTarget.style.transform = 'rotate(90deg)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                  e.currentTarget.style.transform = 'rotate(0deg)';
+                }}
+              />
+            </div>
+            <div className="modal-body justify-content-center flex-column d-flex">
+              <i className="icofont-ui-delete text-danger display-2 text-center mt-2" />
+              <p className="mt-4 fs-5 text-center">
+                You can only delete this item Permanently
+              </p>
+            </div>
+            <div className="modal-footer" style={{
+              borderTop: '1px solid rgba(255, 105, 180, 0.1)',
+              padding: '16px 25px',
+              display: 'flex',
+              justifyContent: 'center'
+            }}>
+              <button
+                type="button"
+                className="btn"
+                data-bs-dismiss="modal"
+                style={{
+                  backgroundColor: 'rgba(255, 94, 0, 0.1)',
+                  color: '#ff5e00',
+                  border: '1px solid rgba(255, 94, 0, 0.3)',
+                  borderRadius: '8px',
+                  padding: '8px 20px',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  transition: 'all 0.2s ease',
+                  marginRight: '10px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.2)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
+                }}
+              >
+                <i className="icofont-close-circled me-2"></i>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn"
+                style={{
+                  background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 20px',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  boxShadow: '0 4px 10px rgba(255, 105, 180, 0.2)',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={handleDelete}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 12px rgba(255, 105, 180, 0.3)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 10px rgba(255, 105, 180, 0.2)';
+                }}
+              >
+                <i className="icofont-ui-delete me-2"></i>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Bank Details Modal */}
+      <div
+        className="modal fade"
+        id="bankDetailsModal"
+        tabIndex={-1}
+        aria-hidden="true"
+        style={{ zIndex: 9998 }}
+      >
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content" style={{
+            borderRadius: '15px',
+            border: 'none',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+            overflow: 'hidden'
+          }}>
+            <div className="modal-header" style={{
+              background: 'linear-gradient(135deg, #52b447, #429938)',
+              borderBottom: 'none',
+              padding: '20px 25px',
+              position: 'relative'
+            }}>
+              <h5 className="modal-title fw-bold" style={{ color: 'white', fontSize: '18px', fontWeight: 700 }}>
+                <i className="bi bi-bank me-2"></i>
+                {selectedEmployee?.employeeName || 'Employee'}'s Bank Details
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  borderRadius: '50%',
+                  padding: '8px',
+                  opacity: '1',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                  e.currentTarget.style.transform = 'rotate(90deg)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                  e.currentTarget.style.transform = 'rotate(0deg)';
+                }}
+              />
+            </div>
+            <div className="modal-body">
+              <div className="row g-3">
+                {/* Bank Name */}
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100" style={{
+                    backgroundColor: 'rgba(65, 105, 225, 0.02)',
+                    border: '1px solid rgba(65, 105, 225, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="d-flex align-items-center">
+                      <i className="bi bi-bank fs-4 text-primary me-3" style={{ color: '#1e40af' }}></i>
+                      <div className="flex-grow-1">
+                        <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>Bank Name</div>
+                        <div className="d-flex align-items-center">
+                          <span className="me-2" style={{ color: '#666', fontSize: '13px' }}>
+                            {selectedEmployee?.bankDetails?.bankName || 'Not provided'}
+                          </span>
+                          {selectedEmployee?.bankDetails?.bankName && (
+                            <i
+                              className="bi bi-clipboard cursor-pointer"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.bankDetails.bankName);
+                                toast.success('Bank Name copied!');
+                              }}
+                              title="Copy Bank Name"
+                              style={{ color: '#1e40af', fontSize: '14px' }}
+                            ></i>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* Image Viewer Modal */}
-            {selectedImageDetails.url && !pdfUrl && (
-              <div
-                className="modal"
-                style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999 }}
-                onClick={handleImageModalBackdropClick}
-              >
-                <div className="modal-dialog modal-dialog-centered modal-lg">
-                  <div className="modal-content" style={{ marginLeft: '5rem' }}>
-                    <div className="modal-header">
-                      <h5 className="modal-title">{selectedImageDetails.name}</h5>
-                      <button type="button" className="btn-close" onClick={closeImageModal}></button>
-                    </div>
-                    <div className="modal-body">
-                      <img src={selectedImageDetails.url} alt="Enlarged view" style={{ width: '100%', height: '500px', objectFit: 'contain' }} />
+                {/* Account Holder Name */}
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100" style={{
+                    backgroundColor: 'rgba(255, 105, 180, 0.02)',
+                    border: '1px solid rgba(255, 105, 180, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="d-flex align-items-center">
+                      <i className="bi bi-person fs-4 text-primary me-3" style={{ color: '#ff69b4' }}></i>
+                      <div className="flex-grow-1">
+                        <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>Account Holder</div>
+                        <div className="d-flex align-items-center">
+                          <span className="me-2" style={{ color: '#666', fontSize: '13px' }}>
+                            {selectedEmployee?.bankDetails?.accountHolderName || 'Not provided'}
+                          </span>
+                          {selectedEmployee?.bankDetails?.accountHolderName && (
+                            <i
+                              className="bi bi-clipboard cursor-pointer"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.bankDetails.accountHolderName);
+                                toast.success('Account Holder Name copied!');
+                              }}
+                              title="Copy Account Holder Name"
+                              style={{ color: '#ff69b4', fontSize: '14px' }}
+                            ></i>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* Bank Details Modal */}
-            <div
-              className="modal fade"
-              id="bankDetailsModal"
-              tabIndex={-1}
-              aria-hidden="true"
-              style={{ zIndex: 9998 }}
-            >
-              <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title fw-bold">
-                      {selectedEmployee?.employeeName || 'Employee'}'s Bank Details
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    />
+                {/* Account Number */}
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100" style={{
+                    backgroundColor: 'rgba(82, 180, 71, 0.02)',
+                    border: '1px solid rgba(82, 180, 71, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="d-flex align-items-center">
+                      <i className="bi bi-credit-card fs-4 text-primary me-3" style={{ color: '#52b447' }}></i>
+                      <div className="flex-grow-1">
+                        <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>Account Number</div>
+                        <div className="d-flex align-items-center">
+                          <span className="me-2" style={{ color: '#666', fontSize: '13px' }}>
+                            {selectedEmployee?.bankDetails?.accountNumber || 'Not provided'}
+                          </span>
+                          {selectedEmployee?.bankDetails?.accountNumber && (
+                            <i
+                              className="bi bi-clipboard cursor-pointer"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.bankDetails.accountNumber);
+                                toast.success('Account Number copied!');
+                              }}
+                              title="Copy Account Number"
+                              style={{ color: '#52b447', fontSize: '14px' }}
+                            ></i>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="modal-body">
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <div className="bank-info-item p-3 border rounded h-100">
-                          <i className="bi bi-bank fs-4 text-primary me-2"></i>
-                          <div className="flex-grow-1">
-                            <div className="fw-bold">Bank Name</div>
-                            <div className="d-flex align-items-center">
-                              <span className="me-2">{selectedEmployee?.bankDetails?.bankName || 'Not provided'}</span>
-                              {selectedEmployee?.bankDetails?.bankName && (
-                                <i
-                                  className="bi bi-clipboard cursor-pointer"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.bankName);
-                                    toast.success('Bank Name copied!');
-                                  }}
-                                  title="Copy Bank Name"
-                                ></i>
+                </div>
+
+                {/* IFSC Code */}
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100" style={{
+                    backgroundColor: 'rgba(255, 94, 0, 0.02)',
+                    border: '1px solid rgba(255, 94, 0, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="d-flex align-items-center">
+                      <i className="bi bi-building fs-4 text-primary me-3" style={{ color: '#ff5e00' }}></i>
+                      <div className="flex-grow-1">
+                        <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>IFSC Code</div>
+                        <div className="d-flex align-items-center">
+                          <span className="me-2" style={{ color: '#666', fontSize: '13px' }}>
+                            {selectedEmployee?.bankDetails?.ifscCode || 'Not provided'}
+                          </span>
+                          {selectedEmployee?.bankDetails?.ifscCode && (
+                            <i
+                              className="bi bi-clipboard cursor-pointer"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.bankDetails.ifscCode);
+                                toast.success('IFSC Code copied!');
+                              }}
+                              title="Copy IFSC Code"
+                              style={{ color: '#ff5e00', fontSize: '14px' }}
+                            ></i>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Account Type */}
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100" style={{
+                    backgroundColor: 'rgba(65, 105, 225, 0.02)',
+                    border: '1px solid rgba(65, 105, 225, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="d-flex align-items-center">
+                      <i className="bi bi-wallet2 fs-4 text-primary me-3" style={{ color: '#1e40af' }}></i>
+                      <div className="flex-grow-1">
+                        <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>Account Type</div>
+                        <div className="d-flex align-items-center">
+                          <span className="me-2" style={{ color: '#666', fontSize: '13px' }}>
+                            {selectedEmployee?.bankDetails?.accountType || 'Not provided'}
+                          </span>
+                          {selectedEmployee?.bankDetails?.accountType && (
+                            <i
+                              className="bi bi-clipboard cursor-pointer"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.bankDetails.accountType);
+                                toast.success('Account Type copied!');
+                              }}
+                              title="Copy Account Type"
+                              style={{ color: '#1e40af', fontSize: '14px' }}
+                            ></i>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* UPI ID */}
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100" style={{
+                    backgroundColor: 'rgba(255, 105, 180, 0.02)',
+                    border: '1px solid rgba(255, 105, 180, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="d-flex align-items-center">
+                      <i className="bi bi-phone fs-4 text-primary me-3" style={{ color: '#ff69b4' }}></i>
+                      <div className="flex-grow-1">
+                        <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>UPI ID</div>
+                        <div className="d-flex align-items-center">
+                          <span className="me-2" style={{ color: '#666', fontSize: '13px' }}>
+                            {selectedEmployee?.bankDetails?.upiId || 'Not provided'}
+                          </span>
+                          {selectedEmployee?.bankDetails?.upiId && (
+                            <i
+                              className="bi bi-clipboard cursor-pointer"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.bankDetails.upiId);
+                                toast.success('UPI ID copied!');
+                              }}
+                              title="Copy UPI ID"
+                              style={{ color: '#ff69b4', fontSize: '14px' }}
+                            ></i>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payment App */}
+                <div className="col-md-6">
+                  <div className="bank-info-item p-3 border rounded h-100" style={{
+                    backgroundColor: 'rgba(82, 180, 71, 0.02)',
+                    border: '1px solid rgba(82, 180, 71, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="d-flex align-items-center">
+                      <i className="bi bi-app fs-4 text-primary me-3" style={{ color: '#52b447' }}></i>
+                      <div className="flex-grow-1">
+                        <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>Payment App</div>
+                        <div className="d-flex align-items-center">
+                          <span className="me-2" style={{ color: '#666', fontSize: '13px' }}>
+                            {selectedEmployee?.bankDetails?.paymentApp || 'Not provided'}
+                          </span>
+                          {selectedEmployee?.bankDetails?.paymentApp && (
+                            <i
+                              className="bi bi-clipboard cursor-pointer"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.bankDetails.paymentApp);
+                                toast.success('Payment App copied!');
+                              }}
+                              title="Copy Payment App"
+                              style={{ color: '#52b447', fontSize: '14px' }}
+                            ></i>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* QR Code */}
+                {selectedEmployee?.bankDetails?.qrCode && (
+                  <div className="col-md-6">
+                    <div className="bank-info-item p-3 border rounded h-100" style={{
+                      backgroundColor: 'rgba(255, 94, 0, 0.02)',
+                      border: '1px solid rgba(255, 94, 0, 0.1)',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-qr-code fs-4 text-primary me-3" style={{ color: '#ff5e00' }}></i>
+                        <div className="flex-grow-1">
+                          <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>QR Code</div>
+                          <div className="d-flex align-items-center">
+                            <img
+                              src={`${import.meta.env.VITE_BASE_URL}${selectedEmployee.bankDetails.qrCode}`}
+                              alt="QR Code"
+                              style={{
+                                width: '60px',
+                                height: '60px',
+                                borderRadius: '8px',
+                                cursor: 'pointer'
+                              }}
+                              onClick={() => handleImageClick(
+                                `${import.meta.env.VITE_BASE_URL}${selectedEmployee.bankDetails.qrCode}`,
+                                `${selectedEmployee.employeeName} - QR Code`
                               )}
-                            </div>
+                              title="Click to view QR Code"
+                            />
                           </div>
                         </div>
                       </div>
-
-                      <div className="col-md-6">
-                        <div className="bank-info-item p-3 border rounded h-100">
-                          <i className="bi bi-person fs-4 text-success me-2"></i>
-                          <div className="flex-grow-1">
-                            <div className="fw-bold">Account Holder</div>
-                            <div className="d-flex align-items-center">
-                              <span className="me-2">{selectedEmployee?.bankDetails?.accountHolderName || 'Not provided'}</span>
-                              {selectedEmployee?.bankDetails?.accountHolderName && (
-                                <i
-                                  className="bi bi-clipboard cursor-pointer"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.accountHolderName);
-                                    toast.success('Account Holder Name copied!');
-                                  }}
-                                  title="Copy Account Holder Name"
-                                ></i>
-                              )}
-                            </div>
-                          </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* View Documents Modal */}
+      <div
+        className="modal fade"
+        id="viewDocumentsModal"
+        tabIndex={-1}
+        aria-hidden="true"
+        style={{ zIndex: 9999 }}
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content" style={{
+            borderRadius: '15px',
+            border: 'none',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+            overflow: 'hidden'
+          }}>
+            <div className="modal-header" style={{
+              background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+              borderBottom: 'none',
+              padding: '20px 25px',
+              position: 'relative'
+            }}>
+              <h5 className="modal-title fw-bold" style={{ color: 'white', fontSize: '18px', fontWeight: 700 }}>
+                <i className="bi bi-file-earmark-text me-2"></i>
+                {selectedEmployee?.employeeName || 'Employee'}'s Documents
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  borderRadius: '50%',
+                  padding: '8px',
+                  opacity: '1',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                  e.currentTarget.style.transform = 'rotate(90deg)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                  e.currentTarget.style.transform = 'rotate(0deg)';
+                }}
+              />
+            </div>
+            <div className="modal-body">
+              <div className="row g-3">
+                {/* Resume */}
+                <div className="col-md-6">
+                  <div className="document-item p-3 border rounded h-100" style={{
+                    backgroundColor: 'rgba(65, 105, 225, 0.02)',
+                    border: '1px solid rgba(65, 105, 225, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="d-flex flex-column align-items-center">
+                      <i className="bi bi-file-earmark-text fs-1 text-primary mb-2" style={{ color: '#1e40af' }}></i>
+                      <div className="fw-bold mb-2" style={{ color: '#444', fontSize: '16px' }}>Resume</div>
+                      {selectedEmployee?.resume ? (
+                        <div className="d-flex justify-content-center gap-3 mt-2">
+                          <button
+                            className="btn btn-sm btn-outline-primary"
+                            onClick={(e) => handleFileClick(
+                              e,
+                              `${import.meta.env.VITE_BASE_URL}${selectedEmployee.resume}`,
+                              selectedEmployee.resume.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image',
+                              `${selectedEmployee.employeeName} - Resume`
+                            )}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            <i className="bi bi-eye me-1"></i> View
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-success"
+                            onClick={() => handleDownload(
+                              `${import.meta.env.VITE_BASE_URL}${selectedEmployee.resume}`,
+                              `${selectedEmployee.employeeName}_resume${selectedEmployee.resume.substring(selectedEmployee.resume.lastIndexOf('.'))}`
+                            )}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            <i className="bi bi-download me-1"></i> Download
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDocumentDelete(selectedEmployee._id, 'resume')}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            <i className="bi bi-trash me-1"></i> Delete
+                          </button>
                         </div>
-                      </div>
+                      ) : (
+                        <p className="text-muted mb-0" style={{ fontSize: '13px' }}>No resume uploaded</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-                      <div className="col-md-6">
-                        <div className="bank-info-item p-3 border rounded h-100">
-                          <i className="bi bi-credit-card fs-4 text-info me-2"></i>
-                          <div className="flex-grow-1">
-                            <div className="fw-bold">Account Number</div>
-                            <div className="d-flex align-items-center">
-                              <span className="me-2">{selectedEmployee?.bankDetails?.accountNumber || 'Not provided'}</span>
-                              {selectedEmployee?.bankDetails?.accountNumber && (
-                                <i
-                                  className="bi bi-clipboard cursor-pointer"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.accountNumber);
-                                    toast.success('Account Number copied!');
-                                  }}
-                                  title="Copy Account Number"
-                                ></i>
-                              )}
-                            </div>
-                          </div>
+                {/* Aadhaar Card */}
+                <div className="col-md-6">
+                  <div className="document-item p-3 border rounded h-100" style={{
+                    backgroundColor: 'rgba(255, 105, 180, 0.02)',
+                    border: '1px solid rgba(255, 105, 180, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="d-flex flex-column align-items-center">
+                      <i className="bi bi-card-text fs-1 text-primary mb-2" style={{ color: '#ff69b4' }}></i>
+                      <div className="fw-bold mb-2" style={{ color: '#444', fontSize: '16px' }}>Aadhaar Card</div>
+                      {selectedEmployee?.aadhaarCard ? (
+                        <div className="d-flex justify-content-center gap-3 mt-2">
+                          <button
+                            className="btn btn-sm btn-outline-primary"
+                            onClick={(e) => handleFileClick(
+                              e,
+                              `${import.meta.env.VITE_BASE_URL}${selectedEmployee.aadhaarCard}`,
+                              selectedEmployee.aadhaarCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image',
+                              `${selectedEmployee.employeeName} - Aadhaar Card`
+                            )}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            <i className="bi bi-eye me-1"></i> View
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-success"
+                            onClick={() => handleDownload(
+                              `${import.meta.env.VITE_BASE_URL}${selectedEmployee.aadhaarCard}`,
+                              `${selectedEmployee.employeeName}_aadhaar${selectedEmployee.aadhaarCard.substring(selectedEmployee.aadhaarCard.lastIndexOf('.'))}`
+                            )}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            <i className="bi bi-download me-1"></i> Download
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDocumentDelete(selectedEmployee._id, 'aadhaarCard')}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            <i className="bi bi-trash me-1"></i> Delete
+                          </button>
                         </div>
-                      </div>
+                      ) : (
+                        <p className="text-muted mb-0" style={{ fontSize: '13px' }}>No Aadhaar card uploaded</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-                      <div className="col-md-6">
-                        <div className="bank-info-item p-3 border rounded h-100">
-                          <i className="bi bi-building fs-4 text-warning me-2"></i>
-                          <div className="flex-grow-1">
-                            <div className="fw-bold">IFSC Code</div>
-                            <div className="d-flex align-items-center">
-                              <span className="me-2">{selectedEmployee?.bankDetails?.ifscCode || 'Not provided'}</span>
-                              {selectedEmployee?.bankDetails?.ifscCode && (
-                                <i
-                                  className="bi bi-clipboard cursor-pointer"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.ifscCode);
-                                    toast.success('IFSC Code copied!');
-                                  }}
-                                  title="Copy IFSC Code"
-                                ></i>
-                              )}
-                            </div>
-                          </div>
+                {/* PAN Card */}
+                <div className="col-md-6">
+                  <div className="document-item p-3 border rounded h-100" style={{
+                    backgroundColor: 'rgba(82, 180, 71, 0.02)',
+                    border: '1px solid rgba(82, 180, 71, 0.1)',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div className="d-flex flex-column align-items-center">
+                      <i className="bi bi-card-heading fs-1 text-primary mb-2" style={{ color: '#52b447' }}></i>
+                      <div className="fw-bold mb-2" style={{ color: '#444', fontSize: '16px' }}>PAN Card</div>
+                      {selectedEmployee?.panCard ? (
+                        <div className="d-flex justify-content-center gap-3 mt-2">
+                          <button
+                            className="btn btn-sm btn-outline-primary"
+                            onClick={(e) => handleFileClick(
+                              e,
+                              `${import.meta.env.VITE_BASE_URL}${selectedEmployee.panCard}`,
+                              selectedEmployee.panCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image',
+                              `${selectedEmployee.employeeName} - PAN Card`
+                            )}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            <i className="bi bi-eye me-1"></i> View
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-success"
+                            onClick={() => handleDownload(
+                              `${import.meta.env.VITE_BASE_URL}${selectedEmployee.panCard}`,
+                              `${selectedEmployee.employeeName}_pan${selectedEmployee.panCard.substring(selectedEmployee.panCard.lastIndexOf('.'))}`
+                            )}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            <i className="bi bi-download me-1"></i> Download
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDocumentDelete(selectedEmployee._id, 'panCard')}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            <i className="bi bi-trash me-1"></i> Delete
+                          </button>
                         </div>
-                      </div>
-
-                      <div className="col-md-6">
-                        <div className="bank-info-item p-3 border rounded h-100">
-                          <i className="bi bi-wallet2 fs-4 text-danger me-2"></i>
-                          <div className="flex-grow-1">
-                            <div className="fw-bold">Account Type</div>
-                            <div className="d-flex align-items-center">
-                              <span className="me-2">{selectedEmployee?.bankDetails?.accountType || 'Not provided'}</span>
-                              {selectedEmployee?.bankDetails?.accountType && (
-                                <i
-                                  className="bi bi-clipboard cursor-pointer"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.accountType);
-                                    toast.success('Account Type copied!');
-                                  }}
-                                  title="Copy Account Type"
-                                ></i>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-md-6">
-                        <div className="bank-info-item p-3 border rounded h-100">
-                          <i className="bi bi-phone fs-4 text-success me-2"></i>
-                          <div className="flex-grow-1">
-                            <div className="fw-bold">UPI ID</div>
-                            <div className="d-flex align-items-center">
-                              <span className="me-2">{selectedEmployee?.bankDetails?.upiId || 'Not provided'}</span>
-                              {selectedEmployee?.bankDetails?.upiId && (
-                                <i
-                                  className="bi bi-clipboard cursor-pointer"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.upiId);
-                                    toast.success('UPI ID copied!');
-                                  }}
-                                  title="Copy UPI ID"
-                                ></i>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-md-6">
-                        <div className="bank-info-item p-3 border rounded h-100">
-                          <i className="bi bi-app fs-4 text-primary me-2"></i>
-                          <div className="flex-grow-1">
-                            <div className="fw-bold">Payment App</div>
-                            <div className="d-flex align-items-center">
-                              <span className="me-2">{selectedEmployee?.bankDetails?.paymentApp || 'Not provided'}</span>
-                              {selectedEmployee?.bankDetails?.paymentApp && (
-                                <i
-                                  className="bi bi-clipboard cursor-pointer"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(selectedEmployee.bankDetails.paymentApp);
-                                    toast.success('Payment App copied!');
-                                  }}
-                                  title="Copy Payment App"
-                                ></i>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {selectedEmployee?.bankDetails?.qrCode && (
-                        <div className="col-md-6">
-                          <div className="bank-info-item p-3 border rounded h-100">
-                            <i className="bi bi-qr-code fs-4 text-dark me-2"></i>
-                            <div>
-                              <div className="fw-bold">QR Code</div>
-                              <div className="d-flex align-items-center gap-2 mt-2">
-                                <img
-                                  src={`${import.meta.env.VITE_BASE_URL}${selectedEmployee.bankDetails.qrCode.replace('uploads/', '')}`}
-                                  alt="QR Code"
-                                  style={{ width: '100px', height: '100px', objectFit: 'contain', cursor: 'pointer' }}
-                                  onClick={(e) => handleFileClick(
-                                    e,
-                                    `${import.meta.env.VITE_BASE_URL}${selectedEmployee.bankDetails.qrCode.replace('uploads/', '')}`,
-                                    'image',
-                                    `${selectedEmployee.employeeName} - QR Code`
-                                  )}
-
-                                />
-                                <i
-                                  className="bi bi-download fs-4 text-primary"
-                                  style={{ cursor: 'pointer' }}
-                                  onClick={() => handleDownload(
-                                    selectedEmployee.bankDetails.qrCode,
-                                    `${selectedEmployee.employeeName}_qr_code${selectedEmployee.bankDetails.qrCode.substr(selectedEmployee.bankDetails.qrCode.lastIndexOf('.'))}`
-                                  )}
-                                  title="Download QR Code"
-                                ></i>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                      ) : (
+                        <p className="text-muted mb-0" style={{ fontSize: '13px' }}>No PAN card uploaded</p>
                       )}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* View Documents Modal */}
-            <div className="modal fade" id="viewDocumentsModal" tabIndex={-1} aria-hidden="true" style={{ zIndex: 9998 }}>
-              <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title fw-bold">Employee Documents</h5>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-                  </div>
-                  <div className="modal-body">
-                    {selectedEmployee && (
-                      <div className="row g-3">
-                        <div className="col-12">
-                          <h6 className="border-bottom pb-2">Resume</h6>
-                          {selectedEmployee.resume ? (
-                            <div className="d-flex align-items-center gap-3">
-                              {selectedEmployee.resume.toLowerCase().endsWith('.pdf') ? (
-                                <a href="#" onClick={(e) => handleFileClick(
-                                  e,
-                                  `${import.meta.env.VITE_BASE_URL}${selectedEmployee.resume}`,
-                                  'pdf',
-                                  selectedEmployee.employeeName
-                                )}>View PDF</a>
-                              ) : (
-                                <img
-                                  src={`${import.meta.env.VITE_BASE_URL}${selectedEmployee.resume}`}
-                                  alt="Resume"
-                                  className="img-thumbnail"
-                                  style={{ maxWidth: '100px', cursor: 'pointer' }}
-                                  onClick={(e) => handleFileClick(
-                                    e,
-                                    `${import.meta.env.VITE_BASE_URL}${selectedEmployee.resume}`,
-                                    'image',
-                                    selectedEmployee.employeeName
-                                  )}
-                                />
-                              )}
-                              <div className="d-flex gap-2">
-                                <button
-                                  className="btn btn-sm btn-primary"
-                                  onClick={() => handleDownload(selectedEmployee.resume, `${selectedEmployee.employeeName}_resume${selectedEmployee.resume.substr(selectedEmployee.resume.lastIndexOf('.'))}`)}
-                                >
-                                  <i className="bi bi-download"></i> Download
-                                </button>
-                                <button
-                                  className="btn btn-sm btn-danger"
-                                  onClick={() => handleDocumentDelete(selectedEmployee._id, 'resume')}
-                                >
-                                  <i className="bi bi-trash"></i> Delete
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="text-muted">No resume uploaded</p>
-                          )}
-                        </div>
-
-                        <div className="col-12">
-                          <h6 className="border-bottom pb-2">Aadhaar Card</h6>
-                          {selectedEmployee.aadhaarCard ? (
-                            <div className="row align-items-center g-2">
-                              <div className="col-6">
-                                {selectedEmployee.aadhaarCard.toLowerCase().endsWith('.pdf') ? (
-                                  <a href="#" onClick={(e) => handleFileClick(
-                                    e,
-                                    `${import.meta.env.VITE_BASE_URL}${selectedEmployee.aadhaarCard.replace('uploads/', '')}`,
-                                    'pdf',
-                                    selectedEmployee.employeeName
-                                  )}>View</a>
-                                ) : (
-                                  <img
-                                    src={`${import.meta.env.VITE_BASE_URL}${selectedEmployee.aadhaarCard.replace('uploads/', '')}`}
-                                    alt=""
-                                    className="avatar sm img-thumbnail shadow-sm"
-                                    onClick={(e) => handleFileClick(
-                                      e,
-                                      `${import.meta.env.VITE_BASE_URL}${selectedEmployee.aadhaarCard.replace('uploads/', '')}`,
-                                      'image',
-                                      selectedEmployee.employeeName
-                                    )}
-                                    style={{ cursor: 'pointer' }}
-                                  />
-                                )}
-                              </div>
-                              <div className="col-3 text-center">
-                                <i
-                                  className="bi bi-download text-primary"
-                                  style={{ cursor: 'pointer' }}
-                                  onClick={() => handleDownload(selectedEmployee.aadhaarCard, `${selectedEmployee.employeeName}_aadhaar${selectedEmployee.aadhaarCard.substr(selectedEmployee.aadhaarCard.lastIndexOf('.'))}`)}
-                                  title="Download Aadhaar Card"
-                                ></i>
-                              </div>
-                              <div className="col-3 text-center">
-                                <i
-                                  className="bi bi-trash text-danger"
-                                  style={{ cursor: 'pointer' }}
-                                  onClick={() => handleDocumentDelete(selectedEmployee._id, 'aadhaarCard')}
-                                  title="Delete Aadhaar Card"
-                                ></i>
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="text-muted">No Aadhaar card uploaded</p>
-                          )}
-                        </div>
-
-                        <div className="col-12">
-                          <h6 className="border-bottom pb-2">PAN Card</h6>
-                          {selectedEmployee.panCard ? (
-                            <div className="row align-items-center g-2">
-                              <div className="col-6">
-                                {selectedEmployee.panCard.toLowerCase().endsWith('.pdf') ? (
-                                  <a href="#" onClick={(e) => handleFileClick(
-                                    e,
-                                    `${import.meta.env.VITE_BASE_URL}${selectedEmployee.panCard.replace('uploads/', '')}`,
-                                    'pdf',
-                                    selectedEmployee.employeeName
-                                  )}>View</a>
-                                ) : (
-                                  <img
-                                    src={`${import.meta.env.VITE_BASE_URL}${selectedEmployee.panCard.replace('uploads/', '')}`}
-                                    alt=""
-                                    className="avatar sm img-thumbnail shadow-sm"
-                                    onClick={(e) => handleFileClick(
-                                      e,
-                                      `${import.meta.env.VITE_BASE_URL}${selectedEmployee.panCard.replace('uploads/', '')}`,
-                                      'image',
-                                      selectedEmployee.employeeName
-                                    )}
-                                    style={{ cursor: 'pointer' }}
-                                  />
-                                )}
-                              </div>
-                              <div className="col-3 text-center">
-                                <i
-                                  className="bi bi-download text-primary"
-                                  style={{ cursor: 'pointer' }}
-                                  onClick={() => handleDownload(selectedEmployee.panCard, `${selectedEmployee.employeeName}_pan${selectedEmployee.panCard.substr(selectedEmployee.panCard.lastIndexOf('.'))}`)}
-                                  title="Download Pan Card"
-                                ></i>
-                              </div>
-                              <div className="col-3 text-center">
-                                <i
-                                  className="bi bi-trash text-danger"
-                                  style={{ cursor: 'pointer' }}
-                                  onClick={() => handleDocumentDelete(selectedEmployee._id, 'panCard')}
-                                  title="Delete Pan Card"
-                                ></i>
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="text-muted">No PAN card uploaded</p>
-                          )}
+            <div className="modal-footer" style={{
+              borderTop: '1px solid rgba(255, 105, 180, 0.1)',
+              padding: '16px 25px',
+              display: 'flex',
+              justifyContent: 'center'
+            }}>
+              <button
+                type="button"
+                className="btn"
+                data-bs-dismiss="modal"
+                style={{
+                  backgroundColor: 'rgba(255, 94, 0, 0.1)',
+                  color: '#ff5e00',
+                  border: '1px solid rgba(255, 94, 0, 0.3)',
+                  borderRadius: '8px',
+                  padding: '8px 20px',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.2)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
+                }}
+              >
+                <i className="icofont-close-circled me-2"></i>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Social Media Modal */}
+      <div
+        className="modal fade"
+        id="socialMediaModal"
+        tabIndex={-1}
+        aria-hidden="true"
+        style={{ zIndex: 9999 }}
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content" style={{
+            borderRadius: '15px',
+            border: 'none',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+            overflow: 'hidden'
+          }}>
+            <div className="modal-header" style={{
+              background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+              borderBottom: 'none',
+              padding: '20px 25px',
+              position: 'relative'
+            }}>
+              <h5 className="modal-title fw-bold" style={{ color: 'white', fontSize: '18px', fontWeight: 700 }}>
+                <i className="bi bi-share-fill me-2"></i>
+                {selectedEmployee?.employeeName || 'Employee'}'s Social Media Links
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  borderRadius: '50%',
+                  padding: '8px',
+                  opacity: '1',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                  e.currentTarget.style.transform = 'rotate(90deg)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                  e.currentTarget.style.transform = 'rotate(0deg)';
+                }}
+              />
+            </div>
+            <div className="modal-body" style={{ padding: '25px' }}>
+              <div className="row g-3">
+                {/* LinkedIn */}
+                {selectedEmployee?.socialLinks?.linkedin && (
+                  <div className="col-md-6 col-lg-4">
+                    <div className="social-link-item p-3 border rounded h-100" style={{
+                      backgroundColor: 'rgba(0, 119, 181, 0.05)',
+                      border: '1px solid rgba(0, 119, 181, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(0, 119, 181, 0.1)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(0, 119, 181, 0.05)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}>
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-linkedin fs-4 me-3" style={{ color: '#0077b5' }}></i>
+                        <div className="flex-grow-1">
+                          <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>LinkedIn</div>
+                          <div className="d-flex align-items-center">
+                            <a 
+                              href={selectedEmployee.socialLinks.linkedin} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-decoration-none"
+                              style={{ color: '#0077b5', fontSize: '13px' }}
+                            >
+                              View Profile
+                            </a>
+                            <i
+                              className="bi bi-clipboard cursor-pointer ms-2"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.socialLinks.linkedin);
+                                toast.success('LinkedIn URL copied!');
+                              }}
+                              title="Copy LinkedIn URL"
+                              style={{ color: '#0077b5', fontSize: '14px' }}
+                            ></i>
+                          </div>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
-                  <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                )}
+
+                {/* Instagram */}
+                {selectedEmployee?.socialLinks?.instagram && (
+                  <div className="col-md-6 col-lg-4">
+                    <div className="social-link-item p-3 border rounded h-100" style={{
+                      backgroundColor: 'rgba(225, 48, 108, 0.05)',
+                      border: '1px solid rgba(225, 48, 108, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(225, 48, 108, 0.1)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(225, 48, 108, 0.05)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}>
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-instagram fs-4 me-3" style={{ color: '#e1306c' }}></i>
+                        <div className="flex-grow-1">
+                          <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>Instagram</div>
+                          <div className="d-flex align-items-center">
+                            <a 
+                              href={selectedEmployee.socialLinks.instagram} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-decoration-none"
+                              style={{ color: '#e1306c', fontSize: '13px' }}
+                            >
+                              View Profile
+                            </a>
+                            <i
+                              className="bi bi-clipboard cursor-pointer ms-2"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.socialLinks.instagram);
+                                toast.success('Instagram URL copied!');
+                              }}
+                              title="Copy Instagram URL"
+                              style={{ color: '#e1306c', fontSize: '14px' }}
+                            ></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {/* YouTube */}
+                {selectedEmployee?.socialLinks?.youtube && (
+                  <div className="col-md-6 col-lg-4">
+                    <div className="social-link-item p-3 border rounded h-100" style={{
+                      backgroundColor: 'rgba(255, 0, 0, 0.05)',
+                      border: '1px solid rgba(255, 0, 0, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 0, 0, 0.05)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}>
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-youtube fs-4 me-3" style={{ color: '#ff0000' }}></i>
+                        <div className="flex-grow-1">
+                          <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>YouTube</div>
+                          <div className="d-flex align-items-center">
+                            <a 
+                              href={selectedEmployee.socialLinks.youtube} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-decoration-none"
+                              style={{ color: '#ff0000', fontSize: '13px' }}
+                            >
+                              View Channel
+                            </a>
+                            <i
+                              className="bi bi-clipboard cursor-pointer ms-2"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.socialLinks.youtube);
+                                toast.success('YouTube URL copied!');
+                              }}
+                              title="Copy YouTube URL"
+                              style={{ color: '#ff0000', fontSize: '14px' }}
+                            ></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Facebook */}
+                {selectedEmployee?.socialLinks?.facebook && (
+                  <div className="col-md-6 col-lg-4">
+                    <div className="social-link-item p-3 border rounded h-100" style={{
+                      backgroundColor: 'rgba(66, 103, 178, 0.05)',
+                      border: '1px solid rgba(66, 103, 178, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(66, 103, 178, 0.1)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(66, 103, 178, 0.05)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}>
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-facebook fs-4 me-3" style={{ color: '#4267b2' }}></i>
+                        <div className="flex-grow-1">
+                          <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>Facebook</div>
+                          <div className="d-flex align-items-center">
+                            <a 
+                              href={selectedEmployee.socialLinks.facebook} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-decoration-none"
+                              style={{ color: '#4267b2', fontSize: '13px' }}
+                            >
+                              View Profile
+                            </a>
+                            <i
+                              className="bi bi-clipboard cursor-pointer ms-2"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.socialLinks.facebook);
+                                toast.success('Facebook URL copied!');
+                              }}
+                              title="Copy Facebook URL"
+                              style={{ color: '#4267b2', fontSize: '14px' }}
+                            ></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* GitHub */}
+                {selectedEmployee?.socialLinks?.github && (
+                  <div className="col-md-6 col-lg-4">
+                    <div className="social-link-item p-3 border rounded h-100" style={{
+                      backgroundColor: 'rgba(36, 41, 46, 0.05)',
+                      border: '1px solid rgba(36, 41, 46, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(36, 41, 46, 0.1)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(36, 41, 46, 0.05)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}>
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-github fs-4 me-3" style={{ color: '#24292e' }}></i>
+                        <div className="flex-grow-1">
+                          <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>GitHub</div>
+                          <div className="d-flex align-items-center">
+                            <a 
+                              href={selectedEmployee.socialLinks.github} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-decoration-none"
+                              style={{ color: '#24292e', fontSize: '13px' }}
+                            >
+                              View Profile
+                            </a>
+                            <i
+                              className="bi bi-clipboard cursor-pointer ms-2"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.socialLinks.github);
+                                toast.success('GitHub URL copied!');
+                              }}
+                              title="Copy GitHub URL"
+                              style={{ color: '#24292e', fontSize: '14px' }}
+                            ></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Website */}
+                {selectedEmployee?.socialLinks?.website && (
+                  <div className="col-md-6 col-lg-4">
+                    <div className="social-link-item p-3 border rounded h-100" style={{
+                      backgroundColor: 'rgba(52, 152, 219, 0.05)',
+                      border: '1px solid rgba(52, 152, 219, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(52, 152, 219, 0.1)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(52, 152, 219, 0.05)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}>
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-globe fs-4 me-3" style={{ color: '#3498db' }}></i>
+                        <div className="flex-grow-1">
+                          <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>Website</div>
+                          <div className="d-flex align-items-center">
+                            <a 
+                              href={selectedEmployee.socialLinks.website} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-decoration-none"
+                              style={{ color: '#3498db', fontSize: '13px' }}
+                            >
+                              Visit Website
+                            </a>
+                            <i
+                              className="bi bi-clipboard cursor-pointer ms-2"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.socialLinks.website);
+                                toast.success('Website URL copied!');
+                              }}
+                              title="Copy Website URL"
+                              style={{ color: '#3498db', fontSize: '14px' }}
+                            ></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Other */}
+                {selectedEmployee?.socialLinks?.other && (
+                  <div className="col-md-6 col-lg-4">
+                    <div className="social-link-item p-3 border rounded h-100" style={{
+                      backgroundColor: 'rgba(155, 89, 182, 0.05)',
+                      border: '1px solid rgba(155, 89, 182, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(155, 89, 182, 0.1)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(155, 89, 182, 0.05)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}>
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-link-45deg fs-4 me-3" style={{ color: '#9b59b6' }}></i>
+                        <div className="flex-grow-1">
+                          <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>Other Link</div>
+                          <div className="d-flex align-items-center">
+                            <a 
+                              href={selectedEmployee.socialLinks.other} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-decoration-none"
+                              style={{ color: '#9b59b6', fontSize: '13px' }}
+                            >
+                              Visit Link
+                            </a>
+                            <i
+                              className="bi bi-clipboard cursor-pointer ms-2"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedEmployee.socialLinks.other);
+                                toast.success('Other URL copied!');
+                              }}
+                              title="Copy Other URL"
+                              style={{ color: '#9b59b6', fontSize: '14px' }}
+                            ></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* Show message if no social media links */}
+              {(!selectedEmployee?.socialLinks?.linkedin && 
+                !selectedEmployee?.socialLinks?.instagram && 
+                !selectedEmployee?.socialLinks?.youtube && 
+                !selectedEmployee?.socialLinks?.facebook && 
+                !selectedEmployee?.socialLinks?.github && 
+                !selectedEmployee?.socialLinks?.website && 
+                !selectedEmployee?.socialLinks?.other) && (
+                <div className="text-center mt-4">
+                  <i className="bi bi-share-fill display-4 text-muted mb-3" style={{ fontSize: '3rem' }}></i>
+                  <p className="text-muted mb-0" style={{ fontSize: '16px' }}>
+                    No social media links added yet
+                  </p>
+                  <p className="text-muted mt-2" style={{ fontSize: '14px' }}>
+                    Social media links can be added when editing the employee profile
+                  </p>
+                </div>
+              )}
             </div>
-
-          </>
+            <div className="modal-footer" style={{
+              borderTop: '1px solid rgba(255, 105, 180, 0.1)',
+              padding: '16px 25px',
+              display: 'flex',
+              justifyContent: 'center'
+            }}>
+              <button
+                type="button"
+                className="btn"
+                data-bs-dismiss="modal"
+                style={{
+                  backgroundColor: 'rgba(255, 94, 0, 0.1)',
+                  color: '#ff5e00',
+                  border: '1px solid rgba(255, 94, 0, 0.3)',
+                  borderRadius: '8px',
+                  padding: '8px 20px',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.2)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
+                }}
+              >
+                <i className="icofont-close-circled me-2"></i>
+                Close
+              </button>
+            </div>
+          </div>
         </div>
-        <ToastContainer />
-        <FloatingMenu userType="admin" isMobile={isMobile} />
       </div>
-      <style>
-        {`
-          .arrow-link {
-  display: inline-block;
-  transition: transform 0.2s ease;
-}
-
-.arrow-link:hover {
-  transform: translateX(5px);
-}
-
-.bank-info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.bank-info-item:hover {
-  background-color: #f8f9fa;
-}
-        `}
-      </style>
     </>
   );
 };
