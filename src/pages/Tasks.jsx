@@ -9,8 +9,6 @@ import "./Loading.css";
 import Select from 'react-select';
 import io from 'socket.io-client';
 import FloatingMenu from '../Chats/FloatingMenu'
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Tasks = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
