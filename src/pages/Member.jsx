@@ -417,6 +417,18 @@ const Member = () => {
     }
   };
 
+  const getInitials = (name) => {
+    if (!name) return 'E';
+    const words = name.trim().split(' ');
+    if (words.length === 1) {
+      return words[0].charAt(0).toUpperCase();
+    }
+    return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+  };
+  
+  // State to track broken images
+  const [brokenImages, setBrokenImages] = useState({});
+
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const handleEditClick = (employee) => {
@@ -945,27 +957,46 @@ const Member = () => {
                                       backgroundColor: 'white',
                                       boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)'
                                     }}>
-                                      <img
-                                        src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
-                                        alt={employee.employeeName}
-                                        style={{
+                                      {(!employee.employeeImage || brokenImages[employee._id]) ? (
+                                        <div style={{
                                           width: '100%',
                                           height: '100%',
-                                          objectFit: 'cover',
-                                          transition: 'transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1)',
-                                          cursor: 'pointer'
+                                          background: '#ff69b4',
+                                          color: 'white',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          fontWeight: '700',
+                                          fontSize: '28px',
                                         }}
-                                        onMouseEnter={(e) => {
-                                          e.target.style.transform = 'scale(1.2) rotate(3deg)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                          e.target.style.transform = 'scale(1) rotate(0deg)';
-                                        }}
-                                        onClick={() => handleImageClick(
-                                          `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
-                                          employee.employeeName
-                                        )}
-                                      />
+                                          title={employee.employeeName}
+                                        >
+                                          {getInitials(employee.employeeName)}
+                                        </div>
+                                      ) : (
+                                        <img
+                                          src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
+                                          alt={employee.employeeName}
+                                          style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                            transition: 'transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1)',
+                                            cursor: 'pointer'
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            e.target.style.transform = 'scale(1.2) rotate(3deg)';
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            e.target.style.transform = 'scale(1) rotate(0deg)';
+                                          }}
+                                          onClick={() => handleImageClick(
+                                            `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
+                                            employee.employeeName
+                                          )}
+                                          onError={() => setBrokenImages(prev => ({ ...prev, [employee._id]: true }))}
+                                        />
+                                      )}
                                     </div>
                                   </div>
 
@@ -1585,23 +1616,44 @@ const Member = () => {
                                         borderBottom: '1px solid rgba(0,0,0,0.05)'
                                       }}>
                                         <div className="d-flex align-items-center gap-3">
-                                          <img
-                                            src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
-                                            alt={employee.employeeName}
-                                            className="rounded-circle"
-                                            style={{
-                                              width: '40px',
-                                              height: '40px',
-                                              objectFit: 'cover',
-                                              border: '2px solid #ff69b4',
-                                              padding: '2px',
-                                              cursor: 'pointer'
-                                            }}
-                                            onClick={() => handleImageClick(
-                                              `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
-                                              employee.employeeName
-                                            )}
-                                          />
+                                          {(!employee.employeeImage || brokenImages[employee._id]) ? (
+                                            <div
+                                              className="rounded-circle"
+                                              style={{
+                                                width: '40px',
+                                                height: '40px',
+                                                background: '#ff69b4',
+                                                color: 'white',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontWeight: '700',
+                                                fontSize: '18px',
+                                              }}
+                                              title={employee.employeeName}
+                                            >
+                                              {getInitials(employee.employeeName)}
+                                            </div>
+                                          ) : (
+                                            <img
+                                              src={`${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`}
+                                              alt={employee.employeeName}
+                                              className="rounded-circle"
+                                              style={{
+                                                width: '40px',
+                                                height: '40px',
+                                                objectFit: 'cover',
+                                                border: '2px solid #ff69b4',
+                                                padding: '2px',
+                                                cursor: 'pointer'
+                                              }}
+                                              onClick={() => handleImageClick(
+                                                `${import.meta.env.VITE_BASE_URL}${employee.employeeImage}`,
+                                                employee.employeeName
+                                              )}
+                                              onError={() => setBrokenImages(prev => ({ ...prev, [employee._id]: true }))}
+                                            />
+                                          )}
                                           <div>
                                             <div style={{
                                               fontWeight: '600',

@@ -7,6 +7,15 @@ import "react-toastify/dist/ReactToastify.css";
 import "./Loading.css"
 import FloatingMenu from '../Chats/FloatingMenu'
 
+// Helper function to get initials from client name
+const getInitials = (name) => {
+    if (!name) return 'C';
+    const words = name.trim().split(' ');
+    if (words.length === 1) {
+        return words[0].charAt(0).toUpperCase();
+    }
+    return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+};
 
 const Client = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -474,6 +483,9 @@ const Client = () => {
         }
     };
 
+    // State to track broken images
+    const [brokenImages, setBrokenImages] = useState({});
+
     return (
         <>
             <div id="mytask-layout">
@@ -686,22 +698,44 @@ const Client = () => {
                                                                         backgroundColor: 'white',
                                                                         boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)'
                                                                     }}>
-                                                                        <img
-                                                                            src={`${import.meta.env.VITE_BASE_URL}${client.clientImage}`}
-                                                                            alt={client.clientName}
-                                                                            style={{
+                                                                        {(!client.clientImage || brokenImages[client._id]) ? (
+                                                                            <div style={{
                                                                                 width: '100%',
                                                                                 height: '100%',
-                                                                                objectFit: 'cover',
-                                                                                transition: 'transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1)'
+                                                                                // borderRadius: '16px',
+                                                                                background: '#ff69b4',
+                                                                                color: 'white',
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                justifyContent: 'center',
+                                                                                fontWeight: '700',
+                                                                                fontSize: '28px',
+                                                                                // border: '3px solid #ff69b4',
+                                                                                // boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)'
                                                                             }}
-                                                                            onMouseEnter={(e) => {
-                                                                                e.target.style.transform = 'scale(1.2) rotate(3deg)';
-                                                                            }}
-                                                                            onMouseLeave={(e) => {
-                                                                                e.target.style.transform = 'scale(1) rotate(0deg)';
-                                                                            }}
-                                                                        />
+                                                                              title={client.clientName}
+                                                                            >
+                                                                              {getInitials(client.clientName)}
+                                                                            </div>
+                                                                        ) : (
+                                                                            <img
+                                                                                src={`${import.meta.env.VITE_BASE_URL}${client.clientImage}`}
+                                                                                alt={client.clientName}
+                                                                                style={{
+                                                                                    width: '100%',
+                                                                                    height: '100%',
+                                                                                    objectFit: 'cover',
+                                                                                    transition: 'transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1)'
+                                                                                }}
+                                                                                onMouseEnter={(e) => {
+                                                                                    e.target.style.transform = 'scale(1.2) rotate(3deg)';
+                                                                                }}
+                                                                                onMouseLeave={(e) => {
+                                                                                    e.target.style.transform = 'scale(1) rotate(0deg)';
+                                                                                }}
+                                                                                onError={() => setBrokenImages(prev => ({ ...prev, [client._id]: true }))}
+                                                                            />
+                                                                        )}
                                                                     </div>
                                                                 </div>
 
@@ -1042,18 +1076,37 @@ const Client = () => {
                                                                             borderBottom: '1px solid rgba(0,0,0,0.05)'
                                                                         }}>
                                                                             <div className="d-flex align-items-center gap-3">
-                                                                                <img
-                                                                                    src={`${import.meta.env.VITE_BASE_URL}${client.clientImage}`}
-                                                                                    alt={client.clientName}
-                                                                                    className="rounded-circle"
-                                                                                    style={{
-                                                                                        width: '40px',
-                                                                                        height: '40px',
-                                                                                        objectFit: 'cover',
-                                                                                        border: '2px solid #ff69b4',
-                                                                                        padding: '2px'
-                                                                                    }}
-                                                                                />
+                                                                                {(!client.clientImage || brokenImages[client._id]) ? (
+                                                                                    <div className="rounded-circle d-flex align-items-center justify-content-center"
+                                                                                        style={{
+                                                                                            width: '40px',
+                                                                                            height: '40px',
+                                                                                            background: '#ff69b4',
+                                                                                            color: 'white',
+                                                                                            fontWeight: '700',
+                                                                                            fontSize: '20px',
+                                                                                            border: '2px solid #ff69b4',
+                                                                                            userSelect: 'none',
+                                                                                        }}
+                                                                                        title={client.clientName}
+                                                                                    >
+                                                                                        {getInitials(client.clientName)}
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <img
+                                                                                        src={`${import.meta.env.VITE_BASE_URL}${client.clientImage}`}
+                                                                                        alt={client.clientName}
+                                                                                        className="rounded-circle"
+                                                                                        style={{
+                                                                                            width: '40px',
+                                                                                            height: '40px',
+                                                                                            objectFit: 'cover',
+                                                                                            border: '2px solid #ff69b4',
+                                                                                            padding: '2px'
+                                                                                        }}
+                                                                                        onError={() => setBrokenImages(prev => ({ ...prev, [client._id]: true }))}
+                                                                                    />
+                                                                                )}
                                                                                 <div>
                                                                                     <div style={{
                                                                                         fontWeight: '600',

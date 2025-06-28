@@ -812,6 +812,30 @@ const Project = () => {
     return luminance > 0.5 ? '#000000' : '#ffffff';
   };
 
+  // Helper function to generate initials from project name
+  const getInitials = (name) => {
+    if (!name) return 'P';
+    const words = name.trim().split(' ');
+    if (words.length === 1) {
+      return words[0].charAt(0).toUpperCase();
+    }
+    return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+  };
+
+  // Helper function to generate a consistent color based on project name
+  const getProjectColor = (name) => {
+    if (!name) return '#1e40af';
+    const colors = [
+      '#1e40af', '#ff8a00', '#fc6db2', '#007bff', '#6f42c1', 
+      '#e83e8c', '#fd7e14', '#20c997', '#17a2b8', '#6c757d'
+    ];
+    const hash = name.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   // Add these state declarations for the image modal
   const [selectedImages, setSelectedImages] = useState([]);
   const [selectedImageTitle, setSelectedImageTitle] = useState('');
@@ -852,6 +876,9 @@ const Project = () => {
   const startPage = Math.floor((currentPage - 1) / pageLimit) * pageLimit + 1;
   const endPage = Math.min(startPage + pageLimit - 1, totalPages);
 
+  // State at the top of your component
+  const [brokenIcons, setBrokenIcons] = useState({});
+
   return (
     <>
       <div id="mytask-layout">
@@ -868,7 +895,7 @@ const Project = () => {
                 <div className="row align-items-center">
                   <div className="border-bottom mb-4">
                     <div className="card-header py-4 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between" style={{
-                      borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                      borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                       backgroundColor: 'transparent',
                       padding: '0 0 20px 0'
                     }}>
@@ -886,7 +913,7 @@ const Project = () => {
                           transform: 'translateY(-50%)',
                           width: '5px',
                           height: '24px',
-                          background: 'linear-gradient(to bottom, #ff8a00, #ff5e00)',
+                          background: 'linear-gradient(to bottom, #4169e1, #1e40af)',
                           borderRadius: '3px'
                         }}></span>
                         Projects
@@ -899,23 +926,23 @@ const Project = () => {
                           data-bs-toggle="modal"
                           data-bs-target="#createproject"
                           style={{
-                            background: 'linear-gradient(135deg, #52b447, #429938)',
+                            background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
                             color: 'white',
                             border: 'none',
                             borderRadius: '8px',
                             padding: '10px 18px',
                             fontWeight: '600',
-                            boxShadow: '0 4px 10px rgba(82, 180, 71, 0.2)',
+                            boxShadow: '0 4px 10px rgba(65, 105, 225, 0.2)',
                             transition: 'all 0.2s ease',
                             fontSize: '14px'
                           }}
                           onMouseOver={(e) => {
                             e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 12px rgba(82, 180, 71, 0.3)';
+                            e.currentTarget.style.boxShadow = '0 6px 12px rgba(65, 105, 225, 0.3)';
                           }}
                           onMouseOut={(e) => {
                             e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 10px rgba(82, 180, 71, 0.2)';
+                            e.currentTarget.style.boxShadow = '0 4px 10px rgba(65, 105, 225, 0.2)';
                           }}
                         >
                           <i className="icofont-plus-circle me-2" style={{ fontSize: '16px' }} />
@@ -944,7 +971,7 @@ const Project = () => {
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "All" ? 'white' : '#666',
-                                background: activeTab === "All" ? 'linear-gradient(135deg, #ff8a00, #ff5e00)' : 'transparent',
+                                background: activeTab === "All" ? 'linear-gradient(135deg, #4169e1, #1e40af)' : 'transparent',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
@@ -967,7 +994,7 @@ const Project = () => {
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "In Progress" ? 'white' : '#666',
-                                background: activeTab === "In Progress" ? 'linear-gradient(135deg, #ff8a00, #ff5e00)' : 'transparent',
+                                background: activeTab === "In Progress" ? 'linear-gradient(135deg, #4169e1, #1e40af)' : 'transparent',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
@@ -992,7 +1019,7 @@ const Project = () => {
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "Completed" ? 'white' : '#666',
-                                background: activeTab === "Completed" ? 'linear-gradient(135deg, #52b447, #429938)' : 'transparent',
+                                background: activeTab === "Completed" ? 'linear-gradient(135deg, #ff70b4, #ff69b4)' : 'transparent',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
@@ -1034,25 +1061,25 @@ const Project = () => {
                       {filteredEmployeeName && (
                         <div className="d-flex align-items-center mb-3 mb-md-0 mx-auto">
                           <div style={{
-                            backgroundColor: 'rgba(255, 138, 0, 0.1)',
+                            backgroundColor: 'rgba(65, 105, 225, 0.1)',
                             padding: '8px 15px',
                             borderRadius: '8px',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '10px'
                           }}>
-                            <i className="icofont-filter" style={{ color: '#ff5e00', fontSize: '16px' }}></i>
+                            <i className="icofont-filter" style={{ color: '#4169e1', fontSize: '16px' }}></i>
                             <span style={{ 
                               fontWeight: '600', 
                               color: '#333',
                               fontSize: '14px'
-                            }}>Projects for: <span style={{ color: '#ff5e00' }}>{filteredEmployeeName}</span></span>
+                            }}>Projects for: <span style={{ color: '#4169e1' }}>{filteredEmployeeName}</span></span>
                           <button
                             type="button"
                               className="btn"
                             onClick={clearFilter}
                               style={{
-                                backgroundColor: '#ff5e00',
+                                backgroundColor: '#4169e1',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '6px',
@@ -1065,10 +1092,10 @@ const Project = () => {
                                 transition: 'all 0.2s ease'
                               }}
                               onMouseOver={(e) => {
-                                e.currentTarget.style.backgroundColor = '#e65500';
+                                e.currentTarget.style.backgroundColor = '#1e40af';
                               }}
                               onMouseOut={(e) => {
-                                e.currentTarget.style.backgroundColor = '#ff5e00';
+                                e.currentTarget.style.backgroundColor = '#4169e1';
                               }}
                             >
                               <i className="icofont-close-line"></i>
@@ -1093,7 +1120,7 @@ const Project = () => {
                             value={searchTerm}
                             onChange={handleSearch}
                             style={{
-                              border: '1px solid rgba(82, 180, 71, 0.2)',
+                              border: '1px solid rgba(65, 105, 225, 0.2)',
                               borderRight: 'none',
                               padding: '10px 15px',
                               fontSize: '14px',
@@ -1106,7 +1133,7 @@ const Project = () => {
                             className="input-group-text"
                             id="addon-wrapping"
                             style={{
-                              backgroundColor: '#52b447',
+                              backgroundColor: '#4169e1',
                               border: 'none',
                               color: 'white',
                               padding: '0 15px',
@@ -1138,7 +1165,7 @@ const Project = () => {
                           overflow: 'hidden'
                         }}>
                           <div className="card-body" style={{ padding: '0' }}>
-                            {/* Desktop view - with orange and green theme */}
+                            {/* Desktop view - with blue and pink theme */}
                             <table className="table align-middle mb-0 d-none d-md-table" style={{ 
                               width: "100%",
                               borderCollapse: 'separate',
@@ -1150,7 +1177,7 @@ const Project = () => {
                                     padding: '16px 15px',
                                     fontWeight: '600',
                                     color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                     textAlign: 'center',
                                     fontSize: '14px'
                                   }}>Sr.No.</th>
@@ -1158,14 +1185,14 @@ const Project = () => {
                                     padding: '16px 15px',
                                     fontWeight: '600',
                                     color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                     fontSize: '14px'
                                   }}>Project Name</th>
                                   <th style={{
                                     padding: '16px 15px',
                                     fontWeight: '600',
                                     color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                     width: "6rem",
                                     fontSize: '14px'
                                   }}>Client</th>
@@ -1173,35 +1200,35 @@ const Project = () => {
                                     padding: '16px 15px',
                                     fontWeight: '600',
                                     color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                     fontSize: '14px'
                                   }}>Start Date</th>
                                   <th style={{
                                     padding: '16px 15px',
                                     fontWeight: '600',
                                     color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                     fontSize: '14px'
                                   }}>End Date</th>
                                   <th style={{
                                     padding: '16px 15px',
                                     fontWeight: '600',
                                     color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                     fontSize: '14px'
                                   }}>Employees</th>
                                   <th style={{
                                     padding: '16px 15px',
                                     fontWeight: '600',
                                     color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                     fontSize: '14px'
                                   }}>Progress</th>
                                   <th style={{
                                     padding: '16px 15px',
                                     fontWeight: '600',
                                     color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                    borderBottom: '2px solid rgba(65, 105, 225, 0.2)',
                                     textAlign: 'center',
                                     fontSize: '14px'
                                   }}>Actions</th>
@@ -1254,7 +1281,7 @@ const Project = () => {
                                       style={{
                                         transition: 'background 0.2s ease',
                                       }}
-                                      onMouseOver={(e) => e.currentTarget.style.background = 'rgba(82, 180, 71, 0.04)'}
+                                      onMouseOver={(e) => e.currentTarget.style.background = 'rgba(65, 105, 225, 0.04)'}
                                       onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                                     >
                                       <td style={{
@@ -1263,7 +1290,7 @@ const Project = () => {
                                         textAlign: 'center'
                                       }}>
                                         <span style={{ 
-                                          background: 'linear-gradient(135deg, #ff8a00, #ff5e00)',
+                                          background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                                           color: 'white', 
                                           borderRadius: '50%',
                                           width: '30px',
@@ -1273,7 +1300,7 @@ const Project = () => {
                                           justifyContent: 'center',
                                           fontWeight: '600',
                                           fontSize: '14px',
-                                          boxShadow: '0 2px 5px rgba(255, 138, 0, 0.3)'
+                                          boxShadow: '0 2px 5px rgba(65, 105, 225, 0.3)'
                                         }}>
                                           {index + 1}
                                         </span>
@@ -1284,7 +1311,25 @@ const Project = () => {
                                       }}>
                                         <div className="d-flex gap-2 align-items-center">
                                           <div className="d-flex align-items-center">
-                                            {project.projectIcon && (
+                                            {(!project.projectIcon || brokenIcons[project._id || project.id]) ? (
+                                              <div
+                                                className="me-2 rounded-circle d-flex align-items-center justify-content-center"
+                                                style={{
+                                                  width: '36px', // ya 32px for card
+                                                  height: '36px', // ya 32px for card
+                                                  background: getProjectColor(project.projectName),
+                                                  color: getContrastColor(getProjectColor(project.projectName)),
+                                                  fontWeight: '700',
+                                                  fontSize: '18px',
+                                                  border: '2px solid #4169e1',
+                                                  cursor: 'default',
+                                                  userSelect: 'none',
+                                                }}
+                                                title={project.projectName}
+                                              >
+                                                {getInitials(project.projectName)}
+                                              </div>
+                                            ) : (
                                               <img
                                                 src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon}`}
                                                 alt="Project Icon"
@@ -1294,7 +1339,7 @@ const Project = () => {
                                                   height: '36px',
                                                   objectFit: 'cover',
                                                   cursor: 'pointer',
-                                                  border: '2px solid #52b447',
+                                                  border: '2px solid #4169e1',
                                                   padding: '2px',
                                                   backgroundColor: 'white'
                                                 }}
@@ -1304,6 +1349,7 @@ const Project = () => {
                                                   const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
                                                   modal.show();
                                                 }}
+                                                onError={() => setBrokenIcons(prev => ({ ...prev, [project._id || project.id]: true }))}
                                               />
                                             )}
                                             <div>
@@ -1315,7 +1361,7 @@ const Project = () => {
                                                 fontSize: '15px'
                                               }} 
                                               state={{ projectName: project.projectName }}
-                                              onMouseOver={(e) => e.currentTarget.style.color = '#52b447'}
+                                              onMouseOver={(e) => e.currentTarget.style.color = '#4169e1'}
                                               onMouseOut={(e) => e.currentTarget.style.color = '#333'}>
                                               {project.projectName}
                                             </Link>
@@ -1323,7 +1369,7 @@ const Project = () => {
                                                 fontSize: '12px',
                                                 color: '#777'
                                               }}>
-                                                <i className="icofont-clock-time me-1" style={{ color: '#52b447' }}></i>
+                                                <i className="icofont-clock-time me-1" style={{ color: '#4169e1' }}></i>
                                                 {getFormattedDate(project.projectDate, true)}
                                               </div>
                                             </div>
@@ -1333,12 +1379,12 @@ const Project = () => {
                                             <button
                                               className="btn"
                                               style={{
-                                                color: '#52b447',
+                                                color: '#4169e1',
                                                 padding: '5px',
                                                 borderRadius: '50%',
                                                 transition: 'all 0.2s',
                                                 border: 'none',
-                                                backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                                                backgroundColor: 'rgba(65, 105, 225, 0.1)',
                                                 width: '30px',
                                                 height: '30px',
                                                 display: 'inline-flex',
@@ -1347,10 +1393,10 @@ const Project = () => {
                                               }}
                                               onClick={() => handleOpenProjectImages(project)}
                                               onMouseOver={(e) => {
-                                                e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                                e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)';
                                               }}
                                               onMouseOut={(e) => {
-                                                e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                                e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.1)';
                                               }}
                                             >
                                               <i className="icofont-attachment" style={{ fontSize: '14px' }} />
@@ -1370,8 +1416,8 @@ const Project = () => {
                                               data-bs-toggle="dropdown" 
                                               aria-expanded="false"
                                               style={{
-                                                backgroundColor: 'rgba(255, 138, 0, 0.1)',
-                                                color: '#ff5e00',
+                                                backgroundColor: 'rgba(255, 105, 180, 0.1)',
+                                                color: '#ff69b4',
                                                 borderRadius: '6px',
                                                 padding: '6px 12px',
                                                 fontSize: '13px',
@@ -1389,16 +1435,16 @@ const Project = () => {
                                               padding: '10px',
                                               borderRadius: '8px',
                                               boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-                                              border: '1px solid rgba(255, 138, 0, 0.2)',
+                                              border: '1px solid rgba(255, 105, 180, 0.2)',
                                               minWidth: '200px'
                                             }}>
                                               <li style={{
-                                                borderBottom: '1px solid rgba(255, 138, 0, 0.1)',
+                                                borderBottom: '1px solid rgba(255, 105, 180, 0.1)',
                                                 paddingBottom: '8px',
                                                 marginBottom: '8px'
                                               }}>
                                                 <div style={{
-                                                  color: '#ff5e00',
+                                                  color: '#ff69b4',
                                                   fontWeight: '600',
                                                   fontSize: '13px',
                                                   display: 'flex',
@@ -1412,7 +1458,7 @@ const Project = () => {
                                                 <li key={idx} style={{ marginBottom: '8px' }}>
                                                   <div className="d-flex align-items-center">
                                                     <i className="icofont-business-man" style={{ 
-                                                      color: '#ff5e00', 
+                                                      color: '#ff69b4', 
                                                       fontSize: '14px',
                                                       marginRight: '8px'
                                                     }}></i>
@@ -1438,10 +1484,10 @@ const Project = () => {
                                         borderBottom: '1px solid rgba(0,0,0,0.05)'
                                       }}>
                                         <div style={{
-                                          backgroundColor: 'rgba(255, 138, 0, 0.1)',
+                                          backgroundColor: 'rgba(65, 105, 225, 0.1)',
                                           padding: '6px 10px',
                                           borderRadius: '6px',
-                                          color: '#ff5e00',
+                                          color: '#4169e1',
                                           fontSize: '13px',
                                           fontWeight: '600',
                                           display: 'inline-block'
@@ -1455,10 +1501,10 @@ const Project = () => {
                                         borderBottom: '1px solid rgba(0,0,0,0.05)'
                                       }}>
                                         <div style={{
-                                          backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                                          backgroundColor: 'rgba(255, 105, 180, 0.1)',
                                           padding: '6px 10px',
                                           borderRadius: '6px',
-                                          color: '#52b447',
+                                          color: '#ff69b4',
                                           fontSize: '13px',
                                           fontWeight: '600',
                                           display: 'inline-block'
@@ -1479,8 +1525,8 @@ const Project = () => {
                                               data-bs-toggle="dropdown" 
                                               aria-expanded="false"
                                               style={{
-                                                backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                                color: '#52b447',
+                                                backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                                color: '#4169e1',
                                                 borderRadius: '6px',
                                                 padding: '6px 12px',
                                                 fontSize: '13px',
@@ -1498,16 +1544,16 @@ const Project = () => {
                                               padding: '10px',
                                               borderRadius: '8px',
                                               boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-                                              border: '1px solid rgba(82, 180, 71, 0.2)',
+                                              border: '1px solid rgba(65, 105, 225, 0.2)',
                                               minWidth: '200px'
                                             }}>
                                               <li style={{
-                                                borderBottom: '1px solid rgba(82, 180, 71, 0.1)',
+                                                borderBottom: '1px solid rgba(65, 105, 225, 0.1)',
                                                 paddingBottom: '8px',
                                                 marginBottom: '8px'
                                               }}>
                                                 <div style={{
-                                                  color: '#52b447',
+                                                  color: '#4169e1',
                                                   fontWeight: '600',
                                                   fontSize: '13px',
                                                   display: 'flex',
@@ -1521,7 +1567,7 @@ const Project = () => {
                                                 <li key={idx} style={{ marginBottom: '8px' }}>
                                                   <div className="d-flex align-items-center">
                                                     <i className="icofont-user-alt-5" style={{ 
-                                                      color: '#52b447', 
+                                                      color: '#4169e1', 
                                                       fontSize: '14px',
                                                       marginRight: '8px'
                                                     }}></i>
@@ -1548,9 +1594,9 @@ const Project = () => {
                                       }}>
                                         <div className="d-flex justify-content-center" style={{
                                           fontWeight: '600',
-                                          color: project.progress > 75 ? '#52b447' : 
-                                                 project.progress > 50 ? '#ff8a00' : 
-                                                 project.progress > 25 ? '#ff5e00' : '#dc3545',
+                                          color: project.progress > 75 ? '#1e40af' : 
+                                                 project.progress > 50 ? '#4169e1' : 
+                                                 project.progress > 25 ? '#ff69b4' : '#dc3545',
                                           marginBottom: '5px',
                                           fontSize: '14px'
                                         }}>
@@ -1567,8 +1613,8 @@ const Project = () => {
                                             style={{ 
                                               width: `${project.progress}%`,
                                               background: `linear-gradient(to right, 
-                                                ${project.progress > 75 ? '#52b447' : '#ff8a00'}, 
-                                                ${project.progress > 50 ? '#52b447' : '#ff5e00'}
+                                                ${project.progress > 75 ? '#1e40af' : '#4169e1'}, 
+                                                ${project.progress > 50 ? '#1e40af' : '#ff69b4'}
                                               )`,
                                               borderRadius: '4px',
                                               transition: 'width 0.5s ease'
@@ -1593,8 +1639,8 @@ const Project = () => {
                                           data-bs-target="#editproject"
                                             title="Edit Project"
                                             style={{
-                                              backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                              color: '#52b447',
+                                              backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                              color: '#4169e1',
                                               width: '32px',
                                               height: '32px',
                                               borderRadius: '50%',
@@ -1606,10 +1652,10 @@ const Project = () => {
                                               transition: 'all 0.2s ease'
                                             }}
                                             onMouseOver={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                              e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)';
                                             }}
                                             onMouseOut={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                              e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.1)';
                                             }}
                                           >
                                             <i className="icofont-edit"></i>
@@ -1621,8 +1667,8 @@ const Project = () => {
                                           data-bs-target="#deleteproject"
                                             title="Delete Project"
                                             style={{
-                                              backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                                              color: '#ff5e00',
+                                              backgroundColor: 'rgba(255, 105, 180, 0.1)',
+                                              color: '#ff69b4',
                                               width: '32px',
                                               height: '32px',
                                               borderRadius: '50%',
@@ -1637,10 +1683,10 @@ const Project = () => {
                                             setDeletableId(project._id);
                                           }}
                                             onMouseOver={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.2)';
+                                              e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.2)';
                                             }}
                                             onMouseOut={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
+                                              e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.1)';
                                             }}
                                           >
                                             <i className="icofont-ui-delete"></i>
@@ -1652,8 +1698,8 @@ const Project = () => {
                                           type="button"
                                             title="Messages"
                                             style={{
-                                              backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                              color: '#52b447',
+                                              backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                              color: '#4169e1',
                                               width: '32px',
                                               height: '32px',
                                               borderRadius: '50%',
@@ -1666,10 +1712,10 @@ const Project = () => {
                                             }}
                                           onClick={() => handleOpenMessages(project)}
                                             onMouseOver={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                              e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)';
                                             }}
                                             onMouseOut={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                              e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.1)';
                                             }}
                                           >
                                             <i className="icofont-ui-message"></i>
@@ -1678,7 +1724,7 @@ const Project = () => {
                                                 position: 'absolute',
                                                 top: '-5px',
                                                 right: '-5px',
-                                                backgroundColor: '#ff5e00',
+                                                backgroundColor: '#ff69b4',
                                                 color: 'white',
                                                 borderRadius: '50%',
                                                 width: '18px',
@@ -1688,7 +1734,7 @@ const Project = () => {
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 fontWeight: 'bold',
-                                                boxShadow: '0 2px 5px rgba(255, 94, 0, 0.3)'
+                                                boxShadow: '0 2px 5px rgba(255, 105, 180, 0.3)'
                                               }}>
                                               {notifications[project._id]}
                                             </span>
@@ -1875,105 +1921,153 @@ const Project = () => {
                                   style={{
                                     backgroundColor: '#ffffff',
                                     color: 'inherit',
-                                    height: '320px',
+                                    height: '340px',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    borderRadius: '12px',
-                                    boxShadow: '0 6px 15px rgba(0,0,0,0.05)',
+                                    borderRadius: '20px',
+                                    boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
                                     border: 'none',
                                     overflow: 'hidden',
                                     position: 'relative',
-                                    transition: 'transform 0.3s, box-shadow 0.3s'
+                                    transition: 'all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)'
                                   }}
                                   onMouseOver={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-5px)';
-                                    e.currentTarget.style.boxShadow = '0 12px 20px rgba(0,0,0,0.1)';
+                                    e.currentTarget.style.transform = 'translateY(-10px)';
+                                    e.currentTarget.style.boxShadow = '0 20px 35px rgba(0,0,0,0.1)';
                                   }}
                                   onMouseOut={(e) => {
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 6px 15px rgba(0,0,0,0.05)';
+                                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.05)';
                                   }}
                                 >
-                                  <div
-                                    style={{
-                                      position: 'absolute',
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      height: '6px',
-                                      background: 'linear-gradient(90deg, #ff8a00, #ff5e00)'
-                                    }}
-                                  ></div>
-                                  <div className="card-body d-flex flex-column" style={{ padding: '22px' }}>
+                                  {/* Gradient Border Effect */}
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: '6px',
+                                    background: 'linear-gradient(90deg, #4169e1, #1e40af, #ff69b4)',
+                                    opacity: 0.9
+                                  }}></div>
+                                  <div className="card-body d-flex flex-column" style={{ padding: '28px' }}>
                                     <div className="d-flex justify-content-between align-items-center">
                                       <span style={{ 
-                                        background: 'linear-gradient(135deg, #ff8a00, #ff5e00)',
+                                        background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                                         color: 'white', 
-                                        borderRadius: '50%',
-                                        width: '32px',
-                                        height: '32px',
+                                        borderRadius: '12px',
+                                        width: '40px',
+                                        height: '40px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         fontWeight: '600',
-                                        fontSize: '14px',
-                                        boxShadow: '0 4px 8px rgba(255, 138, 0, 0.3)'
+                                        fontSize: '16px',
+                                        boxShadow: '0 4px 15px rgba(65, 105, 225, 0.3)',
+                                        border: '2px solid rgba(255, 255, 255, 0.8)'
                                       }}>
                                         {index + 1}
                                       </span>
 
-                                      <div className="d-flex flex-grow-1 justify-content-center">
-                                        {project.projectIcon && (
-                                          <img
-                                            src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon}`}
-                                            alt="Project Icon"
-                                            className="me-2 rounded-circle"
+                                      <div className="d-flex flex-grow-1 flex-column align-items-center justify-content-center" style={{ minWidth: 0 }}>
+                                        {/* Icon */}
+                                        {(!project.projectIcon || brokenIcons[project._id || project.id]) ? (
+                                          <div
+                                            className="me-0 mb-1 rounded-circle d-flex align-items-center justify-content-center"
                                             style={{
-                                              width: '32px',
-                                              height: '32px',
-                                              objectFit: 'cover',
-                                              cursor: 'pointer',
-                                              border: '2px solid #52b447',
-                                              padding: '2px',
-                                              backgroundColor: 'white'
+                                              width: '36px',
+                                              height: '36px',
+                                              background: getProjectColor(project.projectName),
+                                              color: getContrastColor(getProjectColor(project.projectName)),
+                                              fontWeight: '700',
+                                              fontSize: '20px',
+                                              border: '3px solid #ff69b4',
+                                              cursor: 'default',
+                                              userSelect: 'none',
+                                              borderRadius: '16px',
+                                              overflow: 'hidden',
+                                              backgroundColor: 'white',
+                                              boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)'
                                             }}
-                                            onClick={() => {
-                                              setSelectedImages([project.projectIcon]);
-                                              setSelectedImageTitle(`${project.projectName} Icon`);
-                                              const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
-                                              modal.show();
-                                            }}
-                                          />
+                                            title={project.projectName}
+                                          >
+                                            {getInitials(project.projectName)}
+                                          </div>
+                                        ) : (
+                                          <div style={{
+                                            width: '36px',
+                                            height: '36px',
+                                            borderRadius: '16px',
+                                            overflow: 'hidden',
+                                            border: '3px solid #ff69b4',
+                                            backgroundColor: 'white',
+                                            boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)',
+                                            marginBottom: '6px'
+                                          }}>
+                                            <img
+                                              src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon}`}
+                                              alt="Project Icon"
+                                              style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover',
+                                                cursor: 'pointer',
+                                                transition: 'transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1)'
+                                              }}
+                                              onMouseEnter={(e) => {
+                                                e.target.style.transform = 'scale(1.2) rotate(3deg)';
+                                              }}
+                                              onMouseLeave={(e) => {
+                                                e.target.style.transform = 'scale(1) rotate(0deg)';
+                                              }}
+                                              onClick={() => {
+                                                setSelectedImages([project.projectIcon]);
+                                                setSelectedImageTitle(`${project.projectName} Icon`);
+                                                const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+                                                modal.show();
+                                              }}
+                                              onError={() => setBrokenIcons(prev => ({ ...prev, [project._id || project.id]: true }))}
+                                            />
+                                          </div>
                                         )}
-                                        <h5 className="card-title text-capitalize text-center mb-0 text-truncate"
-                                          style={{ 
-                                            maxWidth: '200px',
-                                            color: '#333333',
+                                        {/* Project Name */}
+                                        <h6 className="card-title text-capitalize text-center mb-0 text-truncate"
+                                          style={{
+                                            maxWidth: '120px',
+                                            color: '#1a1a1a',
                                             fontWeight: '700',
-                                            fontSize: '17px'
+                                            letterSpacing: '-0.3px',
+                                            marginLeft: 0
                                           }}
                                           title={project.projectName}>
                                           {project.projectName}
-                                        </h5>
+                                        </h6>
                                       </div>
 
                                       {project.projectImage && project.projectImage.length > 0 && (
                                         <button
                                           className="btn"
                                           style={{
-                                            color: '#52b447',
+                                            color: '#4169e1',
                                             padding: '6px',
                                             borderRadius: '50%',
                                             transition: 'all 0.2s',
                                             border: 'none',
-                                            backgroundColor: 'rgba(82, 180, 71, 0.1)'
+                                            backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                            width: '35px',
+                                            height: '35px',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
                                           }}
                                           onClick={() => handleOpenProjectImages(project)}
                                           onMouseOver={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                            e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)';
+                                            e.currentTarget.style.transform = 'scale(1.1)';
                                           }}
                                           onMouseOut={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                            e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.1)';
+                                            e.currentTarget.style.transform = 'scale(1)';
                                           }}
                                         >
                                           <i className="icofont-attachment fs-6" />
@@ -1981,29 +2075,101 @@ const Project = () => {
                                       )}
                                     </div>
 
-                                    <div className="mt-3" style={{ borderTop: '1px solid rgba(82, 180, 71, 0.1)', paddingTop: '12px' }}>
+                                    <div className="mt-3" style={{ borderTop: '1px solid rgba(65, 105, 225, 0.1)', paddingTop: '12px' }}>
                                       <div className="d-flex justify-content-between">
                                         <div style={{
-                                          backgroundColor: 'rgba(255, 138, 0, 0.1)',
-                                          padding: '5px 10px',
-                                          borderRadius: '6px',
-                                          color: '#ff5e00',
+                                          backgroundColor: 'rgba(65, 105, 225, 0.04)',
+                                          padding: '8px 12px',
+                                          borderRadius: '12px',
+                                          color: '#4169e1',
                                           fontSize: '12px',
-                                          fontWeight: '600'
+                                          fontWeight: '600',
+                                          border: '1px solid rgba(65, 105, 225, 0.15)',
+                                          transition: 'all 0.3s ease'
+                                        }}
+                                        onMouseOver={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
+                                          e.currentTarget.style.transform = 'translateY(-2px)';
+                                        }}
+                                        onMouseOut={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.04)';
+                                          e.currentTarget.style.transform = 'translateY(0)';
                                         }}>
-                                          <i className="icofont-calendar me-1"></i>
-                                          {getFormattedDate(project.projectStartDate)}
+                                          <div className="d-flex align-items-center">
+                                            <div style={{
+                                              width: '24px',
+                                              height: '24px',
+                                              borderRadius: '6px',
+                                              backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              marginRight: '8px'
+                                            }}>
+                                              <i className="icofont-calendar" style={{ color: '#4169e1', fontSize: '12px' }}></i>
+                                            </div>
+                                            <div>
+                                              <div style={{
+                                                fontSize: '10px',
+                                                color: '#666',
+                                                marginBottom: '1px',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.5px'
+                                              }}>Start</div>
+                                              <div style={{
+                                                fontSize: '11px',
+                                                fontWeight: '600',
+                                                color: '#1a1a1a'
+                                              }}>{getFormattedDate(project.projectStartDate)}</div>
+                                            </div>
+                                          </div>
                                         </div>
                                         <div style={{
-                                          backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                          padding: '5px 10px',
-                                          borderRadius: '6px',
-                                          color: '#52b447',
+                                          backgroundColor: 'rgba(255, 105, 180, 0.04)',
+                                          padding: '8px 12px',
+                                          borderRadius: '12px',
+                                          color: '#ff69b4',
                                           fontSize: '12px',
-                                          fontWeight: '600'
+                                          fontWeight: '600',
+                                          border: '1px solid rgba(255, 105, 180, 0.15)',
+                                          transition: 'all 0.3s ease'
+                                        }}
+                                        onMouseOver={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.08)';
+                                          e.currentTarget.style.transform = 'translateY(-2px)';
+                                        }}
+                                        onMouseOut={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.04)';
+                                          e.currentTarget.style.transform = 'translateY(0)';
                                         }}>
-                                          <i className="icofont-calendar me-1"></i>
-                                          {getFormattedDate(project.projectEndDate)}
+                                          <div className="d-flex align-items-center">
+                                            <div style={{
+                                              width: '24px',
+                                              height: '24px',
+                                              borderRadius: '6px',
+                                              backgroundColor: 'rgba(255, 105, 180, 0.1)',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              marginRight: '8px'
+                                            }}>
+                                              <i className="icofont-calendar" style={{ color: '#ff69b4', fontSize: '12px' }}></i>
+                                            </div>
+                                            <div>
+                                              <div style={{
+                                                fontSize: '10px',
+                                                color: '#666',
+                                                marginBottom: '1px',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.5px'
+                                              }}>End</div>
+                                              <div style={{
+                                                fontSize: '11px',
+                                                fontWeight: '600',
+                                                color: '#1a1a1a'
+                                              }}>{getFormattedDate(project.projectEndDate)}</div>
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
 
@@ -2017,14 +2183,15 @@ const Project = () => {
                                           marginBottom: '8px'
                                         }}>
                                           <span style={{
-                                            backgroundColor: '#f9fcf7',
-                                            color: '#52b447',
+                                            backgroundColor: 'rgba(65, 105, 225, 0.04)',
+                                            color: '#4169e1',
                                             padding: '3px 10px',
                                             borderRadius: '4px',
                                             fontWeight: '600',
                                             fontSize: '12px',
                                             display: 'flex',
-                                            alignItems: 'center'
+                                            alignItems: 'center',
+                                            border: '1px solid rgba(65, 105, 225, 0.15)'
                                           }}>
                                             <i className="icofont-users-alt-2 me-1"></i>
                                             Employees
@@ -2033,18 +2200,18 @@ const Project = () => {
                                         <div
                                             className="members-list"
                                           style={{
-                                            height: '80px',
+                                            height: '60px',
                                             overflowY: 'auto',
                                             scrollbarWidth: 'thin',
-                                            scrollbarColor: '#52b447 #f0f0f0',
+                                            scrollbarColor: '#4169e1 #f0f0f0',
                                             padding: '2px 8px'
                                           }}
                                         >
                                           {project.taskAssignPerson.map((member, idx) => (
                                             <div key={idx} className="mb-1" style={{ color: '#444' }}>
                                               <div className="d-flex gap-2 align-items-center">
-                                                <i className="icofont-user-alt-5" style={{ color: '#52b447', fontSize: '14px' }}></i>
-                                                  <span className="text-truncate" style={{ maxWidth: '120px', fontSize: '13px' }} title={member.employeeName}>
+                                                <i className="icofont-user-alt-5" style={{ color: '#4169e1', fontSize: '12px' }}></i>
+                                                  <span className="text-truncate" style={{ maxWidth: '120px', fontSize: '11px' }} title={member.employeeName}>
                                                   {member.employeeName}
                                                 </span>
                                               </div>
@@ -2061,14 +2228,15 @@ const Project = () => {
                                           marginBottom: '8px'
                                         }}>
                                           <span style={{
-                                            backgroundColor: 'rgba(255, 138, 0, 0.1)',
-                                            color: '#ff5e00',
+                                            backgroundColor: 'rgba(255, 105, 180, 0.04)',
+                                            color: '#ff69b4',
                                             padding: '3px 10px',
                                             borderRadius: '4px',
                                             fontWeight: '600',
                                             fontSize: '12px',
                                             display: 'flex',
-                                            alignItems: 'center'
+                                            alignItems: 'center',
+                                            border: '1px solid rgba(255, 105, 180, 0.15)'
                                           }}>
                                             <i className="icofont-people me-1"></i>
                                             Client
@@ -2077,20 +2245,20 @@ const Project = () => {
                                         <div
                                           className="clients-list"
                                           style={{
-                                              height: '80px',
+                                              height: '60px',
                                             overflowY: 'auto',
                                             scrollbarWidth: 'thin',
-                                            scrollbarColor: '#ff5e00 #f0f0f0',
+                                            scrollbarColor: '#ff69b4 #f0f0f0',
                                             padding: '2px 8px'
                                           }}
                                         >
                                           {project.clientAssignPerson?.map((client, idx) => (
                                             <div key={idx} className="d-flex gap-2 align-items-center" title={client.clientName}>
-                                              <i className="icofont-business-man" style={{ color: '#ff5e00', fontSize: '14px' }}></i>
+                                              <i className="icofont-business-man" style={{ color: '#ff69b4', fontSize: '12px' }}></i>
                                               <span style={{ 
                                                   maxWidth: '120px',
                                                 color: '#444',
-                                                fontSize: '13px'
+                                                fontSize: '11px'
                                               }} className="text-truncate">
                                               {client.clientName}
                                               </span>
@@ -2103,11 +2271,11 @@ const Project = () => {
                                     </div>
 
                                     <div className="d-flex justify-content-between align-items-center mt-auto pt-2" style={{ 
-                                      borderTop: '1px solid rgba(82, 180, 71, 0.1)',
+                                      borderTop: '1px solid rgba(65, 105, 225, 0.1)',
                                       marginTop: '12px'
                                     }}>
                                       <span className="d-flex justify-content-start text-muted small" style={{ fontSize: '11px' }}>
-                                        <i className="icofont-clock-time me-1" style={{ color: '#52b447' }}></i>
+                                        <i className="icofont-clock-time me-1" style={{ color: '#4169e1' }}></i>
                                         {getFormattedDate(project.projectDate, true)}
                                       </span>
                                       <div className="d-flex justify-content-between" style={{ gap: '5px' }}>
@@ -2118,26 +2286,28 @@ const Project = () => {
                                           data-bs-target="#editproject"
                                           title="Edit"
                                           style={{
-                                            backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                            color: '#52b447',
-                                            width: '32px',
-                                            height: '32px',
-                                            borderRadius: '50%',
+                                            backgroundColor: 'rgba(65, 105, 225, 0.08)',
+                                            color: '#4169e1',
+                                            width: '38px',
+                                            height: '38px',
+                                            borderRadius: '12px',
                                             padding: '0',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             border: 'none',
-                                            transition: 'all 0.2s ease'
+                                            transition: 'all 0.3s ease'
                                           }}
                                           onMouseOver={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                            e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.15)';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
                                           }}
                                           onMouseOut={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                            e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
+                                            e.currentTarget.style.transform = 'translateY(0)';
                                           }}
                                         >
-                                          <i className="icofont-edit"></i>
+                                          <i className="icofont-edit" style={{ fontSize: '16px' }}></i>
                                         </button>
                                         <button
                                           className="btn"
@@ -2146,26 +2316,28 @@ const Project = () => {
                                           onClick={() => setDeletableId(project._id)}
                                           title="Delete"
                                           style={{
-                                            backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                                            color: '#ff5e00',
-                                            width: '32px',
-                                            height: '32px',
-                                            borderRadius: '50%',
+                                            backgroundColor: 'rgba(255, 105, 180, 0.08)',
+                                            color: '#ff69b4',
+                                            width: '38px',
+                                            height: '38px',
+                                            borderRadius: '12px',
                                             padding: '0',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             border: 'none',
-                                            transition: 'all 0.2s ease'
+                                            transition: 'all 0.3s ease'
                                           }}
                                           onMouseOver={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.2)';
+                                            e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.15)';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
                                           }}
                                           onMouseOut={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
+                                            e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.08)';
+                                            e.currentTarget.style.transform = 'translateY(0)';
                                           }}
                                         >
-                                          <i className="icofont-ui-delete"></i>
+                                          <i className="icofont-ui-delete" style={{ fontSize: '16px' }}></i>
                                         </button>
                                         <button
                                           className="btn position-relative"
@@ -2174,32 +2346,34 @@ const Project = () => {
                                           onClick={() => handleOpenMessages(project)}
                                           title="Message"
                                           style={{
-                                            backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                            color: '#52b447',
-                                            width: '32px',
-                                            height: '32px',
-                                            borderRadius: '50%',
+                                            backgroundColor: 'rgba(65, 105, 225, 0.08)',
+                                            color: '#4169e1',
+                                            width: '38px',
+                                            height: '38px',
+                                            borderRadius: '12px',
                                             padding: '0',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             border: 'none',
-                                            transition: 'all 0.2s ease'
+                                            transition: 'all 0.3s ease'
                                           }}
                                           onMouseOver={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                            e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.15)';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
                                           }}
                                           onMouseOut={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                            e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
+                                            e.currentTarget.style.transform = 'translateY(0)';
                                           }}
                                         >
-                                          <i className="icofont-ui-message"></i>
+                                          <i className="icofont-ui-message" style={{ fontSize: '16px' }}></i>
                                           {notifications[project._id] > 0 && (
                                             <span style={{
                                               position: 'absolute',
                                               top: '-5px',
                                               right: '-5px',
-                                              backgroundColor: '#ff5e00',
+                                              backgroundColor: '#ff69b4',
                                               color: 'white',
                                               borderRadius: '50%',
                                               width: '18px',
@@ -2209,7 +2383,7 @@ const Project = () => {
                                               alignItems: 'center',
                                               justifyContent: 'center',
                                               fontWeight: 'bold',
-                                              boxShadow: '0 2px 5px rgba(255, 94, 0, 0.3)'
+                                              boxShadow: '0 2px 5px rgba(255, 105, 180, 0.3)'
                                             }}>
                                               {notifications[project._id]}
                                             </span>
@@ -2245,7 +2419,7 @@ const Project = () => {
                   overflow: 'hidden'
                 }}>
                   <div className="modal-header" style={{
-                    background: 'linear-gradient(135deg, #52b447, #429938)',
+                    background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                     borderBottom: 'none',
                     padding: '20px 25px',
                     position: 'relative'
@@ -2301,7 +2475,7 @@ const Project = () => {
                           gap: '5px'
                         }}
                       >
-                        <i className="icofont-paper" style={{ color: '#52b447' }}></i>
+                        <i className="icofont-paper" style={{ color: '#1e40af' }}></i>
                         Project Name <span className="text-danger">*</span>
                       </label>
                       <input
@@ -2314,7 +2488,7 @@ const Project = () => {
                         onChange={handleChange}
                         style={{
                           borderRadius: '8px',
-                          border: '1px solid rgba(82, 180, 71, 0.3)',
+                          border: '1px solid rgba(71, 82, 180, 0.3)',
                           padding: '10px 15px',
                           color: '#333',
                           boxShadow: 'none'
@@ -2334,7 +2508,7 @@ const Project = () => {
                           gap: '5px'
                         }}
                       >
-                        <i className="icofont-tag" style={{ color: '#52b447' }}></i>
+                        <i className="icofont-tag" style={{ color: '#1e40af' }}></i>
                         Project Category <span className="text-danger">*</span>
                       </label>
                       <input
@@ -2346,7 +2520,7 @@ const Project = () => {
                         onChange={handleChange}
                         style={{
                           borderRadius: '8px',
-                          border: '1px solid rgba(82, 180, 71, 0.3)',
+                          border: '1px solid rgba(71, 91, 180, 0.3)',
                           padding: '10px 15px',
                           color: '#333',
                           boxShadow: 'none'
@@ -2369,7 +2543,7 @@ const Project = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-file-image" style={{ color: '#ff5e00' }}></i>
+                          <i className="icofont-file-image" style={{ color: '#fc6db2' }}></i>
                           Project Images
                       </label>
                       <input
@@ -2403,7 +2577,7 @@ const Project = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-image" style={{ color: '#ff5e00' }}></i>
+                          <i className="icofont-image" style={{ color: '#fc6db2' }}></i>
                         Project Icon
                       </label>
                       <input
@@ -2445,7 +2619,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-calendar" style={{ color: '#ff5e00' }}></i>
+                              <i className="icofont-calendar" style={{ color: '#fc6db2' }}></i>
                               Start Date <span className="text-danger">*</span>
                             </label>
                             <input
@@ -2479,7 +2653,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-calendar" style={{ color: '#52b447' }}></i>
+                              <i className="icofont-calendar" style={{ color: '#1e40af' }}></i>
                               End Date <span className="text-danger">*</span>
                             </label>
                             <input
@@ -2515,7 +2689,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-users-alt-2" style={{ color: '#52b447' }}></i>
+                              <i className="icofont-users-alt-2" style={{ color: '#1e40af' }}></i>
                               Project Employees <span className="text-danger">*</span>
                             </label>
                             <div style={{
@@ -2548,7 +2722,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-Client" style={{ color: '#ff5e00' }}></i>
+                              <i className="icofont-Client" style={{ color: '#fc6db2' }}></i>
                               Project Client
                             </label>
                             <div style={{
@@ -2584,7 +2758,7 @@ const Project = () => {
                           gap: '5px'
                         }}
                       >
-                        <i className="icofont-notepad" style={{ color: '#52b447' }}></i>
+                        <i className="icofont-notepad" style={{ color: '#1e40af' }}></i>
                         Description
                       </label>
                       <textarea
@@ -2619,7 +2793,7 @@ const Project = () => {
                           gap: '5px'
                         }}
                       >
-                        <i className="icofont-paint" style={{ color: '#ff5e00' }}></i>
+                        <i className="icofont-paint" style={{ color: '#fc6db2' }}></i>
                         Card Color
                       </label>
                       <div className="d-flex align-items-center gap-2" style={{
@@ -2674,7 +2848,7 @@ const Project = () => {
                       data-bs-dismiss="modal"
                       style={{
                         backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                        color: '#ff5e00',
+                        color: '#fc6db2',
                         border: '1px solid rgba(255, 94, 0, 0.3)',
                         borderRadius: '8px',
                         padding: '8px 20px',
@@ -2696,7 +2870,7 @@ const Project = () => {
                       type="button"
                       className="btn"
                       style={{
-                        background: 'linear-gradient(135deg, #52b447, #429938)',
+                        background: 'linear-gradient(135deg, #1e40af)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -2736,7 +2910,7 @@ const Project = () => {
               </div>
             </div>
 
-            {/* Update Project Modal with Orange and Green Theme */}
+            {/* Update Project Modal */}
             <div
               className="modal fade"
               id="editproject"
@@ -2751,7 +2925,7 @@ const Project = () => {
                   overflow: 'hidden'
                 }}>
                   <div className="modal-header" style={{
-                    background: 'linear-gradient(135deg, #ff8a00, #ff5e00)',
+                    background: 'linear-gradient(135deg, #fc6db2)',
                     borderBottom: 'none',
                     padding: '20px 25px',
                     position: 'relative'
@@ -2807,7 +2981,7 @@ const Project = () => {
                           gap: '5px'
                         }}
                       >
-                        <i className="icofont-paper" style={{ color: '#52b447' }}></i>
+                        <i className="icofont-paper" style={{ color: '#1e40af' }}></i>
                         Project Name
                       </label>
                       <input
@@ -2840,7 +3014,7 @@ const Project = () => {
                           gap: '5px'
                         }}
                       >
-                        <i className="icofont-tag" style={{ color: '#52b447' }}></i>
+                        <i className="icofont-tag" style={{ color: '#1e40af' }}></i>
                         Project Category
                       </label>
                       <select
@@ -2887,7 +3061,7 @@ const Project = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-file-image" style={{ color: '#ff5e00' }}></i>
+                          <i className="icofont-file-image" style={{ color: '#fc6db2' }}></i>
                           Project Images
                       </label>
                       <input
@@ -2922,7 +3096,7 @@ const Project = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-image" style={{ color: '#ff5e00' }}></i>
+                          <i className="icofont-image" style={{ color: '#fc6db2' }}></i>
                           Project Icon
                         </label>
                         {projectFormData.projectIcon && (
@@ -2930,12 +3104,12 @@ const Project = () => {
                             <img
                               src={`${import.meta.env.VITE_BASE_URL}${projectFormData.projectIcon}`}
                               alt="Current Icon"
-                              style={{
-                                width: '36px',
-                                height: '36px',
-                                objectFit: 'cover',
+                                            style={{
+                                              width: '36px',
+                                              height: '36px',
+                                              objectFit: 'cover',
                                 borderRadius: '8px',
-                                border: '2px solid #52b447',
+                                              border: '2px solid #1e40af',
                                 padding: '2px'
                               }}
                             />
@@ -2981,7 +3155,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-calendar" style={{ color: '#ff5e00' }}></i>
+                              <i className="icofont-calendar" style={{ color: '#fc6db2' }}></i>
                               Start Date
                             </label>
                             <input
@@ -3015,7 +3189,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-calendar" style={{ color: '#52b447' }}></i>
+                              <i className="icofont-calendar" style={{ color: '#1e40af' }}></i>
                               End Date
                             </label>
                             <input
@@ -3051,7 +3225,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-users-alt-2" style={{ color: '#52b447' }}></i>
+                              <i className="icofont-users-alt-2" style={{ color: '#1e40af' }}></i>
                               Project Employees
                             </label>
                             <div style={{
@@ -3083,7 +3257,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-Client" style={{ color: '#ff5e00' }}></i>
+                              <i className="icofont-Client" style={{ color: '#fc6db2' }}></i>
                               Project Client
                             </label>
                             <div style={{
@@ -3117,7 +3291,7 @@ const Project = () => {
                           gap: '5px'
                         }}
                       >
-                        <i className="icofont-notepad" style={{ color: '#52b447' }}></i>
+                        <i className="icofont-notepad" style={{ color: '#1e40af' }}></i>
                         Description (optional)
                       </label>
                       <textarea
@@ -3151,7 +3325,7 @@ const Project = () => {
                           gap: '5px'
                         }}
                       >
-                        <i className="icofont-paint" style={{ color: '#ff5e00' }}></i>
+                        <i className="icofont-paint" style={{ color: '#fc6db2' }}></i>
                         Card Color
                       </label>
                       <div className="d-flex align-items-center gap-2" style={{
@@ -3206,7 +3380,7 @@ const Project = () => {
                       data-bs-dismiss="modal"
                       style={{
                         backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                        color: '#ff5e00',
+                        color: '#fc6db2',
                         border: '1px solid rgba(255, 94, 0, 0.3)',
                         borderRadius: '8px',
                         padding: '8px 20px',
@@ -3228,7 +3402,7 @@ const Project = () => {
                       type="button"
                       className="btn"
                       style={{
-                        background: 'linear-gradient(135deg, #52b447, #429938)',
+                        background: 'linear-gradient(135deg, #1e40af, #1e40af)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -3306,7 +3480,7 @@ const Project = () => {
               </div>
             </div>
 
-            {/* Message Modal with Orange and Green Theme */}
+            {/* Message Modal */}
             <div className="modal fade" id="addUser" tabIndex={-1} aria-labelledby="addUserLabel" aria-hidden="true" onHide={() => setIsChatModalOpen(false)}>
               <div className="modal-dialog modal-dialog-centered modal-lg">
                 <div className="modal-content" style={{
@@ -3319,7 +3493,7 @@ const Project = () => {
                   flexDirection: 'column'
                 }}>
                   <div className="modal-header" style={{
-                    background: 'linear-gradient(135deg, #52b447, #429938)',
+                    background: 'linear-gradient(135deg, #1e40af, #1e40af)',
                     borderBottom: 'none',
                     padding: '15px 20px',
                     position: 'relative',
@@ -3413,7 +3587,7 @@ const Project = () => {
                           justifyContent: 'center',
                           marginBottom: '15px'
                         }}>
-                          <i className="icofont-ui-messaging" style={{ fontSize: '40px', color: '#52b447' }}></i>
+                          <i className="icofont-ui-messaging" style={{ fontSize: '40px', color: '#1e40af' }}></i>
                         </div>
                         <h6 style={{ color: '#666', marginBottom: '10px' }}>No messages yet</h6>
                         <p style={{ textAlign: 'center', fontSize: '14px' }}>
@@ -3490,7 +3664,7 @@ const Project = () => {
                                   }}>
                                     {new Date(message.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                     {isCurrentUser && (
-                                      <i className="icofont-check-circled ms-1" style={{ color: '#52b447' }}></i>
+                                      <i className="icofont-check-circled ms-1" style={{ color: '#1e40af' }}></i>
                                     )}
                               </div>
                             </div>
@@ -3507,7 +3681,7 @@ const Project = () => {
                                     marginLeft: '10px',
                                     flexShrink: 0
                                   }}>
-                                    <i className="icofont-user-alt-7" style={{ color: '#52b447', fontSize: '18px' }}></i>
+                                    <i className="icofont-user-alt-7" style={{ color: '#1e40af', fontSize: '18px' }}></i>
                             </div>
                                 )}
                                 
@@ -3554,7 +3728,7 @@ const Project = () => {
                                               <img 
                                                 src={cleanFileUrl} 
                                                 alt={`Attachment ${index + 1}`} 
-                                                style={{ 
+                                          style={{ 
                                                   width: '100%', 
                                                   height: '100%', 
                                                   objectFit: 'cover', 
@@ -3579,7 +3753,7 @@ const Project = () => {
                                                 padding: '8px 12px',
                                                 backgroundColor: isCurrentUser ? 'rgba(82, 180, 71, 0.1)' : 'rgba(255, 138, 0, 0.1)',
                                                 borderRadius: '10px',
-                                                color: isCurrentUser ? '#52b447' : '#ff8a00',
+                                                color: isCurrentUser ? '#1e40af' : '#ff8a00',
                                                 textDecoration: 'none',
                                                 maxWidth: '250px'
                                               }}
@@ -3686,7 +3860,7 @@ const Project = () => {
                             width: '45px',
                             height: '45px',
                             borderRadius: '50%',
-                            backgroundColor: '#52b447',
+                            backgroundColor: '#1e40af',
                               color: 'white',
                               border: 'none',
                             display: 'flex',
@@ -3697,11 +3871,11 @@ const Project = () => {
                             }}
                             onMouseOver={(e) => {
                             e.currentTarget.style.transform = 'scale(1.05)';
-                            e.currentTarget.style.backgroundColor = '#429938';
+                            e.currentTarget.style.backgroundColor = '#1e40af';
                             }}
                             onMouseOut={(e) => {
                             e.currentTarget.style.transform = 'scale(1)';
-                            e.currentTarget.style.backgroundColor = '#52b447';
+                            e.currentTarget.style.backgroundColor = '#1e40af';
                             }}
                           >
                           <i className="icofont-paper-plane" style={{ fontSize: '18px' }}></i>
@@ -3733,7 +3907,7 @@ const Project = () => {
                             style={{
                               backgroundColor: 'transparent',
                               border: 'none',
-                              color: '#ff5e00',
+                              color: '#fc6db2',
                               fontSize: '13px',
                               cursor: 'pointer'
                             }}
@@ -3755,7 +3929,7 @@ const Project = () => {
               </div>
             </div>
 
-            {/* Image Preview Modal with Orange and Green Theme */}
+            {/* Image Preview Modal */}
             <div className="modal fade" id="imagePreviewModal" tabIndex={-1} aria-hidden="true">
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content" style={{
@@ -3765,7 +3939,7 @@ const Project = () => {
                   overflow: 'hidden'
                 }}>
                   <div className="modal-header" style={{
-                    background: 'linear-gradient(135deg, #ff8a00, #ff5e00)',
+                    background: 'linear-gradient(135deg, #fc6db2)',
                     borderBottom: 'none',
                     padding: '16px 25px',
                     position: 'relative'
@@ -3813,7 +3987,7 @@ const Project = () => {
                     <div>
                       {selectedImages.map((image, index) => (
                         <div key={index} className="position-relative mb-3" style={{
-                          border: '3px solid #52b447',
+                          border: '3px solid #1e40af',
                           borderRadius: '10px',
                           overflow: 'hidden',
                           boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
@@ -3888,7 +4062,7 @@ const Project = () => {
                       className="btn"
                       data-bs-dismiss="modal"
                       style={{
-                        background: 'linear-gradient(135deg, #52b447, #429938)',
+                        background: 'linear-gradient(135deg, #1e40af, #1e40af)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -3918,7 +4092,7 @@ const Project = () => {
               </div>
             </div>
 
-            {/* Project Images Modal with Orange and Green Theme */}
+            {/* Project Images Modal  */}
             <div className="modal fade" id="projectImagesModal" tabIndex={-1} aria-hidden="true">
               <div className="modal-dialog modal-dialog-centered modal-lg">
                 <div className="modal-content" style={{
@@ -3928,7 +4102,7 @@ const Project = () => {
                   overflow: 'hidden'
                 }}>
                   <div className="modal-header" style={{
-                    background: 'linear-gradient(135deg, #52b447, #429938)',
+                    background: 'linear-gradient(135deg, #1e40af, #1e40af)',
                     borderBottom: 'none',
                     padding: '20px 25px',
                     position: 'relative'
@@ -4023,7 +4197,7 @@ const Project = () => {
                                   position: 'absolute',
                                   top: '10px',
                                   right: '10px',
-                                  backgroundColor: index % 2 === 0 ? 'rgba(82, 180, 71, 0.8)' : 'rgba(255, 94, 0, 0.8)',
+                                  backgroundColor: index % 2 === 0 ? 'rgba(91, 71, 180, 0.8)' : 'rgba(255, 94, 0, 0.8)',
                                   color: 'white',
                                   borderRadius: '20px',
                                   padding: '3px 10px',
@@ -4045,7 +4219,7 @@ const Project = () => {
                                   onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image}`, '_blank')}
                                   style={{
                                     backgroundColor: index % 2 === 0 ? 'rgba(82, 180, 71, 0.1)' : 'rgba(255, 94, 0, 0.1)',
-                                    color: index % 2 === 0 ? '#52b447' : '#ff5e00',
+                                    color: index % 2 === 0 ? '#1e40af' : '#fc6db2',
                                     border: 'none',
                                     borderRadius: '8px',
                                     padding: '8px 15px',
@@ -4083,7 +4257,7 @@ const Project = () => {
                           }}>
                             <i className="icofont-image" style={{ 
                               fontSize: '48px', 
-                              color: '#52b447',
+                              color: '#1e40af',
                               opacity: '0.5',
                               marginBottom: '15px',
                               display: 'block'
@@ -4110,7 +4284,7 @@ const Project = () => {
                       className="btn"
                       data-bs-dismiss="modal"
                       style={{
-                        background: 'linear-gradient(135deg, #ff8a00, #ff5e00)',
+                        background: 'linear-gradient(135deg, #fc6db2)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -4140,7 +4314,7 @@ const Project = () => {
               </div>
             </div>
 
-            {/* Pagination controls with orange and green theme */}
+            {/* Pagination controls  */}
             <div className="row mt-4" style={{ marginBottom: '20px' }}>
               <div className="col-12 col-md-6 mb-3">
                 <div className="d-flex align-items-center" style={{ 
@@ -4186,7 +4360,7 @@ const Project = () => {
                     backgroundColor: 'rgba(82, 180, 71, 0.1)',
                     borderRadius: '6px',
                     fontSize: '13px',
-                    color: '#52b447',
+                    color: '#1e40af',
                     fontWeight: '600',
                     display: 'flex',
                     alignItems: 'center'
@@ -4211,7 +4385,7 @@ const Project = () => {
                         style={{ 
                           border: '1px solid rgba(82, 180, 71, 0.3)',
                           borderRadius: '6px 0 0 6px',
-                          color: currentPage === 1 ? '#999' : '#52b447',
+                          color: currentPage === 1 ? '#999' : '#1e40af',
                           padding: '8px 14px',
                           fontWeight: '600',
                           backgroundColor: currentPage === 1 ? '#f8f8f8' : 'white',
@@ -4235,7 +4409,7 @@ const Project = () => {
                             padding: '8px 14px',
                             fontWeight: '600',
                             background: currentPage === page ? 
-                              'linear-gradient(135deg, #ff8a00, #ff5e00)' : 'white',
+                              'linear-gradient(135deg, #fc6db2)' : 'white',
                             boxShadow: currentPage === page ? 
                               '0 2px 5px rgba(255, 94, 0, 0.3)' : 'none',
                             transition: 'all 0.2s ease',
@@ -4255,7 +4429,7 @@ const Project = () => {
                           style={{ 
                             border: '1px solid rgba(82, 180, 71, 0.3)',
                             borderRadius: '0 6px 6px 0',
-                            color: '#52b447',
+                            color: '#1e40af',
                             padding: '8px 14px',
                             fontWeight: '600',
                             backgroundColor: 'white',
