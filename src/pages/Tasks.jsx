@@ -730,7 +730,7 @@ const Tasks = () => {
                           transform: 'translateY(-50%)',
                           width: '5px',
                           height: '24px',
-                          background: 'linear-gradient(to bottom, #ff8a00, #ff5e00)',
+                          background: 'linear-gradient(to bottom, #4169e1, #1e40af)',
                           borderRadius: '3px'
                         }}></span>
                         Task Management
@@ -742,7 +742,7 @@ const Tasks = () => {
                           data-bs-toggle="modal"
                           data-bs-target="#createtask"
                                           style={{
-                                            background: 'linear-gradient(135deg, #52b447, #429938)',
+                                            background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '8px',
@@ -786,7 +786,7 @@ const Tasks = () => {
                               fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "All" ? 'white' : '#666',
-                                background: activeTab === "All" ? 'linear-gradient(135deg, #ff8a00, #ff5e00)' : 'transparent',
+                                background: activeTab === "All" ? 'linear-gradient(135deg, #4169e1, #1e40af)' : 'transparent',
                                         borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
@@ -809,7 +809,7 @@ const Tasks = () => {
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "Not Started" ? 'white' : '#666',
-                                background: activeTab === "Not Started" ? 'linear-gradient(135deg, #ff8a00, #ff5e00)' : 'transparent',
+                                background: activeTab === "Not Started" ? 'linear-gradient(135deg, #4169e1, #1e40af)' : 'transparent',
                                 borderRadius: '8px',
                               border: 'none',
                                 transition: 'all 0.2s ease',
@@ -834,7 +834,7 @@ const Tasks = () => {
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "In Progress" ? 'white' : '#666',
-                                background: activeTab === "In Progress" ? 'linear-gradient(135deg, #ff8a00, #ff5e00)' : 'transparent',
+                                background: activeTab === "In Progress" ? 'linear-gradient(135deg, #4169e1, #1e40af)' : 'transparent',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
@@ -859,7 +859,7 @@ const Tasks = () => {
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "Completed" ? 'white' : '#666',
-                                background: activeTab === "Completed" ? 'linear-gradient(135deg, #52b447, #429938)' : 'transparent',
+                                background: activeTab === "Completed" ? 'linear-gradient(135deg, #ff70b4, #ff69b4)' : 'transparent',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
@@ -887,7 +887,7 @@ const Tasks = () => {
                           title="Switch to List View"
                           style={{
                             backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                            color: '#52b447',
+                            color: '#ff70b4',
                             border: 'none',
                             borderRadius: '8px',
                             padding: '8px 12px',
@@ -909,7 +909,7 @@ const Tasks = () => {
                           title="Switch to Grid View"
                           style={{
                             backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                            color: '#52b447',
+                            color: '#ff70b4',
                             border: 'none',
                             borderRadius: '8px',
                             padding: '8px 12px',
@@ -939,14 +939,14 @@ const Tasks = () => {
                         gap: '10px',
                         flexWrap: 'wrap'
                       }}>
-                        <i className="icofont-filter" style={{ color: '#ff5e00', fontSize: '16px' }}></i>
+                        <i className="icofont-filter" style={{ color: '#1e40af', fontSize: '16px' }}></i>
                         
                         {filteredProjectName && (
                           <span style={{
                             fontWeight: '600',
                             color: '#333',
                             fontSize: '14px'
-                          }}>Project: <span style={{ color: '#ff5e00' }}>{filteredProjectName}</span></span>
+                          }}>Project: <span style={{ color: '#1e40af' }}>{filteredProjectName}</span></span>
                         )}
                         
                         {filteredEmployeeName && (
@@ -955,7 +955,7 @@ const Tasks = () => {
                             color: '#333',
                             fontSize: '14px',
                             marginLeft: filteredProjectName ? '10px' : '0'
-                          }}>Assignee: <span style={{ color: '#ff5e00' }}>{filteredEmployeeName}</span></span>
+                          }}>Assignee: <span style={{ color: '#1e40af' }}>{filteredEmployeeName}</span></span>
                         )}
                         
                       <button
@@ -963,7 +963,7 @@ const Tasks = () => {
                           className="btn"
                           onClick={clearFilter}
                           style={{
-                            backgroundColor: '#ff5e00',
+                            backgroundColor: '#1e40af',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
@@ -979,7 +979,7 @@ const Tasks = () => {
                             e.currentTarget.style.backgroundColor = '#e65500';
                           }}
                           onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = '#ff5e00';
+                            e.currentTarget.style.backgroundColor = '#1e40af';
                           }}
                         >
                           <i className="icofont-close-line"></i>
@@ -1017,7 +1017,7 @@ const Tasks = () => {
                         className="input-group-text"
                         id="addon-wrapping"
                         style={{
-                          backgroundColor: '#52b447',
+                          backgroundColor: '#ff70b4',
                           border: 'none',
                           color: 'white',
                           padding: '0 15px',
@@ -1141,7 +1141,7 @@ const Tasks = () => {
                                         textAlign: 'center'
                                       }}>
                                         <span style={{
-                                          background: 'linear-gradient(135deg, #ff8a00, #ff5e00)',
+                                          background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                                           color: 'white',
                                           borderRadius: '50%',
                                           width: '30px',
@@ -1173,7 +1173,7 @@ const Tasks = () => {
                                               fontSize: '12px',
                                               color: '#777'
                                             }}>
-                                              <i className="bi-calendar3 me-1" style={{ color: '#52b447' }}></i>
+                                              <i className="bi-calendar3 me-1" style={{ color: '#ff70b4' }}></i>
                                               {task.taskDate}
                                             </div>
                                           </div>
@@ -1181,7 +1181,7 @@ const Tasks = () => {
                                           {/* <button
                                             className="btn"
                                             style={{
-                                              color: '#52b447',
+                                              color: '#ff70b4',
                                               padding: '5px',
                                               borderRadius: '50%',
                                               transition: 'all 0.2s',
@@ -1241,7 +1241,7 @@ const Tasks = () => {
                                             </div>
                                             
                                             <div style={{ 
-                                              color: '#52b447',
+                                              color: '#ff70b4',
                                               marginLeft: '10px'
                                             }}>
                                               <i className="bi-pencil"></i>
@@ -1256,7 +1256,7 @@ const Tasks = () => {
                                             borderRadius: '8px'
                                           }}>
                                             <h6 style={{ 
-                                              color: '#52b447', 
+                                              color: '#ff70b4', 
                                               fontWeight: '600',
                                               marginBottom: '10px',
                                               borderBottom: '1px solid rgba(82, 180, 71, 0.2)',
@@ -1312,7 +1312,7 @@ const Tasks = () => {
                                                 onClick={() => taskHandleSubmit(task._id)}
                                                 style={{
                                                   backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                                  color: '#52b447',
+                                                  color: '#ff70b4',
                                                   fontWeight: '600',
                                                   fontSize: '13px',
                                                   padding: '6px 12px',
@@ -1361,7 +1361,7 @@ const Tasks = () => {
                                               <div className="d-flex align-items-center">
                                                 <div style={{
                                                   backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                                  color: '#52b447',
+                                                  color: '#ff70b4',
                                                   width: '30px',
                                                   height: '30px',
                                                   borderRadius: '50%',
@@ -1394,7 +1394,7 @@ const Tasks = () => {
                                               <div className="d-flex align-items-center">
                                                 <div style={{
                                                   backgroundColor: 'rgba(255, 138, 0, 0.1)',
-                                                  color: '#ff8a00',
+                                                  color: '#4169e1',
                                                   width: '30px',
                                                   height: '30px',
                                                   borderRadius: '50%',
@@ -1433,7 +1433,7 @@ const Tasks = () => {
                                             fontSize: '12px',
                                             color: '#777'
                                           }}>
-                                            <i className="bi-person-check me-1" style={{ color: '#52b447' }}></i>
+                                            <i className="bi-person-check me-1" style={{ color: '#ff70b4' }}></i>
                                             By: {task.assignedBy}
                                           </div>
                                         </div>
@@ -1459,7 +1459,7 @@ const Tasks = () => {
                                               fontSize: '13px',
                                               backgroundColor: 'transparent',
                                               border: 'none',
-                                              color: isOverdue ? '#dc3545' : '#52b447',
+                                              color: isOverdue ? '#dc3545' : '#ff70b4',
                                               fontWeight: '600',
                                               padding: '0'
                                             }}
@@ -1487,7 +1487,7 @@ const Tasks = () => {
                                             color: 
                                               task.taskPriority === 'Highest' ? '#dc3545' : 
                                               task.taskPriority === 'Medium' ? '#ffc107' : 
-                                              task.taskPriority === 'Lowest' ? '#52b447' : 
+                                              task.taskPriority === 'Lowest' ? '#ff70b4' : 
                                               '#666',
                                             border: 'none',
                                             borderRadius: '6px',
@@ -1512,7 +1512,7 @@ const Tasks = () => {
                                           title="Update Task"
                                             style={{
                                               backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                              color: '#52b447',
+                                              color: '#ff70b4',
                                               width: '32px',
                                               height: '32px',
                                               borderRadius: '50%',
@@ -1539,7 +1539,7 @@ const Tasks = () => {
                                           title="Delete Task"
                                             style={{
                                               backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                                              color: '#ff5e00',
+                                              color: '#1e40af',
                                               width: '32px',
                                               height: '32px',
                                               borderRadius: '50%',
@@ -1589,7 +1589,7 @@ const Tasks = () => {
                                       {task.taskStatus === 'Completed' && (
                                             <div style={{
                                               backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                              color: '#52b447',
+                                              color: '#ff70b4',
                                               padding: '5px 10px',
                                               borderRadius: '6px',
                                               fontSize: '12px',
@@ -1604,7 +1604,7 @@ const Tasks = () => {
                                         onClick={() => handleOpenMessages(task)}
                                             style={{
                                               backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                              color: '#52b447',
+                                              color: '#ff70b4',
                                               width: '32px',
                                               height: '32px',
                                               borderRadius: '50%',
@@ -1628,7 +1628,7 @@ const Tasks = () => {
                                                 position: 'absolute',
                                                 top: '-5px',
                                                 right: '-5px',
-                                                backgroundColor: '#ff5e00',
+                                                backgroundColor: '#1e40af',
                                                 color: 'white',
                                                 borderRadius: '50%',
                                                 width: '18px',
@@ -1672,13 +1672,13 @@ const Tasks = () => {
                             let priorityColor = '#999';
                             let priorityBg = '#f0f0f0';
                             if (task.taskPriority === 'Highest') {
-                              priorityColor = '#ff5e00';
+                              priorityColor = '#1e40af';
                               priorityBg = 'rgba(255, 94, 0, 0.1)';
                             } else if (task.taskPriority === 'Medium') {
-                              priorityColor = '#ff8a00';
+                              priorityColor = '#4169e1';
                               priorityBg = 'rgba(255, 138, 0, 0.1)';
                             } else if (task.taskPriority === 'Lowest') {
-                              priorityColor = '#52b447';
+                              priorityColor = '#ff70b4';
                               priorityBg = 'rgba(82, 180, 71, 0.1)';
                             }
 
@@ -1711,11 +1711,11 @@ const Tasks = () => {
                                     height: '6px',
                                     width: '100%',
                                     background: task.taskStatus === 'Completed'
-                                      ? 'linear-gradient(to right, #52b447, #429938)'
+                                      ? 'linear-gradient(to right, #ff70b4, #ff69b4)'
                                       : task.taskStatus === 'In Progress'
-                                        ? 'linear-gradient(to right, #ff8a00, #ff5e00)'
+                                        ? 'linear-gradient(to right, #4169e1, #1e40af)'
                                         : isOverdue
-                                          ? 'linear-gradient(to right, #ff5e00, #d14b00)'
+                                          ? 'linear-gradient(to right, #1e40af, #d14b00)'
                                           : 'linear-gradient(to right, #ffb347, #ffcc33)'
                                   }}></div>
 
@@ -1734,7 +1734,7 @@ const Tasks = () => {
                                           width: '28px',
                                           height: '28px',
                                           borderRadius: '50%',
-                                          backgroundColor: '#52b447',
+                                          backgroundColor: '#ff70b4',
                                           color: 'white',
                                           display: 'flex',
                                           alignItems: 'center',
@@ -1757,7 +1757,7 @@ const Tasks = () => {
                                           className="btn btn-link p-0 ms-2"
                                           onClick={() => handleOpenTaskImages(task)}
                                           style={{
-                                            color: '#ff8a00',
+                                            color: '#4169e1',
                                             transition: 'transform 0.2s ease',
                                           }}
                                           onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
@@ -1831,7 +1831,7 @@ const Tasks = () => {
                                           </div>
 
                                           <div style={{
-                                            color: isOverdue && task.taskStatus !== 'Completed' ? '#ff5e00' : '#52b447',
+                                            color: isOverdue && task.taskStatus !== 'Completed' ? '#1e40af' : '#ff70b4',
                                             fontSize: '13px',
                                             fontWeight: '600',
                                             display: 'flex',
@@ -1850,7 +1850,7 @@ const Tasks = () => {
                                           padding: '10px 15px',
                                         }}>
                                           <p className="mb-1 fw-semibold" style={{ fontSize: '14px', color: '#666' }}>
-                                            <i className="bi bi-person-fill me-2" style={{ color: '#52b447' }}></i>
+                                            <i className="bi bi-person-fill me-2" style={{ color: '#ff70b4' }}></i>
                                             Assigned to:
                                           </p>
                                           <p className="mb-1" style={{
@@ -1869,7 +1869,7 @@ const Tasks = () => {
                                           }
                                             <span className="badge" style={{
                                               backgroundColor: task.taskAssignPerson && task.taskAssignPerson.employeeName ? 'rgba(82, 180, 71, 0.2)' : 'rgba(255, 138, 0, 0.2)',
-                                              color: task.taskAssignPerson && task.taskAssignPerson.employeeName ? '#52b447' : '#ff8a00',
+                                              color: task.taskAssignPerson && task.taskAssignPerson.employeeName ? '#ff70b4' : '#4169e1',
                                               fontSize: '11px',
                                               padding: '4px 8px',
                                               borderRadius: '4px',
@@ -1879,7 +1879,7 @@ const Tasks = () => {
                                           </p>
                                           <p className="mb-0" style={{ fontSize: '13px', color: '#666' }}>
                                             <i className="bi bi-person-plus me-1"></i>
-                                            By: <span style={{ color: '#52b447', fontWeight: '600' }}>{task.assignedBy}</span>
+                                            By: <span style={{ color: '#ff70b4', fontWeight: '600' }}>{task.assignedBy}</span>
                                           </p>
                                         </div>
                                       </div>
@@ -1944,7 +1944,7 @@ const Tasks = () => {
                                         {task.taskStatus === 'In Progress' && (
                                             <span className="badge" style={{
                                               backgroundColor: 'rgba(255, 138, 0, 0.2)',
-                                              color: '#ff8a00',
+                                              color: '#4169e1',
                                               fontSize: '12px',
                                               padding: '5px 10px',
                                               borderRadius: '4px',
@@ -1954,7 +1954,7 @@ const Tasks = () => {
                                         {task.taskStatus === 'Completed' && (
                                             <span className="badge" style={{
                                               backgroundColor: 'rgba(82, 180, 71, 0.2)',
-                                              color: '#52b447',
+                                              color: '#ff70b4',
                                               fontSize: '12px',
                                               padding: '5px 10px',
                                               borderRadius: '4px',
@@ -1968,7 +1968,7 @@ const Tasks = () => {
                                           data-bs-target="#taskMessage"
                                           onClick={() => handleOpenMessages(task)}
                                           style={{
-                                            color: '#ff8a00',
+                                            color: '#4169e1',
                                             padding: '5px 10px',
                                             transition: 'all 0.2s ease',
                                             borderRadius: '50%',
@@ -1991,7 +1991,7 @@ const Tasks = () => {
                                           <i className="bi bi-chat-left-dots"></i>
                                           {notifications[task._id] > 0 && (
                                             <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill" style={{
-                                              backgroundColor: '#ff5e00',
+                                              backgroundColor: '#1e40af',
                                               color: 'white',
                                               boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
                                             }}>
@@ -2007,7 +2007,7 @@ const Tasks = () => {
                                           className="btn"
                                           style={{
                                             flex: 1,
-                                            background: 'linear-gradient(135deg, #52b447, #429938)',
+                                            background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
                                             color: 'white',
                                             fontWeight: '600',
                                             fontSize: '14px',
@@ -2039,7 +2039,7 @@ const Tasks = () => {
                                           className="btn"
                                           style={{
                                             backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                                            color: '#ff5e00',
+                                            color: '#1e40af',
                                             fontWeight: '600',
                                             fontSize: '14px',
                                             display: 'flex',
@@ -2057,7 +2057,7 @@ const Tasks = () => {
                                           }}
                                           onMouseOut={(e) => {
                                             e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
-                                            e.currentTarget.style.color = '#ff5e00';
+                                            e.currentTarget.style.color = '#1e40af';
                                           }}
                                         >
                                           <i className="bi bi-trash"></i> Delete
@@ -2119,7 +2119,7 @@ const Tasks = () => {
                         backgroundColor: 'rgba(82, 180, 71, 0.1)',
                         borderRadius: '6px',
                         fontSize: '13px',
-                        color: '#52b447',
+                        color: '#ff70b4',
                         fontWeight: '600',
                         display: 'flex',
                         alignItems: 'center'
@@ -2144,7 +2144,7 @@ const Tasks = () => {
                             style={{
                               border: '1px solid rgba(82, 180, 71, 0.3)',
                               borderRadius: '6px 0 0 6px',
-                              color: currentPage === 1 ? '#999' : '#52b447',
+                              color: currentPage === 1 ? '#999' : '#ff70b4',
                               padding: '8px 14px',
                               fontWeight: '600',
                               backgroundColor: currentPage === 1 ? '#f8f8f8' : 'white',
@@ -2168,7 +2168,7 @@ const Tasks = () => {
                                 padding: '8px 14px',
                                 fontWeight: '600',
                                 background: currentPage === page ?
-                                  'linear-gradient(135deg, #ff8a00, #ff5e00)' : 'white',
+                                  'linear-gradient(135deg, #4169e1, #1e40af)' : 'white',
                                 boxShadow: currentPage === page ?
                                   '0 2px 5px rgba(255, 94, 0, 0.3)' : 'none',
                                 transition: 'all 0.2s ease',
@@ -2188,7 +2188,7 @@ const Tasks = () => {
                               style={{
                                 border: '1px solid rgba(82, 180, 71, 0.3)',
                                 borderRadius: '0 6px 6px 0',
-                                color: '#52b447',
+                                color: '#ff70b4',
                                 padding: '8px 14px',
                                 fontWeight: '600',
                                 backgroundColor: 'white',
@@ -2222,7 +2222,7 @@ const Tasks = () => {
                     overflow: 'hidden'
                   }}>
                     <div className="modal-header" style={{
-                      background: 'linear-gradient(135deg, #ff8a00, #ff5e00)',
+                      background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                       borderBottom: 'none',
                       padding: '20px 25px',
                       position: 'relative'
@@ -2277,7 +2277,7 @@ const Tasks = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-folder-open" style={{ color: '#ff5e00' }}></i>
+                          <i className="icofont-folder-open" style={{ color: '#1e40af' }}></i>
                           Project Name <span className="text-danger">*</span>
                         </label>
                         <select
@@ -2321,7 +2321,7 @@ const Tasks = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-file-image" style={{ color: '#52b447' }}></i>
+                          <i className="icofont-file-image" style={{ color: '#ff70b4' }}></i>
                           Task Images &amp; Document
                         </label>
                         <input
@@ -2361,7 +2361,7 @@ const Tasks = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-calendar" style={{ color: '#ff5e00' }}></i>
+                              <i className="icofont-calendar" style={{ color: '#1e40af' }}></i>
                                 Task End Date <span className="text-danger">*</span>
                               </label>
                               <input
@@ -2401,7 +2401,7 @@ const Tasks = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-users" style={{ color: '#52b447' }}></i>
+                          <i className="icofont-users" style={{ color: '#ff70b4' }}></i>
                           Assign Task To
                         </label>
 
@@ -2422,7 +2422,7 @@ const Tasks = () => {
                               onChange={() => setAssignType('employee')}
                               style={{
                                 cursor: 'pointer',
-                                borderColor: '#52b447'
+                                borderColor: '#ff70b4'
                               }}
                             />
                             <label
@@ -2431,7 +2431,7 @@ const Tasks = () => {
                               style={{
                                 cursor: 'pointer',
                                 fontWeight: assignType === 'employee' ? '600' : '400',
-                                color: assignType === 'employee' ? '#52b447' : '#666'
+                                color: assignType === 'employee' ? '#ff70b4' : '#666'
                               }}
                             >
                               <i className={`icofont-business-man-alt-1 me-1 ${assignType === 'employee' ? 'text-success' : 'text-muted'}`}></i>
@@ -2449,7 +2449,7 @@ const Tasks = () => {
                               onChange={() => setAssignType('client')}
                               style={{
                                 cursor: 'pointer',
-                                borderColor: '#ff8a00'
+                                borderColor: '#4169e1'
                               }}
                             />
                             <label
@@ -2458,7 +2458,7 @@ const Tasks = () => {
                               style={{
                                 cursor: 'pointer',
                                 fontWeight: assignType === 'client' ? '600' : '400',
-                                color: assignType === 'client' ? '#ff8a00' : '#666'
+                                color: assignType === 'client' ? '#4169e1' : '#666'
                               }}
                             >
                               <i className={`icofont-user-alt-3 me-1 ${assignType === 'client' ? 'text-warning' : 'text-muted'}`}></i>
@@ -2481,7 +2481,7 @@ const Tasks = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-user-suited" style={{ color: '#52b447' }}></i>
+                              <i className="icofont-user-suited" style={{ color: '#ff70b4' }}></i>
                               Task Assign Person <span className="text-danger">*</span>
                             </label>
                               <select
@@ -2519,7 +2519,7 @@ const Tasks = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-user-alt-7" style={{ color: '#ff8a00' }}></i>
+                              <i className="icofont-user-alt-7" style={{ color: '#4169e1' }}></i>
                               Task Assign Client <span className="text-danger">*</span>
                             </label>
                               <select
@@ -2562,7 +2562,7 @@ const Tasks = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-flag" style={{ color: '#ff5e00' }}></i>
+                          <i className="icofont-flag" style={{ color: '#1e40af' }}></i>
                           Task Priority
                         </label>
                           <select
@@ -2600,7 +2600,7 @@ const Tasks = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-ui-text-chat" style={{ color: '#52b447' }}></i>
+                          <i className="icofont-ui-text-chat" style={{ color: '#ff70b4' }}></i>
                           Task Title <span className="text-danger">*</span>
                         </label>
                         <input
@@ -2636,7 +2636,7 @@ const Tasks = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-notepad" style={{ color: '#52b447' }}></i>
+                          <i className="icofont-notepad" style={{ color: '#ff70b4' }}></i>
                           Task Description <span className="text-danger">*</span>
                         </label>
                         <textarea
@@ -2670,7 +2670,7 @@ const Tasks = () => {
                         data-bs-dismiss="modal"
                         style={{
                           backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                          color: '#ff5e00',
+                          color: '#1e40af',
                           border: '1px solid rgba(255, 94, 0, 0.3)',
                           borderRadius: '8px',
                           padding: '8px 20px',
@@ -2692,7 +2692,7 @@ const Tasks = () => {
                         type="button"
                         className="btn"
                         style={{
-                          background: 'linear-gradient(135deg, #52b447, #429938)',
+                          background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
                           color: 'white',
                           border: 'none',
                           borderRadius: '8px',
@@ -3007,7 +3007,7 @@ const Tasks = () => {
                     flexDirection: 'column'
                   }}>
                     <div className="modal-header" style={{
-                      background: 'linear-gradient(135deg, #ff8a00, #ff5e00)',
+                      background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                       borderBottom: 'none',
                       padding: '15px 20px',
                       position: 'relative',
@@ -3100,7 +3100,7 @@ const Tasks = () => {
                             justifyContent: 'center',
                             marginBottom: '15px'
                           }}>
-                            <i className="bi bi-chat-square-text" style={{ fontSize: '40px', color: '#ff8a00' }}></i>
+                            <i className="bi bi-chat-square-text" style={{ fontSize: '40px', color: '#4169e1' }}></i>
                           </div>
                           <h6 style={{ color: '#666', marginBottom: '10px' }}>No messages yet</h6>
                           <p style={{ textAlign: 'center', fontSize: '14px' }}>
@@ -3148,7 +3148,7 @@ const Tasks = () => {
                                       marginRight: '10px',
                                       flexShrink: 0
                                     }}>
-                                      <i className="bi bi-person" style={{ color: '#ff8a00', fontSize: '18px' }}></i>
+                                      <i className="bi bi-person" style={{ color: '#4169e1', fontSize: '18px' }}></i>
                                     </div>
                                   )}
 
@@ -3205,7 +3205,7 @@ const Tasks = () => {
                                     }}>
                                       {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                       {isCurrentUser && (
-                                        <i className="bi bi-check-all ms-1" style={{ color: '#52b447' }}></i>
+                                        <i className="bi bi-check-all ms-1" style={{ color: '#ff70b4' }}></i>
                                       )}
                                     </div>
                                   </div>
@@ -3222,7 +3222,7 @@ const Tasks = () => {
                                       marginLeft: '10px',
                                       flexShrink: 0
                                     }}>
-                                      <i className="bi bi-person" style={{ color: '#52b447', fontSize: '18px' }}></i>
+                                      <i className="bi bi-person" style={{ color: '#ff70b4', fontSize: '18px' }}></i>
                                     </div>
                                   )}
 
@@ -3294,7 +3294,7 @@ const Tasks = () => {
                                                   padding: '8px 12px',
                                                   backgroundColor: isCurrentUser ? 'rgba(82, 180, 71, 0.1)' : 'rgba(255, 138, 0, 0.1)',
                                                   borderRadius: '10px',
-                                                  color: isCurrentUser ? '#52b447' : '#ff8a00',
+                                                  color: isCurrentUser ? '#ff70b4' : '#4169e1',
                                                   textDecoration: 'none',
                                                   maxWidth: '250px'
                                                 }}
@@ -3382,7 +3382,7 @@ const Tasks = () => {
                                 bottom: '10px',
                                 margin: 0,
                                 cursor: 'pointer',
-                                color: '#ff8a00'
+                                color: '#4169e1'
                               }}
                             >
                               <i className="bi bi-paperclip" style={{ fontSize: '20px' }}></i>
@@ -3401,7 +3401,7 @@ const Tasks = () => {
                               width: '45px',
                               height: '45px',
                               borderRadius: '50%',
-                              backgroundColor: '#52b447',
+                              backgroundColor: '#ff70b4',
                               color: 'white',
                               border: 'none',
                               display: 'flex',
@@ -3412,11 +3412,11 @@ const Tasks = () => {
                             }}
                             onMouseOver={(e) => {
                               e.currentTarget.style.transform = 'scale(1.05)';
-                              e.currentTarget.style.backgroundColor = '#429938';
+                              e.currentTarget.style.backgroundColor = '#ff69b4';
                             }}
                             onMouseOut={(e) => {
                               e.currentTarget.style.transform = 'scale(1)';
-                              e.currentTarget.style.backgroundColor = '#52b447';
+                              e.currentTarget.style.backgroundColor = '#ff70b4';
                             }}
                           >
                             <i className="bi bi-send" style={{ fontSize: '18px' }}></i>
@@ -3448,7 +3448,7 @@ const Tasks = () => {
                               style={{
                                 backgroundColor: 'transparent',
                                 border: 'none',
-                                color: '#ff5e00',
+                                color: '#1e40af',
                                 fontSize: '13px',
                                 cursor: 'pointer'
                               }}
@@ -3484,7 +3484,7 @@ const Tasks = () => {
             overflow: 'hidden'
           }}>
             <div className="modal-header" style={{
-              background: 'linear-gradient(135deg, #52b447, #429938)',
+              background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
               borderBottom: 'none',
               padding: '20px 25px',
               position: 'relative'
@@ -3606,7 +3606,7 @@ const Tasks = () => {
                 className="btn" 
                 data-bs-dismiss="modal"
                 style={{
-                  background: 'linear-gradient(135deg, #ff8a00, #ff5e00)',
+                  background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                   color: 'white',
                   border: 'none',
                   padding: '10px 25px',
