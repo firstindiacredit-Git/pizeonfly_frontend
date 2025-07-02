@@ -20,6 +20,7 @@ const getInitials = (name) => {
 const Client = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [clients, setClients] = useState([]);
+    const [allClients, setAllClients] = useState([]);
     const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState('grid');
     const [selectedClient, setSelectedClient] = useState(null);
@@ -183,8 +184,8 @@ const Client = () => {
             setLoading(true);
             try {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/clients`);
-                // console.log(response.data);
                 setClients(response.data);
+                setAllClients(response.data); // Store full list for global search
             } catch (error) {
                 console.error('Error fetching clients:', error);
             } finally {
@@ -195,19 +196,22 @@ const Client = () => {
         fetchClients();
     }, []);
 
-    //Search By Name
+    // Global (client-side) search
     const [searchQuery, setSearchQuery] = useState('');
-    const handleSearchSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/search?name=${searchQuery}`);
-            setClients(response.data);
-            // setErrorMessage('');
-        } catch (error) {
-            console.error('Error searching clients:', error);
-            setClients([]);
-            // setErrorMessage('Error searching clients. Please try again later.');
+    const handleSearch = (query) => {
+        setSearchQuery(query);
+        if (!query) {
+            setClients(allClients);
+            return;
         }
+        const lower = query.toLowerCase();
+        const filtered = allClients.filter(client =>
+            (client.clientName && client.clientName.toLowerCase().includes(lower)) ||
+            (client.clientEmail && client.clientEmail.toLowerCase().includes(lower)) ||
+            (client.clientPhone && client.clientPhone.toLowerCase().includes(lower)) ||
+            (client.businessName && client.businessName.toLowerCase().includes(lower))
+        );
+        setClients(filtered);
     };
 
     //Update a Client
@@ -580,47 +584,48 @@ const Client = () => {
                                                     )}
                                                 </div>
                                                 <div className="order-0">
-                                                    <div className="input-group" style={{
-                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                                                        borderRadius: '8px',
-                                                        overflow: 'hidden'
-                                                    }}>
-                                                        <input
-                                                            type="search"
-                                                            className="form-control"
-                                                            aria-label="search"
-                                                            aria-describedby="addon-wrapping"
-                                                            value={searchQuery}
-                                                            onChange={(e) => {
-                                                                setSearchQuery(e.target.value);
-                                                                handleSearchSubmit(e.target.value);
-                                                            }}
-                                                            placeholder="Enter Member Name"
-                                                            style={{
-                                                                border: '1px solid rgba(65, 105, 225, 0.2)',
-                                                                borderRight: 'none',
-                                                                padding: '10px 15px',
-                                                                fontSize: '14px',
-                                                                color: '#333',
-                                                                minWidth: '220px'
-                                                            }}
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            className="input-group-text"
-                                                            id="addon-wrapping"
-                                                            onClick={handleSearchSubmit}
-                                                            style={{
-                                                                backgroundColor: '#4169e1',
-                                                                border: 'none',
-                                                                color: 'white',
-                                                                padding: '0 15px',
-                                                                cursor: 'pointer'
-                                                            }}
-                                                        >
-                                                            <i className="fa fa-search" />
-                                                        </button>
-                                                    </div>
+                                                    <form autoComplete="off" style={{margin:0}} onSubmit={e => e.preventDefault()}>
+                                                        <div className="input-group" style={{
+                                                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                                                            borderRadius: '8px',
+                                                            overflow: 'hidden'
+                                                        }}>
+                                                            <input
+                                                                type="search"
+                                                                className="form-control"
+                                                                aria-label="search"
+                                                                aria-describedby="addon-wrapping"
+                                                                name="searchClient"
+                                                                value={searchQuery}
+                                                                onChange={(e) => handleSearch(e.target.value)}
+                                                                placeholder="Enter Member Name"
+                                                                autoComplete="new-password"
+                                                                style={{
+                                                                    border: '1px solid rgba(65, 105, 225, 0.2)',
+                                                                    borderRight: 'none',
+                                                                    padding: '10px 15px',
+                                                                    fontSize: '14px',
+                                                                    color: '#333',
+                                                                    minWidth: '220px'
+                                                                }}
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                className="input-group-text"
+                                                                id="addon-wrapping"
+                                                                onClick={() => handleSearch(searchQuery)}
+                                                                style={{
+                                                                    backgroundColor: '#4169e1',
+                                                                    border: 'none',
+                                                                    color: 'white',
+                                                                    padding: '0 15px',
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                            >
+                                                                <i className="fa fa-search" />
+                                                            </button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>

@@ -12,6 +12,7 @@ import FloatingMenu from '../Chats/FloatingMenu'
 const Member = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [employees, setEmployees] = useState([]);
+  const [allEmployees, setAllEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState('grid');
@@ -260,6 +261,7 @@ const Member = () => {
         setEmployeeProjects(projectCounts);
         setEmployeeTasks(taskCounts);
         setEmployees(modifiedEmployees); // Set the modified employees
+        setAllEmployees(modifiedEmployees); // Store the full list for global search
 
       } catch (error) {
         console.error("Error:", error);
@@ -432,8 +434,8 @@ const Member = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const handleEditClick = (employee) => {
-    console.log("Employee data being set:", employee); // Debug log
-    setSelectedEmployee(employee); // Add this line
+    setSelectedEmployee(employee);
+    setToEdit(employee._id); // <-- Add this line
     setEmployeeData({
       ...employee,
       linkedin: employee.socialLinks?.linkedin || '',
@@ -586,38 +588,18 @@ const Member = () => {
 
   // GET SINGLE EMPLOYEE
   const [searchQuery, setSearchQuery] = useState("");
-  const handleSearch = async (searchQuery) => {
-    if (searchQuery !== "") {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}api/search?id=${searchQuery}`
-        );
-        // Check if response.data is an array, if not, set to empty array
-        if (Array.isArray(response.data)) {
-          setEmployees(response.data);
-        } else {
-          setEmployees([]);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        // Set to empty array instead of null to prevent map error
-        setEmployees([]);
-      }
-    } else {
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_BASE_URL}api/employees`
-          );
-          setEmployees(response.data);
-        } catch (error) {
-          console.error("Error:", error);
-          setEmployees([]);
-        }
-      };
-
-      fetchData();
+  const handleSearch = (searchQuery) => {
+    if (!searchQuery) {
+      setEmployees(allEmployees);
+      return;
     }
+    const lower = searchQuery.toLowerCase();
+    const filtered = allEmployees.filter(emp =>
+      (emp.employeeName && emp.employeeName.toLowerCase().includes(lower)) ||
+      (emp.employeeId && emp.employeeId.toLowerCase().includes(lower)) ||
+      (emp.emailid && emp.emailid.toLowerCase().includes(lower))
+    );
+    setEmployees(filtered);
   };
 
   const [selectedImageDetails, setSelectedImageDetails] = useState({ url: null, name: null });
@@ -856,47 +838,51 @@ const Member = () => {
                           )}
                         </div>
                         <div className="order-0">
-                          <div className="input-group" style={{
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                            borderRadius: '8px',
-                            overflow: 'hidden'
-                          }}>
-                            <input
-                              type="search"
-                              className="form-control"
-                              aria-label="search"
-                              aria-describedby="addon-wrapping"
-                              value={searchQuery}
-                              onChange={(e) => {
-                                setSearchQuery(e.target.value);
-                                handleSearch(e.target.value);
-                              }}
-                              placeholder="Enter Employee Name"
-                              style={{
-                                border: '1px solid rgba(65, 105, 225, 0.2)',
-                                borderRight: 'none',
-                                padding: '10px 15px',
-                                fontSize: '14px',
-                                color: '#333',
-                                minWidth: '220px'
-                              }}
-                            />
-                            <button
-                              type="button"
-                              className="input-group-text"
-                              id="addon-wrapping"
-                              onClick={handleSearch}
-                              style={{
-                                backgroundColor: '#4169e1',
-                                border: 'none',
-                                color: 'white',
-                                padding: '0 15px',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              <i className="fa fa-search" />
-                            </button>
-                          </div>
+                          <form autoComplete="off" style={{margin:0}} onSubmit={e => e.preventDefault()}>
+                            <div className="input-group" style={{
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                              borderRadius: '8px',
+                              overflow: 'hidden'
+                            }}>
+                              <input
+                                type="search"
+                                className="form-control"
+                                aria-label="search"
+                                aria-describedby="addon-wrapping"
+                                name="searchEmployee"
+                                value={searchQuery}
+                                onChange={(e) => {
+                                  setSearchQuery(e.target.value);
+                                  handleSearch(e.target.value);
+                                }}
+                                placeholder="Enter Employee Name"
+                                autoComplete="new-password"
+                                style={{
+                                  border: '1px solid rgba(65, 105, 225, 0.2)',
+                                  borderRight: 'none',
+                                  padding: '10px 15px',
+                                  fontSize: '14px',
+                                  color: '#333',
+                                  minWidth: '220px'
+                                }}
+                              />
+                              <button
+                                type="button"
+                                className="input-group-text"
+                                id="addon-wrapping"
+                                onClick={handleSearch}
+                                style={{
+                                  backgroundColor: '#4169e1',
+                                  border: 'none',
+                                  color: 'white',
+                                  padding: '0 15px',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                <i className="fa fa-search" />
+                              </button>
+                            </div>
+                          </form>
                         </div>
                       </div>
                     </div>

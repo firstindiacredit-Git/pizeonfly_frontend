@@ -92,7 +92,7 @@ const Sidebar = () => {
 
   // Add the getImageUrl function from Header
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return "Images/superadminimg.jpg";
+    if (!imagePath) return "Images/default.jpeg";
     const cleanPath = imagePath.replace(/\\/g, '/');
     const pathWithoutUploads = cleanPath.replace('uploads/', '');
     return `${import.meta.env.VITE_BASE_URL}${pathWithoutUploads}`;
