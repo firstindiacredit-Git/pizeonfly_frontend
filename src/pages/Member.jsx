@@ -434,7 +434,6 @@ const Member = () => {
   const handleEditClick = (employee) => {
     console.log("Employee data being set:", employee); // Debug log
     setSelectedEmployee(employee); // Add this line
-    setToEdit(employee._id);
     setEmployeeData({
       ...employee,
       linkedin: employee.socialLinks?.linkedin || '',
@@ -746,6 +745,25 @@ const Member = () => {
     }
   };
 
+  // Add the toggleDisable function
+  const toggleDisable = async (employee) => {
+    const newDisabled = !employee.disabled;
+    try {
+      const response = await axios.patch(
+        `${import.meta.env.VITE_BASE_URL}api/employees/${employee._id}/disable`,
+        { disabled: newDisabled }
+      );
+      // Update local state with the new employee data
+      setEmployees(prev =>
+        prev.map(emp =>
+          emp._id === employee._id ? { ...emp, disabled: newDisabled } : emp
+        )
+      );
+    } catch (error) {
+      // handle error (optional: toast)
+    }
+  };
+
   return (
     <>
       <div id="mytask-layout">
@@ -905,7 +923,8 @@ const Member = () => {
                               transition: 'all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)',
                               overflow: 'hidden',
                               position: 'relative',
-                              backgroundColor: '#ffffff'
+                              backgroundColor: employee.disabled ? '#f0f0f0' : '#ffffff',
+                              opacity: employee.disabled ? 0.5 : 1
                             }}
                               onMouseOver={(e) => {
                                 e.currentTarget.style.transform = 'translateY(-10px)';
@@ -1078,6 +1097,7 @@ const Member = () => {
                                         className="btn"
                                         data-bs-toggle="modal"
                                         data-bs-target="#editemp"
+                                        title="Edit Member"
                                         onClick={() => handleEditClick(employee)}
                                         style={{
                                           backgroundColor: 'rgba(65, 105, 225, 0.08)',
@@ -1089,8 +1109,11 @@ const Member = () => {
                                           alignItems: 'center',
                                           justifyContent: 'center',
                                           border: 'none',
-                                          transition: 'all 0.3s ease'
+                                          transition: 'all 0.3s ease',
+                                          pointerEvents: employee.disabled ? 'none' : 'auto',
+                                          opacity: employee.disabled ? 0.5 : 1
                                         }}
+                                        disabled={employee.disabled}
                                         onMouseOver={(e) => {
                                           e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.15)';
                                           e.currentTarget.style.transform = 'translateY(-2px)';
@@ -1108,6 +1131,7 @@ const Member = () => {
                                         className="btn"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteproject"
+                                        title="Delete Member"
                                         onClick={() => {
                                           setDeletableId(employee._id);
                                         }}
@@ -1121,8 +1145,11 @@ const Member = () => {
                                           alignItems: 'center',
                                           justifyContent: 'center',
                                           border: 'none',
-                                          transition: 'all 0.3s ease'
+                                          transition: 'all 0.3s ease',
+                                          pointerEvents: employee.disabled ? 'none' : 'auto',
+                                          opacity: employee.disabled ? 0.5 : 1
                                         }}
+                                        disabled={employee.disabled}
                                         onMouseOver={(e) => {
                                           e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.15)';
                                           e.currentTarget.style.transform = 'translateY(-2px)';
@@ -1133,6 +1160,30 @@ const Member = () => {
                                         }}
                                       >
                                         <i className="icofont-ui-delete" style={{ fontSize: '16px' }}></i>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="btn"
+                                        title={employee.disabled ? 'Enable Member' : 'Disable Member'}
+                                        style={{
+                                          backgroundColor: 'rgba(128,128,128,0.08)',
+                                          color: '#888',
+                                          width: '38px',
+                                          height: '38px',
+                                          borderRadius: '12px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          border: 'none',
+                                          transition: 'all 0.3s ease'
+                                        }}
+                                        onClick={() => toggleDisable(employee)}
+                                      >
+                                        {employee.disabled ? (
+                                          <i className="bi bi-toggle-off" style={{ fontSize: '20px' }}></i>
+                                        ) : (
+                                          <i className="bi bi-toggle-on" style={{ fontSize: '20px' }}></i>
+                                        )}
                                       </button>
                                     </div>
                                   </div>
@@ -1586,9 +1637,11 @@ const Member = () => {
                                     <tr key={employee.employeeId}
                                       style={{
                                         transition: 'background 0.2s ease',
+                                        background: employee.disabled ? '#f0f0f0' : 'transparent',
+                                        opacity: employee.disabled ? 0.5 : 1
                                       }}
-                                      onMouseOver={(e) => e.currentTarget.style.background = 'rgba(65, 105, 225, 0.04)'}
-                                      onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                                      onMouseOver={(e) => e.currentTarget.style.background = employee.disabled ? '#f0f0f0' : 'rgba(65, 105, 225, 0.04)'}
+                                      onMouseOut={(e) => e.currentTarget.style.background = employee.disabled ? '#f0f0f0' : 'transparent'}
                                     >
                                       <td style={{
                                         padding: '16px 15px',
@@ -1874,6 +1927,31 @@ const Member = () => {
                                             }}
                                           >
                                             <i className="icofont-ui-delete"></i>
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn"
+                                            title={employee.disabled ? 'Enable Member' : 'Disable Member'}
+                                            style={{
+                                              backgroundColor: 'rgba(128,128,128,0.08)',
+                                              color: '#888',
+                                              width: '32px',
+                                              height: '32px',
+                                              borderRadius: '50%',
+                                              padding: '0',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              border: 'none',
+                                              transition: 'all 0.2s ease'
+                                            }}
+                                            onClick={() => toggleDisable(employee)}
+                                          >
+                                            {employee.disabled ? (
+                                              <i className="bi bi-toggle-off" style={{ fontSize: '18px' }}></i>
+                                            ) : (
+                                              <i className="bi bi-toggle-on" style={{ fontSize: '18px' }}></i>
+                                            )}
                                           </button>
                                         </div>
                                       </td>

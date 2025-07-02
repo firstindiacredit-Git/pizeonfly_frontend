@@ -2340,14 +2340,16 @@ const ProjectDashboard = () => {
                                   </div>
 
                                   <div className="btn-group">
-                                    <button
-                                      className="btn btn-primary me-1"
-                                      onClick={addTable}
-                                      title='Add New Table'
-                                    >
-                                      <i className="icofont-plus me-1" />
-                                      <span className="">Table</span>
-                                    </button>
+                                    {tableIndex === tables.length - 1 && (
+                                      <button
+                                        className="btn btn-primary me-1"
+                                        onClick={addTable}
+                                        title='Add New Table'
+                                      >
+                                        <i className="icofont-plus me-1" />
+                                        <span className="">Table</span>
+                                      </button>
+                                    )}
                                     <button
                                       className="btn btn-secondary me-1"
                                       onClick={() => addRow(tableIndex)}
