@@ -17,6 +17,7 @@ import 'react-calendar/dist/Calendar.css';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
 import { evaluateFormula } from '../utils/excelFormulas';
+import * as XLSX from 'xlsx';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -1466,6 +1467,80 @@ const ProjectDashboard = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [selectedCells, tables]);
 
+  // Add this function in your component
+  const handleExcelUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      const bstr = evt.target.result;
+      const wb = XLSX.read(bstr, { type: 'binary' });
+      const wsname = wb.SheetNames[0];
+      const ws = wb.Sheets[wsname];
+      const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+      // Convert data to your table format
+      const rows = data.length;
+      const cols = data[0]?.length || 0;
+      const tableData = data.map(row => {
+        // Fill missing columns with empty string
+        return Array.from({ length: cols }, (_, i) => row[i] || "");
+      });
+
+      // Add new table to tables state
+      const newTable = {
+        id: Date.now().toString(),
+        name: file.name,
+        rows,
+        cols,
+        data: tableData
+      };
+
+      // Update state
+      setTables(prev => {
+        const updatedTables = [...prev, newTable];
+
+        // Save to backend
+        (async () => {
+          try {
+            const userData = JSON.parse(localStorage.getItem('user'));
+            const email = userData.email;
+
+            const url = excelSheetId
+              ? `${import.meta.env.VITE_BASE_URL}api/adminExcelSheet/${excelSheetId}`
+              : `${import.meta.env.VITE_BASE_URL}api/adminExcelSheet`;
+
+            const method = excelSheetId ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+              method,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ tables: updatedTables, email }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data._id) {
+              setExcelSheetId(data._id);
+            }
+          } catch (error) {
+            console.error("Error saving uploaded excel sheet:", error);
+            toast.error("Failed to save uploaded excel sheet");
+          }
+        })();
+
+        return updatedTables;
+      });
+    };
+    reader.readAsBinaryString(file);
+  };
+
   return (
     <>
       <div id="mytask-layout">
@@ -2386,8 +2461,11 @@ const ProjectDashboard = () => {
                                         <i className="icofont-trash me-1 text-white" />
                                         <span className="text-white">Table</span>
                                       </button>
+
                                     )}
+
                                   </div>
+
                                 </div>
                                 {/* <hr className="my-4" style={{
                                   borderColor: isLightColor(excelSheetColors[table.id] || '#d4edda') ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'
@@ -2399,6 +2477,28 @@ const ProjectDashboard = () => {
                       </>
                     )}
                   </div>
+                </div>
+
+                <div className="container mb-5">
+                  {/* Add this button somewhere above the tables... */}
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    style={{ display: 'none' }}
+                    id="excel-upload"
+                    onChange={handleExcelUpload}
+                  />
+                  <label htmlFor="excel-upload" className="btn btn-success mb-2 btn-lg fw-bold" style={{
+                    borderRadius: '30px',
+                    padding: '12px 35px',
+                    transition: 'all 0.3s ease',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    fontWeight: '600',
+                    fontSize: '0.9rem'
+                  }}>
+                    <i className="bi bi-upload me-2"></i> Upload Excel
+                  </label>
                 </div>
 
                 <div className="card shadow-lg mb-5" style={darkModeStyles.card}>
