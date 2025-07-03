@@ -55,6 +55,7 @@ const Header = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const dropdownRef = useRef(null);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [dropdownPosition, setDropdownPosition] = useState({});
 
   useEffect(() => {
     const token = localStorage.getItem("emp_token");
@@ -275,6 +276,24 @@ const Header = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  const handleDropdownToggle = (e) => {
+    e.preventDefault();
+    const rect = e.target.getBoundingClientRect();
+    const isRightAligned = window.innerWidth - rect.right < rect.left;
+
+    setDropdownPosition({
+      position: 'fixed',
+      top: `${rect.bottom}px`,
+      [isRightAligned ? 'right' : 'left']: isRightAligned
+        ? `${window.innerWidth - rect.right}px`
+        : `${rect.left}px`,
+    });
+
+    if (dropdownRef.current) {
+      dropdownRef.current.classList.toggle('show');
+    }
+  };
+
   return (
     <>
       <div className="header">
@@ -282,199 +301,143 @@ const Header = () => {
           <div className="container-xxl">
             {/* header rightbar icon */}
             <div className="h-right d-flex gap-3 align-items-center mr-5 mr-lg-0 order-1">
-              {/* <button onClick={toggleTheme} className="border-0 bg-transparent">
-                {isDarkMode ? <i className="bi bi-brightness-high text-light fs-5" /> : <i className="bi bi-moon-fill fs-5" />}
-              </button> */}
+              <button 
+                onClick={toggleTheme} 
+                className="border-0 bg-transparent"
+                style={{ 
+                  padding: "10px", 
+                  borderRadius: "50%", 
+                  transition: "all 0.3s ease",
+                  backgroundColor: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+                  transform: "scale(1)",
+                  cursor: "pointer"
+                }}
+                onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+                onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+              >
+                {isDarkMode ? 
+                  <i className="bi bi-brightness-high text-light fs-5" style={{ color: "#FFD700" }} /> : 
+                  <i className="bi bi-moon-fill fs-5" style={{ color: "#6c757d" }} />
+                }
+              </button>
               <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center zindex-popover">
                 <div className="u-info me-2">
-                  <p className="mb-0 text-end line-height-sm ">
+                  <p className="mb-0 text-end line-height-sm" style={{ fontWeight: "600", fontSize: "15px", color: isDarkMode ? "#e1e1e1" : "#333" }}>
                     <span className="font-weight-bold">{employeeName}</span>
                   </p>
-                  <small>Employee Profile</small>
+                  <small style={{ color: isDarkMode ? "#a0a0a0" : "#6c757d", fontSize: "12px", letterSpacing: "0.5px" }}>Employee Profile</small>
                 </div>
                 <a
                   className="nav-link dropdown-toggle pulse p-0"
                   href="#"
                   role="button"
-                  data-bs-toggle="dropdown"
-                  data-bs-display="static"
+                  onClick={handleDropdownToggle}
+                  style={{ position: "relative" }}
                 >
                   <img
                     className="avatar lg rounded-circle img-thumbnail"
                     src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`}
                     alt="profile"
+                    style={{ 
+                      border: "3px solid", 
+                      borderColor: isDarkMode ? "#4e4e6a" : "#e9ecef",
+                      boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+                      transition: "all 0.3s ease",
+                      objectFit: "contain"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.borderColor = "#0a9400"}
+                    onMouseOut={(e) => e.currentTarget.style.borderColor = isDarkMode ? "#4e4e6a" : "#e9ecef"}
                   />
                 </a>
-                <div className="dropdown-menu rounded-lg shadow border-0 dropdown-animation dropdown-menu-end p-0 m-0"
-                  ref={dropdownRef}>
-                  <div className="card border-0 w280">
-                    <div className="card-body pb-0">
+                <div
+                  ref={dropdownRef}
+                  className="dropdown-menu rounded-lg shadow border-0 dropdown-animation p-0 m-0"
+                  style={{
+                    ...dropdownPosition,
+                    boxShadow: "0 5px 15px rgba(0,0,0,0.15)",
+                    borderRadius: "15px",
+                    backgroundColor: isDarkMode ? "#1a1a2e" : "#ffffff",
+                    overflow: "hidden"
+                  }}
+                >
+                  <div className="card border-0 w280" style={{ borderRadius: "15px", backgroundColor: "transparent" }}>
+                    <div className="card-body pb-0" style={{ backgroundColor: isDarkMode ? "#242444" : "#f8f9fa", padding: "15px" }}>
                       <div className="d-flex py-1">
                         <img
                           className="avatar rounded-circle"
                           src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`}
                           alt="profile"
-                          style={{
-                            transition: 'transform 0.3s ease-in-out',
-                            cursor: 'pointer',
+                          style={{ 
+                            border: "3px solid", 
+                            borderColor: isDarkMode ? "#4e4e6a" : "#ffffff",
+                            width: "50px",
+                            height: "50px",
+                            objectFit: "cover"
                           }}
-                          onMouseEnter={(e) => {
-                            e.target.style.transform = 'scale(8)';
-                            e.target.style.zIndex = '100';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.transform = 'scale(1)';
-                            e.target.style.zIndex = '1';
-                          }}
-                          onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
                         />
                         <div className="flex-fill ms-3">
-                          <p className="mb-0">
-                            <span className="font-weight-bold">
-                              {employeeName}
-                            </span>
+                          <p className="mb-0 d-flex align-items-center gap-1" style={{ fontWeight: "600", color: isDarkMode ? "#e1e1e1" : "#333" }}>
+                            <span className="font-weight-bold">{employeeName}</span>
                           </p>
-                          <p style={{ width: "210px", fontSize: "small" }}>{email}</p>
-
-                          {/* <div style={{ marginTop: "-18px" }}>
-                            <strong>Aadhaar Card - </strong>
-                            {aadhaarCard ? (
-                              aadhaarCard.toLowerCase().endsWith('.pdf') ? (
-                                <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
-                              ) : (
-                                <img
-                                  src={`${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`}
-                                  alt="Aadhaar Card"
-                                  className="avatar sm img-thumbnail shadow-sm"
-                                  onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, 'image')}
-                                  style={{ cursor: 'pointer' }}
-                                />
-                              )
-                            ) : (
-                              <i className="bi bi-x-lg text-danger"></i>
-                            )}
-                          </div>
-
-                          <div>
-                            <strong>Pan Card - </strong>
-                            {panCard ? (
-                              panCard.toLowerCase().endsWith('.pdf') ? (
-                                <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
-                              ) : (
-                                <img
-                                  src={`${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`}
-                                  alt="Pan Card"
-                                  className="avatar sm img-thumbnail shadow-sm"
-                                  onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, 'image')}
-                                  style={{ cursor: 'pointer' }}
-                                />
-                              )
-                            ) : (
-                              <i className="bi bi-x-lg text-danger"></i>
-                            )}
-                          </div>
-
-                          <div>
-                            <strong>Resume - </strong>
-                            {resume ? (
-                              resume.toLowerCase().endsWith('.pdf') ? (
-                                <a href="#" onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, 'pdf')}>View PDF</a>
-                              ) : (
-                                <img
-                                  src={`${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`}
-                                  alt="Resume"
-                                  className="avatar sm img-thumbnail shadow-sm"
-                                  onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, 'image')}
-                                  style={{ cursor: 'pointer' }}
-                                />
-                              )
-                            ) : (
-                              <i className="bi bi-x-lg text-danger"></i>
-                            )}
-                          </div> */}
-
+                          <small style={{ color: isDarkMode ? "#a0a0a0" : "#6c757d", fontSize: "12px" }}>{email}</small>
                         </div>
                       </div>
                       <div>
-                        <hr className="dropdown-divider border-dark" />
+                        <hr className="dropdown-divider border-dark" style={{ margin: "10px 0" }} />
                       </div>
-                      {/* Add this after the employee info in the dropdown */}
-                      {/* <div className="social-links mt-3">
-                        <div className="d-flex flex-wrap gap-2">
-                          {employeeData.socialLinks?.linkedin && (
-                            <a href={employeeData.socialLinks.linkedin} target="_blank" rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-primary">
-                              <i className="bi bi-linkedin"></i>
-                            </a>
-                          )}
-                          {employeeData.socialLinks?.instagram && (
-                            <a href={employeeData.socialLinks.instagram} target="_blank" rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-danger">
-                              <i className="bi bi-instagram"></i>
-                            </a>
-                          )}
-                          {employeeData.socialLinks?.youtube && (
-                            <a href={employeeData.socialLinks.youtube} target="_blank" rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-danger">
-                              <i className="bi bi-youtube"></i>
-                            </a>
-                          )}
-                          {employeeData.socialLinks?.facebook && (
-                            <a href={employeeData.socialLinks.facebook} target="_blank" rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-primary">
-                              <i className="bi bi-facebook"></i>
-                            </a>
-                          )}
-                          {employeeData.socialLinks?.github && (
-                            <a href={employeeData.socialLinks.github} target="_blank" rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-dark">
-                              <i className="bi bi-github"></i>
-                            </a>
-                          )}
-                          {employeeData.socialLinks?.website && (
-                            <a href={employeeData.socialLinks.website} target="_blank" rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-info">
-                              <i className="bi bi-globe"></i>
-                            </a>
-                          )}
-                          {employeeData.socialLinks?.other && (
-                            <a href={employeeData.socialLinks.other} target="_blank" rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-secondary">
-                              <i className="bi bi-link-45deg"></i>
-                            </a>
-                          )}
-                        </div>
-                      </div> */}
-
                     </div>
                     <div className="list-group m-2 ">
-                      <Link
-                        type=""
+                      <button
                         className="list-group-item list-group-item-action border-0"
                         data-bs-toggle="modal"
                         data-bs-target="#editemp"
-                      // onClick={() => setToEdit(employees._id)}
+                        style={{ 
+                          borderRadius: "10px", 
+                          margin: "5px 0",
+                          backgroundColor: isDarkMode ? "#242444" : "#f8f9fa",
+                          color: isDarkMode ? "#e1e1e1" : "#333",
+                          transition: "all 0.2s ease",
+                          padding: "12px 15px",
+                          fontWeight: "500"
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.backgroundColor = isDarkMode ? "#2d2d5a" : "#e9ecef";
+                          e.currentTarget.style.transform = "translateX(5px)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.backgroundColor = isDarkMode ? "#242444" : "#f8f9fa";
+                          e.currentTarget.style.transform = "translateX(0)";
+                        }}
                       >
-                        <i className="icofont-ui-user-group fs-6 me-3" /> Edit
-                        Profile
-                      </Link>
-                      {/* <Link
-                        type=""
-                        className="list-group-item list-group-item-action border-0"
-                        data-bs-toggle="modal"
-                        data-bs-target="#taskMessage"
-                      >
-                        <i className="icofont-ui-message fs-6 me-3" /> Message
-                      </Link> */}
+                        <i className="bi bi-person fs-6 me-3" style={{ color: "#0a9400" }} />
+                        Edit Profile
+                      </button>
                       <button
                         onClick={handleSignOut}
                         className="list-group-item list-group-item-action border-0 "
+                        style={{ 
+                          borderRadius: "10px", 
+                          margin: "5px 0",
+                          backgroundColor: isDarkMode ? "#242444" : "#f8f9fa",
+                          color: isDarkMode ? "#e1e1e1" : "#333",
+                          transition: "all 0.2s ease",
+                          padding: "12px 15px",
+                          fontWeight: "500"
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.backgroundColor = isDarkMode ? "#2d2d5a" : "#e9ecef";
+                          e.currentTarget.style.transform = "translateX(5px)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.backgroundColor = isDarkMode ? "#242444" : "#f8f9fa";
+                          e.currentTarget.style.transform = "translateX(0)";
+                        }}
                       >
-                        <i className="icofont-logout fs-6 me-3" />
+                        <i className="icofont-logout fs-6 me-3" style={{ color: "#dc3545" }} />
                         Signout
                       </button>
                       <div>
-                        <hr className="dropdown-divider border-dark" />
+                        <hr className="dropdown-divider border-dark" style={{ margin: "10px 0" }} />
                       </div>
                     </div>
                   </div>
