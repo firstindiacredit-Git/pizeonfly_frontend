@@ -146,6 +146,19 @@ const Header = () => {
     }
   };
 
+  // Add this useEffect for outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        dropdownRef.current.classList.remove('show');
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
 
