@@ -269,7 +269,7 @@ const Header = () => {
     checkMissingDocuments();
 
     // Set up interval to check every minute
-    const intervalId = setInterval(checkMissingDocuments, 60000);
+    const intervalId = setInterval(checkMissingDocuments, 100000);
 
     // Clean up interval on component unmount
     return () => clearInterval(intervalId);
@@ -282,9 +282,9 @@ const Header = () => {
           <div className="container-xxl">
             {/* header rightbar icon */}
             <div className="h-right d-flex gap-3 align-items-center mr-5 mr-lg-0 order-1">
-              <button onClick={toggleTheme} className="border-0 bg-transparent">
+              {/* <button onClick={toggleTheme} className="border-0 bg-transparent">
                 {isDarkMode ? <i className="bi bi-brightness-high text-light fs-5" /> : <i className="bi bi-moon-fill fs-5" />}
-              </button>
+              </button> */}
               <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center zindex-popover">
                 <div className="u-info me-2">
                   <p className="mb-0 text-end line-height-sm ">

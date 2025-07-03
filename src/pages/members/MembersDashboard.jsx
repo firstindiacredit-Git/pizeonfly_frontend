@@ -14,6 +14,8 @@ import CustomColorPicker, { isLightColor } from "../colorpicker/CustomColorPicke
 import FloatingMenu from '../../Chats/FloatingMenu'
 import { evaluateFormula } from '../../utils/excelFormulas';
 import { toast } from 'react-toastify';
+import { useTheme } from '../../context/ThemeContext';
+import * as XLSX from 'xlsx';
 
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
@@ -1576,170 +1578,260 @@ const MemberDashboard = () => {
 
     // Add these new functions before the return statement
     const handleCellMouseDown = (tableIndex, rowIndex, colIndex) => {
-      setIsSelecting(true);
-      setSelectedCells({
-        start: { tableIndex, rowIndex, colIndex },
-        end: { tableIndex, rowIndex, colIndex }
-      });
+        setIsSelecting(true);
+        setSelectedCells({
+            start: { tableIndex, rowIndex, colIndex },
+            end: { tableIndex, rowIndex, colIndex }
+        });
     };
 
     const handleCellMouseEnter = (tableIndex, rowIndex, colIndex) => {
-      if (isSelecting) {
-        setSelectedCells(prev => ({
-          ...prev,
-          end: { tableIndex, rowIndex, colIndex }
-        }));
-      }
+        if (isSelecting) {
+            setSelectedCells(prev => ({
+                ...prev,
+                end: { tableIndex, rowIndex, colIndex }
+            }));
+        }
     };
 
     const handleCellMouseUp = () => {
-      setIsSelecting(false);
+        setIsSelecting(false);
     };
 
     const isCellSelected = (tableIndex, rowIndex, colIndex) => {
-      if (!selectedCells.start || !selectedCells.end) return false;
-      if (selectedCells.start.tableIndex !== tableIndex) return false;
+        if (!selectedCells.start || !selectedCells.end) return false;
+        if (selectedCells.start.tableIndex !== tableIndex) return false;
 
-      const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
-      const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
-      const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
-      const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
-
-      return rowIndex >= startRow && rowIndex <= endRow && 
-             colIndex >= startCol && colIndex <= endCol;
-    };
-
-    const handleCopy = (e) => {
-      if (e.key === 'c' && (e.ctrlKey || e.metaKey) && selectedCells.start && selectedCells.end) {
-        const tableIndex = selectedCells.start.tableIndex;
         const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
         const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
         const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
         const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
 
-        const copiedData = [];
-        for (let i = startRow; i <= endRow; i++) {
-          const row = [];
-          for (let j = startCol; j <= endCol; j++) {
-            const cellData = tables[tableIndex].data[i][j];
-            row.push(typeof cellData === 'object' ? cellData.value : cellData);
-          }
-          copiedData.push(row);
+        return rowIndex >= startRow && rowIndex <= endRow &&
+            colIndex >= startCol && colIndex <= endCol;
+    };
+
+    const handleCopy = (e) => {
+        if (e.key === 'c' && (e.ctrlKey || e.metaKey) && selectedCells.start && selectedCells.end) {
+            const tableIndex = selectedCells.start.tableIndex;
+            const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+            const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+            const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
+            const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
+
+            const copiedData = [];
+            for (let i = startRow; i <= endRow; i++) {
+                const row = [];
+                for (let j = startCol; j <= endCol; j++) {
+                    const cellData = tables[tableIndex].data[i][j];
+                    row.push(typeof cellData === 'object' ? cellData.value : cellData);
+                }
+                copiedData.push(row);
+            }
+            setCopiedData(copiedData);
         }
-        setCopiedData(copiedData);
-      }
     };
 
     const handlePaste = (e) => {
-      if (e.key === 'v' && (e.ctrlKey || e.metaKey) && copiedData && selectedCells.start) {
-        const tableIndex = selectedCells.start.tableIndex;
-        const startRow = selectedCells.start.rowIndex;
-        const startCol = selectedCells.start.colIndex;
+        if (e.key === 'v' && (e.ctrlKey || e.metaKey) && copiedData && selectedCells.start) {
+            const tableIndex = selectedCells.start.tableIndex;
+            const startRow = selectedCells.start.rowIndex;
+            const startCol = selectedCells.start.colIndex;
 
-        const newTables = [...tables];
-        copiedData.forEach((row, rowIndex) => {
-          if (startRow + rowIndex < tables[tableIndex].rows) {
-            row.forEach((cell, colIndex) => {
-              if (startCol + colIndex < tables[tableIndex].cols) {
-                newTables[tableIndex].data[startRow + rowIndex][startCol + colIndex] = cell;
-              }
+            const newTables = [...tables];
+            copiedData.forEach((row, rowIndex) => {
+                if (startRow + rowIndex < tables[tableIndex].rows) {
+                    row.forEach((cell, colIndex) => {
+                        if (startCol + colIndex < tables[tableIndex].cols) {
+                            newTables[tableIndex].data[startRow + rowIndex][startCol + colIndex] = cell;
+                        }
+                    });
+                }
             });
-          }
-        });
 
-        setTables(newTables);
+            setTables(newTables);
 
-        // Save to backend
-        handleSaveExcelSheet(newTables);
-      }
+            // Save to backend
+            handleSaveExcelSheet(newTables);
+        }
     };
 
     const handleSaveExcelSheet = async (newTables) => {
-      try {
-        const userData = JSON.parse(localStorage.getItem('user'));
-        const email = userData.email;
+        try {
+            const userData = JSON.parse(localStorage.getItem('user'));
+            const email = userData.email;
 
-        const url = dashboardIds.excelSheet
-          ? `${import.meta.env.VITE_BASE_URL}api/memberExcelSheet/${dashboardIds.excelSheet}`
-          : `${import.meta.env.VITE_BASE_URL}api/memberExcelSheet`;
+            const url = dashboardIds.excelSheet
+                ? `${import.meta.env.VITE_BASE_URL}api/memberExcelSheet/${dashboardIds.excelSheet}`
+                : `${import.meta.env.VITE_BASE_URL}api/memberExcelSheet`;
 
-        const method = dashboardIds.excelSheet ? 'PUT' : 'POST';
+            const method = dashboardIds.excelSheet ? 'PUT' : 'POST';
 
-        await fetch(url, {
-          method,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ tables: newTables, email }),
-        });
-      } catch (error) {
-        console.error("Error saving excel sheet:", error);
-        toast.error("Failed to save changes");
-      }
+            await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ tables: newTables, email }),
+            });
+        } catch (error) {
+            console.error("Error saving excel sheet:", error);
+            toast.error("Failed to save changes");
+        }
     };
 
     // Add useEffect for keyboard events
     useEffect(() => {
-      const handleKeyDown = (e) => {
-        // Existing copy/paste handlers
-        if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
-          handleCopy(e);
-        } else if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
-          handlePaste(e);
-        }
-        // Add formula application shortcut
-        else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && selectedCells.start) {
-          e.preventDefault();
-          handleApplyFormulaToSelection(selectedCells.start.tableIndex);
-        }
-      };
+        const handleKeyDown = (e) => {
+            // Existing copy/paste handlers
+            if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+                handleCopy(e);
+            } else if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+                handlePaste(e);
+            }
+            // Add formula application shortcut
+            else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && selectedCells.start) {
+                e.preventDefault();
+                handleApplyFormulaToSelection(selectedCells.start.tableIndex);
+            }
+        };
 
-      document.addEventListener('keydown', handleKeyDown);
-      document.addEventListener('mouseup', handleCellMouseUp);
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('mouseup', handleCellMouseUp);
 
-      return () => {
-        document.removeEventListener('keydown', handleKeyDown);
-        document.removeEventListener('mouseup', handleCellMouseUp);
-      };
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('mouseup', handleCellMouseUp);
+        };
     }, [selectedCells, copiedData, tables]);
 
     const handleApplyFormulaToSelection = async (tableIndex) => {
-      if (!selectedCells.start || !selectedCells.end) return;
+        if (!selectedCells.start || !selectedCells.end) return;
 
-      try {
-        const newTables = [...tables];
-        const startCell = newTables[tableIndex].data[selectedCells.start.rowIndex][selectedCells.start.colIndex];
-        
-        // Check if the first cell contains a DATESERIES formula
-        if (typeof startCell === 'string' && startCell.startsWith('=DATESERIES')) {
-          const params = startCell.match(/DATESERIES\((.*)\)/i)[1].split(',').map(x => x.trim());
-          const startDate = new Date(params[0]);
-          const count = Math.abs(selectedCells.end.rowIndex - selectedCells.start.rowIndex + 1) *
-                        Math.abs(selectedCells.end.colIndex - selectedCells.start.colIndex + 1);
-          const increment = parseInt(params[2]) || 1;
-          
-          const dates = generateDateSeries(startDate, count, increment);
-          let dateIndex = 0;
+        try {
+            const newTables = [...tables];
+            const startCell = newTables[tableIndex].data[selectedCells.start.rowIndex][selectedCells.start.colIndex];
 
-          // Apply dates to selected range
-          const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
-          const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
-          const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
-          const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
+            // Check if the first cell contains a DATESERIES formula
+            if (typeof startCell === 'string' && startCell.startsWith('=DATESERIES')) {
+                const params = startCell.match(/DATESERIES\((.*)\)/i)[1].split(',').map(x => x.trim());
+                const startDate = new Date(params[0]);
+                const count = Math.abs(selectedCells.end.rowIndex - selectedCells.start.rowIndex + 1) *
+                    Math.abs(selectedCells.end.colIndex - selectedCells.start.colIndex + 1);
+                const increment = parseInt(params[2]) || 1;
 
-          for (let row = startRow; row <= endRow; row++) {
-            for (let col = startCol; col <= endCol; col++) {
-              newTables[tableIndex].data[row][col] = dates[dateIndex++];
+                const dates = generateDateSeries(startDate, count, increment);
+                let dateIndex = 0;
+
+                // Apply dates to selected range
+                const startRow = Math.min(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+                const endRow = Math.max(selectedCells.start.rowIndex, selectedCells.end.rowIndex);
+                const startCol = Math.min(selectedCells.start.colIndex, selectedCells.end.colIndex);
+                const endCol = Math.max(selectedCells.start.colIndex, selectedCells.end.colIndex);
+
+                for (let row = startRow; row <= endRow; row++) {
+                    for (let col = startCol; col <= endCol; col++) {
+                        newTables[tableIndex].data[row][col] = dates[dateIndex++];
+                    }
+                }
+
+                setTables(newTables);
+                await handleSaveExcelSheet(newTables);
             }
-          }
-
-          setTables(newTables);
-          await handleSaveExcelSheet(newTables);
+        } catch (error) {
+            console.error("Error applying date series:", error);
+            toast.error("Failed to apply date series");
         }
-      } catch (error) {
-        console.error("Error applying date series:", error);
-        toast.error("Failed to apply date series");
-      }
+    };
+
+    const { isDarkMode } = useTheme();
+    // Add darkModeStyles for unified card/table styling
+    const darkModeStyles = {
+        card: {
+            backgroundColor: isDarkMode ? '#2b2b2b' : '#fff',
+            color: isDarkMode ? '#fff' : '#000',
+            borderRadius: '16px',
+            border: 'none',
+            overflow: 'hidden',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        },
+        cardHeader: {
+            backgroundColor: isDarkMode ? '#363636' : '#f8f9fa',
+            color: isDarkMode ? '#fff' : '#000',
+        },
+        table: {
+            backgroundColor: isDarkMode ? '#2b2b2b' : '#fff',
+            color: isDarkMode ? '#fff' : '#000',
+        },
+        tableHeader: {
+            backgroundColor: isDarkMode ? '#363636' : '#f8f9fa',
+            color: isDarkMode ? '#fff' : '#000',
+        }
+    };
+
+    // Add this function inside MemberDashboard component
+    const handleExcelUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (evt) => {
+            const bstr = evt.target.result;
+            const wb = XLSX.read(bstr, { type: 'binary' });
+            const wsname = wb.SheetNames[0];
+            const ws = wb.Sheets[wsname];
+            const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+            // Convert data to your table format
+            const rows = data.length;
+            const cols = data[0]?.length || 0;
+            const tableData = data.map(row => {
+                // Fill missing columns with empty string
+                return Array.from({ length: cols }, (_, i) => row[i] || "");
+            });
+
+            // Add new table to tables state
+            const newTable = {
+                id: Date.now().toString(),
+                name: file.name,
+                rows,
+                cols,
+                data: tableData
+            };
+
+            // Update state and save to backend
+            setTables(prev => {
+                const updatedTables = [...prev, newTable];
+                (async () => {
+                    try {
+                        if (dashboardIds.excelSheet) {
+                            await axios.put(
+                                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet/${dashboardIds.excelSheet}`,
+                                {
+                                    tables: updatedTables,
+                                    employeeId: employeeCode
+                                }
+                            );
+                        } else {
+                            const response = await axios.post(
+                                `${import.meta.env.VITE_BASE_URL}api/employeeExcelSheet`,
+                                {
+                                    tables: updatedTables,
+                                    employeeId: employeeCode
+                                }
+                            );
+                            setDashboardIds(prev => ({ ...prev, excelSheet: response.data._id }));
+                        }
+                    } catch (error) {
+                        console.error("Error saving uploaded excel sheet:", error);
+                        toast.error("Failed to save uploaded excel sheet");
+                    }
+                })();
+                return updatedTables;
+            });
+        };
+        reader.readAsBinaryString(file);
     };
 
     return (
@@ -1751,9 +1843,9 @@ const MemberDashboard = () => {
                     <div className="body d-flex py-lg-3 py-md-2">
                         <div className="container-xxl">
                             <div className="col-12">
-                                <div className="card mb-3">
+                                <div className="card mb-3" style={darkModeStyles.card}>
                                     <div className="card-body text-center p-5">
-                                        {/* <div style={{ height: "8rem" }}>
+                                        <div style={{ height: "8rem" }}>
                                             <img
                                                 src="Images/pizeonflylogo.png"
                                                 className="img-fluid"
@@ -1765,269 +1857,251 @@ const MemberDashboard = () => {
                                                 }}
                                             />
                                             <p className="fs-6" style={{ color: "#4989fd" }}>An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span></p>
-                                        </div> */}
+                                        </div>
 
-                                        <div className="profile-section p-3 bg-white rounded-4 shadow-sm mb-4">
-                                            <div className="row g-3 align-items-center">
-                                                {/* Profile Image & Details Column */}
-                                                <div className="col-md-4">
-                                                    <div className="d-flex align-items-center">
-                                                        <div className="profile-image-container me-3">
-                                                            <img
-                                                                className="avatar rounded-circle border border-2 border-primary p-1"
-                                                                src={`${import.meta.env.VITE_BASE_URL}${image ? image.replace('uploads/', '') : ''}`}
-                                                                alt="profile"
-                                                                style={{
-                                                                    transition: 'all 0.3s ease-in-out',
-                                                                    // cursor: 'pointer',
-                                                                    width: '100px',
-                                                                    height: '100px',
-                                                                    objectFit: 'cover'
-                                                                }}
-                                                            // onMouseEnter={(e) => {
-                                                            //     e.target.style.transform = 'scale(2.5)';
-                                                            //     e.target.style.zIndex = '100';
-                                                            //     e.target.style.borderRadius = '8px';
-                                                            // }}
-                                                            // onMouseLeave={(e) => {
-                                                            //     e.target.style.transform = 'scale(1)';
-                                                            //     e.target.style.zIndex = '1';
-                                                            //     e.target.style.borderRadius = '50%';
-                                                            // }}
-                                                            // onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`)}
-                                                            />
-                                                        </div>
-                                                        <div className="profile-details">
-                                                            <h5 className="mb-1 fw-bold text-primary text-start">{employeeName}</h5>
-                                                            <p className="text-muted mb-1 small text-nowrap text-start">
-                                                                <i className="bi bi-envelope-fill me-2"></i>
-                                                                {email}
-                                                            </p>
-                                                            <p className="text-muted mb-1 small text-nowrap text-start">
-                                                                <i className="bi bi-telephone-fill me-2"></i>
-                                                                {employeeData?.phone}
-                                                            </p>
-                                                            <p className="text-muted mb-1 small text-nowrap text-start">
-                                                                <i className="bi bi-calendar-date me-2"></i>
-                                                                {employeeData?.joiningDate && new Date(employeeData.joiningDate).toLocaleDateString()}
-                                                            </p>
-                                                        </div>
+                                        {/* Profile Section */}
+                                        <div
+                                            className="profile-section mb-4"
+                                            style={{
+                                                borderRadius: 24,
+                                                background: isDarkMode
+                                                    ? 'linear-gradient(135deg, #232526 0%, #414345 100%)'
+                                                    : 'linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%)',
+                                                boxShadow: '0 8px 32px rgba(73,137,253,0.10)',
+                                                padding: isMobile ? '1.5rem 1rem' : '2.5rem 2rem',
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                                border: isDarkMode ? '1px solid #333' : '1px solid #e9ecef',
+                                                zIndex: 1,
+                                            }}
+                                        >
+                                            {/* Decorative gradient circle */}
+                                            <div
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: -60,
+                                                    right: -60,
+                                                    width: 180,
+                                                    height: 180,
+                                                    background: 'radial-gradient(circle, #4989fd55 0%, transparent 80%)',
+                                                    zIndex: 0,
+                                                    pointerEvents: 'none',
+                                                }}
+                                            />
+                                            <div className="row g-4 align-items-center" style={{ position: 'relative', zIndex: 2 }}>
+                                                {/* Profile Image & Details */}
+                                                <div className="col-12 col-md-4 d-flex flex-column align-items-center">
+                                                    <div
+                                                        className="profile-image-container mb-3"
+                                                        style={{
+                                                            borderRadius: '50%',
+                                                            border: '5px solid #fff',
+                                                            boxShadow: '0 0 0 6px #4989fd44, 0 8px 32px #4989fd22',
+                                                            overflow: 'hidden',
+                                                            width: 130,
+                                                            height: 130,
+                                                            background: '#fff',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            transition: 'box-shadow 0.3s, transform 0.3s',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                        onMouseOver={e => {
+                                                            e.currentTarget.style.boxShadow = '0 0 0 10px #4989fd88, 0 16px 48px #4989fd33';
+                                                            e.currentTarget.style.transform = 'scale(1.04)';
+                                                        }}
+                                                        onMouseOut={e => {
+                                                            e.currentTarget.style.boxShadow = '0 0 0 6px #4989fd44, 0 8px 32px #4989fd22';
+                                                            e.currentTarget.style.transform = 'scale(1)';
+                                                        }}
+                                                        onClick={() => handleImageClick(`${import.meta.env.VITE_BASE_URL}${image ? image.replace('uploads/', '') : ''}`)}
+                                                    >
+                                                        <img
+                                                            className="avatar"
+                                                            src={`${import.meta.env.VITE_BASE_URL}${image ? image.replace('uploads/', '') : ''}`}
+                                                            alt="profile"
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '100%',
+                                                                objectFit: 'cover',
+                                                                borderRadius: '50%',
+                                                                transition: 'filter 0.3s',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <h3 className="fw-bold mb-1" style={{
+                                                        color: '#4989fd',
+                                                        textAlign: 'center',
+                                                        letterSpacing: 1,
+                                                        textShadow: '0 2px 8px #4989fd22'
+                                                    }}>{employeeName}</h3>
+                                                    <div className="d-flex flex-column align-items-center gap-1 mt-2">
+                                                        <span className="badge rounded-pill bg-light text-dark px-3 py-2" style={{ fontSize: 13 }}>
+                                                            <i className="bi bi-envelope-fill me-2 text-primary"></i>{email}
+                                                        </span>
+                                                        <span className="badge rounded-pill bg-light text-dark px-3 py-2" style={{ fontSize: 13 }}>
+                                                            <i className="bi bi-telephone-fill me-2 text-success"></i>{employeeData.phone}
+                                                        </span>
+                                                        <span className="badge rounded-pill bg-light text-dark px-3 py-2" style={{ fontSize: 13 }}>
+                                                            <i className="bi bi-calendar-date me-2 text-warning"></i>
+                                                            {employeeData.joiningDate ? new Date(employeeData.joiningDate).toLocaleDateString() : ''}
+                                                        </span>
                                                     </div>
                                                     <button
-                                                        className="btn btn-sm btn-outline-primary mt-2"
+                                                        className="btn btn-gradient btn-sm mt-4"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#bankDetailsModal"
+                                                        style={{
+                                                            borderRadius: '20px',
+                                                            fontWeight: 600,
+                                                            background: 'linear-gradient(90deg, #4989fd 0%, #6a82fb 100%)',
+                                                            color: '#fff',
+                                                            boxShadow: '0 2px 8px #4989fd33',
+                                                            border: 'none',
+                                                            padding: '8px 24px',
+                                                            marginTop: 16,
+                                                        }}
                                                     >
-                                                        <i className="bi bi-bank me-2"></i>
-                                                        View Bank Details
+                                                        <i className="bi bi-bank me-2"></i>View Bank Details
                                                     </button>
                                                 </div>
 
-                                                {/* Documents and Social Links in a row */}
-                                                <div className="col-md-8">
-                                                    <div className="row">
-                                                        {/* Documents Column */}
-                                                        <div className="col-md-6">
-                                                            <div className="documents-section p-2 rounded-3">
-                                                                <h6 className="mb-2 fw-bold">
-                                                                    <i className="bi bi-file-earmark-text me-2 text-secondary"></i>
-                                                                    Documents
+                                                {/* Documents & Social Links */}
+                                                <div className="col-12 col-md-8">
+                                                    <div className="row g-3">
+                                                        {/* Documents */}
+                                                        <div className="col-12 col-lg-6">
+                                                            <div
+                                                                className="p-4 rounded-4 shadow-sm h-100"
+                                                                style={{
+                                                                    background: isDarkMode
+                                                                        ? 'linear-gradient(120deg, #232526 60%, #414345 100%)'
+                                                                        : 'linear-gradient(120deg, #f8fafc 60%, #e9ecef 100%)',
+                                                                    border: isDarkMode ? '1px solid #333' : '1px solid #e9ecef',
+                                                                    minHeight: 190,
+                                                                    boxShadow: '0 2px 12px #4989fd11',
+                                                                }}
+                                                            >
+                                                                <h6 className="fw-bold mb-3" style={{ color: '#4989fd', letterSpacing: 1 }}>
+                                                                    <i className="bi bi-file-earmark-text me-2"></i>Documents
                                                                 </h6>
-                                                                <div className="row g-2 mt-2">
-                                                                    {/* Aadhaar Card */}
-                                                                    <div className="col-12">
-                                                                        <div className="document-card p-2 border rounded-3 bg-white">
-                                                                            <div className="d-flex align-items-center justify-content-between">
-                                                                                <strong className="small">
-                                                                                    <i className="bi bi-card-text text-secondary me-1"></i>
-                                                                                    Aadhaar Card
-                                                                                </strong>
-                                                                                {aadhaarCard ? (
-                                                                                    <div className="d-flex gap-1">
-                                                                                        <button
-                                                                                            className="btn btn-sm btn-outline-primary"
-                                                                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, aadhaarCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
-                                                                                        >
-                                                                                            <i className="bi bi-eye small"></i>
-                                                                                        </button>
-                                                                                        <button
-                                                                                            className="btn btn-sm btn-outline-success py-0 px-1"
-                                                                                            onClick={(e) => {
-                                                                                                e.preventDefault();
-                                                                                                handleDownload(
-                                                                                                    `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`,
-                                                                                                    `aadhaar-card${aadhaarCard.substring(aadhaarCard.lastIndexOf('.'))}`
-                                                                                                );
-                                                                                            }}
-                                                                                        >
-                                                                                            <i className="bi bi-download small"></i>
-                                                                                        </button>
-                                                                                    </div>
-                                                                                ) : (
-                                                                                    <span className="text-danger small">
-                                                                                        <i className="bi bi-x-circle"></i>
-                                                                                    </span>
-                                                                                )}
+                                                                <div className="d-flex flex-column gap-3">
+                                                                    {/* Aadhaar */}
+                                                                    <div className="d-flex align-items-center justify-content-between">
+                                                                        <span>
+                                                                            <i className="bi bi-card-text text-secondary me-1"></i> Aadhaar Card
+                                                                        </span>
+                                                                        {aadhaarCard ? (
+                                                                            <div className="d-flex gap-1">
+                                                                                <button className="btn btn-sm btn-outline-primary py-0 px-1"
+                                                                                    onClick={e => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, aadhaarCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}>
+                                                                                    <i className="bi bi-eye small"></i>
+                                                                                </button>
+                                                                                <button className="btn btn-sm btn-outline-success py-0 px-1"
+                                                                                    onClick={e => { e.preventDefault(); handleDownload(`${import.meta.env.VITE_BASE_URL}${aadhaarCard.replace('uploads/', '')}`, `aadhaar-card${aadhaarCard.substring(aadhaarCard.lastIndexOf('.'))}`); }}>
+                                                                                    <i className="bi bi-download small"></i>
+                                                                                </button>
                                                                             </div>
-                                                                        </div>
+                                                                        ) : <span className="text-danger small"><i className="bi bi-x-circle"></i></span>}
                                                                     </div>
-
-                                                                    {/* Pan Card */}
-                                                                    <div className="col-12">
-                                                                        <div className="document-card p-2 border rounded-3 bg-white">
-                                                                            <div className="d-flex align-items-center justify-content-between">
-                                                                                <strong className="small">
-                                                                                    <i className="bi bi-card-heading text-secondary me-1"></i>
-                                                                                    PAN Card
-                                                                                </strong>
-                                                                                {panCard ? (
-                                                                                    <div className="d-flex gap-1">
-                                                                                        <button
-                                                                                            className="btn btn-sm btn-outline-primary py-0 px-1"
-                                                                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, panCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
-                                                                                        >
-                                                                                            <i className="bi bi-eye small"></i>
-                                                                                        </button>
-                                                                                        <button
-                                                                                            className="btn btn-sm btn-outline-success py-0 px-1"
-                                                                                            onClick={(e) => {
-                                                                                                e.preventDefault();
-                                                                                                handleDownload(
-                                                                                                    `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`,
-                                                                                                    `pan-card${panCard.substring(panCard.lastIndexOf('.'))}`
-                                                                                                );
-                                                                                            }}
-                                                                                        >
-                                                                                            <i className="bi bi-download small"></i>
-                                                                                        </button>
-                                                                                    </div>
-                                                                                ) : (
-                                                                                    <span className="text-danger small">
-                                                                                        <i className="bi bi-x-circle"></i>
-                                                                                    </span>
-                                                                                )}
+                                                                    {/* PAN */}
+                                                                    <div className="d-flex align-items-center justify-content-between">
+                                                                        <span>
+                                                                            <i className="bi bi-card-heading text-secondary me-1"></i> PAN Card
+                                                                        </span>
+                                                                        {panCard ? (
+                                                                            <div className="d-flex gap-1">
+                                                                                <button className="btn btn-sm btn-outline-primary py-0 px-1"
+                                                                                    onClick={e => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, panCard.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}>
+                                                                                    <i className="bi bi-eye small"></i>
+                                                                                </button>
+                                                                                <button className="btn btn-sm btn-outline-success py-0 px-1"
+                                                                                    onClick={e => { e.preventDefault(); handleDownload(`${import.meta.env.VITE_BASE_URL}${panCard.replace('uploads/', '')}`, `pan-card${panCard.substring(panCard.lastIndexOf('.'))}`); }}>
+                                                                                    <i className="bi bi-download small"></i>
+                                                                                </button>
                                                                             </div>
-                                                                        </div>
+                                                                        ) : <span className="text-danger small"><i className="bi bi-x-circle"></i></span>}
                                                                     </div>
-
                                                                     {/* Resume */}
-                                                                    <div className="col-12">
-                                                                        <div className="document-card p-2 border rounded-3 bg-white">
-                                                                            <div className="d-flex align-items-center justify-content-between">
-                                                                                <strong className="small">
-                                                                                    <i className="bi bi-file-person text-secondary me-1"></i>
-                                                                                    Resume
-                                                                                </strong>
-                                                                                {resume ? (
-                                                                                    <div className="d-flex gap-1">
-                                                                                        <button
-                                                                                            className="btn btn-sm btn-outline-primary py-0 px-1"
-                                                                                            onClick={(e) => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, resume.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}
-                                                                                        >
-                                                                                            <i className="bi bi-eye small"></i>
-                                                                                        </button>
-                                                                                        <button
-                                                                                            className="btn btn-sm btn-outline-success py-0 px-1"
-                                                                                            onClick={(e) => {
-                                                                                                e.preventDefault();
-                                                                                                handleDownload(
-                                                                                                    `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`,
-                                                                                                    `resume${resume.substring(resume.lastIndexOf('.'))}`
-                                                                                                );
-                                                                                            }}
-                                                                                        >
-                                                                                            <i className="bi bi-download small"></i>
-                                                                                        </button>
-                                                                                    </div>
-                                                                                ) : (
-                                                                                    <span className="text-danger small">
-                                                                                        <i className="bi bi-x-circle"></i>
-                                                                                    </span>
-                                                                                )}
+                                                                    <div className="d-flex align-items-center justify-content-between">
+                                                                        <span>
+                                                                            <i className="bi bi-file-person text-secondary me-1"></i> Resume
+                                                                        </span>
+                                                                        {resume ? (
+                                                                            <div className="d-flex gap-1">
+                                                                                <button className="btn btn-sm btn-outline-primary py-0 px-1"
+                                                                                    onClick={e => handleFileClick(e, `${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, resume.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image')}>
+                                                                                    <i className="bi bi-eye small"></i>
+                                                                                </button>
+                                                                                <button className="btn btn-sm btn-outline-success py-0 px-1"
+                                                                                    onClick={e => { e.preventDefault(); handleDownload(`${import.meta.env.VITE_BASE_URL}${resume.replace('uploads/', '')}`, `resume${resume.substring(resume.lastIndexOf('.'))}`); }}>
+                                                                                    <i className="bi bi-download small"></i>
+                                                                                </button>
                                                                             </div>
-                                                                        </div>
+                                                                        ) : <span className="text-danger small"><i className="bi bi-x-circle"></i></span>}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                        {/* Social Links Column */}
-                                                        <div className="col-md-6">
-                                                            <div className="social-links-section p-2">
-                                                                <h6 className="mb-2 fw-bold">
-                                                                    <i className="bi bi-share me-2 text-secondary"></i>
-                                                                    Social Links
+                                                        {/* Social Links */}
+                                                        <div className="col-12 col-lg-6">
+                                                            <div
+                                                                className="p-4 rounded-4 shadow-sm h-100"
+                                                                style={{
+                                                                    background: isDarkMode
+                                                                        ? 'linear-gradient(120deg, #232526 60%, #414345 100%)'
+                                                                        : 'linear-gradient(120deg, #f8fafc 60%, #e9ecef 100%)',
+                                                                    border: isDarkMode ? '1px solid #333' : '1px solid #e9ecef',
+                                                                    minHeight: 190,
+                                                                    boxShadow: '0 2px 12px #4989fd11',
+                                                                }}
+                                                            >
+                                                                <h6 className="fw-bold mb-3" style={{ color: '#4989fd', letterSpacing: 1 }}>
+                                                                    <i className="bi bi-share me-2"></i>Social Links
                                                                 </h6>
-                                                                <div className="row g-2 mt-2">
+                                                                <div className="d-flex flex-wrap gap-2">
                                                                     {employeeData?.socialLinks?.linkedin && (
-                                                                        <div className="col-2">
-                                                                            <a href={employeeData.socialLinks.linkedin}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="btn btn-outline-primary btn-sm">
-                                                                                <i className="bi bi-linkedin"></i>
-                                                                            </a>
-                                                                        </div>
+                                                                        <a href={employeeData.socialLinks.linkedin} target="_blank" rel="noopener noreferrer"
+                                                                            className="btn btn-outline-primary btn-sm rounded-circle shadow-sm" title="LinkedIn">
+                                                                            <i className="bi bi-linkedin"></i>
+                                                                        </a>
                                                                     )}
                                                                     {employeeData?.socialLinks?.github && (
-                                                                        <div className="col-2">
-                                                                            <a href={employeeData.socialLinks.github}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="btn btn-outline-dark btn-sm">
-                                                                                <i className="bi bi-github"></i>
-                                                                            </a>
-                                                                        </div>
+                                                                        <a href={employeeData.socialLinks.github} target="_blank" rel="noopener noreferrer"
+                                                                            className="btn btn-outline-dark btn-sm rounded-circle shadow-sm" title="GitHub">
+                                                                            <i className="bi bi-github"></i>
+                                                                        </a>
                                                                     )}
                                                                     {employeeData?.socialLinks?.instagram && (
-                                                                        <div className="col-2">
-                                                                            <a href={employeeData.socialLinks.instagram}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="btn btn-outline-danger btn-sm">
-                                                                                <i className="bi bi-instagram"></i>
-                                                                            </a>
-                                                                        </div>
+                                                                        <a href={employeeData.socialLinks.instagram} target="_blank" rel="noopener noreferrer"
+                                                                            className="btn btn-outline-danger btn-sm rounded-circle shadow-sm" title="Instagram">
+                                                                            <i className="bi bi-instagram"></i>
+                                                                        </a>
                                                                     )}
                                                                     {employeeData?.socialLinks?.youtube && (
-                                                                        <div className="col-2">
-                                                                            <a href={employeeData.socialLinks.youtube}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="btn btn-outline-danger btn-sm">
-                                                                                <i className="bi bi-youtube"></i>
-                                                                            </a>
-                                                                        </div>
+                                                                        <a href={employeeData.socialLinks.youtube} target="_blank" rel="noopener noreferrer"
+                                                                            className="btn btn-outline-danger btn-sm rounded-circle shadow-sm" title="YouTube">
+                                                                            <i className="bi bi-youtube"></i>
+                                                                        </a>
                                                                     )}
                                                                     {employeeData?.socialLinks?.facebook && (
-                                                                        <div className="col-2">
-                                                                            <a href={employeeData.socialLinks.facebook}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="btn btn-outline-primary btn-sm">
-                                                                                <i className="bi bi-facebook"></i>
-                                                                            </a>
-                                                                        </div>
+                                                                        <a href={employeeData.socialLinks.facebook} target="_blank" rel="noopener noreferrer"
+                                                                            className="btn btn-outline-primary btn-sm rounded-circle shadow-sm" title="Facebook">
+                                                                            <i className="bi bi-facebook"></i>
+                                                                        </a>
                                                                     )}
                                                                     {employeeData?.socialLinks?.website && (
-                                                                        <div className="col-2">
-                                                                            <a href={employeeData.socialLinks.website}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="btn btn-outline-info btn-sm">
-                                                                                <i className="bi bi-globe"></i>
-                                                                            </a>
-                                                                        </div>
+                                                                        <a href={employeeData.socialLinks.website} target="_blank" rel="noopener noreferrer"
+                                                                            className="btn btn-outline-info btn-sm rounded-circle shadow-sm" title="Website">
+                                                                            <i className="bi bi-globe"></i>
+                                                                        </a>
                                                                     )}
                                                                     {employeeData?.socialLinks?.other && (
-                                                                        <div className="col-2">
-                                                                            <a href={employeeData.socialLinks.other}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="btn btn-outline-secondary btn-sm">
-                                                                                <i className="bi bi-link-45deg"></i>
-                                                                            </a>
-                                                                        </div>
+                                                                        <a href={employeeData.socialLinks.other} target="_blank" rel="noopener noreferrer"
+                                                                            className="btn btn-outline-secondary btn-sm rounded-circle shadow-sm" title="Other">
+                                                                            <i className="bi bi-link-45deg"></i>
+                                                                        </a>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -2035,86 +2109,44 @@ const MemberDashboard = () => {
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            {/* Add Edit Profile Button */}
-                                            {/* <div className="position-absolute bottom-0 end-0 m-3">
-
-                                                <i className="bi bi-pencil-square">Edit Profile</i>
-
-
-                                            </div> */}
                                         </div>
-
-                                        {/* Keep the existing styles */}
-                                        <style jsx>{`
-                      .profile-section {
-                        transition: all 0.3s ease;
-                        background: linear-gradient(145deg, #ffffff, #f5f7fa);
-                        position: relative;  /* Add this to enable absolute positioning of children */
-                        min-height: 160px;   /* Add minimum height to ensure space for the button */
-                      }
-                      
-                      .profile-section:hover {
-                        transform: translateY(-3px);
-                        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
-                      }
-                      
-                      .document-card {
-                        transition: all 0.3s ease;
-                      }
-                      
-                      .document-card:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                      }
-                      
-                      .cursor-pointer {
-                        cursor: pointer;
-                      }
-                      
-                      .btn {
-                        transition: all 0.3s ease;
-                      }
-                      
-                      .btn:hover {
-                        transform: translateY(-2px);
-                      }
-                    `}</style>
 
                                         <div className="row justify-content-center">
                                             <div className="col-12 col-md-6 mb-4">
-                                                <div className="card shadow-lg">
-                                                    <div className="card-body">
-                                                        {/* <div className="d-flex justify-content-between align-items-center"> */}
-                                                        {/* <div></div> */}
-                                                        <h5 className="card-title">Total Projects Assigned</h5>
-                                                        {/* <button
-                                                                type="button"
-                                                                className="btn"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#createproject"
-                                                            >
-                                                                <i className="icofont-plus-circle me-1 text-primary fs-4" />
-                                                            </button> */}
-                                                        {/* </div> */}
-                                                        <div className="">
-                                                            <h2 className="mb-4 text-center" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalProjects}</h2>
-                                                            {/* <span className="text-muted mb-4">({(totalProjects / (totalProjects + totalTasks) * 100).toFixed(1)}%)</span> */}
-                                                            {/* Project Progress Bar */}
-                                                            <p>
-                                                                <EmployeeProjectProgressBar projects={assignedProjects} />
-                                                            </p>
+                                                <div className="card shadow-lg mb-4" style={{
+                                                    ...darkModeStyles.card,
+                                                    borderRadius: '16px',
+                                                    border: 'none',
+                                                    overflow: 'hidden',
+                                                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                                    cursor: 'pointer',
+                                                    background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
+                                                }}
+                                                    onMouseOver={e => {
+                                                        e.currentTarget.style.transform = 'translateY(-5px)';
+                                                        e.currentTarget.style.boxShadow = '0 16px 30px rgba(0,0,0,0.15)';
+                                                    }}
+                                                    onMouseOut={e => {
+                                                        e.currentTarget.style.transform = 'translateY(0)';
+                                                        e.currentTarget.style.boxShadow = '';
+                                                    }}
+                                                >
+                                                    <div style={{ height: '6px', background: 'linear-gradient(to right, rgba(54, 162, 235, 1), rgba(153, 102, 255, 1))' }}></div>
+                                                    <div className="card-body" style={{ padding: '1.5rem' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'center' }}>
+                                                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Total Projects Assigned</h5>
                                                         </div>
-
-
+                                                        <div className="mb-4 text-center">
+                                                            <h2 style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalProjects}</h2>
+                                                        </div>
+                                                        <div className="mb-4">
+                                                            <EmployeeProjectProgressBar projects={assignedProjects} />
+                                                        </div>
                                                         <div className="table-responsive" style={{
-                                                            height: '400px',
+                                                            height: '300px',
                                                             overflowY: 'auto',
-                                                            msOverflowStyle: 'none',  /* IE and Edge */
-                                                            scrollbarWidth: 'none',   /* Firefox */
-                                                            '&::-webkit-scrollbar': {
-                                                                display: 'none'       /* Chrome, Safari and Opera */
-                                                            }
+                                                            msOverflowStyle: 'none',
+                                                            scrollbarWidth: 'none',
                                                         }}>
                                                             <table className="table table-hover">
                                                                 <thead>
@@ -2162,27 +2194,40 @@ const MemberDashboard = () => {
                                                 </div>
                                             </div>
                                             <div className="col-12 col-md-6 mb-4">
-                                                <div className="card shadow-lg">
-                                                    <div className="card-body">
-                                                        <h5 className="card-title text-center">Total Tasks Assigned</h5>
-
-                                                        <div className="">
-                                                            <h2 className="mb-4 text-center" style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalTasks}</h2>
-                                                            {/* <span className="text-muted mb-4">({(totalTasks / (totalProjects + totalTasks) * 100).toFixed(1)}%)</span> */}
-                                                            {/* Task Progress Bar */}
-                                                            <p>
-                                                                <EmployeeTaskProgressBar tasks={assignedTasks} />
-                                                            </p>
+                                                <div className="card shadow-lg mb-4" style={{
+                                                    ...darkModeStyles.card,
+                                                    borderRadius: '16px',
+                                                    border: 'none',
+                                                    overflow: 'hidden',
+                                                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                                    cursor: 'pointer',
+                                                    background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
+                                                }}
+                                                    onMouseOver={e => {
+                                                        e.currentTarget.style.transform = 'translateY(-5px)';
+                                                        e.currentTarget.style.boxShadow = '0 16px 30px rgba(0,0,0,0.15)';
+                                                    }}
+                                                    onMouseOut={e => {
+                                                        e.currentTarget.style.transform = 'translateY(0)';
+                                                        e.currentTarget.style.boxShadow = '';
+                                                    }}
+                                                >
+                                                    <div style={{ height: '6px', background: 'linear-gradient(to right, rgba(255, 206, 86, 1), rgba(54, 162, 235, 1))' }}></div>
+                                                    <div className="card-body" style={{ padding: '1.5rem' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'center' }}>
+                                                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Total Tasks Assigned</h5>
                                                         </div>
-
+                                                        <div className="mb-4 text-center">
+                                                            <h2 style={{ color: 'rgba(54, 162, 235, 1)' }}>{totalTasks}</h2>
+                                                        </div>
+                                                        <div className="mb-4">
+                                                            <EmployeeTaskProgressBar tasks={assignedTasks} />
+                                                        </div>
                                                         <div className="table-responsive" style={{
-                                                            height: '400px',
+                                                            height: '300px',
                                                             overflowY: 'auto',
-                                                            msOverflowStyle: 'none',  /* IE and Edge */
-                                                            scrollbarWidth: 'none',   /* Firefox */
-                                                            '&::-webkit-scrollbar': {
-                                                                display: 'none'       /* Chrome, Safari and Opera */
-                                                            }
+                                                            msOverflowStyle: 'none',
+                                                            scrollbarWidth: 'none',
                                                         }}>
                                                             <table className="table table-hover">
                                                                 <thead>
@@ -2191,7 +2236,6 @@ const MemberDashboard = () => {
                                                                         <th>Task Name</th>
                                                                         <th>Project</th>
                                                                         <th>Status</th>
-                                                                        {/* <th>Priority</th> */}
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -2216,17 +2260,6 @@ const MemberDashboard = () => {
                                                                                         : task.taskStatus || 'Not Started'}
                                                                                 </span>
                                                                             </td>
-                                                                            {/* <td>
-                                                                                <span className={`badge ${
-                                                                                    task.taskPriority === 'High' 
-                                                                                        ? 'bg-danger'
-                                                                                        : task.taskPriority === 'Medium'
-                                                                                        ? 'bg-warning'
-                                                                                        : 'bg-info'
-                                                                                }`}>
-                                                                                    {task.taskPriority}
-                                                                                </span>
-                                                                            </td> */}
                                                                         </tr>
                                                                     ))}
                                                                 </tbody>
@@ -2235,23 +2268,68 @@ const MemberDashboard = () => {
                                                     </div>
                                                 </div>
                                             </div>
-
                                         </div>
+
 
                                         <div className="row justify-content-center mt-3">
                                             <div className={`col-12 ${isSmallScreen() ? 'mb-4' : 'col-md-8'}`}>
-                                                <div className="card shadow-lg mb-4">
-                                                    <div className="card-body">
-                                                        <h5 className="card-title text-center mb-4">Overall Summary</h5>
-                                                        <Bar data={overallChartData} options={chartOptions} />
+                                                <div className="card shadow-lg mb-4" style={{
+                                                    ...darkModeStyles.card,
+                                                    borderRadius: '16px',
+                                                    border: 'none',
+                                                    overflow: 'hidden',
+                                                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                                    cursor: 'pointer',
+                                                    background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
+                                                }}
+                                                    onMouseOver={e => {
+                                                        e.currentTarget.style.transform = 'translateY(-5px)';
+                                                        e.currentTarget.style.boxShadow = '0 16px 30px rgba(0,0,0,0.15)';
+                                                    }}
+                                                    onMouseOut={e => {
+                                                        e.currentTarget.style.transform = 'translateY(0)';
+                                                        e.currentTarget.style.boxShadow = '';
+                                                    }}
+                                                >
+                                                    <div style={{ height: '6px', background: 'linear-gradient(to right, rgba(255, 99, 132, 1), rgba(54, 162, 235, 1))' }}></div>
+                                                    <div className="card-body" style={{ padding: '1.5rem' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'center' }}>
+                                                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Overall Summary</h5>
+                                                        </div>
+                                                        <div style={{ marginTop: '10px' }}>
+                                                            <Bar data={overallChartData} options={chartOptions} />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className={`col-12 ${isSmallScreen() ? '' : 'col-md-4'}`}>
-                                                <div className="card shadow-lg" style={{ height: '95%' }}>
-                                                    <div className="card-body">
-                                                        <h5 className="card-title text-center">Project Status</h5>
-                                                        <Doughnut data={taskStatusChartData} options={doughnutOptions} />
+                                                <div className="card shadow-lg" style={{
+                                                    ...darkModeStyles.card,
+                                                    borderRadius: '16px',
+                                                    border: 'none',
+                                                    overflow: 'hidden',
+                                                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                                    cursor: 'pointer',
+                                                    height: '100%',
+                                                    background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
+                                                }}
+                                                    onMouseOver={e => {
+                                                        e.currentTarget.style.transform = 'translateY(-5px)';
+                                                        e.currentTarget.style.boxShadow = '0 16px 30px rgba(0,0,0,0.15)';
+                                                    }}
+                                                    onMouseOut={e => {
+                                                        e.currentTarget.style.transform = 'translateY(0)';
+                                                        e.currentTarget.style.boxShadow = '';
+                                                    }}
+                                                >
+                                                    <div style={{ height: '6px', background: 'rgba(153, 102, 255, 1)' }}></div>
+                                                    <div className="card-body" style={{ padding: '1.5rem' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'center' }}>
+                                                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Project Status</h5>
+                                                        </div>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100% - 60px)' }}>
+                                                            <Doughnut data={taskStatusChartData} options={doughnutOptions} />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2691,9 +2769,37 @@ const MemberDashboard = () => {
                                                                         <i className="icofont-plus me-1" />
                                                                         <span className="">Add Excel Sheet</span>
                                                                     </button>
+                                                                    <div className="container mb-3 mt-3">
+                                                                        <input
+                                                                            type="file"
+                                                                            accept=".xlsx,.xls,.csv"
+                                                                            style={{ display: 'none' }}
+                                                                            id="excel-upload"
+                                                                            onChange={handleExcelUpload}
+                                                                        />
+                                                                        <label
+                                                                            htmlFor="excel-upload"
+                                                                            className="btn btn-success mb-2 btn-lg fw-bold excel-upload-label"
+                                                                            style={{
+                                                                                borderRadius: '30px',
+                                                                                padding: '12px 35px',
+                                                                                transition: 'all 0.3s ease',
+                                                                                textTransform: 'uppercase',
+                                                                                letterSpacing: '1px',
+                                                                                fontWeight: '600',
+                                                                                fontSize: '0.9rem',
+                                                                                color: '#fff',
+                                                                            }}
+                                                                            onMouseOver={e => { e.currentTarget.style.color = '#fff'; }}
+                                                                            onMouseOut={e => { e.currentTarget.style.color = ''; }}
+                                                                        >
+                                                                            <i className="bi bi-upload me-2"></i> Upload Excel
+                                                                        </label>
+                                                                    </div>
                                                                 </div>
                                                             ) : (
                                                                 <>
+
                                                                     {tables.map((table, tableIndex) => (
                                                                         <div key={table.id} className="">
                                                                             <div className="d-flex justify-content-center align-items-center mb-3">
@@ -2919,14 +3025,16 @@ const MemberDashboard = () => {
                                                                                 </div>
 
                                                                                 <div className='btn-group'>
-                                                                                    <button
-                                                                                        className="btn btn-primary me-1"
-                                                                                        onClick={addTable}
-                                                                                        title='Add New Table'
-                                                                                    >
-                                                                                        <i className="icofont-plus me-1" />
-                                                                                        <span className="">Table</span>
-                                                                                    </button>
+                                                                                    {tableIndex === tables.length - 1 && (
+                                                                                        <button
+                                                                                            className="btn btn-primary me-1"
+                                                                                            onClick={addTable}
+                                                                                            title='Add New Table'
+                                                                                        >
+                                                                                            <i className="icofont-plus me-1" />
+                                                                                            <span className="">Table</span>
+                                                                                        </button>
+                                                                                    )}
                                                                                     <button
                                                                                         className="btn btn-secondary me-1"
                                                                                         onClick={() => addRow(tableIndex)}
@@ -2969,7 +3077,35 @@ const MemberDashboard = () => {
 
                                                                             <hr className="my-4" />
                                                                         </div>
+
                                                                     ))}
+                                                                    <div className="container mb-3 mt-3">
+                                                                        <input
+                                                                            type="file"
+                                                                            accept=".xlsx,.xls,.csv"
+                                                                            style={{ display: 'none' }}
+                                                                            id="excel-upload"
+                                                                            onChange={handleExcelUpload}
+                                                                        />
+                                                                        <label
+                                                                            htmlFor="excel-upload"
+                                                                            className="btn btn-success mb-2 btn-lg fw-bold excel-upload-label"
+                                                                            style={{
+                                                                                borderRadius: '30px',
+                                                                                padding: '12px 35px',
+                                                                                transition: 'all 0.3s ease',
+                                                                                textTransform: 'uppercase',
+                                                                                letterSpacing: '1px',
+                                                                                fontWeight: '600',
+                                                                                fontSize: '0.9rem',
+                                                                                color: '#fff',
+                                                                            }}
+                                                                            onMouseOver={e => { e.currentTarget.style.color = '#fff'; }}
+                                                                            onMouseOut={e => { e.currentTarget.style.color = ''; }}
+                                                                        >
+                                                                            <i className="bi bi-upload me-2"></i> Upload Excel
+                                                                        </label>
+                                                                    </div>
                                                                 </>
                                                             )}
                                                         </>

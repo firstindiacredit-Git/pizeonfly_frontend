@@ -2488,15 +2488,22 @@ const ProjectDashboard = () => {
                     id="excel-upload"
                     onChange={handleExcelUpload}
                   />
-                  <label htmlFor="excel-upload" className="btn btn-success mb-2 btn-lg fw-bold" style={{
-                    borderRadius: '30px',
-                    padding: '12px 35px',
-                    transition: 'all 0.3s ease',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px',
-                    fontWeight: '600',
-                    fontSize: '0.9rem'
-                  }}>
+                  <label
+                    htmlFor="excel-upload"
+                    className="btn btn-success mb-2 btn-lg fw-bold excel-upload-label"
+                    style={{
+                      borderRadius: '30px',
+                      padding: '12px 35px',
+                      transition: 'all 0.3s ease',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      fontWeight: '600',
+                      fontSize: '0.9rem',
+                      color: '#fff', // default text color
+                    }}
+                    onMouseOver={e => { e.currentTarget.style.color = '#fff'; }}
+                    onMouseOut={e => { e.currentTarget.style.color = ''; }}
+                  >
                     <i className="bi bi-upload me-2"></i> Upload Excel
                   </label>
                 </div>
