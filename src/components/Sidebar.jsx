@@ -7,7 +7,7 @@ import Header from './Header';
 import { useTheme } from '../context/ThemeContext';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { toast } from "react-toastify";
 
 
 const Sidebar = () => {
@@ -26,6 +26,9 @@ const Sidebar = () => {
   const fileInputRef = useRef(null);
   const [user, setUser] = useState(null);
   const location = useLocation();
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -162,25 +165,31 @@ const Sidebar = () => {
         }
       );
 
-      const updatedUser = { ...JSON.parse(localStorage.getItem("user")), ...response.data.user };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      if (response.data && response.data.user) {
+        const updatedUser = { ...JSON.parse(localStorage.getItem("user")), ...response.data.user };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
 
-      const modalElement = document.getElementById("profileModal");
-      const modal = window.bootstrap.Modal.getInstance(modalElement);
-      modal.hide();
+        // Modal close
+        const modalElement = document.getElementById("profileModal");
+        const modal = window.bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+          modal.hide();
+        }
 
-      toast.success("Profile updated successfully!", {
-        style: {
-          backgroundColor: "#0d6efd",
-          color: "white",
-        },
-      });
-      setSelectedImage(null);
+        toast.success("Profile updated successfully!", {
+          style: {
+            backgroundColor: "#0d6efd",
+            color: "white",
+          },
+        });
+        setSelectedImage(null);
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000);
-
+        setTimeout(() => {
+          window.location.reload();
+        }, 5000);
+      } else {
+        toast.error("Failed to update profile");
+      }
     } catch (error) {
       toast.error("Failed to update profile");
     }
@@ -547,38 +556,73 @@ const Sidebar = () => {
                   <div className="container">
                     <div className="row">
                       <div className="col-12">
-                        <label htmlFor="currentStatus" className="fw-bold fs-5">
+                        <label htmlFor="currentStatus" className="fw-bold fs-5 text-dark">
                           Change Password
                         </label>
                         <div className="mb-3 mt-3">
-                          <label className="form-label fw-bold">Email</label>
+                          <label className="form-label fw-bold text-dark">Email</label>
                           <input
                             type="email"
-                            className="form-control"
+                            className="form-control bg-transparent border-0"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
+                            disabled
                           />
                         </div>
                         <div className="mb-3 mt-3">
-                          <label className="form-label fw-bold">Old Password</label>
-                          <input
-                            type="password"
-                            className="form-control"
-                            value={oldPassword}
-                            onChange={(e) => setOldPassword(e.target.value)}
-                            required
-                          />
+                          <label className="form-label fw-bold text-dark">Old Password</label>
+                          <div style={{ position: "relative" }}>
+                            <input
+                              type={showOldPassword ? "text" : "password"}
+                              className="form-control"
+                              value={oldPassword}
+                              onChange={(e) => setOldPassword(e.target.value)}
+                              required
+                              style={{ paddingRight: "2.5rem" }}
+                            />
+                            <span
+                              style={{
+                                position: "absolute",
+                                right: "10px",
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                cursor: "pointer",
+                                zIndex: 2
+                              }}
+                              onClick={() => setShowOldPassword((prev) => !prev)}
+                              title={showOldPassword ? "Hide Password" : "Show Password"}
+                            >
+                              <i className={`bi ${showOldPassword ? "bi-eye-slash" : "bi-eye"}`} style={{ fontSize: "1.2rem", color: "#333" }}></i>
+                            </span>
+                          </div>
                         </div>
                         <div className="mb-3">
-                          <label className="form-label fw-bold">New Password</label>
-                          <input
-                            type="password"
-                            className="form-control"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                          />
+                          <label className="form-label fw-bold text-dark">New Password</label>
+                          <div style={{ position: "relative" }}>
+                            <input
+                              type={showNewPassword ? "text" : "password"}
+                              className="form-control"
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              required
+                              style={{ paddingRight: "2.5rem" }}
+                            />
+                            <span
+                              style={{
+                                position: "absolute",
+                                right: "10px",
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                cursor: "pointer",
+                                zIndex: 2
+                              }}
+                              onClick={() => setShowNewPassword((prev) => !prev)}
+                              title={showNewPassword ? "Hide Password" : "Show Password"}
+                            >
+                              <i className={`bi ${showNewPassword ? "bi-eye-slash" : "bi-eye"}`} style={{ fontSize: "1.2rem", color: "#333" }}></i>
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -613,40 +657,75 @@ const Sidebar = () => {
                 <div className="container">
                   <div className="row">
                     <div className="col-12">
-                      <label className="fw-bold fs-5">Edit Profile</label>
-                      <div className="mb-3 mt-3 text-center">
-                        <img
-                          src={selectedImage
-                            ? URL.createObjectURL(selectedImage)
-                            : getImageUrl(user?.profileImage)}
-                          alt="Profile"
-                          className="rounded-circle"
-                          style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-                        />
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          className="d-none"
-                          accept="image/*"
-                          onChange={(e) => setSelectedImage(e.target.files[0])}
-                        />
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-dark mt-2"
-                          onClick={() => fileInputRef.current.click()}
-                        >
-                          Change Photo
-                        </button>
-                      </div>
+                      <label className="fw-bold fs-5 text-dark">Edit Admin Profile</label>
+                      <div className='mt-3 mb-3' style={{ position: "relative", width: "150px", margin: "0 auto" }}>
+                          <img
+                            src={selectedImage
+                              ? URL.createObjectURL(selectedImage)
+                              : getImageUrl(user?.profileImage)}
+                            alt="Profile"
+                            className="rounded-circle"
+                            style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                          />
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="d-none"
+                            accept="image/*"
+                            onChange={(e) => setSelectedImage(e.target.files[0])}
+                            
+                          />
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: "50%",
+                              bottom: "-10px",
+                              transform: "translateX(-50%)",
+                              // background: "#fff",
+                              // borderRadius: "50%",
+                              // boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                              // padding: "6px",
+                              cursor: "pointer",
+                              // border: "1px solid #ddd"
+                              
+                            }}
+                            onClick={() => fileInputRef.current.click()}
+                          >
+                            <i className="bi bi-pencil-square" style={{ fontSize: "1.2rem", color: "#333", title:"Change Image" }}></i>
+                          </span>
+                        </div>
                       <div className="mb-3">
-                        <label className="form-label fw-bold">Username</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={username}
-                          onChange={(e) => setUserName(e.target.value)}
-                          required
-                        />
+                        <label className="form-label fw-bold text-dark">Username</label>
+                        <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={username}
+                            onChange={(e) => setUserName(e.target.value)}
+                            required
+                            ref={input => { window.usernameInputRef = input; }}
+                            style={{ paddingRight: "2.5rem" }}
+                          />
+                          <span
+                            style={{
+                              position: "absolute",
+                              right: "10px",
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              cursor: "pointer",
+                              zIndex: 2
+                            }}
+                            onClick={() => {
+                              if (window.usernameInputRef) {
+                                window.usernameInputRef.focus();
+                                window.usernameInputRef.select();
+                              }
+                            }}
+                            title="Edit Username"
+                          >
+                            <i className="bi bi-pencil-square" style={{ fontSize: "1.1rem", color: "#333" }}></i>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
