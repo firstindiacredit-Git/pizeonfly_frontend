@@ -20,6 +20,7 @@ const Header = () => {
   const fileInputRef = useRef(null);
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [showSignoutModal, setShowSignoutModal] = useState(false);
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "Images/user.jpeg";
@@ -214,6 +215,29 @@ const Header = () => {
     }
   };
 
+  useEffect(() => {
+    if (showSignoutModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [showSignoutModal]);
+
+  const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+
+  const handleProfileImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > MAX_IMAGE_SIZE) {
+        toast.error("Image size should not exceed 2MB");
+        e.target.value = ""; // Reset the input
+        return;
+      }
+      setSelectedImage(file);
+    }
+  };
+
   return (
     <>
       <div className="header">
@@ -260,12 +284,12 @@ const Header = () => {
                     className="avatar lg rounded-circle img-thumbnail"
                     src={getImageUrl(user?.profileImage)}
                     alt="profile"
-                    style={{ 
-                      border: "3px solid", 
+                    style={{
+                      border: "3px solid",
                       borderColor: isDarkMode ? "#4e4e6a" : "#e9ecef",
                       boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
                       transition: "all 0.3s ease",
-                      
+
                       objectFit: "contain"
                     }}
                     onMouseOver={(e) => e.currentTarget.style.borderColor = "#0a9400"}
@@ -290,8 +314,8 @@ const Header = () => {
                           className="avatar rounded-circle"
                           src={getImageUrl(user?.profileImage)}
                           alt="profile"
-                          style={{ 
-                            border: "3px solid", 
+                          style={{
+                            border: "3px solid",
                             borderColor: isDarkMode ? "#4e4e6a" : "#ffffff",
                             width: "50px",
                             height: "50px",
@@ -314,8 +338,8 @@ const Header = () => {
                         className="list-group-item list-group-item-action border-0"
                         data-bs-toggle="modal"
                         data-bs-target="#profileModal"
-                        style={{ 
-                          borderRadius: "10px", 
+                        style={{
+                          borderRadius: "10px",
                           margin: "5px 0",
                           backgroundColor: isDarkMode ? "#242444" : "#f8f9fa",
                           color: isDarkMode ? "#e1e1e1" : "#333",
@@ -339,8 +363,8 @@ const Header = () => {
                         className="list-group-item list-group-item-action border-0 "
                         data-bs-toggle="modal"
                         data-bs-target="#passwordModal"
-                        style={{ 
-                          borderRadius: "10px", 
+                        style={{
+                          borderRadius: "10px",
                           margin: "5px 0",
                           backgroundColor: isDarkMode ? "#242444" : "#f8f9fa",
                           color: isDarkMode ? "#e1e1e1" : "#333",
@@ -361,10 +385,10 @@ const Header = () => {
                         Change Password
                       </button>
                       <button
-                        onClick={handleSignOut}
+                        onClick={() => setShowSignoutModal(true)}
                         className="list-group-item list-group-item-action border-0 "
-                        style={{ 
-                          borderRadius: "10px", 
+                        style={{
+                          borderRadius: "10px",
                           margin: "5px 0",
                           backgroundColor: isDarkMode ? "#242444" : "#f8f9fa",
                           color: isDarkMode ? "#e1e1e1" : "#333",
@@ -393,50 +417,50 @@ const Header = () => {
                 </div>
               </div>
             </div>
-              {/* Notification display */}
-            <div className="" style={{ 
-              flex: "1", 
+            {/* Notification display */}
+            <div className="" style={{
+              flex: "1",
               maxWidth: "60%",
               margin: "0 auto"
             }}>
               {notifications.length > 0 ? (
-                <div className="notification" style={{ 
-                  padding: "14px 22px", 
-                  borderRadius: "12px", 
+                <div className="notification" style={{
+                  padding: "14px 22px",
+                  borderRadius: "12px",
                   backgroundColor: isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(240, 250, 255, 0.95)",
                   boxShadow: "0 3px 12px rgba(0,0,0,0.1)",
                   border: "1px solid",
                   borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(200, 220, 240, 0.8)",
                   transition: "all 0.3s ease"
                 }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.boxShadow = "0 5px 15px rgba(0,0,0,0.15)";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.boxShadow = "0 3px 12px rgba(0,0,0,0.1)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}>
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.boxShadow = "0 5px 15px rgba(0,0,0,0.15)";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.boxShadow = "0 3px 12px rgba(0,0,0,0.1)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}>
                   <p style={{ margin: 0, fontSize: "14px", lineHeight: "1.6" }}>
                     {(() => {
                       const todayMeetings = notifications.filter(meeting => {
                         const meetingDate = new Date(meeting.date);
                         return meetingDate.toDateString() === new Date().toDateString();
                       });
-                      
+
                       return todayMeetings.length > 0 ? (
                         <>
                           <strong style={{
-                            color: "#0a9400", 
-                            fontSize: "15px", 
+                            color: "#0a9400",
+                            fontSize: "15px",
                             background: isDarkMode ? "rgba(10, 148, 0, 0.1)" : "rgba(10, 148, 0, 0.08)",
                             padding: "3px 10px",
                             borderRadius: "15px",
                             marginRight: "8px"
                           }}>Today</strong>{" "}
                           {todayMeetings.map((meeting, index) => (
-                            <span key={meeting._id} style={{ 
-                              display: "inline-block", 
+                            <span key={meeting._id} style={{
+                              display: "inline-block",
                               marginRight: "5px",
                               padding: "3px 8px",
                               backgroundColor: isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.6)",
@@ -444,14 +468,14 @@ const Header = () => {
                               border: "1px solid",
                               borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"
                             }}>
-                              <strong style={{ fontWeight: "600" }}>{meeting.title}</strong> at <strong style={{ 
-                                color: "#0077b6", 
+                              <strong style={{ fontWeight: "600" }}>{meeting.title}</strong> at <strong style={{
+                                color: "#0077b6",
                                 backgroundColor: isDarkMode ? "rgba(0, 119, 182, 0.1)" : "rgba(0, 119, 182, 0.08)",
                                 padding: "2px 6px",
                                 borderRadius: "5px"
                               }}>{formatTime12Hour(meeting.startTime)}</strong>
-                              <CountdownTimer 
-                                meetingDate={meeting.date} 
+                              <CountdownTimer
+                                meetingDate={meeting.date}
                                 meetingTime={meeting.startTime}
                               />
                               {index < todayMeetings.length - 1 ? <span style={{ marginLeft: "5px", marginRight: "5px", color: "#6c757d" }}>•</span> : ''}
@@ -468,11 +492,11 @@ const Header = () => {
                         tomorrow.setDate(tomorrow.getDate() + 1);
                         return meetingDate.toDateString() === tomorrow.toDateString();
                       });
-                      
+
                       return tomorrowMeetings.length > 0 ? (
                         <div className="mt-2">
                           <strong style={{
-                            color: "#dc3545", 
+                            color: "#dc3545",
                             fontSize: "15px",
                             background: isDarkMode ? "rgba(220, 53, 69, 0.1)" : "rgba(220, 53, 69, 0.08)",
                             padding: "3px 10px",
@@ -480,8 +504,8 @@ const Header = () => {
                             marginRight: "8px"
                           }}>Tomorrow</strong>{" "}
                           {tomorrowMeetings.map((meeting, index) => (
-                            <span key={meeting._id} style={{ 
-                              display: "inline-block", 
+                            <span key={meeting._id} style={{
+                              display: "inline-block",
                               marginRight: "5px",
                               padding: "3px 8px",
                               backgroundColor: isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.6)",
@@ -489,14 +513,14 @@ const Header = () => {
                               border: "1px solid",
                               borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"
                             }}>
-                              <strong style={{ fontWeight: "600" }}>{meeting.title}</strong> at <strong style={{ 
-                                color: "#0077b6", 
+                              <strong style={{ fontWeight: "600" }}>{meeting.title}</strong> at <strong style={{
+                                color: "#0077b6",
                                 backgroundColor: isDarkMode ? "rgba(0, 119, 182, 0.1)" : "rgba(0, 119, 182, 0.08)",
                                 padding: "2px 6px",
                                 borderRadius: "5px"
                               }}>{formatTime12Hour(meeting.startTime)}</strong>
-                              <CountdownTimer 
-                                meetingDate={meeting.date} 
+                              <CountdownTimer
+                                meetingDate={meeting.date}
                                 meetingTime={meeting.startTime}
                               />
                               {index < tomorrowMeetings.length - 1 ? <span style={{ marginLeft: "5px", marginRight: "5px", color: "#6c757d" }}>•</span> : ''}
@@ -508,9 +532,9 @@ const Header = () => {
                   </p>
                 </div>
               ) : (
-                <div className="notification" style={{ 
-                  padding: "14px 22px", 
-                  borderRadius: "12px", 
+                <div className="notification" style={{
+                  padding: "14px 22px",
+                  borderRadius: "12px",
                   backgroundColor: isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(240, 250, 255, 0.95)",
                   boxShadow: "0 3px 12px rgba(0,0,0,0.1)",
                   textAlign: "center",
@@ -518,16 +542,16 @@ const Header = () => {
                   borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(200, 220, 240, 0.8)",
                   transition: "all 0.3s ease"
                 }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.boxShadow = "0 5px 15px rgba(0,0,0,0.15)";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.boxShadow = "0 3px 12px rgba(0,0,0,0.1)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}>
-                  <p style={{ 
-                    margin: 0, 
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.boxShadow = "0 5px 15px rgba(0,0,0,0.15)";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.boxShadow = "0 3px 12px rgba(0,0,0,0.1)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}>
+                  <p style={{
+                    margin: 0,
                     color: isDarkMode ? "#a0a0a0" : "#6c757d",
                     fontStyle: "italic",
                     fontSize: "14px"
@@ -541,9 +565,9 @@ const Header = () => {
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#mainHeader"
-              style={{ 
-                padding: "10px", 
-                borderRadius: "8px", 
+              style={{
+                padding: "10px",
+                borderRadius: "8px",
                 backgroundColor: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
                 transition: "all 0.3s ease",
                 cursor: "pointer"
@@ -588,10 +612,10 @@ const Header = () => {
                   fontSize: "22px",
                   marginBottom: "0"
                 }}>Change Password</h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
-                  data-bs-dismiss="modal" 
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
                   aria-label="Close"
                   style={{
                     backgroundColor: isDarkMode ? "rgba(255,255,255,0.5)" : undefined
@@ -609,24 +633,24 @@ const Header = () => {
                         <div className="col-12">
                           <div className="mb-4 mt-2">
                             <label className="form-label" style={{
-                              fontWeight: "600", 
+                              fontWeight: "600",
                               color: isDarkMode ? "#e1e1e1" : "#333",
                               marginBottom: "8px",
                               fontSize: "15px"
                             }}>Email</label>
-                            <div style={{position: "relative"}}>
+                            <div style={{ position: "relative" }}>
                               <i className="bi bi-envelope" style={{
-                                position: "absolute", 
-                                left: "15px", 
-                                top: "12px", 
+                                position: "absolute",
+                                left: "15px",
+                                top: "12px",
                                 color: "#6c757d"
                               }}></i>
-                            <input
-                              type="email"
-                              className="form-control"
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              required
+                              <input
+                                type="email"
+                                className="form-control"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
                                 style={{
                                   padding: "12px 12px 12px 40px",
                                   borderRadius: "10px",
@@ -641,24 +665,24 @@ const Header = () => {
                           </div>
                           <div className="mb-4">
                             <label className="form-label" style={{
-                              fontWeight: "600", 
+                              fontWeight: "600",
                               color: isDarkMode ? "#e1e1e1" : "#333",
                               marginBottom: "8px",
                               fontSize: "15px"
                             }}>Old Password</label>
-                            <div style={{position: "relative"}}>
+                            <div style={{ position: "relative" }}>
                               <i className="bi bi-lock" style={{
-                                position: "absolute", 
-                                left: "15px", 
-                                top: "12px", 
+                                position: "absolute",
+                                left: "15px",
+                                top: "12px",
                                 color: "#6c757d"
                               }}></i>
-                            <input
-                              type="password"
-                              className="form-control"
-                              value={oldPassword}
-                              onChange={(e) => setOldPassword(e.target.value)}
-                              required
+                              <input
+                                type="password"
+                                className="form-control"
+                                value={oldPassword}
+                                onChange={(e) => setOldPassword(e.target.value)}
+                                required
                                 style={{
                                   padding: "12px 12px 12px 40px",
                                   borderRadius: "10px",
@@ -673,24 +697,24 @@ const Header = () => {
                           </div>
                           <div className="mb-3">
                             <label className="form-label" style={{
-                              fontWeight: "600", 
+                              fontWeight: "600",
                               color: isDarkMode ? "#e1e1e1" : "#333",
                               marginBottom: "8px",
                               fontSize: "15px"
                             }}>New Password</label>
-                            <div style={{position: "relative"}}>
+                            <div style={{ position: "relative" }}>
                               <i className="bi bi-shield-lock" style={{
-                                position: "absolute", 
-                                left: "15px", 
-                                top: "12px", 
+                                position: "absolute",
+                                left: "15px",
+                                top: "12px",
                                 color: "#6c757d"
                               }}></i>
-                            <input
-                              type="password"
-                              className="form-control"
-                              value={newPassword}
-                              onChange={(e) => setNewPassword(e.target.value)}
-                              required
+                              <input
+                                type="password"
+                                className="form-control"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                required
                                 style={{
                                   padding: "12px 12px 12px 40px",
                                   borderRadius: "10px",
@@ -707,9 +731,9 @@ const Header = () => {
                       </div>
                       <div className="row mt-4">
                         <div className="col-12 d-flex justify-content-end gap-2">
-                          <button 
-                            type="button" 
-                            className="btn" 
+                          <button
+                            type="button"
+                            className="btn"
                             data-bs-dismiss="modal"
                             style={{
                               padding: "10px 20px",
@@ -723,8 +747,8 @@ const Header = () => {
                           >
                             Cancel
                           </button>
-                          <button 
-                            type="submit" 
+                          <button
+                            type="submit"
                             className="btn"
                             style={{
                               padding: "10px 25px",
@@ -783,10 +807,10 @@ const Header = () => {
                   fontSize: "22px",
                   marginBottom: "0"
                 }}>Edit Profile</h5>
-                <button 
-                  type="button" 
-                  className="btn-close" 
-                  data-bs-dismiss="modal" 
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
                   aria-label="Close"
                   style={{
                     backgroundColor: isDarkMode ? "rgba(255,255,255,0.5)" : undefined
@@ -807,15 +831,15 @@ const Header = () => {
                             display: "inline-block",
                             margin: "0 auto"
                           }}>
-                          <img
-                            src={selectedImage
-                              ? URL.createObjectURL(selectedImage)
-                              : getImageUrl(user?.profileImage)}
-                            alt="Profile"
-                            className="rounded-circle"
-                              style={{ 
-                                width: '160px', 
-                                height: '160px', 
+                            <img
+                              src={selectedImage
+                                ? URL.createObjectURL(selectedImage)
+                                : getImageUrl(user?.profileImage)}
+                              alt="Profile"
+                              className="rounded-circle"
+                              style={{
+                                width: '160px',
+                                height: '160px',
                                 objectFit: 'contain',
                                 border: `4px solid ${isDarkMode ? "#4e4e6a" : "#ffffff"}`,
                                 boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
@@ -834,19 +858,19 @@ const Header = () => {
                               border: `1px solid ${isDarkMode ? "rgba(255,255,255,0.1)" : "#e9ecef"}`,
                               transition: "all 0.3s ease"
                             }}
-                            onClick={() => fileInputRef.current.click()}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.transform = "scale(1.1)";
-                              e.currentTarget.style.backgroundColor = isDarkMode ? "#2d2d5a" : "#f8f9fa";
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.transform = "scale(1)";
-                              e.currentTarget.style.backgroundColor = isDarkMode ? "#242444" : "#ffffff";
-                            }}
+                              onClick={() => fileInputRef.current.click()}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.transform = "scale(1.1)";
+                                e.currentTarget.style.backgroundColor = isDarkMode ? "#2d2d5a" : "#f8f9fa";
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.transform = "scale(1)";
+                                e.currentTarget.style.backgroundColor = isDarkMode ? "#242444" : "#ffffff";
+                              }}
                             >
-                              <i className="bi bi-camera-fill" style={{ 
-                                fontSize: "18px", 
-                                color: "#FE6730" 
+                              <i className="bi bi-camera-fill" style={{
+                                fontSize: "18px",
+                                color: "#FE6730"
                               }}></i>
                             </div>
                           </div>
@@ -855,10 +879,10 @@ const Header = () => {
                             ref={fileInputRef}
                             className="d-none"
                             accept="image/*"
-                            onChange={(e) => setSelectedImage(e.target.files[0])}
+                            onChange={handleProfileImageChange}
                           />
-                          <p style={{ 
-                            marginTop: "12px", 
+                          <p style={{
+                            marginTop: "12px",
                             fontSize: "14px",
                             color: isDarkMode ? "#a0a0a0" : "#6c757d"
                           }}>
@@ -867,24 +891,24 @@ const Header = () => {
                         </div>
                         <div className="mb-3">
                           <label className="form-label" style={{
-                            fontWeight: "600", 
+                            fontWeight: "600",
                             color: isDarkMode ? "#e1e1e1" : "#333",
                             marginBottom: "8px",
                             fontSize: "15px"
                           }}>Username</label>
-                          <div style={{position: "relative"}}>
+                          <div style={{ position: "relative" }}>
                             <i className="bi bi-person" style={{
-                              position: "absolute", 
-                              left: "15px", 
-                              top: "12px", 
+                              position: "absolute",
+                              left: "15px",
+                              top: "12px",
                               color: "#6c757d"
                             }}></i>
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={username}
-                            onChange={(e) => setUserName(e.target.value)}
-                            required
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={username}
+                              onChange={(e) => setUserName(e.target.value)}
+                              required
                               style={{
                                 padding: "12px 12px 12px 40px",
                                 borderRadius: "10px",
@@ -894,16 +918,16 @@ const Header = () => {
                                 fontSize: "15px",
                                 transition: "all 0.3s ease"
                               }}
-                          />
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
-                    </div>
                     <div className="row mt-4">
                       <div className="col-12 d-flex justify-content-end gap-2">
-                        <button 
-                          type="button" 
-                          className="btn" 
+                        <button
+                          type="button"
+                          className="btn"
                           data-bs-dismiss="modal"
                           style={{
                             padding: "10px 20px",
@@ -917,8 +941,8 @@ const Header = () => {
                         >
                           Cancel
                         </button>
-                        <button 
-                          type="submit" 
+                        <button
+                          type="submit"
                           className="btn"
                           style={{
                             padding: "10px 25px",
@@ -949,6 +973,113 @@ const Header = () => {
             </div>
           </div>
         </div>
+        {showSignoutModal && (
+          <div className="modal fade show" style={{ display: "block", background: "rgba(0,0,0,0.35)", zIndex: 2000 }}>
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content" style={{
+                borderRadius: "18px",
+                border: "none",
+                overflow: "hidden",
+                boxShadow: "0 10px 32px rgba(0,0,0,0.18)",
+                background: isDarkMode ? "#23234a" : "#fff"
+              }}>
+                <div className="modal-header d-flex align-items-center gap-2" style={{
+                  backgroundColor: isDarkMode ? "#1a1a2e" : "#f8f9fa",
+                  borderBottom: `1px solid ${isDarkMode ? "rgba(255,255,255,0.08)" : "#e9ecef"}`,
+                  padding: "22px 28px"
+                }}>
+                  <span style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: isDarkMode ? "rgba(254,103,48,0.12)" : "rgba(254,103,48,0.08)",
+                    borderRadius: "50%",
+                    width: 44,
+                    height: 44,
+                    marginRight: 10
+                  }}>
+                    <i className="bi bi-box-arrow-right" style={{ fontSize: 26, color: "#FF6EB4" }}></i>
+                  </span>
+                  <h5 className="modal-title" style={{ color: "#365DD2", fontWeight: 700, fontSize: 22, margin: 0 }}>
+                    Confirm Signout
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close ms-auto"
+                    onClick={() => setShowSignoutModal(false)}
+                    aria-label="Close"
+                    style={{ backgroundColor: isDarkMode ? "rgba(255,255,255,0.4)" : undefined }}
+                  ></button>
+                </div>
+                <div className="modal-body text-center" style={{
+                  backgroundColor: isDarkMode ? "#23234a" : "#fff",
+                  padding: "32px 28px 18px 28px"
+                }}>
+                  <p style={{
+                    color: isDarkMode ? "#e1e1e1" : "#333",
+                    fontSize: 17,
+                    fontWeight: 500,
+                    marginBottom: 0
+                  }}>
+                    Are you sure you want to sign out?
+                  </p>
+                </div>
+                <div className="modal-footer d-flex justify-content-center gap-3" style={{
+                  backgroundColor: isDarkMode ? "#1a1a2e" : "#f8f9fa",
+                  borderTop: `1px solid ${isDarkMode ? "rgba(255,255,255,0.08)" : "#e9ecef"}`,
+                  padding: "18px 28px 22px 28px"
+                }}>
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={() => setShowSignoutModal(false)}
+                    style={{
+                      padding: "10px 28px",
+                      borderRadius: "8px",
+                      backgroundColor: isDarkMode ? "rgba(255,255,255,0.08)" : "#e9ecef",
+                      color: isDarkMode ? "#e1e1e1" : "#333",
+                      fontWeight: 500,
+                      border: "none",
+                      transition: "all 0.2s",
+                      boxShadow: isDarkMode ? "0 2px 8px rgba(0,0,0,0.12)" : "0 2px 8px rgba(254,103,48,0.08)"
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.backgroundColor = isDarkMode ? "#2d2d5a" : "#d1d1d1";
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.backgroundColor = isDarkMode ? "rgba(255,255,255,0.08)" : "#e9ecef";
+                    }}
+                  >
+                    No
+                  </button>
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={handleSignOut}
+                    style={{
+                      padding: "10px 28px",
+                      borderRadius: "8px",
+                      backgroundColor: "#FF6EB4",
+                      color: "white",
+                      fontWeight: 600,
+                      border: "none",
+                      boxShadow: "0 2px 8px rgba(254,103,48,0.18)",
+                      transition: "all 0.2s"
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.backgroundColor = "#365DD2";
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.backgroundColor = "#FF6EB4";
+                    }}
+                  >
+                    Yes, Signout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <ToastContainer />
       </div>
 

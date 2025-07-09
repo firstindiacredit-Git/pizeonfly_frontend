@@ -25,6 +25,7 @@ const Sidebar = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
   const [user, setUser] = useState(null);
+  const [showSignoutModal, setShowSignoutModal] = useState(false);
   const location = useLocation();
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -66,6 +67,15 @@ const Sidebar = () => {
       setUser(userData);
     }
   }, []);
+
+  useEffect(() => {
+    if (showSignoutModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [showSignoutModal]);
 
   const handleColorChange = (color) => {
     setSidebarColor(color);
@@ -198,6 +208,20 @@ const Sidebar = () => {
   // Function to check if we're on a chat route
   const isChatRoute = () => {
     return ['/admin-chat', '/employee-chat', '/client-chat', '/chat'].includes(location.pathname);
+  };
+
+  const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+
+  const handleProfileImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > MAX_IMAGE_SIZE) {
+        toast.error("Image size should not exceed 2MB");
+        e.target.value = ""; // Reset the input
+        return;
+      }
+      setSelectedImage(file);
+    }
   };
 
   return (
@@ -503,7 +527,7 @@ const Sidebar = () => {
                       Change Password
                     </button>
                     <button
-                      onClick={handleSignOut}
+                      onClick={() => setShowSignoutModal(true)}
                       className="list-group-item list-group-item-action border-0 "
                     >
                       <i className="icofont-logout fs-6 me-3" />
@@ -672,8 +696,7 @@ const Sidebar = () => {
                             ref={fileInputRef}
                             className="d-none"
                             accept="image/*"
-                            onChange={(e) => setSelectedImage(e.target.files[0])}
-                            
+                            onChange={handleProfileImageChange}
                           />
                           <span
                             style={{
@@ -687,7 +710,7 @@ const Sidebar = () => {
                               // padding: "6px",
                               cursor: "pointer",
                               // border: "1px solid #ddd"
-                              
+
                             }}
                             onClick={() => fileInputRef.current.click()}
                           >
@@ -743,6 +766,114 @@ const Sidebar = () => {
         </div>
       </div>
       <ToastContainer />
+
+      {showSignoutModal && (
+        <div className="modal fade show" style={{ display: "block", background: "rgba(0,0,0,0.35)", zIndex: 2000 }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content" style={{
+              borderRadius: "18px",
+              border: "none",
+              overflow: "hidden",
+              boxShadow: "0 10px 32px rgba(0,0,0,0.18)",
+              background: isDarkMode ? "#23234a" : "#fff"
+            }}>
+              <div className="modal-header d-flex align-items-center gap-2" style={{
+                backgroundColor: isDarkMode ? "#1a1a2e" : "#f8f9fa",
+                borderBottom: `1px solid ${isDarkMode ? "rgba(255,255,255,0.08)" : "#e9ecef"}`,
+                padding: "22px 28px"
+              }}>
+                <span style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: isDarkMode ? "rgba(254,103,48,0.12)" : "rgba(254,103,48,0.08)",
+                  borderRadius: "50%",
+                  width: 44,
+                  height: 44,
+                  marginRight: 10
+                }}>
+                  <i className="bi bi-box-arrow-right" style={{ fontSize: 26, color: "#FE6730" }}></i>
+                </span>
+                <h5 className="modal-title" style={{ color: "#FE6730", fontWeight: 700, fontSize: 22, margin: 0 }}>
+                  Confirm Signout
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close ms-auto"
+                  onClick={() => setShowSignoutModal(false)}
+                  aria-label="Close"
+                  style={{ backgroundColor: isDarkMode ? "rgba(255,255,255,0.4)" : undefined }}
+                ></button>
+              </div>
+              <div className="modal-body text-center" style={{
+                backgroundColor: isDarkMode ? "#23234a" : "#fff",
+                padding: "32px 28px 18px 28px"
+              }}>
+                <p style={{
+                  color: isDarkMode ? "#e1e1e1" : "#333",
+                  fontSize: 17,
+                  fontWeight: 500,
+                  marginBottom: 0
+                }}>
+                  Are you sure you want to sign out?
+                </p>
+              </div>
+              <div className="modal-footer d-flex justify-content-center gap-3" style={{
+                backgroundColor: isDarkMode ? "#1a1a2e" : "#f8f9fa",
+                borderTop: `1px solid ${isDarkMode ? "rgba(255,255,255,0.08)" : "#e9ecef"}`,
+                padding: "18px 28px 22px 28px"
+              }}>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setShowSignoutModal(false)}
+                  style={{
+                    padding: "10px 28px",
+                    borderRadius: "8px",
+                    backgroundColor: isDarkMode ? "rgba(255,255,255,0.08)" : "#e9ecef",
+                    color: isDarkMode ? "#e1e1e1" : "#333",
+                    fontWeight: 500,
+                    border: "none",
+                    transition: "all 0.2s",
+                    boxShadow: isDarkMode ? "0 2px 8px rgba(0,0,0,0.12)" : "0 2px 8px rgba(254,103,48,0.08)"
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.backgroundColor = isDarkMode ? "#2d2d5a" : "#d1d1d1";
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.backgroundColor = isDarkMode ? "rgba(255,255,255,0.08)" : "#e9ecef";
+                  }}
+                >
+                  No
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={handleSignOut}
+                  style={{
+                    padding: "10px 28px",
+                    borderRadius: "8px",
+                    backgroundColor: "#FE6730",
+                    color: "white",
+                    fontWeight: 600,
+                    border: "none",
+                    boxShadow: "0 2px 8px rgba(254,103,48,0.18)",
+                    transition: "all 0.2s"
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.backgroundColor = "#e55a2a";
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.backgroundColor = "#FE6730";
+                  }}
+                >
+                  Yes, Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
