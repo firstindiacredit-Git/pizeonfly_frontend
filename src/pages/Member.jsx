@@ -1053,7 +1053,7 @@ const Member = () => {
                                           >
                                             <i className="bi bi-share-fill" style={{ 
                                               color: '#ff69b4', 
-                                              fontSize: '16px',
+                                              fontSize: '10px',
                                               transition: 'all 0.3s ease'
                                             }}
                                               onMouseOver={(e) => {
