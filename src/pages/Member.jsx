@@ -4490,6 +4490,39 @@ const Member = () => {
           </div>
         </div>
       </div>
+      {/* PDF Viewer Modal */}
+      {pdfUrl && (
+        <div className="modal show d-block" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.7)' }} onClick={handlePdfModalBackdropClick}>
+          <div className="modal-dialog modal-lg modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{selectedImageDetails.name}</h5>
+                <button type="button" className="btn-close" onClick={closePdfViewer}></button>
+              </div>
+              <div className="modal-body" style={{ height: '80vh' }}>
+                <iframe src={pdfUrl} title="PDF Preview" style={{ width: '100%', height: '100%' }} frameBorder="0"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Viewer Modal */}
+      {selectedImageDetails.url && !pdfUrl && (
+        <div className="modal show d-block" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.7)' }} onClick={handleImageModalBackdropClick}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{selectedImageDetails.name}</h5>
+                <button type="button" className="btn-close" onClick={closeImageModal}></button>
+              </div>
+              <div className="modal-body text-center">
+                <img src={selectedImageDetails.url} alt={selectedImageDetails.name} style={{ maxWidth: '100%', maxHeight: '70vh' }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
