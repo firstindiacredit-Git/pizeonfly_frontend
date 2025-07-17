@@ -675,16 +675,22 @@ const Member = () => {
   // Add this function near your other handler functions
   const handleDownload = async (fileUrl, fileName) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}${fileUrl.replace('uploads/', '')}`);
+      // Use the fileUrl as-is, do not remove 'uploads/'
+      let url = fileUrl;
+      // If fileUrl is not absolute, prefix with base URL
+      if (!/^https?:\/\//.test(fileUrl)) {
+        url = `${import.meta.env.VITE_BASE_URL}${fileUrl}`;
+      }
+      const response = await fetch(url);
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = url;
+      link.href = downloadUrl;
       link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error('Download failed:', error);
       toast.error('Download failed');
