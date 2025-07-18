@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTheme } from "../context/ThemeContext";
 
 const Signin = () => {
   const navigate = useNavigate();
@@ -15,6 +16,9 @@ const Signin = () => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // State for show password
+  const [showForgotModal, setShowForgotModal] = useState(false); // State for forgot password modal
+  const [forgotEmail, setForgotEmail] = useState(""); // State for email in forgot password modal
+  const { isDarkMode } = useTheme();
 
   const handleChange = (e) => {
     setForm({
@@ -27,7 +31,7 @@ const Signin = () => {
     const fetchRoles = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}api/crm-access`);
-        console.log(response.data);
+        // console.log(response.data);
         setRoles(response.data);
       } catch (error) {
         console.error("Error fetching roles:", error);
@@ -71,6 +75,24 @@ const Signin = () => {
         setError("An error occurred. Please try again later.");
         console.error(error);
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!forgotEmail) {
+      toast.error("Please enter your email");
+      return;
+    }
+    setLoading(true);
+    try {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}api/forgot-password`, { email: forgotEmail });
+      toast.success("Password reset link sent to your email.");
+      setShowForgotModal(false);
+      setForgotEmail("");
+    } catch (err) {
+      toast.error("Failed to send reset link. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -196,6 +218,17 @@ const Signin = () => {
                           ></i>
                         </div>
                       </div>
+                      {/* Forgot password link */}
+                      <div className="text-end">
+                        <button
+                          type="button"
+                          className="btn btn-link p-0 text-light"
+                          style={{ textDecoration: "underline", fontSize: "0.95rem" }}
+                          onClick={() => setShowForgotModal(true)}
+                        >
+                          Forgot password?
+                        </button>
+                      </div>
                     </div>
                     <div className="col-12 text-center mt-4">
                       <button
@@ -215,6 +248,128 @@ const Signin = () => {
         </div>
       </div>
       <ToastContainer />
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="modal fade show" tabIndex="-1" style={{ display: "block", background: "rgba(0,0,0,0.45)", zIndex: 2000 }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div
+              className="modal-content"
+              style={{
+                borderRadius: "15px",
+                border: "none",
+                overflow: "hidden",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
+                background: isDarkMode ? "#23234a" : "#fff",
+                color: isDarkMode ? "#e1e1e1" : "#333"
+              }}
+            >
+              <div
+                className="modal-header"
+                style={{
+                  background: "linear-gradient(135deg, #FF6EB4, #FF6EB4)",
+                  borderBottom: "none",
+                  padding: "20px 25px",
+                  position: "relative"
+                }}
+              >
+                <h5 className="modal-title fw-bold" style={{ color: "white", fontSize: "18px", display: "flex", alignItems: "center", gap: "10px", marginBottom: 0 }}>
+                  <i className="icofont-key" style={{ fontSize: "22px" }}></i>
+                  Forgot Password
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  aria-label="Close"
+                  onClick={() => setShowForgotModal(false)}
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.8)",
+                    borderRadius: "50%",
+                    padding: "8px",
+                    opacity: 1,
+                    transition: "all 0.2s ease"
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 1)";
+                    e.currentTarget.style.transform = "rotate(90deg)";
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+                    e.currentTarget.style.transform = "rotate(0deg)";
+                  }}
+                />
+              </div>
+              <div className="modal-body" style={{ padding: "25px", background: isDarkMode ? "#23234a" : "#fff" }}>
+                <label htmlFor="forgotEmail" className="form-label" style={{ fontWeight: 600, color: isDarkMode ? "#e1e1e1" : "#333", fontSize: "15px", marginBottom: "8px", display: "flex", alignItems: "center", gap: "5px" }}>
+                  <i className="bi bi-envelope" style={{ color: "#FF6EB4" }}></i>
+                  Enter your email address
+                </label>
+                <input
+                  type="email"
+                  id="forgotEmail"
+                  className="form-control"
+                  value={forgotEmail}
+                  onChange={e => setForgotEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  style={{
+                    padding: "12px 12px 12px 40px",
+                    borderRadius: "10px",
+                    border: `1px solid ${isDarkMode ? "rgba(255,255,255,0.1)" : "#ced4da"}`,
+                    backgroundColor: isDarkMode ? "rgba(255,255,255,0.05)" : "#fff",
+                    color: isDarkMode ? "#e1e1e1" : "#333",
+                    fontSize: "15px",
+                    transition: "all 0.3s ease",
+                    marginBottom: "10px"
+                  }}
+                />
+              </div>
+              <div className="modal-footer" style={{ background: isDarkMode ? "#23234a" : "#fff", borderTop: "none", padding: "18px 25px" }}>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setShowForgotModal(false)}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    backgroundColor: isDarkMode ? "rgba(255,255,255,0.1)" : "#e9ecef",
+                    color: isDarkMode ? "#e1e1e1" : "#333",
+                    fontWeight: 500,
+                    border: "none",
+                    transition: "all 0.3s ease"
+                  }}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={handleForgotPassword}
+                  disabled={loading}
+                  style={{
+                    padding: "10px 25px",
+                    borderRadius: "8px",
+                    backgroundColor: "#FF6EB4",
+                    color: "white",
+                    fontWeight: 500,
+                    border: "none",
+                    boxShadow: "0 2px 5px rgba(82, 180, 71, 0.18)",
+                    transition: "all 0.3s ease"
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.backgroundColor = "#FF6EB4";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.backgroundColor = "#FF6EB4";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  {loading ? "Sending..." : "Send Reset Link"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -4,6 +4,7 @@ import EmployeeSinup from './pages/EmployeeSinup'
 import Signin from './pages/Signin'
 import EmployeeSinin from './pages/EmployeeSinin'
 import ClientSignin from './pages/ClientSignin'
+import ResetPassword from './pages/ResetPassword';
 
 
 import { HashRouter, Routes, Route } from 'react-router-dom'
@@ -137,6 +138,8 @@ function AppContent() {
           <Route path='/employee-chat' element={<EmployeeChat />}></Route>
           <Route path='/client-chat' element={<ClientChat />}></Route>
           <Route path='/chat' element={<Chat />}></Route>
+
+          <Route path='/reset-password/:token' element={<ResetPassword />} />
 
 
 
