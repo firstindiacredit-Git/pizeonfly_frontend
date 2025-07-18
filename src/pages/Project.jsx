@@ -3996,7 +3996,7 @@ const Project = () => {
                           boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
                         }}>
                           <img
-                            src={`${import.meta.env.VITE_BASE_URL}${image}`}
+                            src={`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads/', '/')}`}
                             alt={`Preview ${index + 1}`}
                             className="img-fluid"
                             style={{ 
@@ -4004,7 +4004,7 @@ const Project = () => {
                               width: '100%',
                               display: 'block'
                             }}
-                            onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image}`, '_blank')}
+                            onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads/', '/')}`, '_blank')}
                           />
                           <div style={{
                             position: 'absolute',
@@ -4025,7 +4025,7 @@ const Project = () => {
                               Image {index + 1}
                             </span>
                             <button 
-                              onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image}`, '_blank')}
+                              onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads/', '/')}`, '_blank')}
                               style={{
                                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
                                 color: 'white',
@@ -4179,7 +4179,7 @@ const Project = () => {
                                 overflow: 'hidden'
                               }}>
                             <img
-                              src={`${import.meta.env.VITE_BASE_URL}${image}`}
+                              src={`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads/', '/')}`}
                               alt={`Project Image ${index + 1}`}
                               style={{
                                     height: '180px',
@@ -4188,7 +4188,7 @@ const Project = () => {
                                     cursor: 'pointer',
                                     transition: 'transform 0.5s ease'
                               }}
-                              onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image}`, '_blank')}
+                              onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads', '/')}`, '_blank')}
                                   onMouseOver={(e) => {
                                     e.currentTarget.style.transform = 'scale(1.05)';
                                   }}
@@ -4219,7 +4219,7 @@ const Project = () => {
                                 flexGrow: 1
                               }}>
                                 <button 
-                                  onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image}`, '_blank')}
+                                  onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads', '/')}`, '_blank')}
                                   style={{
                                     backgroundColor: index % 2 === 0 ? 'rgba(82, 180, 71, 0.1)' : 'rgba(255, 94, 0, 0.1)',
                                     color: index % 2 === 0 ? '#1e40af' : '#fc6db2',
