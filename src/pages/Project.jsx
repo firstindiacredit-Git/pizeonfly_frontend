@@ -56,7 +56,9 @@ const Project = () => {
       });
     }
   };
+  const [isCreating, setIsCreating] = useState(false);
   const handleSubmit = async () => {
+    setIsCreating(true);
     try {
       const formDataToSend = new FormData();
 
@@ -103,6 +105,7 @@ const Project = () => {
       const newProject = {
         ...response.data,
         taskStats: response.data.taskStats || { completed: 0, inProgress: 0, notStarted: 0 },
+        projectIcon: response.data.projectIcon || null, // <-- add this line
       };
       setProjects((prevProjects) => [newProject, ...prevProjects]);
 
@@ -143,6 +146,8 @@ const Project = () => {
     } catch (error) {
       console.error("Error:", error);
       setError("An error occurred. Please try again later.");
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -1311,12 +1316,12 @@ const Project = () => {
                                       }}>
                                         <div className="d-flex gap-2 align-items-center">
                                           <div className="d-flex align-items-center">
-                                            {(!project.projectIcon || brokenIcons[project._id || project.id]) ? (
+                                            {(!project.projectIcon || project.projectIcon === "null" || project.projectIcon === "") ? (
                                               <div
                                                 className="me-2 rounded-circle d-flex align-items-center justify-content-center"
                                                 style={{
-                                                  width: '36px', // ya 32px for card
-                                                  height: '36px', // ya 32px for card
+                                                  width: '36px',
+                                                  height: '36px',
                                                   background: getProjectColor(project.projectName),
                                                   color: getContrastColor(getProjectColor(project.projectName)),
                                                   fontWeight: '700',
@@ -1324,10 +1329,13 @@ const Project = () => {
                                                   border: '2px solid #4169e1',
                                                   cursor: 'default',
                                                   userSelect: 'none',
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'center',
                                                 }}
                                                 title={project.projectName}
                                               >
-                                                {getInitials(project.projectName)}
+                                                <i className="icofont-briefcase" style={{ fontSize: '20px' }}></i>
                                               </div>
                                             ) : (
                                               <img
@@ -1971,64 +1979,49 @@ const Project = () => {
 
                                       <div className="d-flex flex-grow-1 flex-column align-items-center justify-content-center" style={{ minWidth: 0 }}>
                                         {/* Icon */}
-                                        {(!project.projectIcon || brokenIcons[project._id || project.id]) ? (
+                                        {(!project.projectIcon || project.projectIcon === "null" || project.projectIcon === "") ? (
                                           <div
-                                            className="me-0 mb-1 rounded-circle d-flex align-items-center justify-content-center"
+                                            className="me-2 rounded-circle d-flex align-items-center justify-content-center"
                                             style={{
                                               width: '36px',
                                               height: '36px',
                                               background: getProjectColor(project.projectName),
                                               color: getContrastColor(getProjectColor(project.projectName)),
                                               fontWeight: '700',
-                                              fontSize: '20px',
-                                              border: '3px solid #ff69b4',
+                                              fontSize: '18px',
+                                              border: '2px solid #4169e1',
                                               cursor: 'default',
                                               userSelect: 'none',
-                                              borderRadius: '16px',
-                                              overflow: 'hidden',
-                                              backgroundColor: 'white',
-                                              boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)'
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
                                             }}
                                             title={project.projectName}
                                           >
-                                            {getInitials(project.projectName)}
+                                            <i className="icofont-briefcase" style={{ fontSize: '20px' }}></i>
                                           </div>
                                         ) : (
-                                          <div style={{
-                                            width: '36px',
-                                            height: '36px',
-                                            borderRadius: '16px',
-                                            overflow: 'hidden',
-                                            border: '3px solid #ff69b4',
-                                            backgroundColor: 'white',
-                                            boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)',
-                                            marginBottom: '6px'
-                                          }}>
-                                            <img
-                                              src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon}`}
-                                              alt="Project Icon"
-                                              style={{
-                                                width: '100%',
-                                                height: '100%',
-                                                objectFit: 'cover',
-                                                cursor: 'pointer',
-                                                transition: 'transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1)'
-                                              }}
-                                              onMouseEnter={(e) => {
-                                                e.target.style.transform = 'scale(1.2) rotate(3deg)';
-                                              }}
-                                              onMouseLeave={(e) => {
-                                                e.target.style.transform = 'scale(1) rotate(0deg)';
-                                              }}
-                                              onClick={() => {
-                                                setSelectedImages([project.projectIcon]);
-                                                setSelectedImageTitle(`${project.projectName} Icon`);
-                                                const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
-                                                modal.show();
-                                              }}
-                                              onError={() => setBrokenIcons(prev => ({ ...prev, [project._id || project.id]: true }))}
-                                            />
-                                          </div>
+                                          <img
+                                            src={`${import.meta.env.VITE_BASE_URL}${project.projectIcon}`}
+                                            alt="Project Icon"
+                                            className="me-2 rounded-circle"
+                                            style={{
+                                              width: '36px',
+                                              height: '36px',
+                                              objectFit: 'cover',
+                                              cursor: 'pointer',
+                                              border: '2px solid #4169e1',
+                                              padding: '2px',
+                                              backgroundColor: 'white'
+                                            }}
+                                            onClick={() => {
+                                              setSelectedImages([project.projectIcon]);
+                                              setSelectedImageTitle(`${project.projectName} Icon`);
+                                              const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+                                              modal.show();
+                                            }}
+                                            onError={() => setBrokenIcons(prev => ({ ...prev, [project._id || project.id]: true }))}
+                                          />
                                         )}
                                         {/* Project Name */}
                                         <h6 className="card-title text-capitalize text-center mb-0 text-truncate"
@@ -2889,9 +2882,19 @@ const Project = () => {
                         e.currentTarget.style.boxShadow = '0 4px 10px rgba(82, 180, 71, 0.2)';
                       }}
                       onClick={handleSubmit}
+                      disabled={isCreating}
                     >
-                      <i className="icofont-check-circled me-2"></i>
-                      Create Project
+                      {isCreating ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Creating...
+                        </>
+                      ) : (
+                        <>
+                          <i className="icofont-check-circled me-2"></i>
+                          Create Project
+                        </>
+                      )}
                     </button>
                   </div>
                   {error && (
