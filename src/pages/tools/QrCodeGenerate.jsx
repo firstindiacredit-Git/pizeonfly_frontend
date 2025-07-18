@@ -1,5 +1,3 @@
-// UrlShortner.jsx
-
 import React, { useState, useEffect } from 'react';
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
@@ -83,6 +81,53 @@ const QrCodeGenerate = () => {
         }
     };
 
+    const downloadQRCodeWithDetails = (qrCode) => {
+      const canvas = document.createElement('canvas');
+      const width = 400;
+      const height = 500;
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      // White background
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, width, height);
+
+      // Title
+      ctx.fillStyle = '#222';
+      ctx.font = 'bold 22px Arial';
+      ctx.fillText(qrCode.title || '', 20, 40);
+
+      // URL (wrap if too long)
+      ctx.font = '16px Arial';
+      const url = qrCode.content;
+      const maxWidth = width - 40;
+      let y = 70;
+      let line = '';
+      for (let i = 0; i < url.length; i++) {
+        line += url[i];
+        if (ctx.measureText(line).width > maxWidth || i === url.length - 1) {
+          ctx.fillText(line, 20, y);
+          y += 22;
+          line = '';
+        }
+      }
+
+      // QR code image
+      const img = new window.Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () {
+        ctx.drawImage(img, (width - 220) / 2, y + 10, 220, 220);
+
+        // Download
+        const link = document.createElement('a');
+        link.download = `qrcode-${qrCode.title || 'qr'}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
+      img.src = qrCode.qrCode;
+    };
+
     return (
         <>
             <div id="mytask-layout">
@@ -155,7 +200,20 @@ const QrCodeGenerate = () => {
                                                                     <div className="card-body p-4">
                                                                         <div className="d-flex justify-content-center align-items-center mb-4 gap-2">
                                                                             <span className="badge bg-primary rounded px-3">{index + 1}</span>
-                                                                            <h5 className="card-title mb-0 fw-bold text-primary">{qrCode.content}</h5>
+                                                                            <h5
+                                                                                className="card-title mb-0 fw-bold text-primary"
+                                                                                title={qrCode.content}
+                                                                                style={{
+                                                                                    overflow: 'hidden',
+                                                                                    textOverflow: 'ellipsis',
+                                                                                    whiteSpace: 'nowrap',
+                                                                                    display: 'block',
+                                                                                    maxWidth: '100%',
+                                                                                    wordBreak: 'break-all'
+                                                                                }}
+                                                                            >
+                                                                                {qrCode.content}
+                                                                            </h5>
                                                                         </div>
                                                                         <div>{qrCode.title}</div>
                                                                         <div className="text-center mb-4 bg-light p-4 rounded">
@@ -178,6 +236,14 @@ const QrCodeGenerate = () => {
                                                                                 Open Link
                                                                             </a>
                                                                             <div className="btn-group">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light btn-sm me-2"
+                                                                                    title="Download QR Code with details"
+                                                                                    onClick={() => downloadQRCodeWithDetails(qrCode)}
+                                                                                >
+                                                                                    <i className="icofont-download"></i>
+                                                                                </button>
                                                                                 <button
                                                                                     type="button"
                                                                                     className="btn btn-light btn-sm me-2"

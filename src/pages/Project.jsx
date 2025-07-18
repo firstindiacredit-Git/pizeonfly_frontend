@@ -3599,27 +3599,19 @@ const Project = () => {
                       </div>
                     ) : (
                       <div className="chat-messages">
-                      {messages.map((message, index) => {
+                        {messages.map((message, index) => {
                           const isCurrentUser = message.senderId === "currentUser"; // Replace with your actual logic
                           const prevSender = index > 0 ? messages[index-1].senderId : null;
                           const showSender = prevSender !== message.senderId;
-                          
-                        return (
-                            <div key={message._id} className={`message-group ${isCurrentUser ? 'own-messages' : ''}`} style={{
-                              marginBottom: showSender ? '20px' : '2px',
-                              marginTop: showSender ? '20px' : '2px',
-                            }}>
+                          return (
+                            <div key={message._id} className={`message-group ${isCurrentUser ? 'own-messages' : ''}`} style={{ marginBottom: showSender ? '20px' : '2px', marginTop: showSender ? '20px' : '2px' }}>
+                              {/* Message Serial Number */}
+                              {/* <div style={{ fontSize: '11px', color: '#1e40af', fontWeight: 'bold', marginBottom: '2px', marginLeft: isCurrentUser ? 'auto' : '48px', textAlign: isCurrentUser ? 'right' : 'left' }}>
+                                #{index + 1}
+                              </div> */}
                               {showSender && !isCurrentUser && (
-                          <div style={{
-                                  fontSize: '13px', 
-                                  color: '#666',
-                                  marginLeft: '48px',
-                                  marginBottom: '5px'
-                                }}>
-                                  {message.senderId}
-                                </div>
+                                <div style={{ fontSize: '13px', color: '#666', marginLeft: '48px', marginBottom: '5px' }}>{message.senderId}</div>
                               )}
-                              
                               <div style={{
                                 display: 'flex',
                                 alignItems: 'flex-start',

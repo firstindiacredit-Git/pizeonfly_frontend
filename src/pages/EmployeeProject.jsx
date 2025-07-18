@@ -62,7 +62,7 @@ const Project = () => {
   const [files, setFiles] = useState([]);
   const [socket, setSocket] = useState(null);
   const [notifications, setNotifications] = useState(() => {
-    const savedNotifications = localStorage.getItem('employeeProjectNotifications');
+    const savedNotifications = localStorage.getItem('projectNotifications');
     return savedNotifications ? JSON.parse(savedNotifications) : {};
   });
   const messageInputRef = useRef(null);
@@ -78,23 +78,39 @@ const Project = () => {
   useEffect(() => {
     if (socket == null) return;
 
-    socket.on('new message', (message) => {
+    const handleNewMessage = (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
-
       if (!isChatModalOpen || selectProject._id !== message.projectId) {
         setNotifications(prev => {
           const newNotifications = {
             ...prev,
             [message.projectId]: (prev[message.projectId] || 0) + 1
           };
-          localStorage.setItem('employeeProjectNotifications', JSON.stringify(newNotifications));
+          localStorage.setItem('projectNotifications', JSON.stringify(newNotifications));
           return newNotifications;
         });
       }
-    });
+    };
+
+    const handleNewNotification = (notification) => {
+      if (!isChatModalOpen || selectProject._id !== notification.projectId) {
+        setNotifications(prev => {
+          const newNotifications = {
+            ...prev,
+            [notification.projectId]: (prev[notification.projectId] || 0) + 1
+          };
+          localStorage.setItem('projectNotifications', JSON.stringify(newNotifications));
+          return newNotifications;
+        });
+      }
+    };
+
+    socket.on('new message', handleNewMessage);
+    socket.on('new notification', handleNewNotification);
 
     return () => {
-      socket.off('new message');
+      socket.off('new message', handleNewMessage);
+      socket.off('new notification', handleNewNotification);
     };
   }, [socket, selectProject._id, isChatModalOpen]);
 
@@ -164,7 +180,7 @@ const Project = () => {
     // Clear notifications for this specific project only
     setNotifications(prev => {
       const newNotifications = { ...prev, [project._id]: 0 };
-      localStorage.setItem('employeeProjectNotifications', JSON.stringify(newNotifications));
+      localStorage.setItem('projectNotifications', JSON.stringify(newNotifications));
       return newNotifications;
     });
 
@@ -637,6 +653,10 @@ const Project = () => {
                           const showSender = prevSender !== message.senderId;
                           return (
                             <div key={message._id} className={`message-group ${isCurrentUser ? 'own-messages' : ''}`} style={{ marginBottom: showSender ? '20px' : '2px', marginTop: showSender ? '20px' : '2px' }}>
+                              {/* Message Serial Number */}
+                              {/* <div style={{ fontSize: '11px', color: '#1e40af', fontWeight: 'bold', marginBottom: '2px', marginLeft: isCurrentUser ? 'auto' : '48px', textAlign: isCurrentUser ? 'right' : 'left' }}>
+                                #{index + 1}
+                              </div> */}
                               {showSender && !isCurrentUser && (
                                 <div style={{ fontSize: '13px', color: '#666', marginLeft: '48px', marginBottom: '5px' }}>{message.senderId}</div>
                               )}

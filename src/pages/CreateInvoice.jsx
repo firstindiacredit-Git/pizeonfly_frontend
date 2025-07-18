@@ -136,6 +136,8 @@ const CreateInvoice = () => {
           color: "white",
         },
       });
+      // Clear localStorage after successful submit
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
       // Reload the page after 5 seconds
       setTimeout(() => {
         window.location.reload();

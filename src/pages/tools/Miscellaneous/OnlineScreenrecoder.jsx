@@ -106,7 +106,13 @@ const OnlineScreenrecoder = () => {
                                     {recording ? 'Stop' : 'Record'}
                                 </button>
                             </div>
-                            <video ref={videoRef} className="mb-3 w-100" controls autoPlay></video>
+                            <video
+                                ref={videoRef}
+                                className="mb-3"
+                                style={{ width: "60%", maxWidth: "600px", minWidth: "280px", display: "block", margin: "0 auto" }}
+                                controls
+                                autoPlay
+                            ></video>
                             <div className="mb-3">
                                 <label htmlFor="filename" className="form-label">
                                     Enter file name

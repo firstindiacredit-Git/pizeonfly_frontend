@@ -120,11 +120,11 @@ const EmployeeSidebar = () => {
                                         <span>Card Validator</span>
                                     </Link>
                                 </li>
-                                <li>
+                                {/* <li>
                                     <Link className="ms-link" to="/employee-cardGenerator">
                                         <span>Card Generator</span>
                                     </Link>
-                                </li>
+                                </li> */}
 
                                 <li>
                                     <Link className="ms-link" to="/employee-miscellaneous">
