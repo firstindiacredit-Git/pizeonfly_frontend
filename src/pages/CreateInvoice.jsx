@@ -60,6 +60,35 @@ const CreateInvoice = () => {
     setLogo(URL.createObjectURL(file));
   };
 
+  // LocalStorage keys
+  const LOCAL_STORAGE_KEY = 'invoiceDraft';
+
+  // Helper to save draft
+  const saveDraftToLocalStorage = (draft) => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(draft));
+    } catch (e) {
+      // Ignore quota errors
+    }
+  };
+
+  // Helper to load draft
+  const loadDraftFromLocalStorage = () => {
+    try {
+      const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  // Helper to clear draft
+  const clearDraftFromLocalStorage = () => {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+    } catch (e) {}
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -136,8 +165,8 @@ const CreateInvoice = () => {
           color: "white",
         },
       });
-      // Clear localStorage after successful submit
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      // Clear draft after successful submit
+      clearDraftFromLocalStorage();
       // Reload the page after 5 seconds
       setTimeout(() => {
         window.location.reload();
@@ -433,17 +462,39 @@ const CreateInvoice = () => {
     return decodeURIComponent(logoPath.split('-').pop().split('.')[0]);
   };
 
+  // Load draft on mount
+  useEffect(() => {
+    const draft = loadDraftFromLocalStorage();
+    if (draft) {
+      if (draft.formData) setFormData(draft.formData);
+      if (draft.rows) setRows(draft.rows);
+      if (draft.invoiceDate) setInvoiceDate(new Date(draft.invoiceDate));
+      if (draft.invoiceDueDate) setInvoiceDueDate(new Date(draft.invoiceDueDate));
+      if (draft.selectedCountry) setSelectedCountry(draft.selectedCountry);
+      if (draft.selectedState) setSelectedState(draft.selectedState);
+      if (draft.logo) setLogo(draft.logo);
+    }
+  }, []);
 
+  // Auto-save draft on changes
+  useEffect(() => {
+    saveDraftToLocalStorage({
+      formData,
+      rows,
+      invoiceDate,
+      invoiceDueDate,
+      selectedCountry,
+      selectedState,
+      logo
+    });
+  }, [formData, rows, invoiceDate, invoiceDueDate, selectedCountry, selectedState, logo]);
 
-
-
-
-
-
-
-
-
-
+  // Add this style for compact table rows
+  const compactRowStyle = {
+    minHeight: '24px',
+    height: '24px',
+    padding: '2px 4px',
+  };
 
 
   return (
@@ -676,30 +727,30 @@ const CreateInvoice = () => {
                             <th style={{ width: 100, background: "#650bfd", color: "white" }} className="border-secondary">SGST</th>
                           </tr>
                           {rows.map((row, index) => (
-                            <tr key={index} className="item-row ">
-                              <td className="item-name border-secondary">
+                            <tr key={index} className="item-row " style={compactRowStyle}>
+                              <td className="item-name border-secondary" style={compactRowStyle}>
                                 <div className="delete-wpr ">
-                                  <textarea rows="2" style={{ border: "none" }} value={row.item} onChange={(e) => handleInputChange(e, index, 'item')} />
+                                  <textarea rows="2" style={{ border: "none", ...compactRowStyle }} value={row.item} onChange={(e) => handleInputChange(e, index, 'item')} />
                                   <a className="delete" href="javascript:;" onClick={() => handleDeleteRow(index)} title="Remove row">X</a>
                                 </div>
                               </td>
-                              <td className="description border-secondary">
-                                <textarea rows="2" style={{ border: "none" }} value={row.description} onChange={(e) => handleInputChange(e, index, 'description')} />
+                              <td className="description border-secondary" style={compactRowStyle}>
+                                <textarea rows="2" style={{ border: "none", ...compactRowStyle }} value={row.description} onChange={(e) => handleInputChange(e, index, 'description')} />
                               </td>
-                              <td className="border-secondary">
+                              <td className="border-secondary" style={compactRowStyle}>
                                 <textarea
-                                  style={{ border: "none" }}
+                                  style={{ border: "none", ...compactRowStyle }}
                                   className="rate"
                                   value={row.rate}
                                   onChange={(e) => handleInputChange(e, index, 'rate')}
                                   onBlur={(e) => handleBlur(e, index, 'rate')}
                                 />
                               </td>
-                              <td className="border-secondary">
-                                <textarea rows="2" style={{ border: "none" }} className="quantity" value={row.quantity} onChange={(e) => handleInputChange(e, index, 'quantity')} />
+                              <td className="border-secondary" style={compactRowStyle}>
+                                <textarea rows="2" style={{ border: "none", ...compactRowStyle }} className="quantity" value={row.quantity} onChange={(e) => handleInputChange(e, index, 'quantity')} />
                               </td >
-                              <td className="border-secondary">
-                                <textarea rows="2" style={{ border: "none" }} className="gstPercentage" value={row.gstPercentage} onChange={(e) => handleInputChange(e, index, 'gstPercentage')} />
+                              <td className="border-secondary" style={compactRowStyle}>
+                                <textarea rows="2" style={{ border: "none", ...compactRowStyle }} className="gstPercentage" value={row.gstPercentage} onChange={(e) => handleInputChange(e, index, 'gstPercentage')} />
                               </td>
                               {/* <td className="border-secondary">
                                  <span className="igst">₹ {row.igst.toFixed(2)}</span>
@@ -743,30 +794,30 @@ const CreateInvoice = () => {
                                 <th style={{ width: 100, background: "#650bfd", color: "white" }} className="border-secondary">SGST</th> */}
                           </tr>
                           {rows.map((row, index) => (
-                            <tr key={index} className="item-row ">
-                              <td className="item-name border-secondary">
+                            <tr key={index} className="item-row " style={compactRowStyle}>
+                              <td className="item-name border-secondary" style={compactRowStyle}>
                                 <div className="delete-wpr ">
-                                  <textarea style={{ border: "none" }} value={row.item} onChange={(e) => handleInputChange(e, index, 'item')} />
+                                  <textarea style={{ border: "none", ...compactRowStyle }} value={row.item} onChange={(e) => handleInputChange(e, index, 'item')} />
                                   <a className="delete" href="javascript:;" onClick={() => handleDeleteRow(index)} title="Remove row">X</a>
                                 </div>
                               </td>
-                              <td className="description border-secondary">
-                                <textarea style={{ border: "none" }} value={row.description} onChange={(e) => handleInputChange(e, index, 'description')} />
+                              <td className="description border-secondary" style={compactRowStyle}>
+                                <textarea style={{ border: "none", ...compactRowStyle }} value={row.description} onChange={(e) => handleInputChange(e, index, 'description')} />
                               </td>
-                              <td className="border-secondary">
+                              <td className="border-secondary" style={compactRowStyle}>
                                 <textarea
-                                  style={{ border: "none" }}
+                                  style={{ border: "none", ...compactRowStyle }}
                                   className="rate"
                                   value={row.rate}
                                   onChange={(e) => handleInputChange(e, index, 'rate')}
                                   onBlur={(e) => handleBlur(e, index, 'rate')}
                                 />
                               </td>
-                              <td className="border-secondary">
-                                <textarea style={{ border: "none" }} className="quantity" value={row.quantity} onChange={(e) => handleInputChange(e, index, 'quantity')} />
+                              <td className="border-secondary" style={compactRowStyle}>
+                                <textarea style={{ border: "none", ...compactRowStyle }} className="quantity" value={row.quantity} onChange={(e) => handleInputChange(e, index, 'quantity')} />
                               </td >
-                              <td className="border-secondary">
-                                <textarea style={{ border: "none" }} className="gstPercentage" value={row.gstPercentage} onChange={(e) => handleInputChange(e, index, 'gstPercentage')} />
+                              <td className="border-secondary" style={compactRowStyle}>
+                                <textarea style={{ border: "none", ...compactRowStyle }} className="gstPercentage" value={row.gstPercentage} onChange={(e) => handleInputChange(e, index, 'gstPercentage')} />
                               </td>
                               <td className="border-secondary">
                                 <span className="igst">₹ {formatNumber(row.igst)}</span>
