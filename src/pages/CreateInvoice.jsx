@@ -721,6 +721,7 @@ const CreateInvoice = () => {
                             <th style={{ background: "#650bfd", color: "white" }} className="border-secondary">Description</th>
                             <th style={{ width: 100, background: "#650bfd", color: "white" }} className="border-secondary">Rate</th>
                             <th style={{ width: 70, background: "#650bfd", color: "white" }} className="border-secondary">Quantity</th>
+                            <th style={{ width: 100, background: "#650bfd", color: "white" }} className="border-secondary">Sub-Total</th>
                             <th style={{ width: 60, background: "#650bfd", color: "white" }} className="border-secondary">GST %</th>
                             {/* <th style={{ width: 100, background: "#650bfd", color: "white" }} className="border-secondary">IGST</th> */}
                             <th style={{ width: 100, background: "#650bfd", color: "white" }} className="border-secondary">CGST</th>
@@ -749,6 +750,9 @@ const CreateInvoice = () => {
                               <td className="border-secondary" style={compactRowStyle}>
                                 <textarea rows="2" style={{ border: "none", ...compactRowStyle }} className="quantity" value={row.quantity} onChange={(e) => handleInputChange(e, index, 'quantity')} />
                               </td >
+                              <td className="border-secondary">
+                                <span>₹ {formatNumber(row.price)}</span>
+                              </td>
                               <td className="border-secondary" style={compactRowStyle}>
                                 <textarea rows="2" style={{ border: "none", ...compactRowStyle }} className="gstPercentage" value={row.gstPercentage} onChange={(e) => handleInputChange(e, index, 'gstPercentage')} />
                               </td>
@@ -761,24 +765,36 @@ const CreateInvoice = () => {
                               <td className="border-secondary">
                                 <span className="sgst">₹ {formatNumber(row.sgst)}</span>
                               </td>
+                             
                             </tr>
                           ))}
                           <tr id="hiderow" >
-                            <td colSpan={5} className="border-secondary">
+                            <td colSpan={8} className="border-secondary">
                               <a id="addrow" href="javascript:;" onClick={handleAddRow} title="Add a row">Add a row</a>
                             </td>
                           </tr>
                           <tr>
-                            <td colSpan={4} className="blank border-secondary">Amount</td>
-                            <td colSpan={2} className="total-line border-secondary">₹ {formatNumber(total.subtotal)}</td>
+                          <td colSpan={5} className="blank border-secondary"></td>
+                            <td colSpan={2} className="total-line border-secondary">Amount</td>
+                            <td className="total-value border-secondary">
+                              <div id="subtotal">₹ {formatNumber(total.subtotal)}</div>
+                            </td>
+                            {/* <td colSpan={6} className="blank border-secondary">Amount</td>
+                            <td colSpan={3} className="total-line border-secondary">₹ {formatNumber(total.subtotal)}</td> */}
                           </tr>
                           <tr>
-                            <td colSpan={4} className="blank border-secondary">Total GST</td>
-                            <td colSpan={2} className="total-line border-secondary">₹ {formatNumber(total.gstTotal)}</td>
+                          <td colSpan={5} className="blank border-secondary"> </td>
+                            <td colSpan={2} className="total-line border-secondary">Total GST</td>
+                            <td className="total-value border-secondary"><div id="total-gst">₹ {formatNumber(total.gstTotal)}</div></td>
+                            {/* <td colSpan={6} className="blank border-secondary">Total GST</td>
+                            <td colSpan={2} className="total-line border-secondary">₹ {formatNumber(total.gstTotal)}</td> */}
                           </tr>
                           <tr>
-                            <td colSpan={4} className="blank border-secondary">Total (INR)</td>
-                            <td colSpan={2} className="total-line border-secondary fs-6 fw-bold" style={{ background: "#650bfd", color: "white" }}>₹ {formatNumber(total.grandTotal)}</td>
+                          <td colSpan={5} className="blank border-secondary"> </td>
+                            <td colSpan={2} className="total-line border-secondary fs-6 fw-bold" style={{ background: "#650bfd", color: "white" }}>Total (INR)</td>
+                            <td className="total-value border-secondary fs-6 fw-bold" style={{ background: "#650bfd", color: "white" }}><div id="grand-total" style={{ background: "#650bfd", color: "white", width: "max-content" }}>₹ {formatNumber(total.grandTotal)}</div></td>
+                            {/* <td colSpan={6} className="blank border-secondary">Total (INR)</td>
+                            <td colSpan={2} className="total-line border-secondary fs-6 fw-bold" style={{ background: "#650bfd", color: "white" }}>₹ {formatNumber(total.grandTotal)}</td> */}
                           </tr>
                         </tbody>
                         :
@@ -788,6 +804,8 @@ const CreateInvoice = () => {
                             <th style={{ background: "#650bfd", color: "white" }} className="border-secondary">Description</th>
                             <th style={{ width: 100, background: "#650bfd", color: "white" }} className="border-secondary">Rate</th>
                             <th style={{ width: 70, background: "#650bfd", color: "white" }} className="border-secondary">Quantity</th>
+                            {/* <th style={{ width: 70, background: "#650bfd", color: "white" }} className="border-secondary">Sub-Total</th> */}
+                            <th style={{ width: 100, background: "#650bfd", color: "white" }} className="border-secondary">Sub-Total</th>
                             <th style={{ width: 60, background: "#650bfd", color: "white" }} className="border-secondary">GST %</th>
                             <th style={{ width: 100, background: "#650bfd", color: "white" }} className="border-secondary">IGST</th>
                             {/* <th style={{ width: 100, background: "#650bfd", color: "white" }} className="border-secondary">CGST</th>
@@ -816,6 +834,9 @@ const CreateInvoice = () => {
                               <td className="border-secondary" style={compactRowStyle}>
                                 <textarea style={{ border: "none", ...compactRowStyle }} className="quantity" value={row.quantity} onChange={(e) => handleInputChange(e, index, 'quantity')} />
                               </td >
+                              <td className="border-secondary">
+                                <span>₹ {formatNumber(row.price)}</span>
+                              </td>
                               <td className="border-secondary" style={compactRowStyle}>
                                 <textarea style={{ border: "none", ...compactRowStyle }} className="gstPercentage" value={row.gstPercentage} onChange={(e) => handleInputChange(e, index, 'gstPercentage')} />
                               </td>
@@ -828,27 +849,28 @@ const CreateInvoice = () => {
                                   <td className="border-secondary">
                                     <span className="sgst">₹ {row.sgst.toFixed(2)}</span>
                                   </td> */}
+                              
                             </tr>
                           ))}
                           <tr id="hiderow" >
-                            <td colSpan={5} className="border-secondary">
+                            <td colSpan={7} className="border-secondary">
                               <a id="addrow" href="javascript:;" onClick={handleAddRow} title="Add a row">Add a row</a>
                             </td>
                           </tr>
                           <tr>
-                            <td colSpan={3} className="blank border-secondary"></td>
+                            <td colSpan={4} className="blank border-secondary"></td>
                             <td colSpan={2} className="total-line border-secondary">Amount</td>
                             <td className="total-value border-secondary">
                               <div id="subtotal">₹ {formatNumber(total.subtotal)}</div>
                             </td>
                           </tr>
                           <tr>
-                            <td colSpan={3} className="blank border-secondary"> </td>
+                            <td colSpan={4} className="blank border-secondary"> </td>
                             <td colSpan={2} className="total-line border-secondary">Total GST</td>
                             <td className="total-value border-secondary"><div id="total-gst">₹ {formatNumber(total.gstTotal)}</div></td>
                           </tr>
                           <tr>
-                            <td colSpan={3} className="blank border-secondary"> </td>
+                            <td colSpan={4} className="blank border-secondary"> </td>
                             <td colSpan={2} className="total-line border-secondary fs-6 fw-bold" style={{ background: "#650bfd", color: "white" }}>Total (INR)</td>
                             <td className="total-value border-secondary fs-6 fw-bold" style={{ background: "#650bfd", color: "white" }}><div id="grand-total" style={{ background: "#650bfd", color: "white", width: "max-content" }}>₹ {formatNumber(total.grandTotal)}</div></td>
                           </tr>
