@@ -9,6 +9,11 @@ import "./Loading.css"
 import { useNavigate } from "react-router-dom";
 import FloatingMenu from '../Chats/FloatingMenu'
 
+// Add at the top, after imports
+const validatePassword = (password) => {
+  return password.length >= 8 && !/\s/.test(password);
+};
+
 const Member = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [employees, setEmployees] = useState([]);
@@ -68,6 +73,13 @@ const Member = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validatePassword(formData.password)) {
+      setCreatePasswordError("Password must be at least 8 characters and must not contain spaces.");
+      return;
+    } else {
+      setCreatePasswordError('');
+    }
 
     const formDataToSend = new FormData();
 
@@ -496,6 +508,12 @@ const Member = () => {
   };
 
   const updateSubmit = async () => {
+    if (!validatePassword(employeeData.password)) {
+      setUpdatePasswordError("Password must be at least 8 characters and must not contain spaces.");
+      return;
+    } else {
+      setUpdatePasswordError('');
+    }
     try {
       const formData = new FormData();
 
@@ -751,6 +769,14 @@ const Member = () => {
       // handle error (optional: toast)
     }
   };
+
+  // Add state for password errors near other states
+  const [createPasswordError, setCreatePasswordError] = useState('');
+  const [updatePasswordError, setUpdatePasswordError] = useState('');
+
+  // Add state for password visibility near other states
+  const [showCreatePassword, setShowCreatePassword] = useState(false);
+  const [showUpdatePassword, setShowUpdatePassword] = useState(false);
 
   return (
     <>
@@ -2122,22 +2148,37 @@ const Member = () => {
                           <i className="icofont-key" style={{ color: '#ff5e00' }}></i>
                           Password <span className="text-danger">*</span>
                         </label>
-                        <input
-                          type="password"
-                          className="form-control"
-                          placeholder="Password"
-                          name="password"
-                          value={employeeData.password}
-                          onChange={updateChange}
-                          style={{
-                            borderRadius: '8px',
-                            border: '1px solid rgba(255, 94, 0, 0.3)',
-                            padding: '10px 15px',
-                            color: '#333',
-                            boxShadow: 'none',
-                            backgroundColor: 'rgba(255, 94, 0, 0.03)'
-                          }}
-                        />
+                        <div className="input-group">
+                          <input
+                            type={showUpdatePassword ? "text" : "password"}
+                            className="form-control"
+                            placeholder="Password must be at least 8 characters."
+                            name="password"
+                            value={employeeData.password}
+                            onChange={e => {
+                              updateChange(e);
+                              setUpdatePasswordError('');
+                            }}
+                            style={{
+                              borderRadius: '8px',
+                              border: '1px solid rgba(255, 94, 0, 0.3)',
+                              padding: '10px 15px',
+                              color: '#333',
+                              boxShadow: 'none',
+                              backgroundColor: 'rgba(255, 94, 0, 0.03)'
+                            }}
+                          />
+                          <span
+                            className="input-group-text"
+                            style={{ cursor: 'pointer', background: 'transparent', border: 'none' }}
+                            onClick={() => setShowUpdatePassword((prev) => !prev)}
+                          >
+                            <i className={`bi ${showUpdatePassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                          </span>
+                        </div>
+                        {updatePasswordError && (
+                          <small className="text-danger">{updatePasswordError}</small>
+                        )}
                       </div>
                     </div>
 
@@ -2700,7 +2741,7 @@ const Member = () => {
                   overflow: 'hidden'
                 }}>
                   <div className="modal-header" style={{
-                    background: 'linear-gradient(135deg, #52b447, #429938)',
+                    background: 'linear-gradient(135deg, #FF6EB4, #FF6EB4)',
                     borderBottom: 'none',
                     padding: '20px 25px',
                     position: 'relative'
@@ -2848,22 +2889,37 @@ const Member = () => {
                           <i className="icofont-key" style={{ color: '#ff5e00' }}></i>
                           Password <span className="text-danger">*</span>
                         </label>
-                        <input
-                          type="password"
-                          className="form-control"
-                          placeholder="Password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          style={{
-                            borderRadius: '8px',
-                            border: '1px solid rgba(255, 94, 0, 0.3)',
-                            padding: '10px 15px',
-                            color: '#333',
-                            boxShadow: 'none',
-                            backgroundColor: 'rgba(255, 94, 0, 0.03)'
-                          }}
-                        />
+                        <div className="input-group">
+                          <input
+                            type={showCreatePassword ? "text" : "password"}
+                            className="form-control"
+                            placeholder="Password must be at least 8 characters."
+                            name="password"
+                            value={formData.password}
+                            onChange={e => {
+                              handleChange(e);
+                              setCreatePasswordError('');
+                            }}
+                            style={{
+                              borderRadius: '8px',
+                              border: '1px solid rgba(255, 94, 0, 0.3)',
+                              padding: '10px 15px',
+                              color: '#333',
+                              boxShadow: 'none',
+                              backgroundColor: 'rgba(255, 94, 0, 0.03)'
+                            }}
+                          />
+                          <span
+                            className="input-group-text"
+                            style={{ cursor: 'pointer', background: 'transparent', border: 'none' }}
+                            onClick={() => setShowCreatePassword((prev) => !prev)}
+                          >
+                            <i className={`bi ${showCreatePassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                          </span>
+                        </div>
+                        {createPasswordError && (
+                          <small className="text-danger">{createPasswordError}</small>
+                        )}
                       </div>
                     </div>
 

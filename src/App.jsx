@@ -67,6 +67,8 @@ import { useTheme } from './context/ThemeContext'
 import Chat from './Chats/Chat';
 import EmployeeChat from './Chats/EmployeeChat';
 import ClientChat from './Chats/ClientChat';
+import Extractor from './pages/Extractor'
+import Balancesheet from './pages/Balancesheet'
 
 function AppContent() {
   const { isDarkMode } = useTheme();
@@ -141,7 +143,8 @@ function AppContent() {
 
           <Route path='/reset-password/:token' element={<ResetPassword />} />
 
-
+          <Route path='/extractor' element={<Extractor />}></Route>
+          <Route path='/balanceSheet' element={<Balancesheet />}></Route>
 
 
 

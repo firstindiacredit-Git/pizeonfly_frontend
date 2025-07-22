@@ -394,6 +394,11 @@ const Sidebar = () => {
                     <span>All Invoice</span>
                   </Link>
                 </li>
+                <li>
+                  <Link className="ms-link" to="/balanceSheet">
+                    <span>Balance Sheet</span>
+                  </Link>
+                </li>
               </ul>
             </li>
 
@@ -420,6 +425,27 @@ const Sidebar = () => {
                 </li>
               </ul>
             </li>
+
+            <li className="collapsed">
+              <a
+                className={`m-link ${textColorClass}`}
+                data-bs-toggle="collapse"
+                data-bs-target="#datas-Components"
+                href="#"
+              >
+                <i className={`icofont-data ${textColorClass}`} /> <span>Data Mining</span>{" "}
+                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
+              </a>
+              <ul className="sub-menu collapse" id="datas-Components">
+                <li>
+                  <Link className="ms-link" to="/extractor">
+                    <span>Google Map Extrator</span>
+                  </Link>
+                </li>
+              </ul>
+            </li>
+
+
 
             {/* <li className="collapsed">
                 <a
@@ -683,40 +709,40 @@ const Sidebar = () => {
                     <div className="col-12">
                       <label className="fw-bold fs-5 text-dark">Edit Admin Profile</label>
                       <div className='mt-3 mb-3' style={{ position: "relative", width: "150px", margin: "0 auto" }}>
-                          <img
-                            src={selectedImage
-                              ? URL.createObjectURL(selectedImage)
-                              : getImageUrl(user?.profileImage)}
-                            alt="Profile"
-                            className="rounded-circle"
-                            style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-                          />
-                          <input
-                            type="file"
-                            ref={fileInputRef}
-                            className="d-none"
-                            accept="image/*"
-                            onChange={handleProfileImageChange}
-                          />
-                          <span
-                            style={{
-                              position: "absolute",
-                              left: "50%",
-                              bottom: "-10px",
-                              transform: "translateX(-50%)",
-                              // background: "#fff",
-                              // borderRadius: "50%",
-                              // boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                              // padding: "6px",
-                              cursor: "pointer",
-                              // border: "1px solid #ddd"
+                        <img
+                          src={selectedImage
+                            ? URL.createObjectURL(selectedImage)
+                            : getImageUrl(user?.profileImage)}
+                          alt="Profile"
+                          className="rounded-circle"
+                          style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                        />
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          className="d-none"
+                          accept="image/*"
+                          onChange={handleProfileImageChange}
+                        />
+                        <span
+                          style={{
+                            position: "absolute",
+                            left: "50%",
+                            bottom: "-10px",
+                            transform: "translateX(-50%)",
+                            // background: "#fff",
+                            // borderRadius: "50%",
+                            // boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                            // padding: "6px",
+                            cursor: "pointer",
+                            // border: "1px solid #ddd"
 
-                            }}
-                            onClick={() => fileInputRef.current.click()}
-                          >
-                            <i className="bi bi-pencil-square" style={{ fontSize: "1.2rem", color: "#333", title:"Change Image" }}></i>
-                          </span>
-                        </div>
+                          }}
+                          onClick={() => fileInputRef.current.click()}
+                        >
+                          <i className="bi bi-pencil-square" style={{ fontSize: "1.2rem", color: "#333", title: "Change Image" }}></i>
+                        </span>
+                      </div>
                       <div className="mb-3">
                         <label className="form-label fw-bold text-dark">Username</label>
                         <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
