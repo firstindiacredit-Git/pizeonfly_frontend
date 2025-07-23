@@ -1144,7 +1144,7 @@ const Member = () => {
                                         <i className="icofont-edit" style={{ fontSize: '16px' }}></i>
                                       </button>
 
-                                      <button
+                                      {/* <button
                                         type="button"
                                         className="btn"
                                         data-bs-toggle="modal"
@@ -1178,7 +1178,7 @@ const Member = () => {
                                         }}
                                       >
                                         <i className="icofont-ui-delete" style={{ fontSize: '16px' }}></i>
-                                      </button>
+                                      </button> */}
                                       <button
                                         type="button"
                                         className="btn"
@@ -1918,7 +1918,7 @@ const Member = () => {
                                             <i className="icofont-edit"></i>
                                           </button>
 
-                                          <button
+                                          {/* <button
                                             type="button"
                                             className="btn"
                                             data-bs-toggle="modal"
@@ -1945,7 +1945,7 @@ const Member = () => {
                                             }}
                                           >
                                             <i className="icofont-ui-delete"></i>
-                                          </button>
+                                          </button> */}
                                           <button
                                             type="button"
                                             className="btn"
