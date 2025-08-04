@@ -58,6 +58,8 @@ import ClientQrCodeGenerate from './pages/clients-tools/QrCodeGenerate'
 import ClientUrlShortner from './pages/clients-tools/UrlShortner'
 import ClientCardGenerator from './pages/clients-tools/CardGenerator'
 
+import ClientMeeting from './pages/ClientMeeting'
+
 import Notepad from './pages/Excel'
 // import Test from './pages/test'
 
@@ -145,6 +147,8 @@ function AppContent() {
 
           <Route path='/extractor' element={<Extractor />}></Route>
           <Route path='/balanceSheet' element={<Balancesheet />}></Route>
+
+          <Route path='/client-meeting' element={<ClientMeeting />}></Route>
 
 
 

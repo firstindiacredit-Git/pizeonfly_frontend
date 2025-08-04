@@ -423,6 +423,11 @@ const Sidebar = () => {
                     <span>All Meetings</span>
                   </Link>
                 </li>
+                <li>
+                  <Link className="ms-link" to="/client-meeting">
+                    <span>Client Meeting</span>
+                  </Link>
+                </li>
               </ul>
             </li>
 
