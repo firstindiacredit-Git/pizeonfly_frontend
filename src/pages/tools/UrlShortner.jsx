@@ -229,7 +229,7 @@ const UrlShortner = () => {
                     <QRModal qr={selectedQR} onClose={() => setSelectedQR(null)} />
 
                 </div>
-                <FloatingMenu userType="admin" isMobile={isMobile} />
+                {/* <FloatingMenu userType="admin" isMobile={isMobile} /> */}
             </div>
         </>
     );

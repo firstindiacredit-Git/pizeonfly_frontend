@@ -1206,7 +1206,7 @@ const Tasks = () => {
 
           </>
         </div>
-        <FloatingMenu userType="employee" isMobile={isMobile} />
+        {/* <FloatingMenu userType="employee" isMobile={isMobile} /> */}
       </div>
 
       {/* Message Modal */}

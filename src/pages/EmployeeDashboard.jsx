@@ -3022,7 +3022,7 @@ const EmployeeDashboard = () => {
             </div>
           </div>
         </div>
-        <FloatingMenu userType="employee" isMobile={isMobile} />
+        {/* <FloatingMenu userType="employee" isMobile={isMobile} /> */}
       </div>
 
       {/* PDF Viewer Modal */}

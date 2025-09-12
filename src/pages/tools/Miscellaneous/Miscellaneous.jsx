@@ -67,7 +67,7 @@ const Miscellaneous1 = () => {
                         </div>
                     </div>
                 </div>
-                <FloatingMenu userType="admin" isMobile={isMobile} />
+                {/* <FloatingMenu userType="admin" isMobile={isMobile} /> */}
             </div>
         </>
     );

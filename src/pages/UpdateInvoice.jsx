@@ -617,7 +617,7 @@ const UpdateInvoice = () => {
           </button>
         </div>
       </div>
-      <FloatingMenu userType="admin" isMobile={isMobile} />
+      {/* <FloatingMenu userType="admin" isMobile={isMobile} /> */}
     </div>
   );
 };

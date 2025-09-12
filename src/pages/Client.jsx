@@ -2843,7 +2843,7 @@ const Client = () => {
                     </>
                 </div>
                 <ToastContainer />
-                <FloatingMenu userType="client" isMobile={isMobile} />
+                {/* <FloatingMenu userType="client" isMobile={isMobile} /> */}
             </div>
         </>
     )

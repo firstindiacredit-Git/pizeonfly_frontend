@@ -3420,7 +3420,7 @@ const Member = () => {
         </div>
       </div>
       <ToastContainer />
-      <FloatingMenu userType="admin" isMobile={isMobile} />
+      {/* <FloatingMenu userType="admin" isMobile={isMobile} /> */}
       {/* Modal  Delete Folder/ File*/}
       <div
         className="modal fade"

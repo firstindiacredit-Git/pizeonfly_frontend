@@ -201,7 +201,7 @@ const ClientDashboard = () => {
             </div>
           </div>
         </div>
-        <FloatingMenu userType="client" isMobile={isMobile} />
+        {/* <FloatingMenu userType="client" isMobile={isMobile} /> */}
       </div>
     </>
   )

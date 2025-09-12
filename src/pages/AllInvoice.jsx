@@ -157,7 +157,7 @@ const AllInvoice = () => {
           </div>
         </div>
         <ToastContainer />
-        <FloatingMenu userType="admin" isMobile={isMobile} />
+        {/* <FloatingMenu userType="admin" isMobile={isMobile} /> */}
       </div>
     </>
   );

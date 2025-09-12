@@ -397,7 +397,7 @@ const AllMeetings = () => {
           </div>
         </div>
         <ToastContainer />
-        <FloatingMenu userType="admin" isMobile={isMobile} />
+        {/* <FloatingMenu userType="admin" isMobile={isMobile} /> */}
       </div>
       <div className="modal fade" id="deleteMeetingModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered modal-md modal-dialog-scrollable">

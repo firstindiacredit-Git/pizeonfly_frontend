@@ -31,7 +31,7 @@ const SaasManager = () => {
                         </div>
                     </div>
                 </div>
-                <FloatingMenu userType="admin" isMobile={isMobile} />
+                {/* <FloatingMenu userType="admin" isMobile={isMobile} /> */}
             </div>
         </>
     );
