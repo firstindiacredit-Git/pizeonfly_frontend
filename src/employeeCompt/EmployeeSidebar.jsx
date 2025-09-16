@@ -83,6 +83,32 @@ const EmployeeSidebar = () => {
                                 </li>
                             </ul>
                         </li>
+                        {/* Add Chat Menu */}
+                        <li className="collapsed">
+                            <a
+                                className="m-link"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#chat-Components"
+                                href="#"
+                            >
+                                <i className="icofont-chat" />
+                                <span>Chats</span>{" "}
+                                <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
+                            </a>
+                            {/* Menu: Sub menu ul */}
+                            <ul className="sub-menu collapse" id="chat-Components">
+                                <li>
+                                    <Link className="ms-link" to="/chat-employee">
+                                        <span>Employee Chats</span>
+                                    </Link>
+                                </li>
+                                {/* <li>
+                                    <Link className="ms-link" to="/employee-chats">
+                                        <span>Tasks</span>
+                                    </Link>
+                                </li> */}
+                            </ul>
+                        </li>
                         {/* Add Tools Menu */}
                         <li className="collapsed">
                             <a

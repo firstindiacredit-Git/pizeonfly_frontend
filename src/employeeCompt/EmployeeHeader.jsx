@@ -301,7 +301,7 @@ const Header = () => {
           <div className="container-xxl">
             {/* header rightbar icon */}
             <div className="h-right d-flex gap-3 align-items-center mr-5 mr-lg-0 order-1">
-              <button 
+              {/* <button 
                 onClick={toggleTheme} 
                 className="border-0 bg-transparent"
                 style={{ 
@@ -319,7 +319,7 @@ const Header = () => {
                   <i className="bi bi-brightness-high text-light fs-5" style={{ color: "#FFD700" }} /> : 
                   <i className="bi bi-moon-fill fs-5" style={{ color: "#6c757d" }} />
                 }
-              </button>
+              </button> */}
               <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center zindex-popover">
                 <div className="u-info me-2">
                   <p className="mb-0 text-end line-height-sm" style={{ fontWeight: "600", fontSize: "15px", color: isDarkMode ? "#e1e1e1" : "#333" }}>

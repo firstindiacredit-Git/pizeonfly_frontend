@@ -49,6 +49,7 @@ import EmployeeSaasManager from './pages/employee-tools/SaasManager'
 import EmployeeQrCodeGenerate from './pages/employee-tools/QrCodeGenerate'
 import EmployeeUrlShortner from './pages/employee-tools/UrlShortner'
 import EmployeeCardGenerator from './pages/employee-tools/CardGenerator'
+import ChatEmployee from './EmployeeChats/ChatEmployee'
 
 import ClientCardValidator from './pages/clients-tools/CardValidator'
 import ClientHtmlTemplateGenerator from './pages/clients-tools/HtmlTemplateGenerator'
@@ -127,6 +128,7 @@ function AppContent() {
           <Route path='/employee-qrCodeGenerate' element={<EmployeeQrCodeGenerate />}></Route>
           <Route path='/employee-urlShortner' element={<EmployeeUrlShortner />}></Route>
           <Route path='/employee-cardGenerator' element={<EmployeeCardGenerator />}></Route>
+          <Route path='/chat-employee' element={<ChatEmployee />}></Route>
 
           <Route path='/clients-cardValidator' element={<ClientCardValidator />}></Route>
           <Route path='/clients-htmlTemplateGenerator' element={<ClientHtmlTemplateGenerator />}></Route>
