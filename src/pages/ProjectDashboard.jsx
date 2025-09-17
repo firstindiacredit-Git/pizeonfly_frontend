@@ -1557,7 +1557,7 @@ const ProjectDashboard = () => {
                     alt="No Data"
                     style={{
                       height: isMobile ? "3rem" : "5rem",
-                      height: "80%",
+                      height: "70%",
                       width: "50%"
                     }}
                   />

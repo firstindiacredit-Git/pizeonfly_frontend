@@ -399,6 +399,11 @@ const Sidebar = () => {
                     <span>Balance Sheet</span>
                   </Link>
                 </li>
+                <li>
+                  <Link className="ms-link" to="/officeDocs">
+                    <span>Office Docs</span>
+                  </Link>
+                </li>
               </ul>
             </li>
 

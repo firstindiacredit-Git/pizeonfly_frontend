@@ -25,6 +25,7 @@ import AllInvoice from './pages/AllInvoice'
 import UpdateInvoice from './pages/UpdateInvoice'
 import CreateMeeting from './pages/CreateMeeting'
 import AllMeetings from './pages/AllMeetings'
+import Officedocs from './pages/Officedocs'
 
 import UrlShortner from './pages/tools/UrlShortner'
 import QrCodeGenerate from './pages/tools/QrCodeGenerate'
@@ -149,7 +150,7 @@ function AppContent() {
 
           <Route path='/extractor' element={<Extractor />}></Route>
           <Route path='/balanceSheet' element={<Balancesheet />}></Route>
-
+          <Route path='/officeDocs' element={<Officedocs />}></Route>
           <Route path='/client-meeting' element={<ClientMeeting />}></Route>
 
 
