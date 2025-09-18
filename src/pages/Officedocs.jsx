@@ -991,92 +991,78 @@ const Officedocs = () => {
                                 <div className="list-group">
                                     {documents.map(doc => (
                                         <div key={doc._id} className={`list-group-item list-group-item-action mb-2 border rounded ${selectedDocuments.includes(doc._id) ? 'border-primary bg-light' : ''}`}>
-                                            <div className="d-flex w-100 justify-content-between align-items-start">
-                                                <div className="flex-grow-1">
-                                                    <div className="d-flex align-items-center mb-2">
-                                                        <div className="me-3">
-                                                            <input
-                                                                type="checkbox"
-                                                                className="form-check-input me-2"
-                                                                checked={selectedDocuments.includes(doc._id)}
-                                                                onChange={() => handleSelectDocument(doc._id)}
-                                                            />
-                                                            <i className={`fa ${
-                                                                doc.uploadType === 'file' 
-                                                                    ? doc.mimeType?.startsWith('image/') ? 'fa-file-image-o'
-                                                                    : doc.mimeType === 'application/pdf' ? 'fa-file-pdf-o'
-                                                                    : doc.mimeType?.includes('word') ? 'fa-file-word-o'
-                                                                    : doc.mimeType?.includes('excel') ? 'fa-file-excel-o'
-                                                                    : doc.mimeType?.includes('powerpoint') ? 'fa-file-powerpoint-o'
-                                                                    : 'fa-file-o'
-                                                                    : 'fa-link'
-                                                            } fa-2x text-primary`}></i>
-                                                        </div>
-                                                        <div className="flex-grow-1">
-                                                            <h6 className="mb-1">{doc.title}</h6>
-                                                            <div className="d-flex align-items-center gap-2 mb-1">
-                                                                <span className="badge bg-secondary">{doc.documentType}</span>
-                                                                <span className={`badge ${doc.uploadType === 'file' ? 'bg-success' : 'bg-info'}`}>
-                                                                    {doc.uploadType === 'file' ? 'File' : 'Link'}
-                                                                </span>
-                                                                {doc.uploadType === 'file' && doc.fileSize && (
-                                                                    <small className="text-muted">
-                                                                        {formatFileSize(doc.fileSize)}
-                                                                    </small>
-                                                                )}
-                                                            </div>
-                                                            {doc.description && (
-                                                                <p className="mb-1 text-muted small">{doc.description}</p>
-                                                            )}
-                                                            <div className="d-flex align-items-center gap-2">
-                                                                {doc.tags && doc.tags.length > 0 && (
-                                                                    <div>
-                                                                        {doc.tags.slice(0, 3).map(tag => (
-                                                                            <span key={tag} className="badge bg-light text-dark me-1 small">
-                                                                                {tag}
-                                                                            </span>
-                                                                        ))}
-                                                                    </div>
-                                                                )}
-                                                                <small className="text-muted">
-                                                                    Uploaded: {new Date(doc.createdAt).toLocaleDateString()}
-                                                                </small>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                            <div className="d-flex w-100 justify-content-between align-items-center" style={{gap:0}}>
+                                                <div className="d-flex align-items-center flex-grow-1" style={{gap:0, flexWrap: 'wrap'}}>
+                                                    <input
+                                                        type="checkbox"
+                                                        className="form-check-input me-2"
+                                                        checked={selectedDocuments.includes(doc._id)}
+                                                        onChange={() => handleSelectDocument(doc._id)}
+                                                        style={{marginRight:'6px'}}
+                                                    />
+                                                    <i
+                                                        className={`fa ${
+                                                            doc.uploadType === 'file'
+                                                                ? doc.mimeType?.startsWith('image/') ? 'fa-file-image-o'
+                                                                : doc.mimeType === 'application/pdf' ? 'fa-file-pdf-o'
+                                                                : doc.mimeType?.includes('word') ? 'fa-file-word-o'
+                                                                : doc.mimeType?.includes('excel') ? 'fa-file-excel-o'
+                                                                : doc.mimeType?.includes('powerpoint') ? 'fa-file-powerpoint-o'
+                                                                : 'fa-file-o'
+                                                                : 'fa-link'
+                                                        } fa-2x text-primary`}
+                                                        style={{marginRight:'10px'}}
+                                                    ></i>
+                                                    <h6 className="mb-1" style={{marginBottom:0, marginRight:'10px', whiteSpace: 'nowrap'}}>{doc.title}</h6>
+                                                    <span className="badge bg-secondary" style={{marginRight:'6px'}}>{doc.documentType}</span>
+                                                    <span className={`badge ${doc.uploadType === 'file' ? 'bg-success' : 'bg-info'}`} style={{marginRight:'6px'}}>
+                                                        {doc.uploadType === 'file' ? 'File' : 'Link'}
+                                                    </span>
+                                                    {/* File Type */}
+                                                    {doc.uploadType === 'file' && doc.mimeType && (
+                                                        <span className="badge bg-light text-dark" style={{marginRight:'6px', border: '1px solid #ccc'}}>
+                                                            {doc.mimeType.split('/').pop().toUpperCase()}
+                                                        </span>
+                                                    )}
+                                                    {/* File Size */}
+                                                    {doc.uploadType === 'file' && doc.fileSize && (
+                                                        <span className="text-muted small" style={{marginRight:'10px'}}>
+                                                            {formatFileSize(doc.fileSize)}
+                                                        </span>
+                                                    )}
+                                                    {/* Modified Date */}
+                                                    <span className="text-muted small" style={{marginRight:'10px'}}>
+                                                        Modified: {doc.updatedAt ? new Date(doc.updatedAt).toLocaleDateString() : new Date(doc.createdAt).toLocaleDateString()}
+                                                    </span>
+                                                    {/* Uploaded Date */}
+                                                    <span className="text-muted small" style={{marginRight:'10px'}}>
+                                                        Uploaded: {new Date(doc.createdAt).toLocaleDateString()}
+                                                    </span>
+                                                    {/* Description */}
+                                                    {doc.description && (
+                                                        <span className="mb-1 text-muted small" style={{marginRight:'10px'}}>{doc.description}</span>
+                                                    )}
+                                                    {/* Tags */}
+                                                    {doc.tags && doc.tags.length > 0 && (
+                                                        doc.tags.slice(0, 3).map(tag => (
+                                                            <span key={tag} className="badge bg-light text-dark me-1 small" style={{marginRight:'4px'}}>{tag}</span>
+                                                        ))
+                                                    )}
                                                 </div>
-                                                <div className="btn-group-vertical">
-                                                    <button
-                                                        className="btn btn-sm btn-outline-info mb-1"
-                                                        onClick={() => handleViewDocument(doc._id)}
-                                                        title="View Details"
-                                                    >
+                                                <div className="btn-group" style={{gap:0}}>
+                                                    <button className="btn btn-sm btn-outline-info" onClick={() => handleViewDocument(doc._id)} title="View Details" style={{marginRight:'4px'}}>
                                                         <i className="fa fa-eye"></i>
                                                     </button>
                                                     {doc.uploadType === 'file' ? (
-                                                        <button
-                                                            className="btn btn-sm btn-outline-primary mb-1"
-                                                            onClick={() => handleDownload(doc._id)}
-                                                            title="Download"
-                                                        >
+                                                        <button className="btn btn-sm btn-outline-primary" onClick={() => handleDownload(doc._id)} title="Download" style={{marginRight:'4px'}}>
                                                             <i className="fa fa-download"></i>
                                                         </button>
                                                     ) : (
-                                                        <a
-                                                            href={doc.documentLink}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="btn btn-sm btn-outline-primary mb-1"
-                                                            title="Open Link"
-                                                        >
+                                                        <a href={doc.documentLink} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary" title="Open Link" style={{marginRight:'4px'}}>
                                                             <i className="fa fa-external-link"></i>
                                                         </a>
                                                     )}
-                                                    <button
-                                                        className="btn btn-sm btn-outline-danger"
-                                                        onClick={() => handleDelete(doc._id)}
-                                                        title="Delete"
-                                                    >
+                                                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(doc._id)} title="Delete">
                                                         <i className="fa fa-trash"></i>
                                                     </button>
                                                 </div>

@@ -3536,7 +3536,7 @@ const Tasks = () => {
                       e.currentTarget.style.transform = 'translateY(0)';
                     }}>
                       <img 
-                        src={`${import.meta.env.VITE_BASE_URL}${image}`} 
+                        src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`} 
                         alt={`Task image ${index + 1}`} 
                         className="img-fluid"
                         style={{ 
@@ -3545,7 +3545,7 @@ const Tasks = () => {
                           objectFit: 'cover',
                           display: 'block'
                         }}
-                        onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image}`, '_blank')}
+                        onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`, '_blank')}
                       />
                       <div style={{
                         position: 'absolute',
@@ -3566,7 +3566,7 @@ const Tasks = () => {
                           Image {index + 1}
                         </span>
                         <button 
-                          onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image}`, '_blank')}
+                          onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`, '_blank')}
                           style={{
                             backgroundColor: 'rgba(255, 255, 255, 0.2)',
                             color: 'white',
