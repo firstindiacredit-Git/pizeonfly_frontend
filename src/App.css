@@ -4,8 +4,8 @@
 }
 
 .light {
-  /* background-color: #ffffff; */
-    background-color: var(--active-tab-color, rgba(255, 255, 255, 0.15));
+  background-color: #ffffff;
+    /* background-color: var(--active-tab-color, rgba(255, 255, 255, 0.15)); */
   color: #000000;
 }
 

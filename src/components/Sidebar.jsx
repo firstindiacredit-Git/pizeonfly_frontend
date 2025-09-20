@@ -600,7 +600,7 @@ const Sidebar = () => {
                       <i className="icofont-logout fs-6 me-3" />
                       Signout
                     </button>
-                    <div><hr className="dropdown-divider border-dark" /></div>
+                    {/* <div><hr className="dropdown-divider border-dark" /></div> */}
                   </div>
                 </div>
               </div>
