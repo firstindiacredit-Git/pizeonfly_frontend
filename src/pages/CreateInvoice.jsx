@@ -502,13 +502,13 @@ const CreateInvoice = () => {
       <div id="mytask-layout">
         <Sidebar />
         {/* main body area */}
-        <div className="main px-lg-4 px-md-4">
+        <div className="main">
           {/* Body: Header */}
           <Header />
 
           {/*Body*/}
 
-          <div className="body d-flex py-lg-3 py-md-2">
+          <div className="body d-flex py-lg-3 py-md-2 px-lg-4 px-md-4">
             {/* <form onSubmit={handleSubmit}> */}
             <div className="container-xxl">
               <div className="row align-items-center">

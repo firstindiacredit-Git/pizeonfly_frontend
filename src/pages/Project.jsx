@@ -889,13 +889,13 @@ const Project = () => {
       <div id="mytask-layout">
         <Sidebar />
         {/* main body area */}
-        <div className="main px-lg-4 px-md-4">
+        <div className="main">
           {/* Body: Header */}
           <Header />
 
           <>
             {/* Body: Body */}
-            <div className="body d-flex py-lg-3 py-md-2">
+            <div className="body d-flex py-lg-3 py-md-2 px-lg-4 px-md-4">
               <div className="container-xxl">
                 <div className="row align-items-center">
                   <div className="border-bottom mb-4">

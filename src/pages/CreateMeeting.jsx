@@ -119,9 +119,9 @@ const CreateMeeting = () => {
     <>
       <div id="mytask-layout">
         <Sidebar />
-        <div className="main px-lg-4 px-md-4">
+        <div className="main">
           <Header />
-          <div className="body d-flex py-lg-3 py-md-2">
+          <div className="body d-flex py-lg-3 py-md-2 px-lg-4 px-md-4">
             <div className="container-xxl">
               <div className="border-0 mb-3">
                 <div className="card-header py-3 no-bg bg-transparent d-flex align-items-center px-0 justify-content-between border-bottom flex-wrap">

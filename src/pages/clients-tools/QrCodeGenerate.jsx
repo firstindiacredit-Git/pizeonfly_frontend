@@ -62,10 +62,10 @@ const QrCodeGenerate = () => {
         <>
             <div id="mytask-layout">
                 <Sidebar />
-                <div className="main px-lg-4 px-md-4">
+                <div className="main">
                     <Header />
 
-                    <div className="body d-flex py-lg-3 py-md-2">
+                    <div className="body d-flex py-lg-3 py-md-2 px-lg-4 px-md-4">
                         <div className="container-fluid">
                             <div className="row clearfix">
                                 <div className="col-md-12">

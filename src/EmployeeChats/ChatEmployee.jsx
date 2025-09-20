@@ -649,9 +649,9 @@ const ChatEmployee = () => {
     return (
       <div id="mytask-layout">
         <Sidebar />
-        <div className="main px-lg-4 px-md-4">
+        <div className="main">
           <Header />
-          <div className="body d-flex py-lg-3 py-md-2">
+          <div className="body d-flex py-lg-3 py-md-2 px-lg-4 px-md-4">
             <div className="container-xxl">
               <div className="d-flex justify-content-center align-items-center" style={{ height: '50vh' }}>
                 <div className="spinner-border text-primary" role="status">
@@ -670,9 +670,9 @@ const ChatEmployee = () => {
     <>
       <div id="mytask-layout">
         <Sidebar />
-        <div className="main px-lg-4 px-md-4">
+        <div className="main">
           <Header />
-            <div className="body d-flex py-lg-3 py-md-2">
+            <div className="body d-flex py-lg-3 py-md-2 px-lg-4 px-md-4">
               <div className="container-xxl">
                 <div className="row align-items-center">
                   <div className="border-0 mb-4">

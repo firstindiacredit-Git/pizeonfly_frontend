@@ -229,7 +229,7 @@ const UpdateInvoice = () => {
   return (
     <div id="mytask-layout">
       <Sidebar />
-      <div className="main px-lg-4 px-md-4">
+      <div className="main">
         <Header />
         <div className="print_invoice" style={{ marginTop: "-4px" }}>
           <div className="" style={{ borderBottom: "1px solid #A9A9A9" }}>
