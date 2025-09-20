@@ -75,16 +75,16 @@ import Extractor from './pages/Extractor'
 import Balancesheet from './pages/Balancesheet'
 
 function AppContent() {
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, activeTabColor } = useTheme();
 
   return (
-    <div className={`app ${isDarkMode ? 'dark' : 'light'}`}>
-      {/* <div 
+    // <div className={`app ${isDarkMode ? 'dark' : 'light'}`}>
+      <div 
       className={`app ${isDarkMode ? 'dark' : 'light'}`}
       style={{
         '--active-tab-color': activeTabColor
       }}
-    > */}
+    > 
       <HashRouter>
         <Routes>
           <Route path='/signup' element={<Signup />}></Route>
