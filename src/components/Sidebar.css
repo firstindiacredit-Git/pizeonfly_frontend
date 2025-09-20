@@ -1,11 +1,503 @@
-.sidebar {
+/* Professional Sidebar Styles */
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  z-index: 1000;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  overflow: visible;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-content {
+  padding: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+/* Custom scrollbar */
+.sidebar-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Brand Section */
+.brand-section {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0;
+}
+
+.brand-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.brand-logo {
+  height: 40px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.brand-logo:hover {
+  transform: scale(1.05);
+}
+
+/* Navigation */
+.sidebar-nav {
+  padding: 0;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  border: none;
+  background: transparent;
+  position: relative;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  text-decoration: none;
+  padding-left: 24px;
+}
+
+.nav-link.active {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-right: 3px solid #fff;
+  font-weight: 600;
   transition: background-color 0.3s ease;
 }
+
+.nav-link.active .nav-text {
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.nav-link.active .nav-icon i {
+  color: #fff !important;
+}
+
+.submenu-link.active {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  font-weight: 600;
+  border-left: 3px solid #fff;
+  padding-left: 53px !important;
+  transition: background-color 0.3s ease;
+}
+
+.nav-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 18px;
+}
+
+.nav-text {
+  flex: 1;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.nav-arrow {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  font-size: 12px;
+}
+
+.nav-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.submenu-toggle[aria-expanded="true"] .nav-arrow {
+  transform: rotate(180deg);
+}
+
+/* Active dropdown arrow rotation */
+.nav-item:has(.submenu.show) .nav-arrow,
+.nav-item .nav-link.active .nav-arrow {
+  transform: rotate(180deg);
+}
+
+/* Fallback for browsers that don't support :has() */
+.nav-item .submenu.show + .nav-arrow,
+.submenu.show ~ * .nav-arrow {
+  transform: rotate(180deg);
+}
+
+/* Submenu */
+.submenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.submenu-item {
+  margin: 0;
+}
+
+.submenu-link {
+  display: block;
+  padding: 12px 20px 12px 56px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  font-size: 13px;
+  font-weight: 400;
+  position: relative;
+}
+
+.submenu-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  text-decoration: none;
+  padding-left: 60px;
+}
+
+.submenu-link::before {
+  content: '';
+  position: absolute;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+/* Profile Section */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-height: 80px;
+}
+
+.user-profile-section {
+  padding: 16px 20px 8px 20px;
+  flex: 1;
+}
+
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.profile-trigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.profile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.profile-role {
+  font-size: 12px;
+  opacity: 0.8;
+  line-height: 1.2;
+}
+
+.profile-dropdown-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  opacity: 0.7;
+  transition: transform 0.3s ease;
+}
+
+.profile-trigger:hover .profile-dropdown-icon {
+  transform: translateY(-2px);
+}
+
+/* Color Picker Section */
+.color-picker-section {
+  padding: 12px 20px 16px 20px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: auto;
+  position: relative;
+}
+
+.color-picker-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.color-picker-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.color-picker-btn:active {
+  transform: translateY(0);
+}
+
+.color-picker-dropdown {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999 !important;
+  animation: slideUp 0.3s ease;
+  transform-origin: bottom center;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+/* Override CustomColorPicker positioning when inside sidebar */
+.color-picker-dropdown .custom-color-picker {
+  position: relative !important;
+  margin-top: 0 !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 12px !important;
+  border: none !important;
+  background: white !important;
+  width: 280px !important;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* Main content adjustment for fixed sidebar */
+#mytask-layout .main {
+  margin-left: 280px !important;
+  transition: margin-left 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar-container {
+    width: 260px;
+    transform: translateX(-100%);
+  }
+  
+  .sidebar-container.show {
+    transform: translateX(0);
+  }
+
+  /* Adjust main content for mobile */
+  #mytask-layout .main {
+    margin-left: 0 !important;
+  }
+  
+  .sidebar-container.show ~ .main {
+    margin-left: 260px !important;
+  }
+
+  /* Adjust color picker for mobile */
+  .color-picker-dropdown {
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Holiday indicator */
 .holiday-dot {
   display: inline-block;
   width: 8px;
   height: 8px;
-  background-color: red;
+  background-color: #ff4757;
   border-radius: 50%;
-  margin-left: 5px;
+  margin-left: 8px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Dark mode adjustments */
+.sidebar-container.dark-mode {
+  background: #1a1a2e;
+}
+
+.sidebar-container.dark-mode .brand-section {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-container.dark-mode .sidebar-footer {
+  border-top-color: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-container.dark-mode .nav-link:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-container.dark-mode .submenu {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-container.dark-mode .submenu-link:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Animation for collapsing menus */
+.collapse {
+  display: none;
+  transition: all 0.35s ease;
+}
+
+.collapse.show {
+  display: block;
+}
+
+.collapsing {
+  transition: height 0.35s ease;
+}
+
+/* Submenu show/hide animation */
+.submenu.show {
+  display: block !important;
+  animation: slideDown 0.3s ease;
+  max-height: 500px;
+  overflow: visible;
+}
+
+.submenu.collapse {
+  display: none !important;
+  max-height: 0;
+  overflow: hidden;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Improve dropdown menu positioning */
+.dropdown-menu {
+  border-radius: 12px !important;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  padding: 8px !important;
+}
+
+.dropdown-menu .list-group-item {
+  border: none !important;
+  border-radius: 8px !important;
+  margin-bottom: 2px;
+  padding: 10px 16px !important;
+  transition: all 0.2s ease;
+}
+
+.dropdown-menu .list-group-item:hover {
+  background: #f8f9fa !important;
+  transform: translateX(4px);
 }

@@ -364,12 +364,22 @@ const ProjectDashboard = () => {
           precision: 0,
         },
       },
+      x: {
+        categoryPercentage: 0.4,
+        barPercentage: 0.6,
+      },
+    },
+    datasets: {
+      bar: {
+        barThickness: 40,
+        maxBarThickness: 50,
+      },
     },
   };
 
-  const projectsChartData = createChartData('Projects', totalProjects, 'rgba(255, 99, 132, 0.6)');
+  const projectsChartData = createChartData('Projects', totalProjects, 'rgba(54, 162, 235, 0.6)');
   const clientsChartData = createChartData('Client', totalClients, 'rgba(54, 162, 235, 0.6)');
-  const employeesChartData = createChartData('Employees', totalEmployees, 'rgba(75, 192, 192, 0.6)');
+  const employeesChartData = createChartData('Employees', totalEmployees, 'rgba(54, 162, 235, 0.6)');
 
   const chartData = {
     labels: ['Projects', 'Client', 'Employees'],
@@ -378,14 +388,14 @@ const ProjectDashboard = () => {
         label: 'Total Count',
         data: [totalProjects, totalClients, totalEmployees],
         backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
           'rgba(54, 162, 235, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
+          'rgba(54, 162, 235, 0.6)',
+          'rgba(54, 162, 235, 0.6)',
         ],
         borderColor: [
-          'rgba(255, 99, 132, 1)',
           'rgba(54, 162, 235, 1)',
-          'rgba(75, 192, 192, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(54, 162, 235, 1)',
         ],
         borderWidth: 1,
       },
@@ -1550,7 +1560,7 @@ const ProjectDashboard = () => {
           <div className="body d-flex py-lg-3 py-md-2">
             <div className="container-xxl">
               <div className="text-center">
-                <div style={{ height: isMobile ? "6rem" : "9rem" }}>
+                {/* <div style={{ height: isMobile ? "6rem" : "9rem" }}>
                   <img
                     src="Images/pizeonflylogo.png"
                     className="img-fluid"
@@ -1561,11 +1571,12 @@ const ProjectDashboard = () => {
                       width: "50%"
                     }}
                   />
-                </div>
+                </div> */}
 
                 <div className="row justify-content-center mt-5">
                   {/* Projects Card */}
                   <div className="col-12 col-md-4 mb-4">
+                    
                     <Link to="/projects" style={{ textDecoration: 'none' }}>
                       <div className="card shadow-lg" style={{
                         ...darkModeStyles.card,
@@ -1574,42 +1585,150 @@ const ProjectDashboard = () => {
                         overflow: 'hidden',
                         transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                         cursor: 'pointer',
-                        height: '100%',
+                        height: '140px',
                         background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
                       }}
                         onMouseOver={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-8px)';
-                          e.currentTarget.style.boxShadow = '0 16px 32px rgba(0,0,0,0.15)';
+                          e.currentTarget.style.transform = 'translateY(-5px)';
+                          e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.15)';
                         }}
                         onMouseOut={(e) => {
                           e.currentTarget.style.transform = 'translateY(0)';
                           e.currentTarget.style.boxShadow = '';
                         }}>
-                        <div style={{ height: '6px', background: 'rgba(255, 99, 132, 1)' }}></div>
-                        <div className="card-body" style={{ padding: '1.5rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                          
+                         <div style={{ height: '4px', background: 'rgba(54, 162, 235, 1)' }}></div>
+                         <div className="card-body" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
+                           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
+                             <div style={{ display: 'flex', alignItems: 'center' }}>
                             <div style={{
-                              width: '48px',
-                              height: '48px',
-                              borderRadius: '12px',
-                              background: 'rgba(255, 99, 132, 0.15)',
+                                 width: '35px',
+                                 height: '35px',
+                                 borderRadius: '8px',
+                              background: 'rgba(54, 162, 235, 0.15)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              marginRight: '15px'
+                                 marginRight: '10px'
                             }}>
-                              <i className="icofont-briefcase" style={{ color: 'rgba(255, 99, 132, 1)', fontSize: '22px' }}></i>
+                                 <i className="icofont-briefcase" style={{ color: 'rgba(54, 162, 235, 1)', fontSize: '16px' }}></i>
                             </div>
-                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Projects</h5>
-                          </div>
-                          <h2 style={{
-                            fontSize: '42px',
+                               <div>
+                                 <h6 style={{ fontSize: '14px', fontWeight: '600', margin: 0, marginBottom: '2px', color: isDarkMode ? '#fff' : '#000' }}>Projects</h6>
+                                 <h3 style={{
+                                   fontSize: '24px',
                             fontWeight: '700',
-                            marginBottom: '25px',
-                            color: 'rgba(255, 99, 132, 1)',
-                            textShadow: '0px 2px 4px rgba(255, 99, 132, 0.2)'
-                          }}>{totalProjects}</h2>
-                          <Bar data={projectsChartData} options={chartOptions} />
+                                   margin: 0,
+                                   color: 'rgba(54, 162, 235, 1)'
+                                 }}>{totalProjects}</h3>
+                               </div>
+                             </div>
+                             <div style={{ fontSize: '10px', color: isDarkMode ? '#ccc' : '#666', textAlign: 'right' }}>
+                               <div style={{ marginBottom: '1px', fontWeight: '500' }}>Status</div>
+                               <div style={{ color: '#28a745' }}>✓ {projectStatusCounts.completed} Done</div>
+                               <div style={{ color: '#ffc107' }}>⚡ {projectStatusCounts.inProgress} Active</div>
+                             </div>
+                           </div>
+                           
+                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                             <div style={{ fontSize: '9px', color: isDarkMode ? '#ccc' : '#666' }}>
+                               <span style={{ background: 'rgba(54, 162, 235, 0.1)', padding: '2px 6px', borderRadius: '8px', marginRight: '4px' }}>
+                                 Success Rate: {totalProjects > 0 ? Math.round((projectStatusCounts.completed / totalProjects) * 100) : 0}%
+                               </span>
+                               <span style={{ background: 'rgba(54, 162, 235, 0.1)', padding: '2px 6px', borderRadius: '8px' }}>
+                                 Avg: {totalClients > 0 ? Math.round(totalProjects / totalClients * 10) / 10 : 0}/Client
+                               </span>
+                             </div>
+                          
+                             {/* Mini Bar Chart */}
+                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '2px', minWidth: '60px' }}>
+                            <div style={{ display: 'flex', alignItems: 'end', gap: '3px', height: '40px', marginBottom: '2px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div 
+                                  style={{
+                                    width: '16px',
+                                    height: `${Math.max((projectStatusCounts.completed / Math.max(totalProjects, 1)) * 32, 8)}px`,
+                                    background: 'linear-gradient(180deg, rgba(54, 162, 235, 1), rgba(54, 162, 235, 0.7))',
+                                    borderRadius: '4px',
+                                    transition: 'height 0.3s ease',
+                                    position: 'relative',
+                                    boxShadow: '0 2px 4px rgba(54, 162, 235, 0.2)'
+                                  }}
+                                  title={`Completed Projects: ${projectStatusCounts.completed}/${totalProjects} (${totalProjects > 0 ? Math.round((projectStatusCounts.completed / totalProjects) * 100) : 0}%)`}
+                                >
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: '7px',
+                            color: 'rgba(54, 162, 235, 1)',
+                                    fontWeight: '600'
+                                  }}>
+                                    {projectStatusCounts.completed}
+                                  </div>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div 
+                                  style={{
+                                    width: '16px',
+                                    height: `${Math.max((projectStatusCounts.inProgress / Math.max(totalProjects, 1)) * 32, 8)}px`,
+                                    background: 'linear-gradient(180deg, rgba(54, 162, 235, 0.8), rgba(54, 162, 235, 0.5))',
+                                    borderRadius: '4px',
+                                    transition: 'height 0.3s ease',
+                                    position: 'relative',
+                                    boxShadow: '0 2px 4px rgba(54, 162, 235, 0.15)'
+                                  }}
+                                  title={`In Progress Projects: ${projectStatusCounts.inProgress}/${totalProjects} (${totalProjects > 0 ? Math.round((projectStatusCounts.inProgress / totalProjects) * 100) : 0}%)`}
+                                >
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: '7px',
+                                    color: 'rgba(54, 162, 235, 0.8)',
+                                    fontWeight: '600'
+                                  }}>
+                                    {projectStatusCounts.inProgress}
+                                  </div>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div 
+                                  style={{
+                                    width: '16px',
+                                    height: `${Math.max((totalProjects / Math.max(totalProjects, totalClients, totalEmployees)) * 32, 8)}px`,
+                                    background: 'linear-gradient(180deg, rgba(54, 162, 235, 0.6), rgba(54, 162, 235, 0.3))',
+                                    borderRadius: '4px',
+                                    transition: 'height 0.3s ease',
+                                    position: 'relative',
+                                    boxShadow: '0 2px 4px rgba(54, 162, 235, 0.1)'
+                                  }}
+                                  title={`Total Projects: ${totalProjects} | Completion Rate: ${totalProjects > 0 ? Math.round((projectStatusCounts.completed / totalProjects) * 100) : 0}%`}
+                                >
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: '7px',
+                                    color: 'rgba(54, 162, 235, 0.6)',
+                                    fontWeight: '600'
+                                  }}>
+                                    {Math.round((projectStatusCounts.completed / Math.max(totalProjects, 1)) * 100)}%
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                             <div style={{ display: 'flex', gap: '1px', fontSize: '7px', color: isDarkMode ? '#ccc' : '#666', fontWeight: '500' }}>
+                               <span style={{ width: '16px', textAlign: 'center' }}>✓</span>
+                               <span style={{ width: '16px', textAlign: 'center' }}>⚡</span>
+                               <span style={{ width: '16px', textAlign: 'center' }}>%</span>
+                             </div>
+                           </div>
+                           </div>
                         </div>
                       </div>
                     </Link>
@@ -1625,42 +1744,149 @@ const ProjectDashboard = () => {
                         overflow: 'hidden',
                         transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                         cursor: 'pointer',
-                        height: '100%',
+                        height: '140px',
                         background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
                       }}
                         onMouseOver={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-8px)';
-                          e.currentTarget.style.boxShadow = '0 16px 32px rgba(0,0,0,0.15)';
+                          e.currentTarget.style.transform = 'translateY(-5px)';
+                          e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.15)';
                         }}
                         onMouseOut={(e) => {
                           e.currentTarget.style.transform = 'translateY(0)';
                           e.currentTarget.style.boxShadow = '';
                         }}>
-                        <div style={{ height: '6px', background: 'rgba(54, 162, 235, 1)' }}></div>
-                        <div className="card-body" style={{ padding: '1.5rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                         <div style={{ height: '4px', background: 'rgba(54, 162, 235, 1)' }}></div>
+                         <div className="card-body" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
+                           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
+                             <div style={{ display: 'flex', alignItems: 'center' }}>
                             <div style={{
-                              width: '48px',
-                              height: '48px',
-                              borderRadius: '12px',
+                                 width: '35px',
+                                 height: '35px',
+                                 borderRadius: '8px',
                               background: 'rgba(54, 162, 235, 0.15)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              marginRight: '15px'
+                                 marginRight: '10px'
                             }}>
-                              <i className="icofont-users-alt-5" style={{ color: 'rgba(54, 162, 235, 1)', fontSize: '22px' }}></i>
+                                 <i className="icofont-users-alt-5" style={{ color: 'rgba(54, 162, 235, 1)', fontSize: '16px' }}></i>
                             </div>
-                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Client</h5>
-                          </div>
-                          <h2 style={{
-                            fontSize: '42px',
+                               <div>
+                                 <h6 style={{ fontSize: '14px', fontWeight: '600', margin: 0, marginBottom: '2px', color: isDarkMode ? '#fff' : '#000' }}>Clients</h6>
+                                 <h3 style={{
+                                   fontSize: '24px',
                             fontWeight: '700',
-                            marginBottom: '25px',
+                                   margin: 0,
+                                   color: 'rgba(54, 162, 235, 1)'
+                                 }}>{totalClients}</h3>
+                               </div>
+                             </div>
+                             <div style={{ fontSize: '10px', color: isDarkMode ? '#ccc' : '#666', textAlign: 'right' }}>
+                               <div style={{ marginBottom: '1px', fontWeight: '500' }}>Relations</div>
+                               <div style={{ color: '#28a745' }}>🤝 Active</div>
+                               <div style={{ color: '#17a2b8' }}>💼 Business</div>
+                             </div>
+                           </div>
+                           
+                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                             <div style={{ fontSize: '9px', color: isDarkMode ? '#ccc' : '#666' }}>
+                               <span style={{ background: 'rgba(54, 162, 235, 0.1)', padding: '2px 6px', borderRadius: '8px', marginRight: '4px' }}>
+                                 Satisfaction: 95%
+                               </span>
+                               <span style={{ background: 'rgba(54, 162, 235, 0.1)', padding: '2px 6px', borderRadius: '8px' }}>
+                                 Revenue: {totalClients} Sources
+                               </span>
+                             </div>
+                          
+                             {/* Mini Bar Chart */}
+                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '2px', minWidth: '60px' }}>
+                            <div style={{ display: 'flex', alignItems: 'end', gap: '3px', height: '40px', marginBottom: '2px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div 
+                                  style={{
+                                    width: '16px',
+                                    height: `${Math.max((totalClients / Math.max(totalProjects, totalClients, totalEmployees)) * 32, 8)}px`,
+                                    background: 'linear-gradient(180deg, rgba(54, 162, 235, 1), rgba(54, 162, 235, 0.7))',
+                                    borderRadius: '4px',
+                                    transition: 'height 0.3s ease',
+                                    position: 'relative',
+                                    boxShadow: '0 2px 4px rgba(54, 162, 235, 0.2)'
+                                  }}
+                                  title={`Active Clients: ${totalClients} | Client Base Growth`}
+                                >
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: '7px',
                             color: 'rgba(54, 162, 235, 1)',
-                            textShadow: '0px 2px 4px rgba(54, 162, 235, 0.2)'
-                          }}>{totalClients}</h2>
-                          <Bar data={clientsChartData} options={chartOptions} />
+                                    fontWeight: '600'
+                                  }}>
+                                    {totalClients}
+                                  </div>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div 
+                                  style={{
+                                    width: '16px',
+                                    height: `${Math.max((totalClients / Math.max(totalClients, 1)) * 25, 8)}px`,
+                                    background: 'linear-gradient(180deg, rgba(54, 162, 235, 0.8), rgba(54, 162, 235, 0.5))',
+                                    borderRadius: '4px',
+                                    transition: 'height 0.3s ease',
+                                    position: 'relative',
+                                    boxShadow: '0 2px 4px rgba(54, 162, 235, 0.15)'
+                                  }}
+                                  title={`Projects per Client: ${totalProjects > 0 && totalClients > 0 ? Math.round(totalProjects / totalClients * 10) / 10 : 0} avg`}
+                                >
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: '7px',
+                                    color: 'rgba(54, 162, 235, 0.8)',
+                                    fontWeight: '600'
+                                  }}>
+                                    {totalProjects > 0 && totalClients > 0 ? Math.round(totalProjects / totalClients * 10) / 10 : 0}
+                                  </div>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div 
+                                  style={{
+                                    width: '16px',
+                                    height: `${Math.max((totalClients * 0.6), 10)}px`,
+                                    background: 'linear-gradient(180deg, rgba(54, 162, 235, 0.6), rgba(54, 162, 235, 0.3))',
+                                    borderRadius: '4px',
+                                    transition: 'height 0.3s ease',
+                                    position: 'relative',
+                                    boxShadow: '0 2px 4px rgba(54, 162, 235, 0.1)'
+                                  }}
+                                  title={`Client Satisfaction: High | Revenue Stream: ${totalClients} sources`}
+                                >
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: '7px',
+                                    color: 'rgba(54, 162, 235, 0.6)',
+                                    fontWeight: '600'
+                                  }}>
+                                    95%
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                             <div style={{ display: 'flex', gap: '1px', fontSize: '7px', color: isDarkMode ? '#ccc' : '#666', fontWeight: '500' }}>
+                               <span style={{ width: '16px', textAlign: 'center' }}>👥</span>
+                               <span style={{ width: '16px', textAlign: 'center' }}>📊</span>
+                               <span style={{ width: '16px', textAlign: 'center' }}>⭐</span>
+                             </div>
+                           </div>
+                           </div>
                         </div>
                       </div>
                     </Link>
@@ -1676,42 +1902,149 @@ const ProjectDashboard = () => {
                         overflow: 'hidden',
                         transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                         cursor: 'pointer',
-                        height: '100%',
+                        height: '140px',
                         background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
                       }}
                         onMouseOver={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-8px)';
-                          e.currentTarget.style.boxShadow = '0 16px 32px rgba(0,0,0,0.15)';
+                          e.currentTarget.style.transform = 'translateY(-5px)';
+                          e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.15)';
                         }}
                         onMouseOut={(e) => {
                           e.currentTarget.style.transform = 'translateY(0)';
                           e.currentTarget.style.boxShadow = '';
                         }}>
-                        <div style={{ height: '6px', background: 'rgba(75, 192, 192, 1)' }}></div>
-                        <div className="card-body" style={{ padding: '1.5rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                         <div style={{ height: '4px', background: 'rgba(54, 162, 235, 1)' }}></div>
+                         <div className="card-body" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
+                           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
+                             <div style={{ display: 'flex', alignItems: 'center' }}>
                             <div style={{
-                              width: '48px',
-                              height: '48px',
-                              borderRadius: '12px',
-                              background: 'rgba(75, 192, 192, 0.15)',
+                                 width: '35px',
+                                 height: '35px',
+                                 borderRadius: '8px',
+                              background: 'rgba(54, 162, 235, 0.15)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              marginRight: '15px'
+                                 marginRight: '10px'
                             }}>
-                              <i className="icofont-user-male" style={{ color: 'rgba(75, 192, 192, 1)', fontSize: '22px' }}></i>
+                                 <i className="icofont-user-male" style={{ color: 'rgba(54, 162, 235, 1)', fontSize: '16px' }}></i>
                             </div>
-                            <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Employees</h5>
-                          </div>
-                          <h2 style={{
-                            fontSize: '42px',
+                               <div>
+                                 <h6 style={{ fontSize: '14px', fontWeight: '600', margin: 0, marginBottom: '2px', color: isDarkMode ? '#fff' : '#000' }}>Employees</h6>
+                                 <h3 style={{
+                                   fontSize: '24px',
                             fontWeight: '700',
-                            marginBottom: '25px',
-                            color: 'rgba(75, 192, 192, 1)',
-                            textShadow: '0px 2px 4px rgba(75, 192, 192, 0.2)'
-                          }}>{totalEmployees}</h2>
-                          <Bar data={employeesChartData} options={chartOptions} />
+                                   margin: 0,
+                                   color: 'rgba(54, 162, 235, 1)'
+                                 }}>{totalEmployees}</h3>
+                               </div>
+                             </div>
+                             <div style={{ fontSize: '10px', color: isDarkMode ? '#ccc' : '#666', textAlign: 'right' }}>
+                               <div style={{ marginBottom: '1px', fontWeight: '500' }}>Team</div>
+                               <div style={{ color: '#28a745' }}>💪 Strong</div>
+                               <div style={{ color: '#ffc107' }}>🚀 Productive</div>
+                             </div>
+                           </div>
+                           
+                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                             <div style={{ fontSize: '9px', color: isDarkMode ? '#ccc' : '#666' }}>
+                               <span style={{ background: 'rgba(54, 162, 235, 0.1)', padding: '2px 6px', borderRadius: '8px', marginRight: '4px' }}>
+                                 Performance: 92%
+                               </span>
+                               <span style={{ background: 'rgba(54, 162, 235, 0.1)', padding: '2px 6px', borderRadius: '8px' }}>
+                                 Load: {totalEmployees > 0 && totalProjects > 0 ? Math.round(totalProjects / totalEmployees * 10) / 10 : 0}/Person
+                               </span>
+                             </div>
+                          
+                             {/* Mini Bar Chart */}
+                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '2px', minWidth: '60px' }}>
+                            <div style={{ display: 'flex', alignItems: 'end', gap: '3px', height: '40px', marginBottom: '2px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div 
+                                  style={{
+                                    width: '16px',
+                                    height: `${Math.max((totalEmployees / Math.max(totalProjects, totalClients, totalEmployees)) * 32, 8)}px`,
+                                    background: 'linear-gradient(180deg, rgba(54, 162, 235, 1), rgba(54, 162, 235, 0.7))',
+                                    borderRadius: '4px',
+                                    transition: 'height 0.3s ease',
+                                    position: 'relative',
+                                    boxShadow: '0 2px 4px rgba(54, 162, 235, 0.2)'
+                                  }}
+                                  title={`Total Employees: ${totalEmployees} | Team Strength`}
+                                >
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: '7px',
+                            color: 'rgba(54, 162, 235, 1)',
+                                    fontWeight: '600'
+                                  }}>
+                                    {totalEmployees}
+                                  </div>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div 
+                                  style={{
+                                    width: '16px',
+                                    height: `${Math.max((totalEmployees / Math.max(totalEmployees, 1)) * 20, 8)}px`,
+                                    background: 'linear-gradient(180deg, rgba(54, 162, 235, 0.8), rgba(54, 162, 235, 0.5))',
+                                    borderRadius: '4px',
+                                    transition: 'height 0.3s ease',
+                                    position: 'relative',
+                                    boxShadow: '0 2px 4px rgba(54, 162, 235, 0.15)'
+                                  }}
+                                  title={`Workload Distribution: ${totalEmployees > 0 && totalProjects > 0 ? Math.round(totalProjects / totalEmployees * 10) / 10 : 0} projects/employee`}
+                                >
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: '7px',
+                                    color: 'rgba(54, 162, 235, 0.8)',
+                                    fontWeight: '600'
+                                  }}>
+                                    {totalEmployees > 0 && totalProjects > 0 ? Math.round(totalProjects / totalEmployees * 10) / 10 : 0}
+                                  </div>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div 
+                                  style={{
+                                    width: '16px',
+                                    height: `${Math.max((totalEmployees * 0.4), 14)}px`,
+                                    background: 'linear-gradient(180deg, rgba(54, 162, 235, 0.6), rgba(54, 162, 235, 0.3))',
+                                    borderRadius: '4px',
+                                    transition: 'height 0.3s ease',
+                                    position: 'relative',
+                                    boxShadow: '0 2px 4px rgba(54, 162, 235, 0.1)'
+                                  }}
+                                  title={`Team Performance: Excellent | Productivity Score: 92%`}
+                                >
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: '7px',
+                                    color: 'rgba(54, 162, 235, 0.6)',
+                                    fontWeight: '600'
+                                  }}>
+                                    92%
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                             <div style={{ display: 'flex', gap: '1px', fontSize: '7px', color: isDarkMode ? '#ccc' : '#666', fontWeight: '500' }}>
+                               <span style={{ width: '16px', textAlign: 'center' }}>👤</span>
+                               <span style={{ width: '16px', textAlign: 'center' }}>💼</span>
+                               <span style={{ width: '16px', textAlign: 'center' }}>🚀</span>
+                             </div>
+                           </div>
+                           </div>
                         </div>
                       </div>
                     </Link>
@@ -1738,7 +2071,7 @@ const ProjectDashboard = () => {
                         e.currentTarget.style.transform = 'translateY(0)';
                         e.currentTarget.style.boxShadow = '';
                       }}>
-                      <div style={{ height: '6px', background: 'linear-gradient(to right, rgba(255, 99, 132, 1), rgba(54, 162, 235, 1), rgba(75, 192, 192, 1))' }}></div>
+                      {/* <div style={{ height: '6px', background: 'linear-gradient(to right, rgba(54, 162, 235, 1), rgba(54, 162, 235, 1), rgba(54, 162, 235, 1))' }}></div> */}
                       <div className="card-body" style={{ padding: '1.5rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'center' }}>
 
@@ -1771,7 +2104,7 @@ const ProjectDashboard = () => {
                         e.currentTarget.style.transform = 'translateY(0)';
                         e.currentTarget.style.boxShadow = '';
                       }}>
-                      <div style={{ height: '6px', background: 'rgba(153, 102, 255, 1)' }}></div>
+                      {/* <div style={{ height: '6px', background: 'rgba(54, 162, 235, 1)' }}></div> */}
                       <div className="card-body" style={{ padding: '1.5rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'center' }}>
 

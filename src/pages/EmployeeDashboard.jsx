@@ -1770,7 +1770,7 @@ const EmployeeDashboard = () => {
               <div className="col-12">
                 <div className="card mb-3" style={darkModeStyles.card}>
                   <div className="card-body text-center p-5">
-                    <div style={{ height: "8rem" }}>
+                    {/* <div style={{ height: "8rem" }}>
                       <img
                         src="Images/pizeonflylogo.png"
                         className="img-fluid"
@@ -1782,7 +1782,7 @@ const EmployeeDashboard = () => {
                         }}
                       />
                       <p className="fs-6" style={{ color: "#4989fd" }}>An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span></p>
-                    </div>
+                    </div> */}
 
                     {/* Profile Section */}
                     <div

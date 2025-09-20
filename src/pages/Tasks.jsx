@@ -1477,7 +1477,7 @@ const Tasks = () => {
                                         value={task.taskPriority}
                                         onChange={(e) => taskHandleChange(e, task._id)}
                                           style={{ 
-                                            width: '100%', 
+                                            width: '170%', 
                                             fontSize: '13px',
                                             backgroundColor: 
                                               task.taskPriority === 'Highest' ? 'rgba(220, 53, 69, 0.1)' : 

@@ -79,6 +79,12 @@ function AppContent() {
 
   return (
     <div className={`app ${isDarkMode ? 'dark' : 'light'}`}>
+      {/* <div 
+      className={`app ${isDarkMode ? 'dark' : 'light'}`}
+      style={{
+        '--active-tab-color': activeTabColor
+      }}
+    > */}
       <HashRouter>
         <Routes>
           <Route path='/signup' element={<Signup />}></Route>

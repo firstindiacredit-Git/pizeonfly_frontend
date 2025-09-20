@@ -132,7 +132,7 @@ const ClientDashboard = () => {
               <div className="col-12">
                 <div className="card mb-3">
                   <div className="card-body text-center p-5">
-                    <div style={{ height: "8rem" }}>
+                    {/* <div style={{ height: "8rem" }}>
                       <img
                         src="Images/pizeonflylogo.png"
                         className="img-fluid"
@@ -144,7 +144,7 @@ const ClientDashboard = () => {
                         }}
                       />
                       <p className="fs-6" style={{ color: "#4989fd" }}>An agency like no other. <span style={{ color: "#0c117b" }}>Results to match.</span></p>
-                    </div>
+                    </div> */}
                     <div className="mt-4 mb-2">
                       <div className="row justify-content-center">
                         <div className="col-12 col-md-7 mb-4">

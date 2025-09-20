@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';  // Import axios
 import './Sidebar.css';
 import CustomColorPicker, { isLightColor } from '../pages/colorpicker/CustomColorPicker';
@@ -14,8 +14,8 @@ const Sidebar = () => {
   const [role, setRole] = useState('');
   const [isHolidayTomorrow, setIsHolidayTomorrow] = useState(false); // State to check if tomorrow is a holiday
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [sidebarColor, setSidebarColor] = useState(localStorage.getItem('sidebarColor') || '#485563');
-  const { isDarkMode, toggleTheme } = useTheme();
+  const [sidebarColor, setSidebarColor] = useState(localStorage.getItem('sidebarColor') || '#000000');
+  const { isDarkMode, toggleTheme, updateActiveTabColor } = useTheme();
   const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
@@ -29,6 +29,30 @@ const Sidebar = () => {
   const location = useLocation();
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  
+  // Active menu states
+  const [activeDropdowns, setActiveDropdowns] = useState({});
+
+  // Function to check if a route is active
+  const isRouteActive = (routePath) => {
+    return location.pathname === routePath;
+  };
+
+  // Function to check if any child route is active
+  const isParentActive = (childRoutes) => {
+    return childRoutes.some(route => location.pathname === route);
+  };
+
+  // Function to toggle dropdown
+  const toggleDropdown = (dropdownId, e) => {
+    if (e) {
+      e.preventDefault();
+    }
+    setActiveDropdowns(prev => ({
+      ...prev,
+      [dropdownId]: !prev[dropdownId]
+    }));
+  };
 
 
   useEffect(() => {
@@ -36,7 +60,46 @@ const Sidebar = () => {
     if (user) {
       setRole(user.role);
     }
+  }, []);
 
+  // Update active tab color when sidebar color changes or component mounts
+  useEffect(() => {
+    updateActiveTabColor(sidebarColor);
+  }, [sidebarColor, updateActiveTabColor]);
+
+  // Auto-open dropdowns for active routes
+  useEffect(() => {
+    setActiveDropdowns(prev => {
+      const newActiveDropdowns = { ...prev };
+      
+      // Check which parent menus should be open based on current route
+      if (isParentActive(['/projects', '/tasks'])) {
+        newActiveDropdowns['project-Components'] = true;
+      }
+      if (isParentActive(['/clients'])) {
+        newActiveDropdowns['client-Components'] = true;
+      }
+      if (isParentActive(['/members'])) {
+        newActiveDropdowns['emp-Components'] = true;
+      }
+      if (isParentActive(['/urlShortner', '/qrCodeGenerate', '/saasManager', '/miscellaneous'])) {
+        newActiveDropdowns['tools-Components'] = true;
+      }
+      if (isParentActive(['/create-invoice', '/all-invoice', '/balanceSheet', '/officeDocs'])) {
+        newActiveDropdowns['accounts-Components'] = true;
+      }
+      if (isParentActive(['/create-meeting', '/all-meetings', '/client-meeting'])) {
+        newActiveDropdowns['meetings-Components'] = true;
+      }
+      if (isParentActive(['/extractor'])) {
+        newActiveDropdowns['datas-Components'] = true;
+      }
+
+      return newActiveDropdowns;
+    });
+  }, [location.pathname]);
+
+  useEffect(() => {
     // Check if tomorrow is a holiday
     const checkHolidayTomorrow = async () => {
       const tomorrow = new Date();
@@ -80,6 +143,8 @@ const Sidebar = () => {
   const handleColorChange = (color) => {
     setSidebarColor(color);
     localStorage.setItem('sidebarColor', color);
+    // Update the active tab color in context when sidebar color changes
+    updateActiveTabColor(color);
   };
 
   // Determine text color based on sidebar background color
@@ -111,11 +176,14 @@ const Sidebar = () => {
     return `${import.meta.env.VITE_BASE_URL}${pathWithoutUploads}`;
   };
 
+  // Initialize navigation hook
+  const navigate = useNavigate();
+
   // Inside the Sidebar component, add these handlers from Header
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigation("/");
+    navigate("/");
   };
 
   const handleChangePassword = async (e) => {
@@ -149,7 +217,7 @@ const Sidebar = () => {
 
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      navigation("/");
+      navigate("/");
     } catch (error) {
       alert("Incorrect Old Password");
     }
@@ -225,230 +293,230 @@ const Sidebar = () => {
   };
 
   return (
-    <div className={`sidebar px-3 py-3 me-0 ${textColorClass}`} style={{ background: sidebarColor }}>
-      <div className="d-flex flex-column h-100 ">
+    <div className={`sidebar-container ${textColorClass}`} style={{ background: sidebarColor }}>
+      <div className="sidebar-content d-flex flex-column h-100">
 
 
-        <div className="mb-0 brand-icon mt-5">
-          {/* <span className="logo-icon">
-            <img src='../Images/picon.png' style={{ height: "4rem" }} alt="Pizeonfly Logo" />
-          </span>
-          <div className=''>
-            <span className="logo-text fs-3" style={{ color: "#4989fd" }}>pizeon</span>
-            <span className="logo-text fs-3" style={{ marginLeft: "-0.9rem", color: "#0c117b" }}>fly</span>
-          </div> */}
-          <img src='../Images/pizeonflylogo.png' style={{ height: "2.7rem" }} alt="Pizeonfly Logo" />
+        <div className="brand-section">
+          <div className="brand-container">
+            <img src='../Images/pizeonflylogo.png' alt="Pizeonfly Logo" className="brand-logo" />
+          </div>
         </div>
 
         {/* Menu: main ul */}
         {/* {role === 'superadmin' && (
           )} */}
-        <ul className="menu-list flex-grow-1 mt-3">
-          <li>
-            <Link className={`ms-link ${textColorClass}`} to="/project-dashboard">
-              <i className={`icofont-home fs-5 ${textColorClass}`} /> <span className={`fs-6 ${textColorClass}`}>Admin Dashboard</span>
-            </Link>
-          </li>
-          <li className="collapsed">
-            <a
-              className={`m-link ${textColorClass}`}
-              data-bs-toggle="collapse"
-              data-bs-target="#project-Components"
-              href="#"
-            >
-              <i className={`icofont-briefcase ${textColorClass}`} />
-              <span>Projects</span>{" "}
-              <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
-            </a>
-            {/* Menu: Sub menu ul */}
-            <ul className="sub-menu collapse" id="project-Components">
-              <li>
-                <Link className="ms-link" to="/projects">
-                  <span>Projects</span>
-                </Link>
-              </li>
-              <li>
-                <Link className="ms-link" to="/tasks">
-                  <span>Tasks</span>
-                </Link>
-              </li>
-            </ul>
-          </li>
-
-          <>
-            <li className="collapsed">
+        <nav className="sidebar-nav flex-grow-1">
+          <ul className="nav-list">
+            <li className="nav-item">
+              <Link 
+                className={`nav-link ${textColorClass} ${isRouteActive('/project-dashboard') ? 'active' : ''}`} 
+                to="/project-dashboard"
+              >
+                <div className="nav-icon">
+                  <i className={`icofont-home ${textColorClass}`} />
+                </div>
+                <span className={`nav-text ${textColorClass}`}>Admin Dashboard</span>
+              </Link>
+            </li>
+            <li className="nav-item has-submenu">
               <a
-                className={`m-link ${textColorClass}`}
-                data-bs-toggle="collapse"
-                data-bs-target="#client-Components"
+                className={`nav-link submenu-toggle ${textColorClass} ${isParentActive(['/projects', '/tasks']) ? 'active' : ''}`}
+                onClick={(e) => toggleDropdown('project-Components', e)}
                 href="#"
               >
-                <i className={`icofont-user-male ${textColorClass}`} /> <span>Our Clients</span>{" "}
-                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
+                <div className="nav-icon">
+                  <i className={`icofont-briefcase ${textColorClass}`} />
+                </div>
+                <span className="nav-text">Projects</span>
+                <div className={`nav-arrow ${activeDropdowns['project-Components'] ? 'rotated' : ''}`}>
+                  <i className={`icofont-dotted-down ${textColorClass}`} />
+                </div>
               </a>
-              <ul className="sub-menu collapse" id="client-Components">
-                <li>
-                  <Link className="ms-link" to="/clients">
+              <ul className={`submenu ${activeDropdowns['project-Components'] ? 'show' : 'collapse'}`} id="project-Components">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/projects') ? 'active' : ''}`} to="/projects">
+                    <span>Projects</span>
+                  </Link>
+                </li>
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/tasks') ? 'active' : ''}`} to="/tasks">
+                    <span>Tasks</span>
+                  </Link>
+                </li>
+              </ul>
+            </li>
+
+            <li className="nav-item has-submenu">
+              <a
+                className={`nav-link submenu-toggle ${textColorClass} ${isParentActive(['/clients']) ? 'active' : ''}`}
+                onClick={(e) => toggleDropdown('client-Components', e)}
+                href="#"
+              >
+                <div className="nav-icon">
+                  <i className={`icofont-user-male ${textColorClass}`} />
+                </div>
+                <span className="nav-text">Our Clients</span>
+                <div className={`nav-arrow ${activeDropdowns['client-Components'] ? 'rotated' : ''}`}>
+                  <i className={`icofont-dotted-down ${textColorClass}`} />
+                </div>
+              </a>
+              <ul className={`submenu ${activeDropdowns['client-Components'] ? 'show' : 'collapse'}`} id="client-Components">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/clients') ? 'active' : ''}`} to="/clients">
                     <span>Clients</span>
                   </Link>
                 </li>
               </ul>
             </li>
-            <li className="collapsed">
+            <li className="nav-item has-submenu">
               <a
-                className={`m-link ${textColorClass}`}
-                data-bs-toggle="collapse"
-                data-bs-target="#emp-Components"
+                className={`nav-link submenu-toggle ${textColorClass} ${isParentActive(['/members']) ? 'active' : ''}`}
+                onClick={(e) => toggleDropdown('emp-Components', e)}
                 href="#"
               >
-                <i className={`icofont-users-alt-5 ${textColorClass}`} /> <span>Employees</span>{" "}
-                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
+                <div className="nav-icon">
+                  <i className={`icofont-users-alt-5 ${textColorClass}`} />
+                </div>
+                <span className="nav-text">Employees</span>
+                <div className={`nav-arrow ${activeDropdowns['emp-Components'] ? 'rotated' : ''}`}>
+                  <i className={`icofont-dotted-down ${textColorClass}`} />
+                </div>
               </a>
-              <ul className="sub-menu collapse" id="emp-Components">
-                <li>
-                  <Link className="ms-link" to="/members">
+              <ul className={`submenu ${activeDropdowns['emp-Components'] ? 'show' : 'collapse'}`} id="emp-Components">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/members') ? 'active' : ''}`} to="/members">
                     <span>Members</span>
                   </Link>
                 </li>
-                <li>
-
-                </li>
               </ul>
             </li>
 
-            <li className="collapsed">
+            <li className="nav-item has-submenu">
               <a
-                className={`m-link ${textColorClass}`}
-                data-bs-toggle="collapse"
-                data-bs-target="#tools-Components"
+                className={`nav-link submenu-toggle ${textColorClass} ${isParentActive(['/urlShortner', '/qrCodeGenerate', '/saasManager', '/miscellaneous']) ? 'active' : ''}`}
+                onClick={(e) => toggleDropdown('tools-Components', e)}
                 href="#"
               >
-                <i className={`icofont-tools-alt-2 ${textColorClass}`} /> <span>Tools</span>{" "}
-                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
+                <div className="nav-icon">
+                  <i className={`icofont-tools-alt-2 ${textColorClass}`} />
+                </div>
+                <span className="nav-text">Tools</span>
+                <div className={`nav-arrow ${activeDropdowns['tools-Components'] ? 'rotated' : ''}`}>
+                  <i className={`icofont-dotted-down ${textColorClass}`} />
+                </div>
               </a>
-              <ul className="sub-menu collapse" id="tools-Components">
-                <li>
-                  <Link className="ms-link"
-                    // to="https://pizeonflyurl.vercel.app/"
-                    to="/urlShortner"
-                  >
+              <ul className={`submenu ${activeDropdowns['tools-Components'] ? 'show' : 'collapse'}`} id="tools-Components">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/urlShortner') ? 'active' : ''}`} to="/urlShortner">
                     <span>URL Shortner</span>
                   </Link>
                 </li>
-                <li>
-                  <Link className="ms-link" to="/qrCodeGenerate">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/qrCodeGenerate') ? 'active' : ''}`} to="/qrCodeGenerate">
                     <span>QR Code Generator</span>
                   </Link>
                 </li>
-                <li>
-                  <Link className="ms-link" to="/saasManager">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/saasManager') ? 'active' : ''}`} to="/saasManager">
                     <span>Saas Manager</span>
                   </Link>
                 </li>
-
-                {/* <li>
-                    <Link className="ms-link" to="/htmlTemplateGenerator">
-                      <span>HTML Template Generator</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="ms-link" to="/cardValidator">
-                      <span>Card Validator</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="ms-link" to="/cardGenerator">
-                      <span>Card Generator</span>
-                    </Link>
-                  </li> */}
-                <li>
-                  <Link className="ms-link" to="/miscellaneous">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/miscellaneous') ? 'active' : ''}`} to="/miscellaneous">
                     <span>Miscellaneous</span>
                   </Link>
                 </li>
-                {/* <li>
-                    <Link className="ms-link" to="/miscellaneous1">
-                      <span>Miscellaneous1</span>
-                    </Link>
-                  </li> */}
               </ul>
             </li>
-            <li className="collapsed">
+            <li className="nav-item has-submenu">
               <a
-                className={`m-link ${textColorClass}`}
-                data-bs-toggle="collapse"
-                data-bs-target="#accounts-Components"
+                className={`nav-link submenu-toggle ${textColorClass} ${isParentActive(['/create-invoice', '/all-invoice', '/balanceSheet', '/officeDocs']) ? 'active' : ''}`}
+                onClick={(e) => toggleDropdown('accounts-Components', e)}
                 href="#"
               >
-                <i className={`icofont-document-folder ${textColorClass}`} /> <span>Accounts & Billing</span>{" "}
-                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
+                <div className="nav-icon">
+                  <i className={`icofont-document-folder ${textColorClass}`} />
+                </div>
+                <span className="nav-text">Accounts & Billing</span>
+                <div className={`nav-arrow ${activeDropdowns['accounts-Components'] ? 'rotated' : ''}`}>
+                  <i className={`icofont-dotted-down ${textColorClass}`} />
+                </div>
               </a>
-              <ul className="sub-menu collapse" id="accounts-Components">
-                <li>
-                  <Link className="ms-link" to="/create-invoice">
+              <ul className={`submenu ${activeDropdowns['accounts-Components'] ? 'show' : 'collapse'}`} id="accounts-Components">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/create-invoice') ? 'active' : ''}`} to="/create-invoice">
                     <span>Create Invoice</span>
                   </Link>
                 </li>
-                <li>
-                  <Link className="ms-link" to="/all-invoice">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/all-invoice') ? 'active' : ''}`} to="/all-invoice">
                     <span>All Invoice</span>
                   </Link>
                 </li>
-                <li>
-                  <Link className="ms-link" to="/balanceSheet">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/balanceSheet') ? 'active' : ''}`} to="/balanceSheet">
                     <span>Balance Sheet</span>
                   </Link>
                 </li>
-                <li>
-                  <Link className="ms-link" to="/officeDocs">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/officeDocs') ? 'active' : ''}`} to="/officeDocs">
                     <span>Office Docs</span>
                   </Link>
                 </li>
               </ul>
             </li>
 
-            <li className="collapsed">
+            <li className="nav-item has-submenu">
               <a
-                className={`m-link ${textColorClass}`}
-                data-bs-toggle="collapse"
-                data-bs-target="#meetings-Components"
+                className={`nav-link submenu-toggle ${textColorClass} ${isParentActive(['/create-meeting', '/all-meetings', '/client-meeting']) ? 'active' : ''}`}
+                onClick={(e) => toggleDropdown('meetings-Components', e)}
                 href="#"
               >
-                <i className={`icofont-meeting-add ${textColorClass}`} /> <span>Meetings Scheduler</span>{" "}
-                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
+                <div className="nav-icon">
+                  <i className={`icofont-meeting-add ${textColorClass}`} />
+                </div>
+                <span className="nav-text">Meetings Scheduler</span>
+                <div className={`nav-arrow ${activeDropdowns['meetings-Components'] ? 'rotated' : ''}`}>
+                  <i className={`icofont-dotted-down ${textColorClass}`} />
+                </div>
               </a>
-              <ul className="sub-menu collapse" id="meetings-Components">
-                <li>
-                  <Link className="ms-link" to="/create-meeting">
+              <ul className={`submenu ${activeDropdowns['meetings-Components'] ? 'show' : 'collapse'}`} id="meetings-Components">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/create-meeting') ? 'active' : ''}`} to="/create-meeting">
                     <span>Create Meeting</span>
                   </Link>
                 </li>
-                <li>
-                  <Link className="ms-link" to="/all-meetings">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/all-meetings') ? 'active' : ''}`} to="/all-meetings">
                     <span>All Meetings</span>
                   </Link>
                 </li>
-                <li>
-                  <Link className="ms-link" to="/client-meeting">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/client-meeting') ? 'active' : ''}`} to="/client-meeting">
                     <span>Client Meeting</span>
                   </Link>
                 </li>
               </ul>
             </li>
 
-            <li className="collapsed">
+            <li className="nav-item has-submenu">
               <a
-                className={`m-link ${textColorClass}`}
-                data-bs-toggle="collapse"
-                data-bs-target="#datas-Components"
+                className={`nav-link submenu-toggle ${textColorClass} ${isParentActive(['/extractor']) ? 'active' : ''}`}
+                onClick={(e) => toggleDropdown('datas-Components', e)}
                 href="#"
               >
-                <i className={`icofont-data ${textColorClass}`} /> <span>Data Mining</span>{" "}
-                <span className={`arrow icofont-dotted-down ms-auto text-end fs-5 ${textColorClass}`} />
+                <div className="nav-icon">
+                  <i className={`icofont-data ${textColorClass}`} />
+                </div>
+                <span className="nav-text">Data Mining</span>
+                <div className={`nav-arrow ${activeDropdowns['datas-Components'] ? 'rotated' : ''}`}>
+                  <i className={`icofont-dotted-down ${textColorClass}`} />
+                </div>
               </a>
-              <ul className="sub-menu collapse" id="datas-Components">
-                <li>
-                  <Link className="ms-link" to="/extractor">
+              <ul className={`submenu ${activeDropdowns['datas-Components'] ? 'show' : 'collapse'}`} id="datas-Components">
+                <li className="submenu-item">
+                  <Link className={`submenu-link ${isRouteActive('/extractor') ? 'active' : ''}`} to="/extractor">
                     <span>Google Map Extrator</span>
                   </Link>
                 </li>
@@ -457,41 +525,8 @@ const Sidebar = () => {
 
 
 
-            {/* <li className="collapsed">
-                <a
-                  className="m-link"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#more-Components"
-                  href="#"
-                >
-                  <i className="icofont-listine-dots" /> <span>More</span>{" "}
-                  {isHolidayTomorrow && (
-                    <div style={{ marginTop: "-0.5rem", marginLeft: "-0.8rem" }}>
-                      <span className="bi bi-dot text-danger fs-1" />
-                    </div>
-                  )}
-                  <span className="arrow icofont-dotted-down ms-auto text-end fs-5" />
-                </a>
-                <ul className="sub-menu collapse" id="more-Components">
-                  <li>
-                    <Link className="ms-link" to="/calander">
-                      <span>Calendar</span>
-                      {isHolidayTomorrow && (
-                        <div style={{ marginTop: "-0.8rem", marginLeft: "-0.6rem" }}>
-                          <span className="bi bi-dot text-danger fs-1" />
-                        </div>
-                      )}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="ms-link" to="#">
-                      <span>Chat</span>
-                    </Link>
-                  </li>
-                </ul>
-              </li> */}
-          </>
-        </ul>
+          </ul>
+        </nav>
 
         {/* <button
           type="button"
@@ -501,29 +536,25 @@ const Sidebar = () => {
             <i className="icofont-bubble-right" />
           </span>
         </button> */}
-        {/* Profile section - Only show on chat routes */}
-        <div className='d-flex justify-content-between'>
-          {isChatRoute() ? null : <div></div>}
+        {/* Sidebar Footer */}
+        <div className="sidebar-footer">
+          {/* Profile section - Only show on chat routes */}
           {isChatRoute() && (
-            <div className="dropdown user-profile ml-2 ml-sm-3 d-flex align-items-center zindex-popover mt-auto mb-3">
-
-              <a
-                className="nav-link dropdown-toggle pulse p-0 me-2"
-                href="#"
-                role="button"
-                onClick={handleDropdownToggle}
-              >
-                <img
-                  className="avatar md rounded-circle border border-1"
-                  src={getImageUrl(user?.profileImage)}
-                  alt="profile"
-                />
-              </a>
-              <div className="u-info">
-                <p className="mb-0 text-end line-height-sm">
-                  <span className={`font-weight-bold ${textColorClass}`}>{username}</span>
-                </p>
-                <small className={textColorClass}>Admin Profile</small>
+            <div className="user-profile-section">
+              <div className="profile-trigger" onClick={handleDropdownToggle}>
+                <div className="profile-avatar">
+                  <img
+                    src={getImageUrl(user?.profileImage)}
+                    alt="profile"
+                  />
+                </div>
+                <div className="profile-info">
+                  <div className={`profile-name ${textColorClass}`}>{username}</div>
+                  <div className={`profile-role ${textColorClass}`}>Admin Profile</div>
+                </div>
+                <div className="profile-dropdown-icon">
+                  <i className={`bi bi-chevron-up ${textColorClass}`}></i>
+                </div>
               </div>
               <div
                 ref={dropdownRef}
@@ -574,20 +605,19 @@ const Sidebar = () => {
                 </div>
               </div>
             </div>
-
           )}
-          {/* Color picker button */}
-          <div className="d-flex justify-content-end mb-2">
+          
+          {/* Color picker button - Always visible */}
+          <div className="color-picker-section">
             <button
-              // className={`btn btn-sm btn-outline-${isLightColor(sidebarColor) ? 'dark' : 'light'}`}
-              className='border-0 bg-transparent'
+              className={`color-picker-btn ${textColorClass}`}
               onClick={() => setShowColorPicker(!showColorPicker)}
               title="Customize Sidebar Color"
             >
               <i className={`bi bi-palette-fill ${textColorClass}`}></i>
             </button>
             {showColorPicker && (
-              <div className='position-absolute' style={{ top: '25rem', right: '67rem' }}>
+              <div className="color-picker-dropdown">
                 <CustomColorPicker
                   color={sidebarColor}
                   onChange={handleColorChange}
