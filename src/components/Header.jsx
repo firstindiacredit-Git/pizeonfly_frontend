@@ -998,7 +998,7 @@ const Header = () => {
                     height: 44,
                     marginRight: 10
                   }}>
-                    <i className="bi bi-box-arrow-right" style={{ fontSize: 26, color: "#FF6EB4" }}></i>
+                    <i className="bi bi-box-arrow-right" style={{ fontSize: 26, color: "#36a2eb" }}></i>
                   </span>
                   <h5 className="modal-title" style={{ color: "#365DD2", fontWeight: 700, fontSize: 22, margin: 0 }}>
                     Confirm Signout
@@ -1059,7 +1059,7 @@ const Header = () => {
                     style={{
                       padding: "10px 28px",
                       borderRadius: "8px",
-                      backgroundColor: "#FF6EB4",
+                      backgroundColor: "#36a2eb",
                       color: "white",
                       fontWeight: 600,
                       border: "none",
@@ -1070,7 +1070,7 @@ const Header = () => {
                       e.currentTarget.style.backgroundColor = "#365DD2";
                     }}
                     onMouseOut={e => {
-                      e.currentTarget.style.backgroundColor = "#FF6EB4";
+                      e.currentTarget.style.backgroundColor = "#36a2eb";
                     }}
                   >
                     Yes, Signout

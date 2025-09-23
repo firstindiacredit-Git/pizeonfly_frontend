@@ -306,7 +306,7 @@ const Officedocs = () => {
                                         className="btn mb-3 mb-sm-0 me-sm-3"
                                         onClick={() => setShowUploadModal(true)}
                                         style={{
-                                            background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                                            background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '8px',
@@ -418,7 +418,7 @@ const Officedocs = () => {
                             </div>
                             <div className="col-md-3">
                                 <div className="card h-100" style={{
-                                    background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                                    background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
                                     border: 'none',
                                     borderRadius: '12px',
                                     boxShadow: '0 6px 15px rgba(255, 105, 180, 0.2)',
@@ -593,10 +593,10 @@ const Officedocs = () => {
                                             id="selectAll"
                                             checked={documents.length > 0 && selectedDocuments.length === documents.length}
                                             onChange={handleSelectAll}
-                                            style={{ borderColor: '#ff69b4' }}
+                                            style={{ borderColor: '#36a2eb' }}
                                         />
                                         <label className="form-check-label" htmlFor="selectAll" style={{
-                                            color: '#ff69b4',
+                                            color: '#36a2eb',
                                             fontWeight: '600',
                                             fontSize: '14px',
                                             margin: 0
@@ -726,7 +726,7 @@ const Officedocs = () => {
                                                     height: '6px',
                                                     background: doc.uploadType === 'file' 
                                                         ? 'linear-gradient(90deg, #4169e1, #1e40af, #28a745)' 
-                                                        : 'linear-gradient(90deg, #ff70b4, #ff69b4, #ffc107)',
+                                                        : 'linear-gradient(90deg, #36a2eb, #36a2eb, #ffc107)',
                                                     opacity: 0.9
                                                 }}></div>
                                                 
@@ -765,7 +765,7 @@ const Officedocs = () => {
                                                                         : 'fa-link'
                                                                 }`} style={{ 
                                                                     fontSize: '20px', 
-                                                                    color: doc.uploadType === 'file' ? '#4169e1' : '#ff69b4' 
+                                                                    color: doc.uploadType === 'file' ? '#4169e1' : '#36a2eb' 
                                                                 }}></i>
                                                             </div>
                                                         </div>
@@ -791,7 +791,7 @@ const Officedocs = () => {
                                                     <div className="text-center mb-2">
                                                         <span className="badge" style={{
                                                             backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                                            color: '#ff69b4',
+                                                            color: '#36a2eb',
                                                             padding: '4px 10px',
                                                             borderRadius: '12px',
                                                             fontSize: '12px',
@@ -840,7 +840,7 @@ const Officedocs = () => {
                                                                         {doc.tags.slice(0, 2).map(tag => (
                                                                             <span key={tag} className="badge me-1" style={{
                                                                                 backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                                                                color: '#ff69b4',
+                                                                                color: '#36a2eb',
                                                                                 fontSize: '10px',
                                                                                 padding: '3px 8px',
                                                                                 borderRadius: '10px'
@@ -957,7 +957,7 @@ const Officedocs = () => {
                                                                 title="Delete"
                                                                 style={{
                                                                     backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                                                    color: '#ff69b4',
+                                                                    color: '#36a2eb',
                                                                     width: '35px',
                                                                     height: '35px',
                                                                     borderRadius: '50%',
@@ -1634,7 +1634,7 @@ const Officedocs = () => {
                                 overflow: 'hidden'
                             }}>
                                 <div className="modal-header" style={{
-                                    background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                                    background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
                                     borderBottom: 'none',
                                     padding: '20px 25px',
                                     position: 'relative'
@@ -1685,7 +1685,7 @@ const Officedocs = () => {
                                             justifyContent: 'center',
                                             margin: '0 auto 20px auto'
                                         }}>
-                                            <i className="fa fa-trash fa-2x" style={{ color: '#ff69b4' }}></i>
+                                            <i className="fa fa-trash fa-2x" style={{ color: '#36a2eb' }}></i>
                                         </div>
                                         <h5 style={{ color: '#333', fontWeight: '600', marginBottom: '15px' }}>
                                             {deleteType === 'bulk' 
@@ -1735,7 +1735,7 @@ const Officedocs = () => {
                                         onClick={confirmDelete}
                                         disabled={loading}
                                         style={{
-                                            background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                                            background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '8px',

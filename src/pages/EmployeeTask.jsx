@@ -469,7 +469,7 @@ const Tasks = () => {
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: filterStatus === "Completed" ? 'white' : '#666',
-                                background: filterStatus === "Completed" ? 'linear-gradient(135deg, #ff70b4, #ff69b4)' : 'transparent',
+                                background: filterStatus === "Completed" ? 'linear-gradient(135deg, #36a2eb, #36a2eb)' : 'transparent',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
@@ -622,7 +622,7 @@ const Tasks = () => {
                                             fontSize: '12px',
                                             color: '#777'
                                           }}>
-                                            <i className="bi-calendar3 me-1" style={{ color: '#ff70b4' }}></i>
+                                            <i className="bi-calendar3 me-1" style={{ color: '#36a2eb' }}></i>
                                             {getFormattedDate(task.taskDate)}
                                           </div>
                                         </div>
@@ -713,7 +713,7 @@ const Tasks = () => {
                                         fontSize: '12px',
                                         color: '#777'
                                       }}>
-                                        <i className="bi-person-check me-1" style={{ color: '#ff70b4' }}></i>
+                                        <i className="bi-person-check me-1" style={{ color: '#36a2eb' }}></i>
                                         By: {task.assignedBy}
                                       </div>
                                 </td>
@@ -751,7 +751,7 @@ const Tasks = () => {
                                       onClick={() => handleOpenMessages(task)}
                                           style={{
                                             backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                            color: '#ff70b4',
+                                            color: '#36a2eb',
                                             width: '32px',
                                             height: '32px',
                                             borderRadius: '50%',
@@ -827,7 +827,7 @@ const Tasks = () => {
                                           color:
                                             taskStatuses[task._id] === 'Not Started' ? '#ffc107' :
                                               taskStatuses[task._id] === 'In Progress' ? '#0dcaf0' :
-                                                '#ff70b4',
+                                                '#36a2eb',
                                           border: 'none',
                                           borderRadius: '6px',
                                           padding: '8px 12px',
@@ -870,7 +870,7 @@ const Tasks = () => {
                           priorityColor = '#4169e1';
                           priorityBg = 'rgba(255, 138, 0, 0.1)';
                         } else if (task.taskPriority === 'Lowest') {
-                          priorityColor = '#ff70b4';
+                          priorityColor = '#36a2eb';
                           priorityBg = 'rgba(82, 180, 71, 0.1)';
                         }
                         return (
@@ -902,7 +902,7 @@ const Tasks = () => {
                                 height: '6px',
                                 width: '100%',
                                 background: task.taskStatus === 'Completed'
-                                  ? 'linear-gradient(to right, #ff70b4, #ff69b4)'
+                                  ? 'linear-gradient(to right, #36a2eb, #36a2eb)'
                                   : task.taskStatus === 'In Progress'
                                     ? 'linear-gradient(to right, #4169e1, #1e40af)'
                                     : isOverdue
@@ -925,7 +925,7 @@ const Tasks = () => {
                                       width: '28px',
                                       height: '28px',
                                       borderRadius: '50%',
-                                      backgroundColor: '#ff70b4',
+                                      backgroundColor: '#36a2eb',
                                       color: 'white',
                                       display: 'flex',
                                       alignItems: 'center',
@@ -998,7 +998,7 @@ const Tasks = () => {
                                       {task.taskPriority || 'No Priority'}
                                     </div>
                                     <div style={{
-                                      color: isOverdue && task.taskStatus !== 'Completed' ? '#1e40af' : '#ff70b4',
+                                      color: isOverdue && task.taskStatus !== 'Completed' ? '#1e40af' : '#36a2eb',
                                       fontSize: '13px',
                                       fontWeight: '600',
                                       display: 'flex',
@@ -1016,7 +1016,7 @@ const Tasks = () => {
                                     padding: '10px 15px',
                                   }}>
                                     <p className="mb-1 fw-semibold" style={{ fontSize: '14px', color: '#666' }}>
-                                      <i className="bi bi-person-fill me-2" style={{ color: '#ff70b4' }}></i>
+                                      <i className="bi bi-person-fill me-2" style={{ color: '#36a2eb' }}></i>
                                       Assigned to:
                                     </p>
                                     <p className="mb-1" style={{
@@ -1032,7 +1032,7 @@ const Tasks = () => {
                                         : 'Unassigned'}
                                       <span className="badge" style={{
                                         backgroundColor: 'rgba(82, 180, 71, 0.2)',
-                                        color: '#ff70b4',
+                                        color: '#36a2eb',
                                         fontSize: '11px',
                                         padding: '4px 8px',
                                         borderRadius: '4px',
@@ -1042,7 +1042,7 @@ const Tasks = () => {
                                     </p>
                                     <p className="mb-0" style={{ fontSize: '13px', color: '#666' }}>
                                       <i className="bi bi-person-plus me-1"></i>
-                                      By: <span style={{ color: '#ff70b4', fontWeight: '600' }}>{task.assignedBy}</span>
+                                      By: <span style={{ color: '#36a2eb', fontWeight: '600' }}>{task.assignedBy}</span>
                                     </p>
                                   </div>
                                 </div>
@@ -1057,7 +1057,7 @@ const Tasks = () => {
                                         borderRadius: '6px',
                                         marginBottom: '5px',
                                         fontWeight: '600',
-                                        color: isOverdue ? '#dc3545' : '#ff70b4',
+                                        color: isOverdue ? '#dc3545' : '#36a2eb',
                                         fontSize: '14px',
                                       }}>
                                         {`${taskEndDate.getDate()}/${taskEndDate.getMonth() + 1}/${taskEndDate.getFullYear()}`}
@@ -1109,7 +1109,7 @@ const Tasks = () => {
                                       {task.taskStatus === 'Completed' && (
                                         <span className="badge" style={{
                                           backgroundColor: 'rgba(82, 180, 71, 0.2)',
-                                          color: '#ff70b4',
+                                          color: '#36a2eb',
                                           fontSize: '12px',
                                           padding: '5px 10px',
                                           borderRadius: '4px',
@@ -1368,7 +1368,7 @@ const Tasks = () => {
                             }}>
                               {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               {isCurrentUser && (
-                                <i className="bi bi-check-all ms-1" style={{ color: '#ff70b4' }}></i>
+                                <i className="bi bi-check-all ms-1" style={{ color: '#36a2eb' }}></i>
                               )}
                             </div>
                           </div>
@@ -1384,7 +1384,7 @@ const Tasks = () => {
                               marginLeft: '10px',
                               flexShrink: 0
                             }}>
-                              <i className="bi bi-person" style={{ color: '#ff70b4', fontSize: '18px' }}></i>
+                              <i className="bi bi-person" style={{ color: '#36a2eb', fontSize: '18px' }}></i>
                             </div>
                           )}
                           {isCurrentUser && !showSender && (
@@ -1450,7 +1450,7 @@ const Tasks = () => {
                                           padding: '8px 12px',
                                           backgroundColor: isCurrentUser ? 'rgba(82, 180, 71, 0.1)' : 'rgba(255, 138, 0, 0.1)',
                                           borderRadius: '10px',
-                                          color: isCurrentUser ? '#ff70b4' : '#4169e1',
+                                          color: isCurrentUser ? '#36a2eb' : '#4169e1',
                                           textDecoration: 'none',
                                           maxWidth: '250px'
                                         }}
@@ -1480,7 +1480,7 @@ const Tasks = () => {
                                           padding: '8px 12px',
                                           backgroundColor: isCurrentUser ? 'rgba(82, 180, 71, 0.1)' : 'rgba(255, 138, 0, 0.1)',
                                           borderRadius: '10px',
-                                          color: isCurrentUser ? '#ff70b4' : '#4169e1',
+                                          color: isCurrentUser ? '#36a2eb' : '#4169e1',
                                           textDecoration: 'none',
                                           maxWidth: '250px'
                                         }}
@@ -1577,7 +1577,7 @@ const Tasks = () => {
                       width: '45px',
                       height: '45px',
                       borderRadius: '50%',
-                      backgroundColor: '#ff70b4',
+                      backgroundColor: '#36a2eb',
                       color: 'white',
                       border: 'none',
                       display: 'flex',
@@ -1588,11 +1588,11 @@ const Tasks = () => {
                     }}
                     onMouseOver={e => {
                       e.currentTarget.style.transform = 'scale(1.05)';
-                      e.currentTarget.style.backgroundColor = '#ff69b4';
+                      e.currentTarget.style.backgroundColor = '#36a2eb';
                     }}
                     onMouseOut={e => {
                       e.currentTarget.style.transform = 'scale(1)';
-                      e.currentTarget.style.backgroundColor = '#ff70b4';
+                      e.currentTarget.style.backgroundColor = '#36a2eb';
                     }}
                   >
                     <i className="bi bi-send" style={{ fontSize: '18px' }}></i>

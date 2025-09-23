@@ -931,7 +931,7 @@ const Project = () => {
                           data-bs-toggle="modal"
                           data-bs-target="#createproject"
                           style={{
-                            background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                            background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
                             color: 'white',
                             border: 'none',
                             borderRadius: '8px',
@@ -1024,7 +1024,7 @@ const Project = () => {
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "Completed" ? 'white' : '#666',
-                                background: activeTab === "Completed" ? 'linear-gradient(135deg, #ff70b4, #ff69b4)' : 'transparent',
+                                background: activeTab === "Completed" ? 'linear-gradient(135deg, #36a2eb, #36a2eb)' : 'transparent',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
@@ -1170,7 +1170,7 @@ const Project = () => {
                           overflow: 'hidden'
                         }}>
                           <div className="card-body" style={{ padding: '0' }}>
-                            {/* Desktop view - with blue and pink theme */}
+                            {/* Desktop view - with blue theme */}
                             <table className="table align-middle mb-0 d-none d-md-table" style={{ 
                               width: "100%",
                               borderCollapse: 'separate',
@@ -1425,7 +1425,7 @@ const Project = () => {
                                               aria-expanded="false"
                                               style={{
                                                 backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                                color: '#ff69b4',
+                                                color: '#36a2eb',
                                                 borderRadius: '6px',
                                                 padding: '6px 12px',
                                                 fontSize: '13px',
@@ -1452,7 +1452,7 @@ const Project = () => {
                                                 marginBottom: '8px'
                                               }}>
                                                 <div style={{
-                                                  color: '#ff69b4',
+                                                  color: '#36a2eb',
                                                   fontWeight: '600',
                                                   fontSize: '13px',
                                                   display: 'flex',
@@ -1466,7 +1466,7 @@ const Project = () => {
                                                 <li key={idx} style={{ marginBottom: '8px' }}>
                                                   <div className="d-flex align-items-center">
                                                     <i className="icofont-business-man" style={{ 
-                                                      color: '#ff69b4', 
+                                                      color: '#36a2eb', 
                                                       fontSize: '14px',
                                                       marginRight: '8px'
                                                     }}></i>
@@ -1512,7 +1512,7 @@ const Project = () => {
                                           backgroundColor: 'rgba(255, 105, 180, 0.1)',
                                           padding: '6px 10px',
                                           borderRadius: '6px',
-                                          color: '#ff69b4',
+                                          color: '#36a2eb',
                                           fontSize: '13px',
                                           fontWeight: '600',
                                           display: 'inline-block'
@@ -1604,7 +1604,7 @@ const Project = () => {
                                           fontWeight: '600',
                                           color: project.progress > 75 ? '#1e40af' : 
                                                  project.progress > 50 ? '#4169e1' : 
-                                                 project.progress > 25 ? '#ff69b4' : '#dc3545',
+                                                 project.progress > 25 ? '#36a2eb' : '#dc3545',
                                           marginBottom: '5px',
                                           fontSize: '14px'
                                         }}>
@@ -1622,7 +1622,7 @@ const Project = () => {
                                               width: `${project.progress}%`,
                                               background: `linear-gradient(to right, 
                                                 ${project.progress > 75 ? '#1e40af' : '#4169e1'}, 
-                                                ${project.progress > 50 ? '#1e40af' : '#ff69b4'}
+                                                ${project.progress > 50 ? '#1e40af' : '#36a2eb'}
                                               )`,
                                               borderRadius: '4px',
                                               transition: 'width 0.5s ease'
@@ -1676,7 +1676,7 @@ const Project = () => {
                                             title="Delete Project"
                                             style={{
                                               backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                              color: '#ff69b4',
+                                              color: '#36a2eb',
                                               width: '32px',
                                               height: '32px',
                                               borderRadius: '50%',
@@ -1732,7 +1732,7 @@ const Project = () => {
                                                 position: 'absolute',
                                                 top: '-5px',
                                                 right: '-5px',
-                                                backgroundColor: '#ff69b4',
+                                                backgroundColor: '#36a2eb',
                                                 color: 'white',
                                                 borderRadius: '50%',
                                                 width: '18px',
@@ -1955,7 +1955,7 @@ const Project = () => {
                                     left: 0,
                                     right: 0,
                                     height: '6px',
-                                    background: 'linear-gradient(90deg, #4169e1, #1e40af, #ff69b4)',
+                                    background: 'linear-gradient(90deg, #4169e1, #1e40af, #36a2eb)',
                                     opacity: 0.9
                                   }}></div>
                                   <div className="card-body d-flex flex-column" style={{ padding: '28px' }}>
@@ -2121,7 +2121,7 @@ const Project = () => {
                                           backgroundColor: 'rgba(255, 105, 180, 0.04)',
                                           padding: '8px 12px',
                                           borderRadius: '12px',
-                                          color: '#ff69b4',
+                                          color: '#36a2eb',
                                           fontSize: '12px',
                                           fontWeight: '600',
                                           border: '1px solid rgba(255, 105, 180, 0.15)',
@@ -2146,7 +2146,7 @@ const Project = () => {
                                               justifyContent: 'center',
                                               marginRight: '8px'
                                             }}>
-                                              <i className="icofont-calendar" style={{ color: '#ff69b4', fontSize: '12px' }}></i>
+                                              <i className="icofont-calendar" style={{ color: '#36a2eb', fontSize: '12px' }}></i>
                                             </div>
                                             <div>
                                               <div style={{
@@ -2222,7 +2222,7 @@ const Project = () => {
                                         }}>
                                           <span style={{
                                             backgroundColor: 'rgba(255, 105, 180, 0.04)',
-                                            color: '#ff69b4',
+                                            color: '#36a2eb',
                                             padding: '3px 10px',
                                             borderRadius: '4px',
                                             fontWeight: '600',
@@ -2241,13 +2241,13 @@ const Project = () => {
                                               height: '60px',
                                             overflowY: 'auto',
                                             scrollbarWidth: 'thin',
-                                            scrollbarColor: '#ff69b4 #f0f0f0',
+                                            scrollbarColor: '#36a2eb #f0f0f0',
                                             padding: '2px 8px'
                                           }}
                                         >
                                           {project.clientAssignPerson?.map((client, idx) => (
                                             <div key={idx} className="d-flex gap-2 align-items-center" title={client.clientName}>
-                                              <i className="icofont-business-man" style={{ color: '#ff69b4', fontSize: '12px' }}></i>
+                                              <i className="icofont-business-man" style={{ color: '#36a2eb', fontSize: '12px' }}></i>
                                               <span style={{ 
                                                   maxWidth: '120px',
                                                 color: '#444',
@@ -2310,7 +2310,7 @@ const Project = () => {
                                           title="Delete"
                                           style={{
                                             backgroundColor: 'rgba(255, 105, 180, 0.08)',
-                                            color: '#ff69b4',
+                                            color: '#36a2eb',
                                             width: '38px',
                                             height: '38px',
                                             borderRadius: '12px',
@@ -2366,7 +2366,7 @@ const Project = () => {
                                               position: 'absolute',
                                               top: '-5px',
                                               right: '-5px',
-                                              backgroundColor: '#ff69b4',
+                                              backgroundColor: '#36a2eb',
                                               color: 'white',
                                               borderRadius: '50%',
                                               width: '18px',

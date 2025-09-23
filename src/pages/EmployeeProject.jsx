@@ -311,15 +311,15 @@ const Project = () => {
                                       <div style={{ backgroundColor: 'rgba(65, 105, 225, 0.1)', padding: '6px 10px', borderRadius: '6px', color: '#4169e1', fontSize: '13px', fontWeight: '600', display: 'inline-block' }}><i className="icofont-calendar me-1"></i>{getFormattedDate(project.projectStartDate)}</div>
                                     </td>
                                     <td style={{ padding: '16px 15px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                                      <div style={{ backgroundColor: 'rgba(255, 105, 180, 0.1)', padding: '6px 10px', borderRadius: '6px', color: '#ff69b4', fontSize: '13px', fontWeight: '600', display: 'inline-block' }}><i className="icofont-calendar me-1"></i>{getFormattedDate(project.projectEndDate)}</div>
+                                      <div style={{ backgroundColor: 'rgba(54, 162, 235, 0.1)', padding: '6px 10px', borderRadius: '6px', color: '#36a2eb', fontSize: '13px', fontWeight: '600', display: 'inline-block' }}><i className="icofont-calendar me-1"></i>{getFormattedDate(project.projectEndDate)}</div>
                                     </td>
                                     <td style={{ padding: '16px 15px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
                                       {project.taskAssignPerson?.map((name, idx) => <span key={idx}>{name.employeeName}{idx < project.taskAssignPerson.length - 1 ? ', ' : ''}</span>)}
                                     </td>
                                     <td style={{ padding: '16px 15px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                                      <div className="d-flex justify-content-center" style={{ fontWeight: '600', color: project.progress > 75 ? '#1e40af' : project.progress > 50 ? '#4169e1' : project.progress > 25 ? '#ff69b4' : '#dc3545', marginBottom: '5px', fontSize: '14px' }}>{project.progress}%</div>
+                                      <div className="d-flex justify-content-center" style={{ fontWeight: '600', color: project.progress > 75 ? '#1e40af' : project.progress > 50 ? '#4169e1' : project.progress > 25 ? '#36a2eb' : '#dc3545', marginBottom: '5px', fontSize: '14px' }}>{project.progress}%</div>
                                       <div className="progress" style={{ height: "8px", backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: '4px' }}>
-                                        <div className="progress-bar" role="progressbar" style={{ width: `${project.progress}%`, background: `linear-gradient(to right, ${project.progress > 75 ? '#1e40af' : '#4169e1'}, ${project.progress > 50 ? '#1e40af' : '#ff69b4'}`, borderRadius: '4px', transition: 'width 0.5s ease' }} aria-valuenow={project.progress} aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div className="progress-bar" role="progressbar" style={{ width: `${project.progress}%`, background: `linear-gradient(to right, ${project.progress > 75 ? '#1e40af' : '#4169e1'}, ${project.progress > 50 ? '#1e40af' : '#36a2eb'}`, borderRadius: '4px', transition: 'width 0.5s ease' }} aria-valuenow={project.progress} aria-valuemin="0" aria-valuemax="100"></div>
                                       </div>
                                     </td>
                                     <td style={{ padding: '16px 15px', borderBottom: '1px solid rgba(0,0,0,0.05)', textAlign: 'center' }}>
@@ -327,7 +327,7 @@ const Project = () => {
                                         <button className="btn position-relative" data-bs-toggle="modal" data-bs-target="#addUser" type="button" title="Messages" style={{ backgroundColor: 'rgba(65, 105, 225, 0.1)', color: '#4169e1', width: '32px', height: '32px', borderRadius: '50%', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', transition: 'all 0.2s ease' }} onClick={() => handleOpenMessages(project)} onMouseOver={e => { e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)'; }} onMouseOut={e => { e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.1)'; }}>
                                           <i className="icofont-ui-message"></i>
                                           {notifications[project._id] > 0 && (
-                                            <span style={{ position: 'absolute', top: '-5px', right: '-5px', backgroundColor: '#ff69b4', color: 'white', borderRadius: '50%', width: '18px', height: '18px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(255, 105, 180, 0.3)' }}>{notifications[project._id]}</span>
+                                            <span style={{ position: 'absolute', top: '-5px', right: '-5px', backgroundColor: '#36a2eb', color: 'white', borderRadius: '50%', width: '18px', height: '18px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(54, 162, 235, 0.3)' }}>{notifications[project._id]}</span>
                                           )}
                                         </button>
                                       </div>
@@ -388,7 +388,7 @@ const Project = () => {
                               left: 0,
                               right: 0,
                               height: '6px',
-                              background: 'linear-gradient(90deg, #4169e1, #1e40af, #ff69b4)',
+                              background: 'linear-gradient(90deg, #4169e1, #1e40af, #36a2eb)',
                               opacity: 0.9
                             }}></div>
                             <div className="card-body d-flex flex-column" style={{ padding: '28px' }}>
@@ -461,7 +461,7 @@ const Project = () => {
                                     backgroundColor: 'rgba(255, 105, 180, 0.04)',
                                     padding: '8px 12px',
                                     borderRadius: '12px',
-                                    color: '#ff69b4',
+                                    color: '#36a2eb',
                                     fontSize: '12px',
                                     fontWeight: '600',
                                     border: '1px solid rgba(255, 105, 180, 0.15)',
@@ -478,7 +478,7 @@ const Project = () => {
                                         justifyContent: 'center',
                                         marginRight: '8px'
                                       }}>
-                                        <i className="icofont-calendar" style={{ color: '#ff69b4', fontSize: '12px' }}></i>
+                                        <i className="icofont-calendar" style={{ color: '#36a2eb', fontSize: '12px' }}></i>
                                       </div>
                                       <div>
                                         <div style={{ fontSize: '10px', color: '#666', marginBottom: '1px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>End</div>
@@ -511,15 +511,15 @@ const Project = () => {
                                   {/* Client column */}
                                   <div style={{ flex: 1 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                                      <span style={{ backgroundColor: 'rgba(255, 105, 180, 0.04)', color: '#ff69b4', padding: '3px 10px', borderRadius: '4px', fontWeight: '600', fontSize: '12px', display: 'flex', alignItems: 'center', border: '1px solid rgba(255, 105, 180, 0.15)' }}>
+                                      <span style={{ backgroundColor: 'rgba(54, 162, 235, 0.04)', color: '#36a2eb', padding: '3px 10px', borderRadius: '4px', fontWeight: '600', fontSize: '12px', display: 'flex', alignItems: 'center', border: '1px solid rgba(54, 162, 235, 0.15)' }}>
                                         <i className="icofont-people me-1"></i>
                                         Client
                                       </span>
                                     </div>
-                                    <div className="clients-list" style={{ height: '60px', overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: '#ff69b4 #f0f0f0', padding: '2px 8px' }}>
+                                    <div className="clients-list" style={{ height: '60px', overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: '#36a2eb #f0f0f0', padding: '2px 8px' }}>
                                       {project.clientAssignPerson?.map((client, idx) => (
                                         <div key={idx} className="d-flex gap-2 align-items-center" title={client.clientName}>
-                                          <i className="icofont-business-man" style={{ color: '#ff69b4', fontSize: '12px' }}></i>
+                                          <i className="icofont-business-man" style={{ color: '#36a2eb', fontSize: '12px' }}></i>
                                           <span style={{ maxWidth: '120px', color: '#444', fontSize: '11px' }} className="text-truncate">{client.clientName}</span>
                                         </div>
                                       ))}
@@ -567,7 +567,7 @@ const Project = () => {
                                         position: 'absolute',
                                         top: '-5px',
                                         right: '-5px',
-                                        backgroundColor: '#ff69b4',
+                                        backgroundColor: '#36a2eb',
                                         color: 'white',
                                         borderRadius: '50%',
                                         width: '18px',

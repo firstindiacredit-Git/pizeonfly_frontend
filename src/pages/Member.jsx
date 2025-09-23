@@ -824,7 +824,7 @@ const Member = () => {
                             data-bs-toggle="modal"
                             data-bs-target="#createemp"
                             style={{
-                              background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                              background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
                               color: 'white',
                               border: 'none',
                               borderRadius: '8px',
@@ -959,7 +959,7 @@ const Member = () => {
                                 left: 0,
                                 right: 0,
                                 height: '6px',
-                                background: 'linear-gradient(90deg, #4169e1, #1e40af, #ff69b4)',
+                                background: 'linear-gradient(90deg, #4169e1, #1e40af, #36a2eb)',
                                 opacity: 0.9
                               }}></div>
 
@@ -990,7 +990,7 @@ const Member = () => {
                                       height: '60px',
                                       borderRadius: '16px',
                                       overflow: 'hidden',
-                                      border: '3px solid #ff69b4',
+                                      border: '3px solid #36a2eb',
                                       backgroundColor: 'white',
                                       boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)'
                                     }}>
@@ -998,7 +998,7 @@ const Member = () => {
                                         <div style={{
                                           width: '100%',
                                           height: '100%',
-                                          background: '#ff69b4',
+                                          background: '#36a2eb',
                                           color: 'white',
                                           display: 'flex',
                                           alignItems: 'center',
@@ -1084,7 +1084,7 @@ const Member = () => {
                                             title="View Social Media Links"
                                           >
                                             <i className="bi bi-share-fill" style={{ 
-                                              color: '#ff69b4', 
+                                              color: '#36a2eb', 
                                               fontSize: '10px',
                                               transition: 'all 0.3s ease'
                                             }}
@@ -1093,7 +1093,7 @@ const Member = () => {
                                                 e.target.style.transform = 'scale(1.2)';
                                               }}
                                               onMouseOut={(e) => {
-                                                e.target.style.color = '#ff69b4';
+                                                e.target.style.color = '#36a2eb';
                                                 e.target.style.transform = 'scale(1)';
                                               }}
                                             ></i>
@@ -1155,7 +1155,7 @@ const Member = () => {
                                         }}
                                         style={{
                                           backgroundColor: 'rgba(255, 105, 180, 0.08)',
-                                          color: '#ff69b4',
+                                          color: '#36a2eb',
                                           width: '38px',
                                           height: '38px',
                                           borderRadius: '12px',
@@ -1285,7 +1285,7 @@ const Member = () => {
                                         justifyContent: 'center',
                                         marginRight: '10px'
                                       }}>
-                                        <i className="bi bi-envelope-fill" style={{ color: '#ff69b4', fontSize: '14px' }}></i>
+                                        <i className="bi bi-envelope-fill" style={{ color: '#36a2eb', fontSize: '14px' }}></i>
                                       </div>
                                       <div style={{ minWidth: 0 }}>
                                         <div style={{
@@ -1561,7 +1561,7 @@ const Member = () => {
                                     }}
                                     style={{
                                       backgroundColor: 'rgba(255, 105, 180, 0.08)',
-                                      color: '#ff69b4',
+                                      color: '#36a2eb',
                                       border: 'none',
                                       borderRadius: '12px',
                                       padding: '12px 20px',
@@ -1693,7 +1693,7 @@ const Member = () => {
                                               style={{
                                                 width: '40px',
                                                 height: '40px',
-                                                background: '#ff69b4',
+                                                background: '#36a2eb',
                                                 color: 'white',
                                                 display: 'flex',
                                                 alignItems: 'center',
@@ -1714,7 +1714,7 @@ const Member = () => {
                                                 width: '40px',
                                                 height: '40px',
                                                 objectFit: 'cover',
-                                                border: '2px solid #ff69b4',
+                                                border: '2px solid #36a2eb',
                                                 padding: '2px',
                                                 cursor: 'pointer'
                                               }}
@@ -1768,7 +1768,7 @@ const Member = () => {
                                             alignItems: 'center',
                                             gap: '8px'
                                           }}>
-                                            <i className="bi bi-envelope-fill" style={{ color: '#ff69b4', fontSize: '14px' }}></i>
+                                            <i className="bi bi-envelope-fill" style={{ color: '#36a2eb', fontSize: '14px' }}></i>
                                             <span style={{ fontSize: '13px', color: '#333' }}>{employee.emailid}</span>
                                           </div>
                                           <div style={{
@@ -1868,7 +1868,7 @@ const Member = () => {
                                             }}
                                             style={{
                                               backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                              color: '#ff69b4',
+                                              color: '#36a2eb',
                                               width: '32px',
                                               height: '32px',
                                               borderRadius: '50%',
@@ -1926,7 +1926,7 @@ const Member = () => {
                                             onClick={() => setDeletableId(employee._id)}
                                             style={{
                                               backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                              color: '#ff69b4',
+                                              color: '#36a2eb',
                                               width: '32px',
                                               height: '32px',
                                               borderRadius: '50%',
@@ -2741,7 +2741,7 @@ const Member = () => {
                   overflow: 'hidden'
                 }}>
                   <div className="modal-header" style={{
-                    background: 'linear-gradient(135deg, #FF6EB4, #FF6EB4)',
+                    background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
                     borderBottom: 'none',
                     padding: '20px 25px',
                     position: 'relative'
@@ -3436,7 +3436,7 @@ const Member = () => {
             overflow: 'hidden'
           }}>
             <div className="modal-header" style={{
-              background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+              background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
               borderBottom: 'none',
               padding: '20px 25px',
               position: 'relative'
@@ -3512,7 +3512,7 @@ const Member = () => {
                 type="button"
                 className="btn"
                 style={{
-                  background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                  background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',
@@ -3628,7 +3628,7 @@ const Member = () => {
                     transition: 'all 0.3s ease'
                   }}>
                     <div className="d-flex align-items-center">
-                      <i className="bi bi-person fs-4 text-primary me-3" style={{ color: '#ff69b4' }}></i>
+                      <i className="bi bi-person fs-4 text-primary me-3" style={{ color: '#36a2eb' }}></i>
                       <div className="flex-grow-1">
                         <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>Account Holder</div>
                         <div className="d-flex align-items-center">
@@ -3643,7 +3643,7 @@ const Member = () => {
                                 toast.success('Account Holder Name copied!');
                               }}
                               title="Copy Account Holder Name"
-                              style={{ color: '#ff69b4', fontSize: '14px' }}
+                              style={{ color: '#36a2eb', fontSize: '14px' }}
                             ></i>
                           )}
                         </div>
@@ -3756,7 +3756,7 @@ const Member = () => {
                     transition: 'all 0.3s ease'
                   }}>
                     <div className="d-flex align-items-center">
-                      <i className="bi bi-phone fs-4 text-primary me-3" style={{ color: '#ff69b4' }}></i>
+                      <i className="bi bi-phone fs-4 text-primary me-3" style={{ color: '#36a2eb' }}></i>
                       <div className="flex-grow-1">
                         <div className="fw-bold mb-1" style={{ color: '#444', fontSize: '14px' }}>UPI ID</div>
                         <div className="d-flex align-items-center">
@@ -3771,7 +3771,7 @@ const Member = () => {
                                 toast.success('UPI ID copied!');
                               }}
                               title="Copy UPI ID"
-                              style={{ color: '#ff69b4', fontSize: '14px' }}
+                              style={{ color: '#36a2eb', fontSize: '14px' }}
                             ></i>
                           )}
                         </div>
@@ -3867,7 +3867,7 @@ const Member = () => {
             overflow: 'hidden'
           }}>
             <div className="modal-header" style={{
-              background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+              background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
               borderBottom: 'none',
               padding: '20px 25px',
               position: 'relative'
@@ -3972,7 +3972,7 @@ const Member = () => {
                     transition: 'all 0.3s ease'
                   }}>
                     <div className="d-flex flex-column align-items-center">
-                      <i className="bi bi-card-text fs-1 text-primary mb-2" style={{ color: '#ff69b4' }}></i>
+                      <i className="bi bi-card-text fs-1 text-primary mb-2" style={{ color: '#36a2eb' }}></i>
                       <div className="fw-bold mb-2" style={{ color: '#444', fontSize: '16px' }}>Aadhaar Card</div>
                       {selectedEmployee?.aadhaarCard ? (
                         <div className="d-flex justify-content-center gap-3 mt-2">
@@ -4143,7 +4143,7 @@ const Member = () => {
             overflow: 'hidden'
           }}>
             <div className="modal-header" style={{
-              background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+              background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
               borderBottom: 'none',
               padding: '20px 25px',
               position: 'relative'

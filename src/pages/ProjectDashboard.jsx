@@ -421,7 +421,7 @@ const ProjectDashboard = () => {
       },
       title: {
         display: true,
-        text: 'Project Status',
+        // text: 'Project Status',
       },
     },
   };
@@ -2053,7 +2053,7 @@ const ProjectDashboard = () => {
 
                 <div className="row justify-content-center mt-4">
                   {/* Overall Summary Card */}
-                  <div className="col-12 col-md-8 mb-4">
+                  <div className="col-12 col-md-4 mb-4">
                     <div className="card shadow-lg" style={{
                       ...darkModeStyles.card,
                       borderRadius: '16px',
@@ -2061,6 +2061,8 @@ const ProjectDashboard = () => {
                       overflow: 'hidden',
                       transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                       cursor: 'pointer',
+                      height: 'auto',
+                      minHeight: '500px',
                       background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
                     }}
                       onMouseOver={(e) => {
@@ -2077,7 +2079,7 @@ const ProjectDashboard = () => {
 
                           <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Overall Summary</h5>
                         </div>
-                        <div style={{ marginTop: '10px' }}>
+                        <div style={{ marginTop: '10px', height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Bar data={chartData} options={chartOptions} />
                         </div>
                       </div>
@@ -2088,30 +2090,479 @@ const ProjectDashboard = () => {
                   <div className="col-12 col-md-4 mb-4">
                     <div className="card shadow-lg" style={{
                       ...darkModeStyles.card,
-                      borderRadius: '16px',
+                      borderRadius: '20px',
                       border: 'none',
                       overflow: 'hidden',
-                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                       cursor: 'pointer',
-                      height: '100%',
-                      background: darkModeStyles.card.background ? `linear-gradient(145deg, ${darkModeStyles.card.background}, ${darkModeStyles.card.background}ee)` : 'linear-gradient(145deg, #ffffff, #f5f5f5)'
+                      height: 'auto',
+                      minHeight: '400px',
+                      background: darkModeStyles.card.background ? 
+                        `linear-gradient(135deg, ${darkModeStyles.card.background} 0%, ${darkModeStyles.card.background}f0 50%, ${darkModeStyles.card.background}e8 100%)` : 
+                        'linear-gradient(135deg, #ffffff 0%, #fafbfc 50%, #f8f9fa 100%)',
+                      position: 'relative'
                     }}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-5px)';
-                        e.currentTarget.style.boxShadow = '0 16px 30px rgba(0,0,0,0.15)';
+                        e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
+                        e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.08)';
                       }}
                       onMouseOut={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.transform = 'translateY(0) scale(1)';
                         e.currentTarget.style.boxShadow = '';
                       }}>
-                      {/* <div style={{ height: '6px', background: 'rgba(54, 162, 235, 1)' }}></div> */}
-                      <div className="card-body" style={{ padding: '1.5rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'center' }}>
-
-                          <h5 style={{ fontSize: '20px', fontWeight: '600', margin: 0 }}>Project Status</h5>
+                      
+                      {/* Top accent bar with gradient */}
+                      {/* <div style={{ 
+                        height: '5px', 
+                        background: 'linear-gradient(90deg, #36A2EB 0%, #4BC0C0 50%, #FFCE56 100%)',
+                        borderRadius: '20px 20px 0 0'
+                      }}></div> */}
+                      
+                      {/* Header with icon */}
+                      <div className="card-body" style={{ padding: '1.8rem 1.5rem' }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          marginBottom: '25px', 
+                          justifyContent: 'center',
+                          position: 'relative'
+                        }}>
+                          <div style={{
+                            position: 'absolute',
+                            left: '0',
+                            width: '45px',
+                            height: '45px',
+                            borderRadius: '12px',
+                            background: 'linear-gradient(135deg, #36A2EB15, #36A2EB25)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: `2px solid ${isDarkMode ? '#36A2EB30' : '#36A2EB20'}`
+                          }}>
+                            <i className="icofont-chart-pie" style={{ 
+                              color: '#36A2EB', 
+                              fontSize: '20px',
+                              filter: 'drop-shadow(0 2px 4px rgba(54, 162, 235, 0.2))'
+                            }}></i>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100% - 60px)' }}>
-                          <Doughnut data={projectStatusChartData} options={projectStatusChartOptions} />
+                          
+                          <h5 style={{ 
+                            fontSize: '20px', 
+                            fontWeight: '700', 
+                            margin: 0,
+                            color: isDarkMode ? '#fff' : '#2c3e50',
+                            textAlign: 'center',
+                            letterSpacing: '0.5px'
+                          }}>Project Status</h5>
+                          
+                          {/* Status indicator */}
+                          <div style={{
+                            position: 'absolute',
+                            right: '0',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            <div style={{
+                              width: '8px',
+                              height: '8px',
+                              borderRadius: '50%',
+                              background: totalProjects > 0 ? '#28a745' : '#6c757d',
+                              boxShadow: `0 0 8px ${totalProjects > 0 ? '#28a74550' : '#6c757d50'}`
+                            }}></div>
+                            <span style={{
+                              fontSize: '8px',
+                              color: isDarkMode ? '#ccc' : '#666',
+                              fontWeight: '600',
+                              textTransform: 'uppercase'
+                            }}>
+                              {totalProjects > 0 ? 'Active' : 'Idle'}
+                            </span>
+                        </div>
+                      </div>
+
+                        {/* Chart container with enhanced styling */}
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          height: '220px',
+                          position: 'relative'
+                        }}>
+                          {/* Background circle for depth */}
+                          <div style={{
+                            position: 'absolute',
+                            width: '180px',
+                            height: '180px',
+                            borderRadius: '50%',
+                            background: isDarkMode ? 
+                              'radial-gradient(circle, rgba(54, 162, 235, 0.05) 0%, transparent 70%)' :
+                              'radial-gradient(circle, rgba(54, 162, 235, 0.08) 0%, transparent 70%)',
+                            zIndex: 0
+                          }}></div>
+                          
+                          <div style={{ 
+                            position: 'relative', 
+                            zIndex: 1,
+                            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))'
+                          }}>
+                            <Doughnut 
+                              data={projectStatusChartData} 
+                              options={{
+                                ...projectStatusChartOptions,
+                                plugins: {
+                                  ...projectStatusChartOptions.plugins,
+                                  legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                      usePointStyle: true,
+                                      pointStyle: 'circle',
+                                      padding: 25,
+                                      font: {
+                                        size: 10,
+                                        weight: '600'
+                                      },
+                                      color: isDarkMode ? '#fff' : '#2c3e50'
+                                    }
+                                  }
+                                },
+                                cutout: '65%',
+                                radius: '90%',
+                                elements: {
+                                  arc: {
+                                    borderWidth: 3,
+                                    borderColor: isDarkMode ? '#2b2b2b' : '#ffffff'
+                                  }
+                                }
+                              }} 
+                            />
+                    </div>
+                          
+                          {/* Center statistics */}
+                          <div style={{
+                            position: 'absolute',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 2
+                          }}>
+                            <div style={{
+                              fontSize: '24px',
+                              fontWeight: '800',
+                              color: '#36A2EB',
+                              lineHeight: '1',
+                              textShadow: '0 2px 4px rgba(54, 162, 235, 0.2)'
+                            }}>
+                              {totalProjects}
+                            </div>
+                            <div style={{
+                              fontSize: '10px',
+                              color: isDarkMode ? '#ccc' : '#666',
+                              fontWeight: '600',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.5px',
+                              marginTop: '2px'
+                            }}>
+                              Total
+                            </div>
+                            {totalProjects > 0 && (
+                              <div style={{
+                                fontSize: '9px',
+                                color: '#28a745',
+                                fontWeight: '600',
+                                marginTop: '4px',
+                                background: 'rgba(40, 167, 69, 0.1)',
+                                padding: '2px 6px',
+                                borderRadius: '8px'
+                              }}>
+                                {Math.round((projectStatusCounts.completed / totalProjects) * 100)}% Done
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Bottom stats row */}
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-around',
+                          alignItems: 'center',
+                          marginTop: '20px',
+                          padding: '12px 0',
+                          borderTop: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+                          gap: '10px'
+                        }}>
+                          <div style={{ textAlign: 'center', flex: 1 }}>
+                            <div style={{
+                              fontSize: '16px',
+                              fontWeight: '700',
+                              color: '#36A2EB',
+                              lineHeight: '1.2'
+                            }}>
+                              {projectStatusCounts.completed}
+                            </div>
+                            <div style={{
+                              fontSize: '9px',
+                              color: isDarkMode ? '#ccc' : '#666',
+                              fontWeight: '600',
+                              textTransform: 'uppercase',
+                              marginTop: '2px'
+                            }}>
+                              Completed
+                            </div>
+                          </div>
+                          
+                          <div style={{
+                            width: '1px',
+                            height: '30px',
+                            background: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'
+                          }}></div>
+                          
+                          <div style={{ textAlign: 'center', flex: 1 }}>
+                            <div style={{
+                              fontSize: '16px',
+                              fontWeight: '700',
+                              color: '#FFCE56',
+                              lineHeight: '1.2'
+                            }}>
+                              {projectStatusCounts.inProgress}
+                            </div>
+                            <div style={{
+                              fontSize: '9px',
+                              color: isDarkMode ? '#ccc' : '#666',
+                              fontWeight: '600',
+                              textTransform: 'uppercase',
+                              marginTop: '2px'
+                            }}>
+                              In Progress
+                            </div>
+                          </div>
+                          
+                          <div style={{
+                            width: '1px',
+                            height: '30px',
+                            background: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'
+                          }}></div>
+                          
+                          <div style={{ textAlign: 'center', flex: 1 }}>
+                            <div style={{
+                              fontSize: '16px',
+                              fontWeight: '700',
+                              color: totalProjects > 0 ? '#28a745' : '#6c757d',
+                              lineHeight: '1.2'
+                            }}>
+                              {totalProjects > 0 ? Math.round((projectStatusCounts.completed / totalProjects) * 100) : 0}%
+                            </div>
+                            <div style={{
+                              fontSize: '9px',
+                              color: isDarkMode ? '#ccc' : '#666',
+                              fontWeight: '600',
+                              textTransform: 'uppercase',
+                              marginTop: '2px'
+                            }}>
+                              Success Rate
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Calendar Card */}
+                  <div className="col-12 col-md-4 mb-4">
+                    <div className="card shadow-lg" style={{
+                      ...darkModeStyles.card,
+                      borderRadius: '20px',
+                      border: 'none',
+                      overflow: 'hidden',
+                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                      cursor: 'pointer',
+                      height: 'auto',
+                      minHeight: '400px',
+                      background: darkModeStyles.card.background ? 
+                        `linear-gradient(135deg, ${darkModeStyles.card.background} 0%, ${darkModeStyles.card.background}f0 50%, ${darkModeStyles.card.background}e8 100%)` : 
+                        'linear-gradient(135deg, #ffffff 0%, #fafbfc 50%, #f8f9fa 100%)',
+                      position: 'relative'
+                    }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
+                        e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.08)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                        e.currentTarget.style.boxShadow = '';
+                      }}>
+                      
+                      {/* Top accent bar with gradient */}
+                      {/* <div style={{ 
+                        height: '5px', 
+                        background: 'linear-gradient(90deg, #28a745 0%, #20c997 50%, #17a2b8 100%)',
+                        borderRadius: '20px 20px 0 0'
+                      }}></div> */}
+                      
+                      {/* Header with icon */}
+                      <div className="card-body" style={{ padding: '1.8rem 1.5rem' }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          marginBottom: '20px', 
+                          justifyContent: 'center',
+                          position: 'relative'
+                        }}>
+                          <div style={{
+                            position: 'absolute',
+                            left: '0',
+                            width: '45px',
+                            height: '45px',
+                            borderRadius: '12px',
+                            background: 'linear-gradient(135deg, #28a74515, #28a74525)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: `2px solid ${isDarkMode ? '#28a74530' : '#28a74520'}`
+                          }}>
+                            <i className="icofont-calendar" style={{ 
+                              color: '#28a745', 
+                              fontSize: '20px',
+                              filter: 'drop-shadow(0 2px 4px rgba(40, 167, 69, 0.2))'
+                            }}></i>
+                          </div>
+                          
+                          <h5 style={{ 
+                            fontSize: '18px', 
+                            fontWeight: '700', 
+                            margin: 0,
+                            color: isDarkMode ? '#fff' : '#2c3e50',
+                            textAlign: 'center',
+                            letterSpacing: '0.5px'
+                          }}>Calendar</h5>
+                          
+                          {/* Today indicator */}
+                          <div style={{
+                            position: 'absolute',
+                            right: '0',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            <div style={{
+                              width: '8px',
+                              height: '8px',
+                              borderRadius: '50%',
+                              background: '#28a745',
+                              boxShadow: '0 0 8px #28a74550'
+                            }}></div>
+                            <span style={{
+                              fontSize: '8px',
+                              color: isDarkMode ? '#ccc' : '#666',
+                              fontWeight: '600',
+                              textTransform: 'uppercase'
+                            }}>
+                              Today
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Calendar container */}
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          height: '280px',
+                          position: 'relative'
+                        }}>
+                          <div style={{
+                            background: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.8)',
+                            borderRadius: '12px',
+                            padding: '10px',
+                            border: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'}`,
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <Calendar
+                              onChange={handleDateChange}
+                              value={selectedDate}
+                              tileClassName={highlightHolidays}
+                              className={isDarkMode ? 'dark-calendar' : ''}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                width: '100%',
+                                height: '100%'
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Holiday decision section */}
+                        <div style={{
+                          marginTop: '15px',
+                          padding: '12px',
+                          background: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
+                          borderRadius: '12px',
+                          border: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'}`
+                        }}>
+                          {decisionMade ? (
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontSize: '12px',
+                                color: '#28a745',
+                                fontWeight: '600',
+                                marginBottom: '5px'
+                              }}>
+                                ✅ Decision Made
+                              </div>
+                              <div style={{
+                                fontSize: '10px',
+                                color: isDarkMode ? '#ccc' : '#666'
+                              }}>
+                                Thank you!
+                              </div>
+                            </div>
+                          ) : (
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{
+                                fontSize: '11px',
+                                color: isDarkMode ? '#fff' : '#2c3e50',
+                                fontWeight: '600',
+                                marginBottom: '8px'
+                              }}>
+                                Holiday Tomorrow?
+                              </div>
+                              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                <button
+                                  className="btn btn-success btn-sm"
+                                  onClick={() => handleConfirm(true)}
+                                  disabled={decisionMade}
+                                  style={{
+                                    fontSize: '10px',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px'
+                                  }}
+                                >
+                                  Yes
+                                </button>
+                                <button
+                                  className="btn btn-danger btn-sm"
+                                  onClick={() => handleConfirm(false)}
+                                  disabled={decisionMade}
+                                  style={{
+                                    fontSize: '10px',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px'
+                                  }}
+                                >
+                                  No
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -2841,85 +3292,6 @@ const ProjectDashboard = () => {
                   </label>
                 </div>
 
-                <div className="card shadow-lg mb-5" style={darkModeStyles.card}>
-                  <div className="card-body">
-                    <div className='d-flex justify-content-around gap-5'>
-                      <div>
-                        <h5 className="card-title text-center mb-4" style={{ color: isDarkMode ? '#fff' : '#000' }}>Calendar</h5>
-                        <Calendar
-                          onChange={handleDateChange}
-                          value={selectedDate}
-                          tileClassName={highlightHolidays}
-                          className={isDarkMode ? 'dark-calendar' : ''}
-                        />
-                      </div>
-                      <div className='text-center'>
-                        {decisionMade ? (
-                          <h4 className='text-center mb-5' style={{ color: isDarkMode ? '#fff' : '#000' }}>
-                            Thank you for your decision!
-                          </h4>
-                        ) : (
-                          <div>
-                            <h4 className='text-center mb-5 mt-5' style={{ color: isDarkMode ? '#fff' : '#000' }}>
-                              Do you want to declare tomorrow as an office holiday?
-                            </h4>
-                            <div className=''>
-                              <button
-                                className="btn btn-success me-5"
-                                onClick={() => handleConfirm(true)}
-                                disabled={decisionMade}
-                              >
-                                Yes
-                              </button>
-                              <button
-                                className="btn btn-danger"
-                                onClick={() => handleConfirm(false)}
-                                disabled={decisionMade}
-                              >
-                                No
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      {selectedHoliday ? (
-                        <div className="card" style={darkModeStyles.card}>
-                          <div className="card-header" style={darkModeStyles.cardHeader}>
-                            <h3 style={{ color: isDarkMode ? '#fff' : '#000' }}>Holiday Details:</h3>
-                          </div>
-                          <div className="card-body">
-                            <table className="table table-bordered" style={darkModeStyles.table}>
-                              <thead className="thead-light" style={darkModeStyles.tableHeader}>
-                                <tr>
-                                  <th>Name</th>
-                                  <th>Date</th>
-                                  <th>Description</th>
-                                  <th>Type</th>
-                                  <th>Location</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr style={{ color: isDarkMode ? '#fff' : '#000' }}>
-                                  <td>{selectedHoliday.name}</td>
-                                  <td>{selectedHoliday.date.iso}</td>
-                                  <td>{selectedHoliday.description}</td>
-                                  <td>{selectedHoliday.type.join(', ')}</td>
-                                  <td>{selectedHoliday.locations}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      ) : (
-                        <p style={{ color: isDarkMode ? '#fff' : '#000' }}>
-                          No holiday details available for the selected date.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
 
                 <div className="mt-5 mb-4 text-center">
                   <Link

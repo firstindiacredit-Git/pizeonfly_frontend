@@ -266,7 +266,7 @@ const Signin = () => {
               <div
                 className="modal-header"
                 style={{
-                  background: "linear-gradient(135deg, #FF6EB4, #FF6EB4)",
+                  background: "linear-gradient(135deg, #36a2eb, #36a2eb)",
                   borderBottom: "none",
                   padding: "20px 25px",
                   position: "relative"
@@ -300,7 +300,7 @@ const Signin = () => {
               </div>
               <div className="modal-body" style={{ padding: "25px", background: isDarkMode ? "#23234a" : "#fff" }}>
                 <label htmlFor="forgotEmail" className="form-label" style={{ fontWeight: 600, color: isDarkMode ? "#e1e1e1" : "#333", fontSize: "15px", marginBottom: "8px", display: "flex", alignItems: "center", gap: "5px" }}>
-                  <i className="bi bi-envelope" style={{ color: "#FF6EB4" }}></i>
+                  <i className="bi bi-envelope" style={{ color: "#36a2eb" }}></i>
                   Enter your email address
                 </label>
                 <input
@@ -347,7 +347,7 @@ const Signin = () => {
                   style={{
                     padding: "10px 25px",
                     borderRadius: "8px",
-                    backgroundColor: "#FF6EB4",
+                    backgroundColor: "#36a2eb",
                     color: "white",
                     fontWeight: 500,
                     border: "none",
@@ -355,11 +355,11 @@ const Signin = () => {
                     transition: "all 0.3s ease"
                   }}
                   onMouseOver={e => {
-                    e.currentTarget.style.backgroundColor = "#FF6EB4";
+                    e.currentTarget.style.backgroundColor = "#36a2eb";
                     e.currentTarget.style.transform = "translateY(-2px)";
                   }}
                   onMouseOut={e => {
-                    e.currentTarget.style.backgroundColor = "#FF6EB4";
+                    e.currentTarget.style.backgroundColor = "#36a2eb";
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >

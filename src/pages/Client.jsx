@@ -537,7 +537,7 @@ const Client = () => {
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#createproject"
                                                         style={{
-                                                            background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                                                            background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
                                                             color: 'white',
                                                             border: 'none',
                                                             borderRadius: '8px',
@@ -668,7 +668,7 @@ const Client = () => {
                                                             left: 0,
                                                             right: 0,
                                                             height: '6px',
-                                                            background: 'linear-gradient(90deg, #4169e1, #1e40af, #ff69b4)',
+                                                            background: 'linear-gradient(90deg, #4169e1, #1e40af, #36a2eb)',
                                                             opacity: 0.9
                                                         }}></div>
 
@@ -699,7 +699,7 @@ const Client = () => {
                                                                         height: '60px',
                                                                         borderRadius: '16px',
                                                                         overflow: 'hidden',
-                                                                        border: '3px solid #ff69b4',
+                                                                        border: '3px solid #36a2eb',
                                                                         backgroundColor: 'white',
                                                                         boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)'
                                                                     }}>
@@ -708,14 +708,14 @@ const Client = () => {
                                                                                 width: '100%',
                                                                                 height: '100%',
                                                                                 // borderRadius: '16px',
-                                                                                background: '#ff69b4',
+                                                                                background: '#36a2eb',
                                                                                 color: 'white',
                                                                                 display: 'flex',
                                                                                 alignItems: 'center',
                                                                                 justifyContent: 'center',
                                                                                 fontWeight: '700',
                                                                                 fontSize: '28px',
-                                                                                // border: '3px solid #ff69b4',
+                                                                                // border: '3px solid #36a2eb',
                                                                                 // boxShadow: '0 4px 15px rgba(65, 105, 225, 0.2)'
                                                                             }}
                                                                               title={client.clientName}
@@ -803,7 +803,7 @@ const Client = () => {
                                                                             onClick={() => setDeletableId(client._id)}
                                                                             style={{
                                                                                 backgroundColor: 'rgba(255, 105, 180, 0.08)',
-                                                                                color: '#ff69b4',
+                                                                                color: '#36a2eb',
                                                                                 width: '38px',
                                                                                 height: '38px',
                                                                                 borderRadius: '12px',
@@ -906,7 +906,7 @@ const Client = () => {
                                                                             justifyContent: 'center',
                                                                             marginRight: '10px'
                                                                         }}>
-                                                                            <i className="bi bi-envelope-fill" style={{ color: '#ff69b4', fontSize: '14px' }}></i>
+                                                                            <i className="bi bi-envelope-fill" style={{ color: '#36a2eb', fontSize: '14px' }}></i>
                                                                         </div>
                                                                         <div style={{ minWidth: 0 }}> {/* Added minWidth: 0 for better text truncation */}
                                                                             <div style={{
@@ -968,7 +968,7 @@ const Client = () => {
                                                                     onClick={() => setSelectedClient(client)}
                                                                     style={{
                                                                         backgroundColor: 'rgba(255, 105, 180, 0.08)',
-                                                                        color: '#ff69b4',
+                                                                        color: '#36a2eb',
                                                                         border: 'none',
                                                                         borderRadius: '12px',
                                                                         padding: '12px 20px',
@@ -1086,11 +1086,11 @@ const Client = () => {
                                                                                         style={{
                                                                                             width: '40px',
                                                                                             height: '40px',
-                                                                                            background: '#ff69b4',
+                                                                                            background: '#36a2eb',
                                                                                             color: 'white',
                                                                                             fontWeight: '700',
                                                                                             fontSize: '20px',
-                                                                                            border: '2px solid #ff69b4',
+                                                                                            border: '2px solid #36a2eb',
                                                                                             userSelect: 'none',
                                                                                         }}
                                                                                         title={client.clientName}
@@ -1106,7 +1106,7 @@ const Client = () => {
                                                                                             width: '40px',
                                                                                             height: '40px',
                                                                                             objectFit: 'cover',
-                                                                                            border: '2px solid #ff69b4',
+                                                                                            border: '2px solid #36a2eb',
                                                                                             padding: '2px'
                                                                                         }}
                                                                                         onError={() => setBrokenImages(prev => ({ ...prev, [client._id]: true }))}
@@ -1151,7 +1151,7 @@ const Client = () => {
                                                                                     alignItems: 'center',
                                                                                     gap: '8px'
                                                                                 }}>
-                                                                                    <i className="bi bi-envelope-fill" style={{ color: '#ff69b4', fontSize: '14px' }}></i>
+                                                                                    <i className="bi bi-envelope-fill" style={{ color: '#36a2eb', fontSize: '14px' }}></i>
                                                                                     <span style={{ fontSize: '13px', color: '#333' }}>{client.clientEmail}</span>
                                                                                 </div>
                                                                             </div>
@@ -1215,7 +1215,7 @@ const Client = () => {
                                                                                     onClick={() => setSelectedClient(client)}
                                                                                     style={{
                                                                                         backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                                                                        color: '#ff69b4',
+                                                                                        color: '#36a2eb',
                                                                                         width: '32px',
                                                                                         height: '32px',
                                                                                         borderRadius: '50%',
@@ -1273,7 +1273,7 @@ const Client = () => {
                                                                                     onClick={() => setDeletableId(client._id)}
                                                                                     style={{
                                                                                         backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                                                                        color: '#ff69b4',
+                                                                                        color: '#36a2eb',
                                                                                         width: '32px',
                                                                                         height: '32px',
                                                                                         borderRadius: '50%',
