@@ -3358,7 +3358,7 @@ const ProjectDashboard = () => {
                 type="button"
                 className="btn btn-secondary"
                 data-bs-dismiss="modal"
-              >
+              > 
                 Cancel
               </button>
               <button
