@@ -1449,7 +1449,7 @@ const Project = () => {
                                               <li style={{
                                                 borderBottom: '1px solid rgba(255, 105, 180, 0.1)',
                                                 paddingBottom: '8px',
-                                                marginBottom: '8px'
+                                                marginBottom: '6px'
                                               }}>
                                                 <div style={{
                                                   color: '#ff69b4',
@@ -1558,7 +1558,7 @@ const Project = () => {
                                               <li style={{
                                                 borderBottom: '1px solid rgba(65, 105, 225, 0.1)',
                                                 paddingBottom: '8px',
-                                                marginBottom: '8px'
+                                                marginBottom: '6px'
                                               }}>
                                                 <div style={{
                                                   color: '#4169e1',
@@ -1923,17 +1923,17 @@ const Project = () => {
                               return `${day}/${month}/${year}`;
                             };
                             return (
-                              <div className="col-md-4" key={project.id} style={{ padding: '12px' }}>
+                              <div className="col-md-3" key={project.id} style={{ padding: '8px' }}>
                                 <div
                                   className="card task-card"
                                   style={{
                                     backgroundColor: '#ffffff',
                                     color: 'inherit',
-                                    height: '340px',
+                                    height: '280px',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    borderRadius: '20px',
-                                    boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
+                                    borderRadius: '15px',
+                                    boxShadow: '0 8px 20px rgba(0,0,0,0.05)',
                                     border: 'none',
                                     overflow: 'hidden',
                                     position: 'relative',
@@ -1949,7 +1949,7 @@ const Project = () => {
                                   }}
                                 >
                                   {/* Gradient Border Effect */}
-                                  <div style={{
+                                  {/* <div style={{
                                     position: 'absolute',
                                     top: 0,
                                     left: 0,
@@ -1957,20 +1957,20 @@ const Project = () => {
                                     height: '6px',
                                     background: 'linear-gradient(90deg, #4169e1, #1e40af, #ff69b4)',
                                     opacity: 0.9
-                                  }}></div>
-                                  <div className="card-body d-flex flex-column" style={{ padding: '28px' }}>
+                                  }}></div> */}
+                                  <div className="card-body d-flex flex-column" style={{ padding: '18px' }}>
                                     <div className="d-flex justify-content-between align-items-center">
                                       <span style={{ 
                                         background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                                         color: 'white', 
-                                        borderRadius: '12px',
-                                        width: '40px',
-                                        height: '40px',
+                                        borderRadius: '10px',
+                                        width: '32px',
+                                        height: '32px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         fontWeight: '600',
-                                        fontSize: '16px',
+                                        fontSize: '14px',
                                         boxShadow: '0 4px 15px rgba(65, 105, 225, 0.3)',
                                         border: '2px solid rgba(255, 255, 255, 0.8)'
                                       }}>
@@ -1983,12 +1983,12 @@ const Project = () => {
                                           <div
                                             className="me-2 rounded-circle d-flex align-items-center justify-content-center"
                                             style={{
-                                              width: '36px',
-                                              height: '36px',
+                                              width: '28px',
+                                              height: '28px',
                                               background: getProjectColor(project.projectName),
                                               color: getContrastColor(getProjectColor(project.projectName)),
                                               fontWeight: '700',
-                                              fontSize: '18px',
+                                              fontSize: '16px',
                                               border: '2px solid #4169e1',
                                               cursor: 'default',
                                               userSelect: 'none',
@@ -1998,7 +1998,7 @@ const Project = () => {
                                             }}
                                             title={project.projectName}
                                           >
-                                            <i className="icofont-briefcase" style={{ fontSize: '20px' }}></i>
+                                            <i className="icofont-briefcase" style={{ fontSize: '18px' }}></i>
                                           </div>
                                         ) : (
                                           <img
@@ -2006,8 +2006,8 @@ const Project = () => {
                                             alt="Project Icon"
                                             className="me-2 rounded-circle"
                                             style={{
-                                              width: '36px',
-                                              height: '36px',
+                                              width: '28px',
+                                              height: '28px',
                                               objectFit: 'cover',
                                               cursor: 'pointer',
                                               border: '2px solid #4169e1',
@@ -2026,11 +2026,12 @@ const Project = () => {
                                         {/* Project Name */}
                                         <h6 className="card-title text-capitalize text-center mb-0 text-truncate"
                                           style={{
-                                            maxWidth: '120px',
+                                            maxWidth: '100px',
                                             color: '#1a1a1a',
                                             fontWeight: '700',
                                             letterSpacing: '-0.3px',
-                                            marginLeft: 0
+                                            marginLeft: 0,
+                                            fontSize: '13px'
                                           }}
                                           title={project.projectName}>
                                           {project.projectName}
@@ -2047,8 +2048,8 @@ const Project = () => {
                                             transition: 'all 0.2s',
                                             border: 'none',
                                             backgroundColor: 'rgba(65, 105, 225, 0.1)',
-                                            width: '35px',
-                                            height: '35px',
+                                            width: '28px',
+                                            height: '28px',
                                             display: 'inline-flex',
                                             alignItems: 'center',
                                             justifyContent: 'center'
@@ -2068,14 +2069,14 @@ const Project = () => {
                                       )}
                                     </div>
 
-                                    <div className="mt-3" style={{ borderTop: '1px solid rgba(65, 105, 225, 0.1)', paddingTop: '12px' }}>
+                                    <div className="mt-2" style={{ borderTop: '1px solid rgba(65, 105, 225, 0.1)', paddingTop: '8px' }}>
                                       <div className="d-flex justify-content-between">
                                         <div style={{
                                           backgroundColor: 'rgba(65, 105, 225, 0.04)',
-                                          padding: '8px 12px',
-                                          borderRadius: '12px',
+                                          padding: '4px 6px',
+                                          borderRadius: '8px',
                                           color: '#4169e1',
-                                          fontSize: '12px',
+                                          fontSize: '10px',
                                           fontWeight: '600',
                                           border: '1px solid rgba(65, 105, 225, 0.15)',
                                           transition: 'all 0.3s ease'
@@ -2090,27 +2091,27 @@ const Project = () => {
                                         }}>
                                           <div className="d-flex align-items-center">
                                             <div style={{
-                                              width: '24px',
-                                              height: '24px',
-                                              borderRadius: '6px',
+                                              width: '16px',
+                                              height: '16px',
+                                              borderRadius: '4px',
                                               backgroundColor: 'rgba(65, 105, 225, 0.1)',
                                               display: 'flex',
                                               alignItems: 'center',
                                               justifyContent: 'center',
-                                              marginRight: '8px'
+                                              marginRight: '6px'
                                             }}>
-                                              <i className="icofont-calendar" style={{ color: '#4169e1', fontSize: '12px' }}></i>
+                                              <i className="icofont-calendar" style={{ color: '#4169e1', fontSize: '8px' }}></i>
                                             </div>
                                             <div>
                                               <div style={{
-                                                fontSize: '10px',
+                                                fontSize: '8px',
                                                 color: '#666',
                                                 marginBottom: '1px',
                                                 textTransform: 'uppercase',
-                                                letterSpacing: '0.5px'
+                                                letterSpacing: '0.3px'
                                               }}>Start</div>
                                               <div style={{
-                                                fontSize: '11px',
+                                                fontSize: '9px',
                                                 fontWeight: '600',
                                                 color: '#1a1a1a'
                                               }}>{getFormattedDate(project.projectStartDate)}</div>
@@ -2119,10 +2120,10 @@ const Project = () => {
                                         </div>
                                         <div style={{
                                           backgroundColor: 'rgba(255, 105, 180, 0.04)',
-                                          padding: '8px 12px',
-                                          borderRadius: '12px',
+                                          padding: '4px 6px',
+                                          borderRadius: '8px',
                                           color: '#ff69b4',
-                                          fontSize: '12px',
+                                          fontSize: '10px',
                                           fontWeight: '600',
                                           border: '1px solid rgba(255, 105, 180, 0.15)',
                                           transition: 'all 0.3s ease'
@@ -2137,27 +2138,27 @@ const Project = () => {
                                         }}>
                                           <div className="d-flex align-items-center">
                                             <div style={{
-                                              width: '24px',
-                                              height: '24px',
-                                              borderRadius: '6px',
+                                              width: '16px',
+                                              height: '16px',
+                                              borderRadius: '4px',
                                               backgroundColor: 'rgba(255, 105, 180, 0.1)',
                                               display: 'flex',
                                               alignItems: 'center',
                                               justifyContent: 'center',
-                                              marginRight: '8px'
+                                              marginRight: '6px'
                                             }}>
-                                              <i className="icofont-calendar" style={{ color: '#ff69b4', fontSize: '12px' }}></i>
+                                              <i className="icofont-calendar" style={{ color: '#ff69b4', fontSize: '8px' }}></i>
                                             </div>
                                             <div>
                                               <div style={{
-                                                fontSize: '10px',
+                                                fontSize: '8px',
                                                 color: '#666',
                                                 marginBottom: '1px',
                                                 textTransform: 'uppercase',
-                                                letterSpacing: '0.5px'
+                                                letterSpacing: '0.3px'
                                               }}>End</div>
                                               <div style={{
-                                                fontSize: '11px',
+                                                fontSize: '9px',
                                                 fontWeight: '600',
                                                 color: '#1a1a1a'
                                               }}>{getFormattedDate(project.projectEndDate)}</div>
@@ -2167,21 +2168,21 @@ const Project = () => {
                                       </div>
 
                                       {/* Employees and Client row - placed side by side */}
-                                      <div className="d-flex mt-3 gap-2">
+                                      <div className="d-flex mt-2 justify-content-between">
                                         {/* Employees column */}
-                                        <div style={{ flex: 1 }}>
+                                        <div style={{ flex: 1, marginRight: '30px' }}>
                                         <div style={{
                                           display: 'flex',
                                           alignItems: 'center',
-                                          marginBottom: '8px'
+                                          marginBottom: '6px'
                                         }}>
                                           <span style={{
                                             backgroundColor: 'rgba(65, 105, 225, 0.04)',
                                             color: '#4169e1',
-                                            padding: '3px 10px',
-                                            borderRadius: '4px',
+                                            padding: '2px 6px',
+                                            borderRadius: '3px',
                                             fontWeight: '600',
-                                            fontSize: '12px',
+                                            fontSize: '9px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             border: '1px solid rgba(65, 105, 225, 0.15)'
@@ -2193,18 +2194,18 @@ const Project = () => {
                                         <div
                                             className="members-list"
                                           style={{
-                                            height: '60px',
+                                            height: '45px',
                                             overflowY: 'auto',
                                             scrollbarWidth: 'thin',
                                             scrollbarColor: '#4169e1 #f0f0f0',
-                                            padding: '2px 8px'
+                                            padding: '2px 6px'
                                           }}
                                         >
                                           {project.taskAssignPerson.map((member, idx) => (
-                                            <div key={idx} className="mb-1" style={{ color: '#444' }}>
-                                              <div className="d-flex gap-2 align-items-center">
-                                                <i className="icofont-user-alt-5" style={{ color: '#4169e1', fontSize: '12px' }}></i>
-                                                  <span className="text-truncate" style={{ maxWidth: '120px', fontSize: '11px' }} title={member.employeeName}>
+                                            <div key={idx} className="mb-0" style={{ color: '#444' }}>
+                                              <div className="d-flex gap-1 align-items-center">
+                                                <i className="icofont-user-alt-5" style={{ color: '#4169e1', fontSize: '10px' }}></i>
+                                                  <span className="text-truncate" style={{ maxWidth: '100px', fontSize: '9px' }} title={member.employeeName}>
                                                   {member.employeeName}
                                                 </span>
                                               </div>
@@ -2214,19 +2215,19 @@ const Project = () => {
                                       </div>
 
                                         {/* Client column */}
-                                        <div style={{ flex: 1 }}>
+                                        <div style={{ flex: 1, marginLeft: '8px' }}>
                                         <div style={{
                                           display: 'flex',
                                           alignItems: 'center',
-                                          marginBottom: '8px'
+                                          marginBottom: '6px'
                                         }}>
                                           <span style={{
                                             backgroundColor: 'rgba(255, 105, 180, 0.04)',
                                             color: '#ff69b4',
-                                            padding: '3px 10px',
-                                            borderRadius: '4px',
+                                            padding: '2px 6px',
+                                            borderRadius: '3px',
                                             fontWeight: '600',
-                                            fontSize: '12px',
+                                            fontSize: '9px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             border: '1px solid rgba(255, 105, 180, 0.15)'
@@ -2238,20 +2239,20 @@ const Project = () => {
                                         <div
                                           className="clients-list"
                                           style={{
-                                              height: '60px',
+                                              height: '45px',
                                             overflowY: 'auto',
                                             scrollbarWidth: 'thin',
                                             scrollbarColor: '#ff69b4 #f0f0f0',
-                                            padding: '2px 8px'
+                                            padding: '2px 6px'
                                           }}
                                         >
                                           {project.clientAssignPerson?.map((client, idx) => (
-                                            <div key={idx} className="d-flex gap-2 align-items-center" title={client.clientName}>
-                                              <i className="icofont-business-man" style={{ color: '#ff69b4', fontSize: '12px' }}></i>
+                                            <div key={idx} className="d-flex gap-1 align-items-center" title={client.clientName}>
+                                              <i className="icofont-business-man" style={{ color: '#ff69b4', fontSize: '10px' }}></i>
                                               <span style={{ 
-                                                  maxWidth: '120px',
+                                                  maxWidth: '100px',
                                                 color: '#444',
-                                                fontSize: '11px'
+                                                fontSize: '9px'
                                               }} className="text-truncate">
                                               {client.clientName}
                                               </span>
@@ -2265,7 +2266,7 @@ const Project = () => {
 
                                     <div className="d-flex justify-content-between align-items-center mt-auto pt-2" style={{ 
                                       borderTop: '1px solid rgba(65, 105, 225, 0.1)',
-                                      marginTop: '12px'
+                                      marginTop: '8px'
                                     }}>
                                       <span className="d-flex justify-content-start text-muted small" style={{ fontSize: '11px' }}>
                                         <i className="icofont-clock-time me-1" style={{ color: '#4169e1' }}></i>
@@ -2281,8 +2282,8 @@ const Project = () => {
                                           style={{
                                             backgroundColor: 'rgba(65, 105, 225, 0.08)',
                                             color: '#4169e1',
-                                            width: '38px',
-                                            height: '38px',
+                                            width: '32px',
+                                            height: '32px',
                                             borderRadius: '12px',
                                             padding: '0',
                                             display: 'flex',
@@ -2300,7 +2301,7 @@ const Project = () => {
                                             e.currentTarget.style.transform = 'translateY(0)';
                                           }}
                                         >
-                                          <i className="icofont-edit" style={{ fontSize: '16px' }}></i>
+                                          <i className="icofont-edit" style={{ fontSize: '14px' }}></i>
                                         </button>
                                         <button
                                           className="btn"
@@ -2311,8 +2312,8 @@ const Project = () => {
                                           style={{
                                             backgroundColor: 'rgba(255, 105, 180, 0.08)',
                                             color: '#ff69b4',
-                                            width: '38px',
-                                            height: '38px',
+                                            width: '32px',
+                                            height: '32px',
                                             borderRadius: '12px',
                                             padding: '0',
                                             display: 'flex',
@@ -2330,7 +2331,7 @@ const Project = () => {
                                             e.currentTarget.style.transform = 'translateY(0)';
                                           }}
                                         >
-                                          <i className="icofont-ui-delete" style={{ fontSize: '16px' }}></i>
+                                          <i className="icofont-ui-delete" style={{ fontSize: '14px' }}></i>
                                         </button>
                                         <button
                                           className="btn position-relative"
@@ -2341,8 +2342,8 @@ const Project = () => {
                                           style={{
                                             backgroundColor: 'rgba(65, 105, 225, 0.08)',
                                             color: '#4169e1',
-                                            width: '38px',
-                                            height: '38px',
+                                            width: '32px',
+                                            height: '32px',
                                             borderRadius: '12px',
                                             padding: '0',
                                             display: 'flex',
@@ -2360,7 +2361,7 @@ const Project = () => {
                                             e.currentTarget.style.transform = 'translateY(0)';
                                           }}
                                         >
-                                          <i className="icofont-ui-message" style={{ fontSize: '16px' }}></i>
+                                          <i className="icofont-ui-message" style={{ fontSize: '14px' }}></i>
                                           {notifications[project._id] > 0 && (
                                             <span style={{
                                               position: 'absolute',
@@ -3745,7 +3746,7 @@ const Project = () => {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: '8px',
-                                                padding: '8px 12px',
+                                                padding: '6px 8px',
                                                 backgroundColor: isCurrentUser ? 'rgba(82, 180, 71, 0.1)' : 'rgba(255, 138, 0, 0.1)',
                                                 borderRadius: '10px',
                                                 color: isCurrentUser ? '#1e40af' : '#ff8a00',
