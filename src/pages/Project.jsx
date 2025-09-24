@@ -2268,8 +2268,8 @@ const Project = () => {
                                       borderTop: '1px solid rgba(65, 105, 225, 0.1)',
                                       marginTop: '8px'
                                     }}>
-                                      <span className="d-flex justify-content-start text-muted small" style={{ fontSize: '11px' }}>
-                                        <i className="icofont-clock-time me-1" style={{ color: '#4169e1' }}></i>
+                                      <span className="d-flex justify-content-start text-muted small" style={{ fontSize: '9px' }}>
+                                        <i className="icofont-clock-time me-1" style={{ color: '#4169e1', fontSize: '10px' }}></i>
                                         {getFormattedDate(project.projectDate, true)}
                                       </span>
                                       <div className="d-flex justify-content-between" style={{ gap: '5px' }}>
