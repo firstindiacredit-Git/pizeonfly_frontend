@@ -712,19 +712,19 @@ const Tasks = () => {
                 <div className="row align-items-center">
                   <div className="border-0 mb-3">
                     <div className="card-header py-4 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between" style={{
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                      borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
                       backgroundColor: 'transparent',
                       padding: '0 0 20px 0'
                     }}>
                       <h3 className="flex-fill mb-3 mb-sm-0" style={{
                         fontWeight: '700',
-                                              color: '#333',
+                        color: '#333',
                         fontSize: '24px',
                         position: 'relative',
                         paddingLeft: '15px'
                       }}>
-                                              <span style={{
-                                                position: 'absolute',
+                        <span style={{
+                          position: 'absolute',
                           left: '0',
                           top: '50%',
                           transform: 'translateY(-50%)',
@@ -741,26 +741,26 @@ const Tasks = () => {
                           className="btn mb-3 mb-sm-0 me-sm-3"
                           data-bs-toggle="modal"
                           data-bs-target="#createtask"
-                                          style={{
-                                            background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '8px',
+                          style={{
+                            background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
                             padding: '10px 18px',
                             fontWeight: '600',
-                          boxShadow: '0 4px 10px rgba(82, 180, 71, 0.2)',
+                            boxShadow: '0 4px 10px rgba(82, 180, 71, 0.2)',
                             transition: 'all 0.2s ease',
                             fontSize: '14px'
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow = '0 6px 12px rgba(82, 180, 71, 0.3)';
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = '0 4px 10px rgba(82, 180, 71, 0.2)';
-                        }}
-                      >
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 6px 12px rgba(82, 180, 71, 0.3)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = '0 4px 10px rgba(82, 180, 71, 0.2)';
+                          }}
+                        >
                           <i className="icofont-plus-circle me-2" style={{ fontSize: '16px' }} />
                           Create Task
                         </button>
@@ -774,47 +774,58 @@ const Tasks = () => {
                             boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
                           }}
                         >
+                          <style>
+                            {`
+                              .nav-link1.active {
+                                background-color: #36a2eb !important;
+                                color: white !important;
+                                box-shadow: 0 2px 4px rgba(54, 162, 235, 0.3) !important;
+                              }
+                              .nav-link1.active:hover {
+                                background-color: #36a2eb !important;
+                                color: white !important;
+                              }
+                            `}
+                          </style>
                           <div className="nav-item" style={{ position: 'relative' }}>
                             <a
-                              className={`nav-link ${activeTab === "All" ? "active" : ""}`}
+                              className={`nav-link1 ${activeTab === "All" ? "active" : ""}`}
                               onClick={() => setActiveTab("All")}
                               data-bs-toggle="tab"
                               href="#All-list"
                               role="tab"
-                            style={{
+                              style={{
                                 padding: '8px 20px',
-                              fontWeight: '600',
+                                fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "All" ? 'white' : '#666',
-                                background: activeTab === "All" ? 'linear-gradient(135deg, #4169e1, #1e40af)' : 'transparent',
-                                        borderRadius: '8px',
+                                borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
-                                zIndex: '1',
-                                                position: 'relative'
+                                textDecoration: 'none',
+                                display: 'inline-block'
                               }}
                             >
                               All
                             </a>
-                                              </div>
+                          </div>
                           <div className="nav-item" style={{ position: 'relative' }}>
                             <a
-                              className={`nav-link ${activeTab === "Not Started" ? "active" : ""}`}
+                              className={`nav-link1 ${activeTab === "Not Started" ? "active" : ""}`}
                               onClick={() => setActiveTab("Not Started")}
                               data-bs-toggle="tab"
                               href="#NotStarted-list"
                               role="tab"
-                                                style={{
+                              style={{
                                 padding: '8px 20px',
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "Not Started" ? 'white' : '#666',
-                                background: activeTab === "Not Started" ? 'linear-gradient(135deg, #4169e1, #1e40af)' : 'transparent',
                                 borderRadius: '8px',
-                              border: 'none',
+                                border: 'none',
                                 transition: 'all 0.2s ease',
-                                zIndex: '1',
-                                position: 'relative'
+                                textDecoration: 'none',
+                                display: 'inline-block'
                               }}
                             >
                               <i className={`icofont-ui-timer me-1 ${activeTab === "Not Started" ? '' : 'text-warning'}`}
@@ -824,7 +835,7 @@ const Tasks = () => {
                           </div>
                           <div className="nav-item" style={{ position: 'relative' }}>
                             <a
-                              className={`nav-link ${activeTab === "In Progress" ? "active" : ""}`}
+                              className={`nav-link1 ${activeTab === "In Progress" ? "active" : ""}`}
                               onClick={() => setActiveTab("In Progress")}
                               data-bs-toggle="tab"
                               href="#Started-list"
@@ -834,12 +845,11 @@ const Tasks = () => {
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "In Progress" ? 'white' : '#666',
-                                background: activeTab === "In Progress" ? 'linear-gradient(135deg, #4169e1, #1e40af)' : 'transparent',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
-                                zIndex: '1',
-                                position: 'relative'
+                                textDecoration: 'none',
+                                display: 'inline-block'
                               }}
                             >
                               <i className={`icofont-spinner-alt-3 me-1 ${activeTab === "In Progress" ? '' : 'text-warning'}`}
@@ -849,7 +859,7 @@ const Tasks = () => {
                           </div>
                           <div className="nav-item" style={{ position: 'relative' }}>
                             <a
-                              className={`nav-link ${activeTab === "Completed" ? "active" : ""}`}
+                              className={`nav-link1 ${activeTab === "Completed" ? "active" : ""}`}
                               onClick={() => setActiveTab("Completed")}
                               data-bs-toggle="tab"
                               href="#Completed-list"
@@ -859,19 +869,18 @@ const Tasks = () => {
                                 fontWeight: '600',
                                 fontSize: '14px',
                                 color: activeTab === "Completed" ? 'white' : '#666',
-                                background: activeTab === "Completed" ? 'linear-gradient(135deg, #36a2eb, #36a2eb)' : 'transparent',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
-                                zIndex: '1',
-                                position: 'relative'
+                                textDecoration: 'none',
+                                display: 'inline-block'
                               }}
                             >
                               <i className={`icofont-verification-check me-1 ${activeTab === "Completed" ? '' : 'text-success'}`}
                                 style={{ fontSize: '14px' }}></i>
                               Completed
                             </a>
-                      </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -940,7 +949,7 @@ const Tasks = () => {
                         flexWrap: 'wrap'
                       }}>
                         <i className="icofont-filter" style={{ color: '#1e40af', fontSize: '16px' }}></i>
-                        
+
                         {filteredProjectName && (
                           <span style={{
                             fontWeight: '600',
@@ -948,7 +957,7 @@ const Tasks = () => {
                             fontSize: '14px'
                           }}>Project: <span style={{ color: '#1e40af' }}>{filteredProjectName}</span></span>
                         )}
-                        
+
                         {filteredEmployeeName && (
                           <span style={{
                             fontWeight: '600',
@@ -957,9 +966,9 @@ const Tasks = () => {
                             marginLeft: filteredProjectName ? '10px' : '0'
                           }}>Assignee: <span style={{ color: '#1e40af' }}>{filteredEmployeeName}</span></span>
                         )}
-                        
-                      <button
-                        type="button"
+
+                        <button
+                          type="button"
                           className="btn"
                           onClick={clearFilter}
                           style={{
@@ -984,10 +993,10 @@ const Tasks = () => {
                         >
                           <i className="icofont-close-line"></i>
                           Clear
-                      </button>
-                    </div>
+                        </button>
                       </div>
-                    )}
+                    </div>
+                  )}
 
                   <div>
                     <div className="input-group" style={{
@@ -1044,141 +1053,141 @@ const Tasks = () => {
                   <>
                     <div>
                       {viewMode === 'list' ? (
-                       <div className="card mb-3" style={{
-                        borderRadius: '12px',
-                        boxShadow: '0 6px 15px rgba(0,0,0,0.05)',
-                        border: 'none',
-                        overflow: 'hidden'
-                      }}>
-                        <div className="card-body" style={{ padding: '0' }}>
-                        <div className="table-responsive">
-                            <table className="table align-middle mb-0" style={{
-                              width: "100%",
-                              borderCollapse: 'separate',
-                              borderSpacing: '0'
-                            }}>
-                            <thead>
-                                <tr style={{ background: '#f8f9fa' }}>
-                                  <th style={{
-                                    padding: '16px 15px',
-                                    fontWeight: '600',
-                                    color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                    textAlign: 'center',
-                                    fontSize: '14px'
-                                  }}>SrNo.</th>
-                                  <th style={{
-                                    padding: '16px 15px',
-                                    fontWeight: '600',
-                                    color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                    fontSize: '14px'
-                                  }}>Project name</th>
-                                  <th style={{
-                                    padding: '16px 15px',
-                                    fontWeight: '600',
-                                    color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                    fontSize: '14px'
-                                  }}>Task name</th>
-                                  <th style={{
-                                    padding: '16px 15px',
-                                    fontWeight: '600',
-                                    color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                    fontSize: '14px'
-                                  }}>Assignee</th>
-                                  <th style={{
-                                    padding: '16px 15px',
-                                    fontWeight: '600',
-                                    color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                    fontSize: '14px'
-                                  }}>Due Date</th>
-                                  <th style={{
-                                    padding: '16px 15px',
-                                    fontWeight: '600',
-                                    color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                    fontSize: '14px'
-                                  }}>Priority</th>
-                                  <th style={{
-                                    padding: '16px 15px',
-                                    fontWeight: '600',
-                                    color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                    textAlign: 'center',
-                                    fontSize: '14px'
-                                  }}>Actions</th>
-                                  <th style={{
-                                    padding: '16px 15px',
-                                    fontWeight: '600',
-                                    color: '#444',
-                                    borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                    fontSize: '14px'
-                                  }}>Status</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {currentTasks.map((task, index) => {
-                                const currentDate = new Date();
-                                const taskEndDate = new Date(task.taskEndDate);
-                                const isOverdue = taskEndDate < currentDate && task.taskStatus !== 'Completed';
+                        <div className="card mb-3" style={{
+                          borderRadius: '12px',
+                          boxShadow: '0 6px 15px rgba(0,0,0,0.05)',
+                          border: 'none',
+                          overflow: 'hidden'
+                        }}>
+                          <div className="card-body" style={{ padding: '0' }}>
+                            <div className="table-responsive">
+                              <table className="table align-middle mb-0" style={{
+                                width: "100%",
+                                borderCollapse: 'separate',
+                                borderSpacing: '0'
+                              }}>
+                                <thead>
+                                  <tr style={{ background: '#f8f9fa' }}>
+                                    <th style={{
+                                      padding: '16px 15px',
+                                      fontWeight: '600',
+                                      color: '#444',
+                                      borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                      textAlign: 'center',
+                                      fontSize: '14px'
+                                    }}>SrNo.</th>
+                                    <th style={{
+                                      padding: '16px 15px',
+                                      fontWeight: '600',
+                                      color: '#444',
+                                      borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                      fontSize: '14px'
+                                    }}>Project name</th>
+                                    <th style={{
+                                      padding: '16px 15px',
+                                      fontWeight: '600',
+                                      color: '#444',
+                                      borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                      fontSize: '14px'
+                                    }}>Task name</th>
+                                    <th style={{
+                                      padding: '16px 15px',
+                                      fontWeight: '600',
+                                      color: '#444',
+                                      borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                      fontSize: '14px'
+                                    }}>Assignee</th>
+                                    <th style={{
+                                      padding: '16px 15px',
+                                      fontWeight: '600',
+                                      color: '#444',
+                                      borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                      fontSize: '14px'
+                                    }}>Due Date</th>
+                                    <th style={{
+                                      padding: '16px 15px',
+                                      fontWeight: '600',
+                                      color: '#444',
+                                      borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                      fontSize: '14px'
+                                    }}>Priority</th>
+                                    <th style={{
+                                      padding: '16px 15px',
+                                      fontWeight: '600',
+                                      color: '#444',
+                                      borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                      textAlign: 'center',
+                                      fontSize: '14px'
+                                    }}>Actions</th>
+                                    <th style={{
+                                      padding: '16px 15px',
+                                      fontWeight: '600',
+                                      color: '#444',
+                                      borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                      fontSize: '14px'
+                                    }}>Status</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {currentTasks.map((task, index) => {
+                                    const currentDate = new Date();
+                                    const taskEndDate = new Date(task.taskEndDate);
+                                    const isOverdue = taskEndDate < currentDate && task.taskStatus !== 'Completed';
 
-                                  // Remove the background color for overdue items since we'll use a badge instead
+                                    // Remove the background color for overdue items since we'll use a badge instead
 
-                                return (
-                                    <tr key={task._id}
-                                      style={{
-                                        transition: 'background 0.2s ease',
-                                      }}
-                                      onMouseOver={(e) => e.currentTarget.style.background = 'rgba(82, 180, 71, 0.04)'}
-                                      onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
-                                    >
-                                      <td style={{
-                                        padding: '16px 15px',
-                                        borderBottom: '1px solid rgba(0,0,0,0.05)',
-                                        textAlign: 'center'
-                                      }}>
-                                        <span style={{
-                                          background: 'linear-gradient(135deg, #4169e1, #1e40af)',
-                                          color: 'white',
-                                          borderRadius: '50%',
-                                          width: '30px',
-                                          height: '30px',
-                                          display: 'inline-flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          fontWeight: '600',
-                                          fontSize: '14px',
-                                          boxShadow: '0 2px 5px rgba(255, 138, 0, 0.3)'
+                                    return (
+                                      <tr key={task._id}
+                                        style={{
+                                          transition: 'background 0.2s ease',
+                                        }}
+                                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(82, 180, 71, 0.04)'}
+                                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                                      >
+                                        <td style={{
+                                          padding: '16px 15px',
+                                          borderBottom: '1px solid rgba(0,0,0,0.05)',
+                                          textAlign: 'center'
                                         }}>
-                                          {index + 1}
-                                        </span>
-                                      </td>
-                                      <td style={{
-                                        padding: '16px 15px',
-                                        borderBottom: '1px solid rgba(0,0,0,0.05)'
-                                      }}>
-                                        <div className="d-flex gap-2 align-items-center">
-                                          <div>
-                                            <div style={{
-                                              fontWeight: '600',
-                                              color: '#333',
-                                              fontSize: '14px'
-                                            }}>
-                                      {task.projectName}
+                                          <span style={{
+                                            background: 'linear-gradient(135deg, #4169e1, #1e40af)',
+                                            color: 'white',
+                                            borderRadius: '50%',
+                                            width: '30px',
+                                            height: '30px',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontWeight: '600',
+                                            fontSize: '14px',
+                                            boxShadow: '0 2px 5px rgba(255, 138, 0, 0.3)'
+                                          }}>
+                                            {index + 1}
+                                          </span>
+                                        </td>
+                                        <td style={{
+                                          padding: '16px 15px',
+                                          borderBottom: '1px solid rgba(0,0,0,0.05)'
+                                        }}>
+                                          <div className="d-flex gap-2 align-items-center">
+                                            <div>
+                                              <div style={{
+                                                fontWeight: '600',
+                                                color: '#333',
+                                                fontSize: '14px'
+                                              }}>
+                                                {task.projectName}
+                                              </div>
+                                              <div className="mt-1" style={{
+                                                fontSize: '12px',
+                                                color: '#777'
+                                              }}>
+                                                <i className="bi-calendar3 me-1" style={{ color: '#36a2eb' }}></i>
+                                                {task.taskDate}
+                                              </div>
                                             </div>
-                                            <div className="mt-1" style={{
-                                              fontSize: '12px',
-                                              color: '#777'
-                                            }}>
-                                              <i className="bi-calendar3 me-1" style={{ color: '#36a2eb' }}></i>
-                                              {task.taskDate}
-                                            </div>
-                                          </div>
-                                          
-                                          {/* <button
+
+                                            {/* <button
                                             className="btn"
                                             style={{
                                               color: '#36a2eb',
@@ -1203,456 +1212,456 @@ const Tasks = () => {
                                           >
                                             <i className="bi-paperclip" style={{ fontSize: '14px' }} />
                                           </button> */}
-                                        </div>
-                                    </td>
-                                      <td style={{
-                                        padding: '16px 15px',
-                                        borderBottom: '1px solid rgba(0,0,0,0.05)'
-                                      }}>
-                                        <div className="dropdown">
-                                          {/* Task title display */}
-                                          <div 
-                                            className="d-flex align-items-center justify-content-between"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                            style={{ cursor: 'pointer' }}
-                                          >
-                                            <div>
-                                              <div style={{ 
-                                                fontWeight: '600', 
-                                                fontSize: '14px',
-                                                color: '#333',
-                                                marginBottom: '3px'
-                                              }}>
-                                                {task.taskTitle || 'Untitled Task'}
-                                              </div>
-                                              
-                                              <div style={{ 
-                                                fontSize: '13px',
-                                                color: '#666',
-                                                display: '-webkit-box',
-                                                WebkitLineClamp: '2',
-                                                WebkitBoxOrient: 'vertical',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis'
-                                              }}>
-                                                {task.description || 'No description'}
-                                              </div>
-                                            </div>
-                                            
-                                            <div style={{ 
-                                              color: '#36a2eb',
-                                              marginLeft: '10px'
-                                            }}>
-                                              <i className="bi-pencil"></i>
-                                            </div>
                                           </div>
-                                          
-                                          {/* Dropdown menu with edit form */}
-                                          <div className="dropdown-menu p-3" style={{ 
-                                            width: '300px',
-                                            boxShadow: '0 6px 15px rgba(0,0,0,0.1)',
-                                            border: '1px solid rgba(82, 180, 71, 0.2)',
-                                            borderRadius: '8px'
-                                          }}>
-                                            <h6 style={{ 
-                                              color: '#36a2eb', 
-                                              fontWeight: '600',
-                                              marginBottom: '10px',
-                                              borderBottom: '1px solid rgba(82, 180, 71, 0.2)',
-                                              paddingBottom: '8px'
-                                            }}>
-                                              <i className="bi-list-task me-2"></i>
-                                              Edit Task Details
-                                            </h6>
-                                            
-                                            <div className="mb-3">
-                                              <label className="form-label" style={{ fontSize: '13px', fontWeight: '600', color: '#555' }}>
-                                                Task Title
-                                              </label>
-                                      <input
-                                                className="form-control"
-                                        type="text"
-                                        name="taskTitle"
-                                        placeholder="Task Title"
-                                        value={task.taskTitle}
-                                        onChange={(e) => taskHandleChange(e, task._id)}
-                                                style={{ 
-                                                  fontSize: '14px',
-                                                  border: '1px solid rgba(82, 180, 71, 0.2)',
-                                                  padding: '8px 12px'
-                                                }}
-                                              />
-                                            </div>
-                                            
-                                            <div className="mb-3">
-                                              <label className="form-label" style={{ fontSize: '13px', fontWeight: '600', color: '#555' }}>
-                                                Task Description
-                                              </label>
-                                      <textarea
-                                                className="form-control"
-                                        type="text"
-                                        placeholder="Explain The Task What To Do & How To Do"
-                                        name="description"
-                                        value={task.description}
-                                        onChange={(e) => taskHandleChange(e, task._id)}
-                                                style={{ 
-                                                  fontSize: '13px',
-                                                  border: '1px solid rgba(82, 180, 71, 0.2)',
-                                                  padding: '8px 12px',
-                                                  resize: 'vertical',
-                                                  minHeight: '80px'
-                                                }}
-                                              />
-                                            </div>
-                                            
-                                            <div className="d-flex justify-content-end">
-                                              <button 
-                                                className="btn"
-                                                onClick={() => taskHandleSubmit(task._id)}
-                                                style={{
-                                                  backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                                  color: '#36a2eb',
-                                                  fontWeight: '600',
-                                                  fontSize: '13px',
-                                                  padding: '6px 12px',
-                                                  borderRadius: '6px',
-                                                  border: 'none',
-                                                  transition: 'all 0.2s ease'
-                                                }}
-                                                onMouseOver={(e) => {
-                                                  e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
-                                                }}
-                                                onMouseOut={(e) => {
-                                                  e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
-                                                }}
-                                              >
-                                                <i className="bi-check2 me-1"></i>
-                                                Save Changes
-                                              </button>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        
-                                        {/* Overdue indicator below the task details */}
-                                        {isOverdue && (
-                                          <div style={{
-                                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                                            padding: '4px 8px',
-                                            borderRadius: '4px',
-                                            color: '#dc3545',
-                                            fontSize: '11px',
-                                            fontWeight: '600',
-                                            display: 'inline-block',
-                                            marginTop: '5px'
-                                          }}>
-                                            <i className="bi-exclamation-triangle-fill me-1"></i>
-                                            Overdue
-                                          </div>
-                                        )}
-                                    </td>
-                                      <td style={{
-                                        padding: '16px 15px',
-                                        borderBottom: '1px solid rgba(0,0,0,0.05)'
-                                      }}>
-                                        <div>
-                                          {task.taskAssignPerson && task.taskAssignPerson.employeeName ? (
-                                            <>
-                                              <div className="d-flex align-items-center">
-                                                <div style={{
-                                                  backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                                  color: '#36a2eb',
-                                                  width: '30px',
-                                                  height: '30px',
-                                                  borderRadius: '50%',
-                                                  display: 'flex',
-                                                  alignItems: 'center',
-                                                  justifyContent: 'center',
-                                                  marginRight: '8px'
-                                                }}>
-                                                  <i className="bi-person"></i>
-                                                </div>
-                                                <div>
-                                                  <div style={{
-                                                    fontSize: '14px',
-                                                    fontWeight: '600',
-                                                    color: '#333'
-                                                  }}>{task.taskAssignPerson.employeeName}</div>
-                                                  <span style={{
-                                                    backgroundColor: 'rgba(13, 202, 240, 0.1)',
-                                                    color: '#0dcaf0',
-                                                    fontSize: '11px',
-                                                    padding: '2px 6px',
-                                                    borderRadius: '4px',
-                                                    fontWeight: '600'
-                                                  }}>Employee</span>
-                                                </div>
-                                              </div>
-                                            </>
-                                          ) : task.clientAssignPerson && task.clientAssignPerson.clientName ? (
-                                            <>
-                                              <div className="d-flex align-items-center">
-                                                <div style={{
-                                                  backgroundColor: 'rgba(255, 138, 0, 0.1)',
-                                                  color: '#4169e1',
-                                                  width: '30px',
-                                                  height: '30px',
-                                                  borderRadius: '50%',
-                                                  display: 'flex',
-                                                  alignItems: 'center',
-                                                  justifyContent: 'center',
-                                                  marginRight: '8px'
-                                                }}>
-                                                  <i className="bi-people"></i>
-                                                </div>
-                                                <div>
-                                                  <div style={{
-                                                    fontSize: '14px',
-                                                    fontWeight: '600',
-                                                    color: '#333'
-                                                  }}>{task.clientAssignPerson.clientName}</div>
-                                                  <span style={{
-                                                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                                                    color: '#ffc107',
-                                                    fontSize: '11px',
-                                                    padding: '2px 6px',
-                                                    borderRadius: '4px',
-                                                    fontWeight: '600'
-                                                  }}>Client Member</span>
-                                                </div>
-                                              </div>
-                                            </>
-                                          ) : (
-                                            <span style={{
-                                              color: '#999',
-                                              fontStyle: 'italic',
-                                              fontSize: '13px'
-                                            }}>Unassigned</span>
-                                          )}
-                                          <div className="mt-2" style={{
-                                            fontSize: '12px',
-                                            color: '#777'
-                                          }}>
-                                            <i className="bi-person-check me-1" style={{ color: '#36a2eb' }}></i>
-                                            By: {task.assignedBy}
-                                          </div>
-                                        </div>
-                                    </td>
-                                      <td style={{
-                                        padding: '16px 15px',
-                                        borderBottom: '1px solid rgba(0,0,0,0.05)'
-                                      }}>
-                                        <div style={{
-                                          backgroundColor: isOverdue ? 'rgba(220, 53, 69, 0.1)' : 'rgba(82, 180, 71, 0.1)',
-                                          padding: '8px 12px',
-                                          borderRadius: '6px',
-                                          marginBottom: '5px'
+                                        </td>
+                                        <td style={{
+                                          padding: '16px 15px',
+                                          borderBottom: '1px solid rgba(0,0,0,0.05)'
                                         }}>
-                                      <input
-                                        type="date"
-                                        className="form-control"
-                                        name="taskEndDate"
-                                        value={task.taskEndDate}
-                                        onChange={(e) => taskHandleChange(e, task._id)}
-                                            style={{ 
-                                              width: '100%', 
-                                              fontSize: '13px',
-                                              backgroundColor: 'transparent',
-                                              border: 'none',
-                                              color: isOverdue ? '#dc3545' : '#36a2eb',
-                                              fontWeight: '600',
-                                              padding: '0'
-                                            }}
-                                          />
-                                        </div>
-                                    </td>
-                                      <td style={{
-                                        padding: '16px 15px',
-                                        borderBottom: '1px solid rgba(0,0,0,0.05)'
-                                      }}>
-                                      <select
-                                        className="form-select"
-                                        aria-label="Default select Priority"
-                                        name="taskPriority"
-                                        value={task.taskPriority}
-                                        onChange={(e) => taskHandleChange(e, task._id)}
-                                          style={{ 
-                                            width: '170%', 
-                                            fontSize: '13px',
-                                            backgroundColor: 
-                                              task.taskPriority === 'Highest' ? 'rgba(220, 53, 69, 0.1)' : 
-                                              task.taskPriority === 'Medium' ? 'rgba(255, 193, 7, 0.1)' : 
-                                              task.taskPriority === 'Lowest' ? 'rgba(82, 180, 71, 0.1)' : 
-                                              'white',
-                                            color: 
-                                              task.taskPriority === 'Highest' ? '#dc3545' : 
-                                              task.taskPriority === 'Medium' ? '#ffc107' : 
-                                              task.taskPriority === 'Lowest' ? '#36a2eb' : 
-                                              '#666',
-                                            border: 'none',
-                                            borderRadius: '6px',
-                                            padding: '8px 12px',
-                                            fontWeight: '600'
-                                          }}
-                                      >
-                                        <option value="">Set Priority</option>
-                                        <option value="Highest">Highest</option>
-                                        <option value="Medium">Medium</option>
-                                        <option value="Lowest">Lowest</option>
-                                      </select>
-                                    </td>
-                                      <td style={{
-                                        padding: '16px 15px',
-                                        borderBottom: '1px solid rgba(0,0,0,0.05)',
-                                        textAlign: 'center'
-                                      }}>
-                                        <div className="d-flex gap-2 justify-content-center">
-                                        <button
-                                          onClick={() => taskHandleSubmit(task._id)}
-                                          title="Update Task"
-                                            style={{
-                                              backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                              color: '#36a2eb',
-                                              width: '32px',
-                                              height: '32px',
-                                              borderRadius: '50%',
-                                              padding: '0',
-                                              display: 'flex',
-                                              alignItems: 'center',
-                                              justifyContent: 'center',
-                                              border: 'none',
-                                              transition: 'all 0.2s ease'
-                                            }}
-                                            onMouseOver={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
-                                            }}
-                                            onMouseOut={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
-                                            }}
-                                          >
-                                            <i className="bi-check2"></i>
-                                          </button>
-                                        <button
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#dremovetask"
-                                          onClick={() => setDeletableId(task._id)}
-                                          title="Delete Task"
-                                            style={{
-                                              backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                                              color: '#1e40af',
-                                              width: '32px',
-                                              height: '32px',
-                                              borderRadius: '50%',
-                                              padding: '0',
-                                              display: 'flex',
-                                              alignItems: 'center',
-                                              justifyContent: 'center',
-                                              border: 'none',
-                                              transition: 'all 0.2s ease'
-                                            }}
-                                            onMouseOver={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.2)';
-                                            }}
-                                            onMouseOut={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
-                                            }}
-                                          >
-                                            <i className="bi-trash"></i>
-                                          </button>
-                                      </div>
-                                    </td>
-                                      <td style={{
-                                        padding: '16px 15px',
-                                        borderBottom: '1px solid rgba(0,0,0,0.05)'
-                                      }}>
-                                        <div className="d-flex align-items-center gap-2">
-                                      {task.taskStatus === 'Not Started' && (
-                                            <div style={{
-                                              backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                                              color: '#ffc107',
-                                              padding: '5px 10px',
-                                              borderRadius: '6px',
-                                              fontSize: '12px',
-                                              fontWeight: '600'
-                                            }}>Not Started</div>
-                                      )}
-                                      {task.taskStatus === 'In Progress' && (
-                                            <div style={{
-                                              backgroundColor: 'rgba(13, 202, 240, 0.1)',
-                                              color: '#0dcaf0',
-                                              padding: '5px 10px',
-                                              borderRadius: '6px',
-                                              fontSize: '12px',
-                                              fontWeight: '600'
-                                            }}>In Progress</div>
-                                      )}
-                                      {task.taskStatus === 'Completed' && (
-                                            <div style={{
-                                              backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                              color: '#36a2eb',
-                                              padding: '5px 10px',
-                                              borderRadius: '6px',
-                                              fontSize: '12px',
-                                              fontWeight: '600'
-                                            }}>Completed</div>
-                                      )}
+                                          <div className="dropdown">
+                                            {/* Task title display */}
+                                            <div
+                                              className="d-flex align-items-center justify-content-between"
+                                              data-bs-toggle="dropdown"
+                                              aria-expanded="false"
+                                              style={{ cursor: 'pointer' }}
+                                            >
+                                              <div>
+                                                <div style={{
+                                                  fontWeight: '600',
+                                                  fontSize: '14px',
+                                                  color: '#333',
+                                                  marginBottom: '3px'
+                                                }}>
+                                                  {task.taskTitle || 'Untitled Task'}
+                                                </div>
 
-                                      <button
-                                            className="btn position-relative"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#taskMessage"
-                                        onClick={() => handleOpenMessages(task)}
+                                                <div style={{
+                                                  fontSize: '13px',
+                                                  color: '#666',
+                                                  display: '-webkit-box',
+                                                  WebkitLineClamp: '2',
+                                                  WebkitBoxOrient: 'vertical',
+                                                  overflow: 'hidden',
+                                                  textOverflow: 'ellipsis'
+                                                }}>
+                                                  {task.description || 'No description'}
+                                                </div>
+                                              </div>
+
+                                              <div style={{
+                                                color: '#36a2eb',
+                                                marginLeft: '10px'
+                                              }}>
+                                                <i className="bi-pencil"></i>
+                                              </div>
+                                            </div>
+
+                                            {/* Dropdown menu with edit form */}
+                                            <div className="dropdown-menu p-3" style={{
+                                              width: '300px',
+                                              boxShadow: '0 6px 15px rgba(0,0,0,0.1)',
+                                              border: '1px solid rgba(82, 180, 71, 0.2)',
+                                              borderRadius: '8px'
+                                            }}>
+                                              <h6 style={{
+                                                color: '#36a2eb',
+                                                fontWeight: '600',
+                                                marginBottom: '10px',
+                                                borderBottom: '1px solid rgba(82, 180, 71, 0.2)',
+                                                paddingBottom: '8px'
+                                              }}>
+                                                <i className="bi-list-task me-2"></i>
+                                                Edit Task Details
+                                              </h6>
+
+                                              <div className="mb-3">
+                                                <label className="form-label" style={{ fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                                                  Task Title
+                                                </label>
+                                                <input
+                                                  className="form-control"
+                                                  type="text"
+                                                  name="taskTitle"
+                                                  placeholder="Task Title"
+                                                  value={task.taskTitle}
+                                                  onChange={(e) => taskHandleChange(e, task._id)}
+                                                  style={{
+                                                    fontSize: '14px',
+                                                    border: '1px solid rgba(82, 180, 71, 0.2)',
+                                                    padding: '8px 12px'
+                                                  }}
+                                                />
+                                              </div>
+
+                                              <div className="mb-3">
+                                                <label className="form-label" style={{ fontSize: '13px', fontWeight: '600', color: '#555' }}>
+                                                  Task Description
+                                                </label>
+                                                <textarea
+                                                  className="form-control"
+                                                  type="text"
+                                                  placeholder="Explain The Task What To Do & How To Do"
+                                                  name="description"
+                                                  value={task.description}
+                                                  onChange={(e) => taskHandleChange(e, task._id)}
+                                                  style={{
+                                                    fontSize: '13px',
+                                                    border: '1px solid rgba(82, 180, 71, 0.2)',
+                                                    padding: '8px 12px',
+                                                    resize: 'vertical',
+                                                    minHeight: '80px'
+                                                  }}
+                                                />
+                                              </div>
+
+                                              <div className="d-flex justify-content-end">
+                                                <button
+                                                  className="btn"
+                                                  onClick={() => taskHandleSubmit(task._id)}
+                                                  style={{
+                                                    backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                                                    color: '#36a2eb',
+                                                    fontWeight: '600',
+                                                    fontSize: '13px',
+                                                    padding: '6px 12px',
+                                                    borderRadius: '6px',
+                                                    border: 'none',
+                                                    transition: 'all 0.2s ease'
+                                                  }}
+                                                  onMouseOver={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                                  }}
+                                                  onMouseOut={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                                  }}
+                                                >
+                                                  <i className="bi-check2 me-1"></i>
+                                                  Save Changes
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {/* Overdue indicator below the task details */}
+                                          {isOverdue && (
+                                            <div style={{
+                                              backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                              padding: '4px 8px',
+                                              borderRadius: '4px',
+                                              color: '#dc3545',
+                                              fontSize: '11px',
+                                              fontWeight: '600',
+                                              display: 'inline-block',
+                                              marginTop: '5px'
+                                            }}>
+                                              <i className="bi-exclamation-triangle-fill me-1"></i>
+                                              Overdue
+                                            </div>
+                                          )}
+                                        </td>
+                                        <td style={{
+                                          padding: '16px 15px',
+                                          borderBottom: '1px solid rgba(0,0,0,0.05)'
+                                        }}>
+                                          <div>
+                                            {task.taskAssignPerson && task.taskAssignPerson.employeeName ? (
+                                              <>
+                                                <div className="d-flex align-items-center">
+                                                  <div style={{
+                                                    backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                                                    color: '#36a2eb',
+                                                    width: '30px',
+                                                    height: '30px',
+                                                    borderRadius: '50%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    marginRight: '8px'
+                                                  }}>
+                                                    <i className="bi-person"></i>
+                                                  </div>
+                                                  <div>
+                                                    <div style={{
+                                                      fontSize: '14px',
+                                                      fontWeight: '600',
+                                                      color: '#333'
+                                                    }}>{task.taskAssignPerson.employeeName}</div>
+                                                    <span style={{
+                                                      backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                                                      color: '#0dcaf0',
+                                                      fontSize: '11px',
+                                                      padding: '2px 6px',
+                                                      borderRadius: '4px',
+                                                      fontWeight: '600'
+                                                    }}>Employee</span>
+                                                  </div>
+                                                </div>
+                                              </>
+                                            ) : task.clientAssignPerson && task.clientAssignPerson.clientName ? (
+                                              <>
+                                                <div className="d-flex align-items-center">
+                                                  <div style={{
+                                                    backgroundColor: 'rgba(255, 138, 0, 0.1)',
+                                                    color: '#4169e1',
+                                                    width: '30px',
+                                                    height: '30px',
+                                                    borderRadius: '50%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    marginRight: '8px'
+                                                  }}>
+                                                    <i className="bi-people"></i>
+                                                  </div>
+                                                  <div>
+                                                    <div style={{
+                                                      fontSize: '14px',
+                                                      fontWeight: '600',
+                                                      color: '#333'
+                                                    }}>{task.clientAssignPerson.clientName}</div>
+                                                    <span style={{
+                                                      backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                                      color: '#ffc107',
+                                                      fontSize: '11px',
+                                                      padding: '2px 6px',
+                                                      borderRadius: '4px',
+                                                      fontWeight: '600'
+                                                    }}>Client Member</span>
+                                                  </div>
+                                                </div>
+                                              </>
+                                            ) : (
+                                              <span style={{
+                                                color: '#999',
+                                                fontStyle: 'italic',
+                                                fontSize: '13px'
+                                              }}>Unassigned</span>
+                                            )}
+                                            <div className="mt-2" style={{
+                                              fontSize: '12px',
+                                              color: '#777'
+                                            }}>
+                                              <i className="bi-person-check me-1" style={{ color: '#36a2eb' }}></i>
+                                              By: {task.assignedBy}
+                                            </div>
+                                          </div>
+                                        </td>
+                                        <td style={{
+                                          padding: '16px 15px',
+                                          borderBottom: '1px solid rgba(0,0,0,0.05)'
+                                        }}>
+                                          <div style={{
+                                            backgroundColor: isOverdue ? 'rgba(220, 53, 69, 0.1)' : 'rgba(82, 180, 71, 0.1)',
+                                            padding: '8px 12px',
+                                            borderRadius: '6px',
+                                            marginBottom: '5px'
+                                          }}>
+                                            <input
+                                              type="date"
+                                              className="form-control"
+                                              name="taskEndDate"
+                                              value={task.taskEndDate}
+                                              onChange={(e) => taskHandleChange(e, task._id)}
+                                              style={{
+                                                width: '100%',
+                                                fontSize: '13px',
+                                                backgroundColor: 'transparent',
+                                                border: 'none',
+                                                color: isOverdue ? '#dc3545' : '#36a2eb',
+                                                fontWeight: '600',
+                                                padding: '0'
+                                              }}
+                                            />
+                                          </div>
+                                        </td>
+                                        <td style={{
+                                          padding: '16px 15px',
+                                          borderBottom: '1px solid rgba(0,0,0,0.05)'
+                                        }}>
+                                          <select
+                                            className="form-select"
+                                            aria-label="Default select Priority"
+                                            name="taskPriority"
+                                            value={task.taskPriority}
+                                            onChange={(e) => taskHandleChange(e, task._id)}
                                             style={{
-                                              backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                                              color: '#36a2eb',
-                                              width: '32px',
-                                              height: '32px',
-                                              borderRadius: '50%',
-                                              padding: '0',
-                                              display: 'flex',
-                                              alignItems: 'center',
-                                              justifyContent: 'center',
+                                              width: '170%',
+                                              fontSize: '13px',
+                                              backgroundColor:
+                                                task.taskPriority === 'Highest' ? 'rgba(220, 53, 69, 0.1)' :
+                                                  task.taskPriority === 'Medium' ? 'rgba(255, 193, 7, 0.1)' :
+                                                    task.taskPriority === 'Lowest' ? 'rgba(82, 180, 71, 0.1)' :
+                                                      'white',
+                                              color:
+                                                task.taskPriority === 'Highest' ? '#dc3545' :
+                                                  task.taskPriority === 'Medium' ? '#ffc107' :
+                                                    task.taskPriority === 'Lowest' ? '#36a2eb' :
+                                                      '#666',
                                               border: 'none',
-                                              transition: 'all 0.2s ease'
-                                            }}
-                                            onMouseOver={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
-                                            }}
-                                            onMouseOut={(e) => {
-                                              e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                              borderRadius: '6px',
+                                              padding: '8px 12px',
+                                              fontWeight: '600'
                                             }}
                                           >
-                                            <i className="bi-chat-left-dots"></i>
-                                        {notifications[task._id] > 0 && (
-                                              <span style={{
-                                                position: 'absolute',
-                                                top: '-5px',
-                                                right: '-5px',
-                                                backgroundColor: '#1e40af',
-                                                color: 'white',
+                                            <option value="">Set Priority</option>
+                                            <option value="Highest">Highest</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Lowest">Lowest</option>
+                                          </select>
+                                        </td>
+                                        <td style={{
+                                          padding: '16px 15px',
+                                          borderBottom: '1px solid rgba(0,0,0,0.05)',
+                                          textAlign: 'center'
+                                        }}>
+                                          <div className="d-flex gap-2 justify-content-center">
+                                            <button
+                                              onClick={() => taskHandleSubmit(task._id)}
+                                              title="Update Task"
+                                              style={{
+                                                backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                                                color: '#36a2eb',
+                                                width: '32px',
+                                                height: '32px',
                                                 borderRadius: '50%',
-                                                width: '18px',
-                                                height: '18px',
-                                                fontSize: '10px',
+                                                padding: '0',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
-                                                fontWeight: 'bold',
-                                                boxShadow: '0 2px 5px rgba(255, 94, 0, 0.3)'
-                                              }}>
-                                            {notifications[task._id]}
-                                          </span>
-                                        )}
-                                      </button>
-                                        </div>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
+                                                border: 'none',
+                                                transition: 'all 0.2s ease'
+                                              }}
+                                              onMouseOver={(e) => {
+                                                e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                              }}
+                                              onMouseOut={(e) => {
+                                                e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                              }}
+                                            >
+                                              <i className="bi-check2"></i>
+                                            </button>
+                                            <button
+                                              data-bs-toggle="modal"
+                                              data-bs-target="#dremovetask"
+                                              onClick={() => setDeletableId(task._id)}
+                                              title="Delete Task"
+                                              style={{
+                                                backgroundColor: 'rgba(255, 94, 0, 0.1)',
+                                                color: '#1e40af',
+                                                width: '32px',
+                                                height: '32px',
+                                                borderRadius: '50%',
+                                                padding: '0',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                border: 'none',
+                                                transition: 'all 0.2s ease'
+                                              }}
+                                              onMouseOver={(e) => {
+                                                e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.2)';
+                                              }}
+                                              onMouseOut={(e) => {
+                                                e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
+                                              }}
+                                            >
+                                              <i className="bi-trash"></i>
+                                            </button>
+                                          </div>
+                                        </td>
+                                        <td style={{
+                                          padding: '16px 15px',
+                                          borderBottom: '1px solid rgba(0,0,0,0.05)'
+                                        }}>
+                                          <div className="d-flex align-items-center gap-2">
+                                            {task.taskStatus === 'Not Started' && (
+                                              <div style={{
+                                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                                color: '#ffc107',
+                                                padding: '5px 10px',
+                                                borderRadius: '6px',
+                                                fontSize: '12px',
+                                                fontWeight: '600'
+                                              }}>Not Started</div>
+                                            )}
+                                            {task.taskStatus === 'In Progress' && (
+                                              <div style={{
+                                                backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                                                color: '#0dcaf0',
+                                                padding: '5px 10px',
+                                                borderRadius: '6px',
+                                                fontSize: '12px',
+                                                fontWeight: '600'
+                                              }}>In Progress</div>
+                                            )}
+                                            {task.taskStatus === 'Completed' && (
+                                              <div style={{
+                                                backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                                                color: '#36a2eb',
+                                                padding: '5px 10px',
+                                                borderRadius: '6px',
+                                                fontSize: '12px',
+                                                fontWeight: '600'
+                                              }}>Completed</div>
+                                            )}
+
+                                            <button
+                                              className="btn position-relative"
+                                              data-bs-toggle="modal"
+                                              data-bs-target="#taskMessage"
+                                              onClick={() => handleOpenMessages(task)}
+                                              style={{
+                                                backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                                                color: '#36a2eb',
+                                                width: '32px',
+                                                height: '32px',
+                                                borderRadius: '50%',
+                                                padding: '0',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                border: 'none',
+                                                transition: 'all 0.2s ease'
+                                              }}
+                                              onMouseOver={(e) => {
+                                                e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                                              }}
+                                              onMouseOut={(e) => {
+                                                e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                                              }}
+                                            >
+                                              <i className="bi-chat-left-dots"></i>
+                                              {notifications[task._id] > 0 && (
+                                                <span style={{
+                                                  position: 'absolute',
+                                                  top: '-5px',
+                                                  right: '-5px',
+                                                  backgroundColor: '#1e40af',
+                                                  color: 'white',
+                                                  borderRadius: '50%',
+                                                  width: '18px',
+                                                  height: '18px',
+                                                  fontSize: '10px',
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'center',
+                                                  fontWeight: 'bold',
+                                                  boxShadow: '0 2px 5px rgba(255, 94, 0, 0.3)'
+                                                }}>
+                                                  {notifications[task._id]}
+                                                </span>
+                                              )}
+                                            </button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
-                        </div>
                         </div>
                       ) : (
                         <div className="row">
@@ -1749,7 +1758,7 @@ const Tasks = () => {
                                           style={{ maxWidth: '140px', fontSize: '14px' }}
                                           title={task.projectName}>
                                           {task.projectName}
-                                      </h5>
+                                        </h5>
                                       </div>
 
                                       {task.taskImages && task.taskImages.length > 0 && (
@@ -1771,37 +1780,37 @@ const Tasks = () => {
                                     {/* Task Content */}
                                     <div className="flex-grow-1 p-2">
                                       <div className="mb-2">
-                                      <input
-                                        className="form-control mb-2"
-                                        type="text"
-                                        name="taskTitle"
-                                        placeholder="Task Title"
-                                        value={task.taskTitle}
-                                        onChange={(e) => taskHandleChange(e, task._id)}
-                                        style={{
-                                          backgroundColor: 'transparent',
-                                          border: 'none',
+                                        <input
+                                          className="form-control mb-2"
+                                          type="text"
+                                          name="taskTitle"
+                                          placeholder="Task Title"
+                                          value={task.taskTitle}
+                                          onChange={(e) => taskHandleChange(e, task._id)}
+                                          style={{
+                                            backgroundColor: 'transparent',
+                                            border: 'none',
                                             borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
                                             borderRadius: '0',
                                             padding: '6px 3px',
-                                          fontWeight: 'bold',
+                                            fontWeight: 'bold',
                                             fontSize: '14px',
                                             width: '100%',
                                             color: '#333',
                                             transition: 'border-color 0.3s ease'
-                                        }}
+                                          }}
                                           onFocus={(e) => e.target.style.borderColor = 'rgba(82, 180, 71, 0.8)'}
                                           onBlur={(e) => e.target.style.borderColor = 'rgba(82, 180, 71, 0.2)'}
-                                      />
-                                      <textarea
-                                        className="form-control mb-2"
-                                        rows=""
-                                        name="description"
+                                        />
+                                        <textarea
+                                          className="form-control mb-2"
+                                          rows=""
+                                          name="description"
                                           placeholder="Task description..."
-                                        value={task.description}
-                                        onChange={(e) => taskHandleChange(e, task._id)}
-                                        style={{
-                                          resize: 'none',
+                                          value={task.description}
+                                          onChange={(e) => taskHandleChange(e, task._id)}
+                                          style={{
+                                            resize: 'none',
                                             backgroundColor: 'rgba(0,0,0,0.02)',
                                             height: '70px',
                                             border: '1px solid rgba(0,0,0,0.07)',
@@ -1861,12 +1870,12 @@ const Tasks = () => {
                                             alignItems: 'center',
                                             justifyContent: 'space-between'
                                           }}>
-                                          {task.taskAssignPerson && task.taskAssignPerson.employeeName
+                                            {task.taskAssignPerson && task.taskAssignPerson.employeeName
                                               ? task.taskAssignPerson.employeeName
-                                            : task.clientAssignPerson && task.clientAssignPerson.clientName
+                                              : task.clientAssignPerson && task.clientAssignPerson.clientName
                                                 ? task.clientAssignPerson.clientName
-                                              : 'Unassigned'
-                                          }
+                                                : 'Unassigned'
+                                            }
                                             <span className="badge" style={{
                                               backgroundColor: task.taskAssignPerson && task.taskAssignPerson.employeeName ? 'rgba(82, 180, 71, 0.2)' : 'rgba(255, 138, 0, 0.2)',
                                               color: task.taskAssignPerson && task.taskAssignPerson.employeeName ? '#36a2eb' : '#4169e1',
@@ -1889,12 +1898,12 @@ const Tasks = () => {
                                         <div className="row g-2">
                                           <div className="col-7">
                                             <label className="form-label mb-1" style={{ fontSize: '11px', color: '#666' }}>Due Date</label>
-                                        <input
-                                          type="date"
+                                            <input
+                                              type="date"
                                               className="form-control"
-                                          name="taskEndDate"
-                                          value={task.taskEndDate}
-                                          onChange={(e) => taskHandleChange(e, task._id)}
+                                              name="taskEndDate"
+                                              value={task.taskEndDate}
+                                              onChange={(e) => taskHandleChange(e, task._id)}
                                               style={{
                                                 fontSize: '12px',
                                                 padding: '6px 8px',
@@ -1905,23 +1914,23 @@ const Tasks = () => {
                                           </div>
                                           <div className="col-5">
                                             <label className="form-label mb-1" style={{ fontSize: '11px', color: '#666' }}>Priority</label>
-                                        <select
+                                            <select
                                               className="form-select"
-                                          name="taskPriority"
-                                          value={task.taskPriority}
-                                          onChange={(e) => taskHandleChange(e, task._id)}
+                                              name="taskPriority"
+                                              value={task.taskPriority}
+                                              onChange={(e) => taskHandleChange(e, task._id)}
                                               style={{
                                                 fontSize: '12px',
                                                 padding: '6px 8px',
                                                 border: '1px solid rgba(0,0,0,0.1)',
                                                 borderRadius: '4px'
                                               }}
-                                        >
-                                          <option value="">Set Priority</option>
-                                          <option value="Highest">Highest</option>
-                                          <option value="Medium">Medium</option>
-                                          <option value="Lowest">Lowest</option>
-                                        </select>
+                                            >
+                                              <option value="">Set Priority</option>
+                                              <option value="Highest">Highest</option>
+                                              <option value="Medium">Medium</option>
+                                              <option value="Lowest">Lowest</option>
+                                            </select>
                                           </div>
                                         </div>
                                       </div>
@@ -1931,7 +1940,7 @@ const Tasks = () => {
                                     <div className="mt-auto p-2 pt-0">
                                       <div className="d-flex justify-content-between align-items-center mb-2">
                                         <div>
-                                        {task.taskStatus === 'Not Started' && (
+                                          {task.taskStatus === 'Not Started' && (
                                             <span className="badge" style={{
                                               backgroundColor: 'rgba(255, 193, 7, 0.2)',
                                               color: '#ffc107',
@@ -1940,8 +1949,8 @@ const Tasks = () => {
                                               borderRadius: '3px',
                                               fontWeight: '600'
                                             }}>Not Started</span>
-                                        )}
-                                        {task.taskStatus === 'In Progress' && (
+                                          )}
+                                          {task.taskStatus === 'In Progress' && (
                                             <span className="badge" style={{
                                               backgroundColor: 'rgba(255, 138, 0, 0.2)',
                                               color: '#4169e1',
@@ -1950,8 +1959,8 @@ const Tasks = () => {
                                               borderRadius: '3px',
                                               fontWeight: '600'
                                             }}>In Progress</span>
-                                        )}
-                                        {task.taskStatus === 'Completed' && (
+                                          )}
+                                          {task.taskStatus === 'Completed' && (
                                             <span className="badge" style={{
                                               backgroundColor: 'rgba(82, 180, 71, 0.2)',
                                               color: '#36a2eb',
@@ -2082,25 +2091,25 @@ const Tasks = () => {
                     <div className="d-flex align-items-center" style={{
                       background: '#f9fcf7',
                       padding: '12px 15px',
-                            borderRadius: '8px',
+                      borderRadius: '8px',
                       border: '1px solid rgba(82, 180, 71, 0.15)'
                     }}>
                       <label htmlFor="tasksPerPage" className="form-label me-3 mb-0" style={{
-                            fontWeight: '600',
-                            color: '#444',
+                        fontWeight: '600',
+                        color: '#444',
                         fontSize: '14px'
                       }}>Tasks per page:</label>
                       <select
                         id="tasksPerPage"
                         className="form-select"
-                              style={{
+                        style={{
                           width: 'auto',
-                                border: '1px solid rgba(82, 180, 71, 0.3)',
+                          border: '1px solid rgba(82, 180, 71, 0.3)',
                           borderRadius: '6px',
-                                color: '#333',
+                          color: '#333',
                           fontWeight: '500',
                           padding: '8px 30px 8px 12px',
-                                boxShadow: 'none',
+                          boxShadow: 'none',
                           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%2352b447' d='M8 10.5l-4-4h8l-4 4z'/%3E%3C/svg%3E")`,
                           cursor: 'pointer'
                         }}
@@ -2348,9 +2357,9 @@ const Tasks = () => {
                       <div className="deadline-form mb-4">
                         <div className="row g-3">
                           <div className="col-12">
-                              <label
-                                htmlFor="datepickerdedone"
-                                className="form-label"
+                            <label
+                              htmlFor="datepickerdedone"
+                              className="form-label"
                               style={{
                                 fontWeight: '600',
                                 color: '#444',
@@ -2362,15 +2371,15 @@ const Tasks = () => {
                               }}
                             >
                               <i className="icofont-calendar" style={{ color: '#1e40af' }}></i>
-                                Task End Date <span className="text-danger">*</span>
-                              </label>
-                              <input
-                                type="date"
-                                className="form-control"
-                                id="datepickerdedone"
-                                name="taskEndDate"
-                                value={formData.taskEndDate}
-                                onChange={handleChange}
+                              Task End Date <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="date"
+                              className="form-control"
+                              id="datepickerdedone"
+                              name="taskEndDate"
+                              value={formData.taskEndDate}
+                              onChange={handleChange}
                               style={{
                                 borderRadius: '8px',
                                 border: '1px solid rgba(255, 94, 0, 0.3)',
@@ -2379,9 +2388,9 @@ const Tasks = () => {
                                 boxShadow: 'none',
                                 backgroundColor: 'rgba(255, 94, 0, 0.03)'
                               }}
-                              />
-                            </div>
+                            />
                           </div>
+                        </div>
                       </div>
 
                       <div className="mb-4" style={{
@@ -2484,10 +2493,10 @@ const Tasks = () => {
                               <i className="icofont-user-suited" style={{ color: '#36a2eb' }}></i>
                               Task Assign Person <span className="text-danger">*</span>
                             </label>
-                              <select
-                                className="form-select"
-                                value={selectedEmployees[0]?.value || ""}
-                                onChange={(e) => setSelectedEmployees([{ label: e.target.options[e.target.selectedIndex].text, value: e.target.value }])}
+                            <select
+                              className="form-select"
+                              value={selectedEmployees[0]?.value || ""}
+                              onChange={(e) => setSelectedEmployees([{ label: e.target.options[e.target.selectedIndex].text, value: e.target.value }])}
                               style={{
                                 borderRadius: '8px',
                                 border: '1px solid rgba(82, 180, 71, 0.3)',
@@ -2496,14 +2505,14 @@ const Tasks = () => {
                                 boxShadow: 'none',
                                 backgroundColor: 'white'
                               }}
-                              >
-                                <option value="" disabled>Select Employees</option>
-                                {assignEmployee.map((employee) => (
-                                  <option key={employee.value} value={employee.value}>
-                                    {employee.label}
-                                  </option>
-                                ))}
-                              </select>
+                            >
+                              <option value="" disabled>Select Employees</option>
+                              {assignEmployee.map((employee) => (
+                                <option key={employee.value} value={employee.value}>
+                                  {employee.label}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                         ) : (
                           <div>
@@ -2522,13 +2531,13 @@ const Tasks = () => {
                               <i className="icofont-user-alt-7" style={{ color: '#4169e1' }}></i>
                               Task Assign Client <span className="text-danger">*</span>
                             </label>
-                              <select
-                                className="form-select"
-                                value={selectedClient?.value || ""}
-                                onChange={(e) => setSelectedClient({
-                                  label: e.target.options[e.target.selectedIndex].text,
-                                  value: e.target.value
-                                })}
+                            <select
+                              className="form-select"
+                              value={selectedClient?.value || ""}
+                              onChange={(e) => setSelectedClient({
+                                label: e.target.options[e.target.selectedIndex].text,
+                                value: e.target.value
+                              })}
                               style={{
                                 borderRadius: '8px',
                                 border: '1px solid rgba(255, 94, 0, 0.3)',
@@ -2537,14 +2546,14 @@ const Tasks = () => {
                                 boxShadow: 'none',
                                 backgroundColor: 'white'
                               }}
-                              >
-                                <option value="" disabled>Select Client</option>
-                                {clients.map((client) => (
-                                  <option key={client._id} value={client._id}>
-                                    {client.clientName}
-                                  </option>
-                                ))}
-                              </select>
+                            >
+                              <option value="" disabled>Select Client</option>
+                              {clients.map((client) => (
+                                <option key={client._id} value={client._id}>
+                                  {client.clientName}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                         )}
                       </div>
@@ -2565,12 +2574,12 @@ const Tasks = () => {
                           <i className="icofont-flag" style={{ color: '#1e40af' }}></i>
                           Task Priority
                         </label>
-                          <select
-                            className="form-select"
-                            aria-label="Default select Priority"
-                            name="taskPriority"
-                            value={formData.taskPriority}
-                            onChange={handleChange}
+                        <select
+                          className="form-select"
+                          aria-label="Default select Priority"
+                          name="taskPriority"
+                          value={formData.taskPriority}
+                          onChange={handleChange}
                           style={{
                             borderRadius: '8px',
                             border: '1px solid rgba(255, 94, 0, 0.3)',
@@ -2584,8 +2593,8 @@ const Tasks = () => {
                           <option value="Highest">Highest</option>
                           <option value="Medium">Medium</option>
                           <option value="Lowest">Lowest</option>
-                          </select>
-                        </div>
+                        </select>
+                      </div>
 
                       <div className="mb-4">
                         <label
@@ -3030,7 +3039,7 @@ const Tasks = () => {
                           }}
                         >
                           <i className="bi bi-card-checklist" style={{ fontSize: '20px', color: 'white' }}></i>
-                    </div>
+                        </div>
                         <div style={{ flex: 1 }}>
                           <h5
                             className="modal-title"
@@ -3168,7 +3177,7 @@ const Tasks = () => {
                                     boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
                                     position: 'relative'
                                   }}>
-                                {message.content.startsWith("```excel") ? (
+                                    {message.content.startsWith("```excel") ? (
                                       <div className="excel-message p-1 rounded bg-light w-100" style={{
                                         border: '1px solid rgba(0,0,0,0.1)',
                                         borderRadius: '8px',
@@ -3178,23 +3187,23 @@ const Tasks = () => {
                                           <i className="bi bi-file-earmark-spreadsheet me-1"></i>Excel Sheet:
                                         </div>
                                         <table className="table table-sm table-bordered m-0">
-                                      <tbody>
-                                        {message.content
-                                          .replace("```excel\n", "")
-                                          .replace("```", "")
-                                          .trim()
-                                          .split('\n')
-                                          .map((row, rowIdx) => (
-                                            <tr key={rowIdx}>
-                                              {row.split('\t').map((cell, cellIdx) => (
+                                          <tbody>
+                                            {message.content
+                                              .replace("```excel\n", "")
+                                              .replace("```", "")
+                                              .trim()
+                                              .split('\n')
+                                              .map((row, rowIdx) => (
+                                                <tr key={rowIdx}>
+                                                  {row.split('\t').map((cell, cellIdx) => (
                                                     <td key={cellIdx} className="px-2 py-1" style={{ fontSize: '13px' }}>{cell}</td>
+                                                  ))}
+                                                </tr>
                                               ))}
-                                            </tr>
-                                          ))}
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                ) : (
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    ) : (
                                       <div style={{ fontSize: '14px' }}>{message.content}</div>
                                     )}
                                     <div style={{
@@ -3250,13 +3259,13 @@ const Tasks = () => {
                                       justifyContent: isCurrentUser ? 'flex-end' : 'flex-start'
                                     }}>
                                       {message.fileUrls.map((fileUrl, index) => {
-                                  if (fileUrl) {
-                                    const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}uploads${fileUrl}`;
-                                    const fileExtension = cleanFileUrl.split('.').pop().toLowerCase();
+                                        if (fileUrl) {
+                                          const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}uploads${fileUrl}`;
+                                          const fileExtension = cleanFileUrl.split('.').pop().toLowerCase();
                                           const fileName = cleanFileUrl.split('/').pop();
 
-                                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                                      return (
+                                          if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                            return (
                                               <div key={index} style={{
                                                 borderRadius: '10px',
                                                 overflow: 'hidden',
@@ -3265,7 +3274,7 @@ const Tasks = () => {
                                                 height: '120px',
                                                 position: 'relative'
                                               }}>
-                                          <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer">
+                                                <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer">
                                                   <img
                                                     src={cleanFileUrl}
                                                     alt={`Attachment ${index + 1}`}
@@ -3276,12 +3285,12 @@ const Tasks = () => {
                                                       cursor: 'pointer'
                                                     }}
                                                   />
-                                          </a>
-                                        </div>
-                                      );
-                                    } else {
+                                                </a>
+                                              </div>
+                                            );
+                                          } else {
                                             const isDoc = fileExtension === 'pdf' || fileExtension === 'doc' || fileExtension === 'docx';
-                                      return (
+                                            return (
                                               <a
                                                 key={index}
                                                 href={cleanFileUrl}
@@ -3309,19 +3318,19 @@ const Tasks = () => {
                                                   {fileName}
                                                 </span>
                                               </a>
-                                      );
-                                    }
-                                  }
-                                  return null;
-                                })}
-                              </div>
+                                            );
+                                          }
+                                        }
+                                        return null;
+                                      })}
+                                    </div>
 
                                     {isCurrentUser && (
                                       <div style={{ width: '45px', flexShrink: 0 }}></div>
                                     )}
-                            </div>
+                                  </div>
                                 )}
-                    </div>
+                              </div>
                             );
                           })}
                         </div>
@@ -3346,20 +3355,20 @@ const Tasks = () => {
                             position: 'relative',
                             flex: 1
                           }}>
-                          <textarea
-                            className="form-control"
-                            id="currentMessage"
-                            name="message"
+                            <textarea
+                              className="form-control"
+                              id="currentMessage"
+                              name="message"
                               rows="1"
-                            value={content}
+                              value={content}
                               onChange={(e) => {
                                 setContent(e.target.value);
                                 // Auto resize textarea
                                 e.target.style.height = 'auto';
                                 e.target.style.height = Math.min(120, e.target.scrollHeight) + 'px';
                               }}
-                            required
-                            ref={messageInputRef}
+                              required
+                              ref={messageInputRef}
                               style={{
                                 borderRadius: '20px',
                                 border: '1px solid rgba(0,0,0,0.1)',
@@ -3387,14 +3396,14 @@ const Tasks = () => {
                             >
                               <i className="bi bi-paperclip" style={{ fontSize: '20px' }}></i>
                             </label>
-                          <input
-                            type="file"
+                            <input
+                              type="file"
                               className="form-control d-none"
-                            id="fileUpload"
-                            onChange={handleFileChange}
-                            multiple
-                          />
-                        </div>
+                              id="fileUpload"
+                              onChange={handleFileChange}
+                              multiple
+                            />
+                          </div>
                           <button
                             type="submit"
                             style={{
@@ -3489,7 +3498,7 @@ const Tasks = () => {
               padding: '20px 25px',
               position: 'relative'
             }}>
-              <h5 
+              <h5
                 className="modal-title"
                 style={{
                   color: 'white',
@@ -3503,10 +3512,10 @@ const Tasks = () => {
                 <i className="icofont-gallery" style={{ fontSize: '22px' }}></i>
                 {selectedTaskName} - Task Images
               </h5>
-              <button 
-                type="button" 
-                className="btn-close" 
-                data-bs-dismiss="modal" 
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
                 aria-label="Close"
                 style={{
                   filter: 'brightness(0) invert(1)',
@@ -3529,19 +3538,19 @@ const Tasks = () => {
                       cursor: 'pointer',
                       position: 'relative'
                     }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-5px)';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}>
-                      <img 
-                        src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`} 
-                        alt={`Task image ${index + 1}`} 
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-5px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}>
+                      <img
+                        src={`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`}
+                        alt={`Task image ${index + 1}`}
                         className="img-fluid"
-                        style={{ 
-                          width: '100%', 
-                          height: '200px', 
+                        style={{
+                          width: '100%',
+                          height: '200px',
                           objectFit: 'cover',
                           display: 'block'
                         }}
@@ -3558,14 +3567,14 @@ const Tasks = () => {
                         justifyContent: 'space-between',
                         alignItems: 'center'
                       }}>
-                        <span style={{ 
+                        <span style={{
                           color: 'white',
                           fontSize: '14px',
                           fontWeight: '500'
                         }}>
                           Image {index + 1}
                         </span>
-                        <button 
+                        <button
                           onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('uploads/', '')}`, '_blank')}
                           style={{
                             backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -3601,9 +3610,9 @@ const Tasks = () => {
               padding: '20px 25px',
               background: '#fff'
             }}>
-              <button 
-                type="button" 
-                className="btn" 
+              <button
+                type="button"
+                className="btn"
                 data-bs-dismiss="modal"
                 style={{
                   background: 'linear-gradient(135deg, #4169e1, #1e40af)',

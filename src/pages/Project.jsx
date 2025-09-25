@@ -831,7 +831,7 @@ const Project = () => {
   const getProjectColor = (name) => {
     if (!name) return '#1e40af';
     const colors = [
-      '#1e40af', '#ff8a00', '#fc6db2', '#007bff', '#6f42c1', 
+      '#1e40af', '#ff8a00', '#36a2eb', '#007bff', '#6f42c1', 
       '#e83e8c', '#fd7e14', '#20c997', '#17a2b8', '#6c757d'
     ];
     const hash = name.split('').reduce((a, b) => {
@@ -931,7 +931,7 @@ const Project = () => {
                           data-bs-toggle="modal"
                           data-bs-target="#createproject"
                           style={{
-                            background: 'linear-gradient(135deg, #ff70b4, #ff69b4)',
+                            background: 'linear-gradient(135deg, #36a2eb, #36a2eb)',
                             color: 'white',
                             border: 'none',
                             borderRadius: '8px',
@@ -964,9 +964,22 @@ const Project = () => {
                             boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
                           }}
                         >
+                          <style>
+                            {`
+                              .nav-link1.active {
+                                background-color: #36a2eb !important;
+                                color: white !important;
+                                box-shadow: 0 2px 4px rgba(54, 162, 235, 0.3) !important;
+                              }
+                              .nav-link1.active:hover {
+                                background-color: #36a2eb !important;
+                                color: white !important;
+                              }
+                            `}
+                          </style>
                           <div className="nav-item" style={{ position: 'relative' }}>
                             <a
-                              className={`nav-link ${activeTab === "All" ? "active" : ""}`}
+                              className={`nav-link1 ${activeTab === "All" ? "active" : ""}`}
                               onClick={() => setActiveTab("All")}
                               data-bs-toggle="tab"
                               href="#All-list"
@@ -975,13 +988,12 @@ const Project = () => {
                                 padding: '8px 20px',
                                 fontWeight: '600',
                                 fontSize: '14px',
-                                color: activeTab === "All" ? 'white' : '#666',
-                                background: activeTab === "All" ? 'linear-gradient(135deg, #4169e1, #1e40af)' : 'transparent',
+                                color: activeTab === "All" ? 'white' : '#333',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
-                                zIndex: '1',
-                                position: 'relative'
+                                textDecoration: 'none',
+                                display: 'inline-block'
                               }}
                             >
                               All
@@ -989,7 +1001,7 @@ const Project = () => {
                           </div>
                           <div className="nav-item" style={{ position: 'relative' }}>
                             <a
-                              className={`nav-link ${activeTab === "In Progress" ? "active" : ""}`}
+                              className={`nav-link1 ${activeTab === "In Progress" ? "active" : ""}`}
                               onClick={() => setActiveTab("In Progress")}
                               data-bs-toggle="tab"
                               href="#Started-list"
@@ -998,23 +1010,22 @@ const Project = () => {
                                 padding: '8px 20px',
                                 fontWeight: '600',
                                 fontSize: '14px',
-                                color: activeTab === "In Progress" ? 'white' : '#666',
-                                background: activeTab === "In Progress" ? 'linear-gradient(135deg, #4169e1, #1e40af)' : 'transparent',
+                                color: activeTab === "In Progress" ? 'white' : '#333',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
-                                zIndex: '1',
-                                position: 'relative'
+                                textDecoration: 'none',
+                                display: 'inline-block'
                               }}
                             >
-                              <i className={`icofont-spinner-alt-3 me-1 ${activeTab === "In Progress" ? '' : 'text-warning'}`} 
+                              <i className={`icofont-spinner-alt-3 me-1 ${activeTab === "In Progress" ? 'text-white' : 'text-warning'}`} 
                                 style={{ fontSize: '14px' }}></i>
                               In Progress
                             </a>
                           </div>
                           <div className="nav-item" style={{ position: 'relative' }}>
                             <a
-                              className={`nav-link ${activeTab === "Completed" ? "active" : ""}`}
+                              className={`nav-link1 ${activeTab === "Completed" ? "active" : ""}`}
                               onClick={() => setActiveTab("Completed")}
                               data-bs-toggle="tab"
                               href="#Completed-list"
@@ -1023,16 +1034,15 @@ const Project = () => {
                                 padding: '8px 20px',
                                 fontWeight: '600',
                                 fontSize: '14px',
-                                color: activeTab === "Completed" ? 'white' : '#666',
-                                background: activeTab === "Completed" ? 'linear-gradient(135deg, #ff70b4, #ff69b4)' : 'transparent',
+                                color: activeTab === "Completed" ? 'white' : '#333',
                                 borderRadius: '8px',
                                 border: 'none',
                                 transition: 'all 0.2s ease',
-                                zIndex: '1',
-                                position: 'relative'
+                                textDecoration: 'none',
+                                display: 'inline-block'
                               }}
                             >
-                              <i className={`icofont-verification-check me-1 ${activeTab === "Completed" ? '' : 'text-success'}`}
+                              <i className={`icofont-verification-check me-1 ${activeTab === "Completed" ? 'text-white' : 'text-success'}`}
                                 style={{ fontSize: '14px' }}></i>
                               Completed
                             </a>
@@ -1425,7 +1435,7 @@ const Project = () => {
                                               aria-expanded="false"
                                               style={{
                                                 backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                                color: '#ff69b4',
+                                                color: '#36a2eb',
                                                 borderRadius: '6px',
                                                 padding: '6px 12px',
                                                 fontSize: '13px',
@@ -1452,7 +1462,7 @@ const Project = () => {
                                                 marginBottom: '6px'
                                               }}>
                                                 <div style={{
-                                                  color: '#ff69b4',
+                                                  color: '#36a2eb',
                                                   fontWeight: '600',
                                                   fontSize: '13px',
                                                   display: 'flex',
@@ -1466,7 +1476,7 @@ const Project = () => {
                                                 <li key={idx} style={{ marginBottom: '8px' }}>
                                                   <div className="d-flex align-items-center">
                                                     <i className="icofont-business-man" style={{ 
-                                                      color: '#ff69b4', 
+                                                      color: '#36a2eb', 
                                                       fontSize: '14px',
                                                       marginRight: '8px'
                                                     }}></i>
@@ -1512,7 +1522,7 @@ const Project = () => {
                                           backgroundColor: 'rgba(255, 105, 180, 0.1)',
                                           padding: '6px 10px',
                                           borderRadius: '6px',
-                                          color: '#ff69b4',
+                                          color: '#36a2eb',
                                           fontSize: '13px',
                                           fontWeight: '600',
                                           display: 'inline-block'
@@ -1604,7 +1614,7 @@ const Project = () => {
                                           fontWeight: '600',
                                           color: project.progress > 75 ? '#1e40af' : 
                                                  project.progress > 50 ? '#4169e1' : 
-                                                 project.progress > 25 ? '#ff69b4' : '#dc3545',
+                                                 project.progress > 25 ? '#36a2eb' : '#dc3545',
                                           marginBottom: '5px',
                                           fontSize: '14px'
                                         }}>
@@ -1622,7 +1632,7 @@ const Project = () => {
                                               width: `${project.progress}%`,
                                               background: `linear-gradient(to right, 
                                                 ${project.progress > 75 ? '#1e40af' : '#4169e1'}, 
-                                                ${project.progress > 50 ? '#1e40af' : '#ff69b4'}
+                                                ${project.progress > 50 ? '#1e40af' : '#36a2eb'}
                                               )`,
                                               borderRadius: '4px',
                                               transition: 'width 0.5s ease'
@@ -1676,7 +1686,7 @@ const Project = () => {
                                             title="Delete Project"
                                             style={{
                                               backgroundColor: 'rgba(255, 105, 180, 0.1)',
-                                              color: '#ff69b4',
+                                              color: '#36a2eb',
                                               width: '32px',
                                               height: '32px',
                                               borderRadius: '50%',
@@ -1732,7 +1742,7 @@ const Project = () => {
                                                 position: 'absolute',
                                                 top: '-5px',
                                                 right: '-5px',
-                                                backgroundColor: '#ff69b4',
+                                                backgroundColor: '#36a2eb',
                                                 color: 'white',
                                                 borderRadius: '50%',
                                                 width: '18px',
@@ -1955,7 +1965,7 @@ const Project = () => {
                                     left: 0,
                                     right: 0,
                                     height: '6px',
-                                    background: 'linear-gradient(90deg, #4169e1, #1e40af, #ff69b4)',
+                                    background: 'linear-gradient(90deg, #4169e1, #1e40af, #36a2eb)',
                                     opacity: 0.9
                                   }}></div> */}
                                   <div className="card-body d-flex flex-column" style={{ padding: '18px' }}>
@@ -1963,14 +1973,14 @@ const Project = () => {
                                       <span style={{ 
                                         background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                                         color: 'white', 
-                                        borderRadius: '10px',
-                                        width: '32px',
-                                        height: '32px',
+                                        borderRadius: '20px',
+                                        width: '25px',
+                                        height: '25px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         fontWeight: '600',
-                                        fontSize: '14px',
+                                        fontSize: '10px',
                                         boxShadow: '0 4px 15px rgba(65, 105, 225, 0.3)',
                                         border: '2px solid rgba(255, 255, 255, 0.8)'
                                       }}>
@@ -2122,7 +2132,7 @@ const Project = () => {
                                           backgroundColor: 'rgba(255, 105, 180, 0.04)',
                                           padding: '4px 6px',
                                           borderRadius: '8px',
-                                          color: '#ff69b4',
+                                          color: '#36a2eb',
                                           fontSize: '10px',
                                           fontWeight: '600',
                                           border: '1px solid rgba(255, 105, 180, 0.15)',
@@ -2147,7 +2157,7 @@ const Project = () => {
                                               justifyContent: 'center',
                                               marginRight: '6px'
                                             }}>
-                                              <i className="icofont-calendar" style={{ color: '#ff69b4', fontSize: '8px' }}></i>
+                                              <i className="icofont-calendar" style={{ color: '#36a2eb', fontSize: '8px' }}></i>
                                             </div>
                                             <div>
                                               <div style={{
@@ -2223,7 +2233,7 @@ const Project = () => {
                                         }}>
                                           <span style={{
                                             backgroundColor: 'rgba(255, 105, 180, 0.04)',
-                                            color: '#ff69b4',
+                                            color: '#36a2eb',
                                             padding: '2px 6px',
                                             borderRadius: '3px',
                                             fontWeight: '600',
@@ -2242,13 +2252,13 @@ const Project = () => {
                                               height: '45px',
                                             overflowY: 'auto',
                                             scrollbarWidth: 'thin',
-                                            scrollbarColor: '#ff69b4 #f0f0f0',
+                                            scrollbarColor: '#36a2eb #f0f0f0',
                                             padding: '2px 6px'
                                           }}
                                         >
                                           {project.clientAssignPerson?.map((client, idx) => (
                                             <div key={idx} className="d-flex gap-1 align-items-center" title={client.clientName}>
-                                              <i className="icofont-business-man" style={{ color: '#ff69b4', fontSize: '10px' }}></i>
+                                              <i className="icofont-business-man" style={{ color: '#36a2eb', fontSize: '10px' }}></i>
                                               <span style={{ 
                                                   maxWidth: '100px',
                                                 color: '#444',
@@ -2311,7 +2321,7 @@ const Project = () => {
                                           title="Delete"
                                           style={{
                                             backgroundColor: 'rgba(255, 105, 180, 0.08)',
-                                            color: '#ff69b4',
+                                            color: '#36a2eb',
                                             width: '32px',
                                             height: '32px',
                                             borderRadius: '12px',
@@ -2367,7 +2377,7 @@ const Project = () => {
                                               position: 'absolute',
                                               top: '-5px',
                                               right: '-5px',
-                                              backgroundColor: '#ff69b4',
+                                              backgroundColor: '#36a2eb',
                                               color: 'white',
                                               borderRadius: '50%',
                                               width: '18px',
@@ -2537,7 +2547,7 @@ const Project = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-file-image" style={{ color: '#fc6db2' }}></i>
+                          <i className="icofont-file-image" style={{ color: '#36a2eb' }}></i>
                           Project Images
                       </label>
                       <input
@@ -2571,7 +2581,7 @@ const Project = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-image" style={{ color: '#fc6db2' }}></i>
+                          <i className="icofont-image" style={{ color: '#36a2eb' }}></i>
                         Project Icon
                       </label>
                       <input
@@ -2613,7 +2623,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-calendar" style={{ color: '#fc6db2' }}></i>
+                              <i className="icofont-calendar" style={{ color: '#36a2eb' }}></i>
                               Start Date <span className="text-danger">*</span>
                             </label>
                             <input
@@ -2716,7 +2726,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-Client" style={{ color: '#fc6db2' }}></i>
+                              <i className="icofont-Client" style={{ color: '#36a2eb' }}></i>
                               Project Client
                             </label>
                             <div style={{
@@ -2787,7 +2797,7 @@ const Project = () => {
                           gap: '5px'
                         }}
                       >
-                        <i className="icofont-paint" style={{ color: '#fc6db2' }}></i>
+                        <i className="icofont-paint" style={{ color: '#36a2eb' }}></i>
                         Card Color
                       </label>
                       <div className="d-flex align-items-center gap-2" style={{
@@ -2842,7 +2852,7 @@ const Project = () => {
                       data-bs-dismiss="modal"
                       style={{
                         backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                        color: '#fc6db2',
+                        color: '#36a2eb',
                         border: '1px solid rgba(255, 94, 0, 0.3)',
                         borderRadius: '8px',
                         padding: '8px 20px',
@@ -2929,7 +2939,7 @@ const Project = () => {
                   overflow: 'hidden'
                 }}>
                   <div className="modal-header" style={{
-                    background: 'linear-gradient(135deg, #fc6db2)',
+                    background: 'linear-gradient(135deg, #36a2eb)',
                     borderBottom: 'none',
                     padding: '20px 25px',
                     position: 'relative'
@@ -3065,7 +3075,7 @@ const Project = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-file-image" style={{ color: '#fc6db2' }}></i>
+                          <i className="icofont-file-image" style={{ color: '#36a2eb' }}></i>
                           Project Images
                       </label>
                       <input
@@ -3100,7 +3110,7 @@ const Project = () => {
                             gap: '5px'
                           }}
                         >
-                          <i className="icofont-image" style={{ color: '#fc6db2' }}></i>
+                          <i className="icofont-image" style={{ color: '#36a2eb' }}></i>
                           Project Icon
                         </label>
                         {projectFormData.projectIcon && (
@@ -3159,7 +3169,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-calendar" style={{ color: '#fc6db2' }}></i>
+                              <i className="icofont-calendar" style={{ color: '#36a2eb' }}></i>
                               Start Date
                             </label>
                             <input
@@ -3261,7 +3271,7 @@ const Project = () => {
                                 gap: '5px'
                               }}
                             >
-                              <i className="icofont-Client" style={{ color: '#fc6db2' }}></i>
+                              <i className="icofont-Client" style={{ color: '#36a2eb' }}></i>
                               Project Client
                             </label>
                             <div style={{
@@ -3329,7 +3339,7 @@ const Project = () => {
                           gap: '5px'
                         }}
                       >
-                        <i className="icofont-paint" style={{ color: '#fc6db2' }}></i>
+                        <i className="icofont-paint" style={{ color: '#36a2eb' }}></i>
                         Card Color
                       </label>
                       <div className="d-flex align-items-center gap-2" style={{
@@ -3384,7 +3394,7 @@ const Project = () => {
                       data-bs-dismiss="modal"
                       style={{
                         backgroundColor: 'rgba(255, 94, 0, 0.1)',
-                        color: '#fc6db2',
+                        color: '#36a2eb',
                         border: '1px solid rgba(255, 94, 0, 0.3)',
                         borderRadius: '8px',
                         padding: '8px 20px',
@@ -3903,7 +3913,7 @@ const Project = () => {
                             style={{
                               backgroundColor: 'transparent',
                               border: 'none',
-                              color: '#fc6db2',
+                              color: '#36a2eb',
                               fontSize: '13px',
                               cursor: 'pointer'
                             }}
@@ -3935,7 +3945,7 @@ const Project = () => {
                   overflow: 'hidden'
                 }}>
                   <div className="modal-header" style={{
-                    background: 'linear-gradient(135deg, #fc6db2)',
+                    background: 'linear-gradient(135deg, #36a2eb)',
                     borderBottom: 'none',
                     padding: '16px 25px',
                     position: 'relative'
@@ -4215,7 +4225,7 @@ const Project = () => {
                                   onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads', '/')}`, '_blank')}
                                   style={{
                                     backgroundColor: index % 2 === 0 ? 'rgba(82, 180, 71, 0.1)' : 'rgba(255, 94, 0, 0.1)',
-                                    color: index % 2 === 0 ? '#1e40af' : '#fc6db2',
+                                    color: index % 2 === 0 ? '#1e40af' : '#36a2eb',
                                     border: 'none',
                                     borderRadius: '8px',
                                     padding: '8px 15px',
@@ -4280,7 +4290,7 @@ const Project = () => {
                       className="btn"
                       data-bs-dismiss="modal"
                       style={{
-                        background: 'linear-gradient(135deg, #fc6db2)',
+                        background: 'linear-gradient(135deg, #36a2eb)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -4405,7 +4415,7 @@ const Project = () => {
                             padding: '8px 14px',
                             fontWeight: '600',
                             background: currentPage === page ? 
-                              'linear-gradient(135deg, #fc6db2)' : 'white',
+                              'linear-gradient(135deg, #36a2eb)' : 'white',
                             boxShadow: currentPage === page ? 
                               '0 2px 5px rgba(255, 94, 0, 0.3)' : 'none',
                             transition: 'all 0.2s ease',
