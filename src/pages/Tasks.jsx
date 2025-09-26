@@ -888,52 +888,42 @@ const Tasks = () => {
                 </div>{" "}
                 <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3 mb-3 gap-3">
                   <div>
-                    <div className="d-flex">
-                      {viewMode === 'row' ? (
-                        <button
-                          className="btn"
-                          onClick={() => setViewMode('list')}
-                          title="Switch to List View"
-                          style={{
-                            backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                            color: '#36a2eb',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '8px 12px',
-                            transition: 'all 0.2s ease'
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
-                          }}
-                        >
-                          <i className="bi bi-list-task"></i>
-                        </button>
-                      ) : (
-                        <button
-                          className="btn"
-                          onClick={() => setViewMode('row')}
-                          title="Switch to Grid View"
-                          style={{
-                            backgroundColor: 'rgba(82, 180, 71, 0.1)',
-                            color: '#36a2eb',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '8px 12px',
-                            transition: 'all 0.2s ease'
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
-                          }}
-                        >
-                          <i className="bi bi-grid-3x3-gap-fill"></i>
-                        </button>
-                      )}
+                    <div className="input-group" style={{
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                      borderRadius: '8px',
+                      overflow: 'hidden'
+                    }}>
+                      <input
+                        type="search"
+                        className="form-control"
+                        aria-label="search"
+                        aria-describedby="addon-wrapping"
+                        placeholder="Search tasks..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        style={{
+                          border: '1px solid rgba(82, 180, 71, 0.2)',
+                          borderRight: 'none',
+                          padding: '10px 15px',
+                          fontSize: '14px',
+                          color: '#333',
+                          minWidth: '220px'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="input-group-text"
+                        id="addon-wrapping"
+                        style={{
+                          backgroundColor: '#36a2eb',
+                          border: 'none',
+                          color: 'white',
+                          padding: '0 15px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <i className="icofont-search" />
+                      </button>
                     </div>
                   </div>
 
@@ -998,45 +988,58 @@ const Tasks = () => {
                     </div>
                   )}
 
+
+
                   <div>
-                    <div className="input-group" style={{
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                      borderRadius: '8px',
-                      overflow: 'hidden'
-                    }}>
-                      <input
-                        type="search"
-                        className="form-control"
-                        aria-label="search"
-                        aria-describedby="addon-wrapping"
-                        placeholder="Search tasks..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{
-                          border: '1px solid rgba(82, 180, 71, 0.2)',
-                          borderRight: 'none',
-                          padding: '10px 15px',
-                          fontSize: '14px',
-                          color: '#333',
-                          minWidth: '220px'
-                        }}
-                      />
-                      <button
-                        type="button"
-                        className="input-group-text"
-                        id="addon-wrapping"
-                        style={{
-                          backgroundColor: '#36a2eb',
-                          border: 'none',
-                          color: 'white',
-                          padding: '0 15px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <i className="icofont-search" />
-                      </button>
+                    <div className="d-flex">
+                      {viewMode === 'row' ? (
+                        <button
+                          className="btn"
+                          onClick={() => setViewMode('list')}
+                          title="Switch to List View"
+                          style={{
+                            backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                            color: '#36a2eb',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '8px 12px',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                          }}
+                        >
+                          <i className="bi bi-list-task"></i>
+                        </button>
+                      ) : (
+                        <button
+                          className="btn"
+                          onClick={() => setViewMode('row')}
+                          title="Switch to Grid View"
+                          style={{
+                            backgroundColor: 'rgba(82, 180, 71, 0.1)',
+                            color: '#36a2eb',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '8px 12px',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.2)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
+                          }}
+                        >
+                          <i className="bi bi-grid-3x3-gap-fill"></i>
+                        </button>
+                      )}
                     </div>
                   </div>
+
                 </div>
 
                 {loading ? (
@@ -1069,62 +1072,62 @@ const Tasks = () => {
                                 <thead>
                                   <tr style={{ background: '#f8f9fa' }}>
                                     <th style={{
-                                      padding: '16px 15px',
+                                      padding: '10px 12px',
                                       fontWeight: '600',
                                       color: '#444',
                                       borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
                                       textAlign: 'center',
-                                      fontSize: '14px'
+                                      fontSize: '12px'
                                     }}>SrNo.</th>
                                     <th style={{
-                                      padding: '16px 15px',
+                                      padding: '10px 12px',
                                       fontWeight: '600',
                                       color: '#444',
                                       borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                      fontSize: '14px'
+                                      fontSize: '12px'
                                     }}>Project name</th>
                                     <th style={{
-                                      padding: '16px 15px',
+                                      padding: '10px 12px',
                                       fontWeight: '600',
                                       color: '#444',
                                       borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                      fontSize: '14px'
+                                      fontSize: '12px'
                                     }}>Task name</th>
                                     <th style={{
-                                      padding: '16px 15px',
+                                      padding: '10px 12px',
                                       fontWeight: '600',
                                       color: '#444',
                                       borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                      fontSize: '14px'
+                                      fontSize: '12px'
                                     }}>Assignee</th>
                                     <th style={{
-                                      padding: '16px 15px',
+                                      padding: '10px 12px',
                                       fontWeight: '600',
                                       color: '#444',
                                       borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                      fontSize: '14px'
+                                      fontSize: '12px'
                                     }}>Due Date</th>
                                     <th style={{
-                                      padding: '16px 15px',
+                                      padding: '10px 12px',
                                       fontWeight: '600',
                                       color: '#444',
                                       borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                      fontSize: '14px'
+                                      fontSize: '12px'
                                     }}>Priority</th>
                                     <th style={{
-                                      padding: '16px 15px',
+                                      padding: '10px 12px',
                                       fontWeight: '600',
                                       color: '#444',
                                       borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
                                       textAlign: 'center',
-                                      fontSize: '14px'
+                                      fontSize: '12px'
                                     }}>Actions</th>
                                     <th style={{
-                                      padding: '16px 15px',
+                                      padding: '10px 12px',
                                       fontWeight: '600',
                                       color: '#444',
                                       borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
-                                      fontSize: '14px'
+                                      fontSize: '12px'
                                     }}>Status</th>
                                   </tr>
                                 </thead>
@@ -1145,7 +1148,7 @@ const Tasks = () => {
                                         onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                                       >
                                         <td style={{
-                                          padding: '16px 15px',
+                                          padding: '10px 12px',
                                           borderBottom: '1px solid rgba(0,0,0,0.05)',
                                           textAlign: 'center'
                                         }}>
@@ -1153,20 +1156,20 @@ const Tasks = () => {
                                             background: 'linear-gradient(135deg, #4169e1, #1e40af)',
                                             color: 'white',
                                             borderRadius: '50%',
-                                            width: '30px',
-                                            height: '30px',
+                                            width: '24px',
+                                            height: '24px',
                                             display: 'inline-flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             fontWeight: '600',
-                                            fontSize: '14px',
+                                            fontSize: '12px',
                                             boxShadow: '0 2px 5px rgba(255, 138, 0, 0.3)'
                                           }}>
                                             {index + 1}
                                           </span>
                                         </td>
                                         <td style={{
-                                          padding: '16px 15px',
+                                          padding: '10px 12px',
                                           borderBottom: '1px solid rgba(0,0,0,0.05)'
                                         }}>
                                           <div className="d-flex gap-2 align-items-center">
@@ -1174,12 +1177,12 @@ const Tasks = () => {
                                               <div style={{
                                                 fontWeight: '600',
                                                 color: '#333',
-                                                fontSize: '14px'
+                                                fontSize: '12px'
                                               }}>
                                                 {task.projectName}
                                               </div>
                                               <div className="mt-1" style={{
-                                                fontSize: '12px',
+                                                fontSize: '10px',
                                                 color: '#777'
                                               }}>
                                                 <i className="bi-calendar3 me-1" style={{ color: '#36a2eb' }}></i>
@@ -1215,7 +1218,7 @@ const Tasks = () => {
                                           </div>
                                         </td>
                                         <td style={{
-                                          padding: '16px 15px',
+                                          padding: '10px 12px',
                                           borderBottom: '1px solid rgba(0,0,0,0.05)'
                                         }}>
                                           <div className="dropdown">
@@ -1229,15 +1232,15 @@ const Tasks = () => {
                                               <div>
                                                 <div style={{
                                                   fontWeight: '600',
-                                                  fontSize: '14px',
+                                                  fontSize: '12px',
                                                   color: '#333',
-                                                  marginBottom: '3px'
+                                                  marginBottom: '2px'
                                                 }}>
                                                   {task.taskTitle || 'Untitled Task'}
                                                 </div>
 
                                                 <div style={{
-                                                  fontSize: '13px',
+                                                  fontSize: '10px',
                                                   color: '#666',
                                                   display: '-webkit-box',
                                                   WebkitLineClamp: '2',
@@ -1251,9 +1254,9 @@ const Tasks = () => {
 
                                               <div style={{
                                                 color: '#36a2eb',
-                                                marginLeft: '10px'
+                                                marginLeft: '8px'
                                               }}>
-                                                <i className="bi-pencil"></i>
+                                                <i className="bi-pencil" style={{ fontSize: '12px' }}></i>
                                               </div>
                                             </div>
 
@@ -1361,7 +1364,7 @@ const Tasks = () => {
                                           )}
                                         </td>
                                         <td style={{
-                                          padding: '16px 15px',
+                                          padding: '10px 12px',
                                           borderBottom: '1px solid rgba(0,0,0,0.05)'
                                         }}>
                                           <div>
@@ -1371,28 +1374,28 @@ const Tasks = () => {
                                                   <div style={{
                                                     backgroundColor: 'rgba(82, 180, 71, 0.1)',
                                                     color: '#36a2eb',
-                                                    width: '30px',
-                                                    height: '30px',
+                                                    width: '24px',
+                                                    height: '24px',
                                                     borderRadius: '50%',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
-                                                    marginRight: '8px'
+                                                    marginRight: '6px'
                                                   }}>
-                                                    <i className="bi-person"></i>
+                                                    <i className="bi-person" style={{ fontSize: '12px' }}></i>
                                                   </div>
                                                   <div>
                                                     <div style={{
-                                                      fontSize: '14px',
+                                                      fontSize: '12px',
                                                       fontWeight: '600',
                                                       color: '#333'
                                                     }}>{task.taskAssignPerson.employeeName}</div>
                                                     <span style={{
                                                       backgroundColor: 'rgba(13, 202, 240, 0.1)',
                                                       color: '#0dcaf0',
-                                                      fontSize: '11px',
-                                                      padding: '2px 6px',
-                                                      borderRadius: '4px',
+                                                      fontSize: '9px',
+                                                      padding: '1px 4px',
+                                                      borderRadius: '3px',
                                                       fontWeight: '600'
                                                     }}>Employee</span>
                                                   </div>
@@ -1404,28 +1407,28 @@ const Tasks = () => {
                                                   <div style={{
                                                     backgroundColor: 'rgba(255, 138, 0, 0.1)',
                                                     color: '#4169e1',
-                                                    width: '30px',
-                                                    height: '30px',
+                                                    width: '24px',
+                                                    height: '24px',
                                                     borderRadius: '50%',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
-                                                    marginRight: '8px'
+                                                    marginRight: '6px'
                                                   }}>
-                                                    <i className="bi-people"></i>
+                                                    <i className="bi-people" style={{ fontSize: '12px' }}></i>
                                                   </div>
                                                   <div>
                                                     <div style={{
-                                                      fontSize: '14px',
+                                                      fontSize: '12px',
                                                       fontWeight: '600',
                                                       color: '#333'
                                                     }}>{task.clientAssignPerson.clientName}</div>
                                                     <span style={{
                                                       backgroundColor: 'rgba(255, 193, 7, 0.1)',
                                                       color: '#ffc107',
-                                                      fontSize: '11px',
-                                                      padding: '2px 6px',
-                                                      borderRadius: '4px',
+                                                      fontSize: '9px',
+                                                      padding: '1px 4px',
+                                                      borderRadius: '3px',
                                                       fontWeight: '600'
                                                     }}>Client Member</span>
                                                   </div>
@@ -1435,27 +1438,27 @@ const Tasks = () => {
                                               <span style={{
                                                 color: '#999',
                                                 fontStyle: 'italic',
-                                                fontSize: '13px'
+                                                fontSize: '11px'
                                               }}>Unassigned</span>
                                             )}
-                                            <div className="mt-2" style={{
-                                              fontSize: '12px',
+                                            <div className="mt-1" style={{
+                                              fontSize: '10px',
                                               color: '#777'
                                             }}>
-                                              <i className="bi-person-check me-1" style={{ color: '#36a2eb' }}></i>
+                                              <i className="bi-person-check me-1" style={{ color: '#36a2eb', fontSize: '10px' }}></i>
                                               By: {task.assignedBy}
                                             </div>
                                           </div>
                                         </td>
                                         <td style={{
-                                          padding: '16px 15px',
+                                          padding: '10px 12px',
                                           borderBottom: '1px solid rgba(0,0,0,0.05)'
                                         }}>
                                           <div style={{
                                             backgroundColor: isOverdue ? 'rgba(220, 53, 69, 0.1)' : 'rgba(82, 180, 71, 0.1)',
-                                            padding: '8px 12px',
-                                            borderRadius: '6px',
-                                            marginBottom: '5px'
+                                            padding: '6px 8px',
+                                            borderRadius: '4px',
+                                            marginBottom: '3px'
                                           }}>
                                             <input
                                               type="date"
@@ -1465,7 +1468,7 @@ const Tasks = () => {
                                               onChange={(e) => taskHandleChange(e, task._id)}
                                               style={{
                                                 width: '100%',
-                                                fontSize: '13px',
+                                                fontSize: '11px',
                                                 backgroundColor: 'transparent',
                                                 border: 'none',
                                                 color: isOverdue ? '#dc3545' : '#36a2eb',
@@ -1476,7 +1479,7 @@ const Tasks = () => {
                                           </div>
                                         </td>
                                         <td style={{
-                                          padding: '16px 15px',
+                                          padding: '10px 12px',
                                           borderBottom: '1px solid rgba(0,0,0,0.05)'
                                         }}>
                                           <select
@@ -1487,7 +1490,7 @@ const Tasks = () => {
                                             onChange={(e) => taskHandleChange(e, task._id)}
                                             style={{
                                               width: '170%',
-                                              fontSize: '13px',
+                                              fontSize: '11px',
                                               backgroundColor:
                                                 task.taskPriority === 'Highest' ? 'rgba(220, 53, 69, 0.1)' :
                                                   task.taskPriority === 'Medium' ? 'rgba(255, 193, 7, 0.1)' :
@@ -1499,8 +1502,8 @@ const Tasks = () => {
                                                     task.taskPriority === 'Lowest' ? '#36a2eb' :
                                                       '#666',
                                               border: 'none',
-                                              borderRadius: '6px',
-                                              padding: '8px 12px',
+                                              borderRadius: '4px',
+                                              padding: '5px 8px',
                                               fontWeight: '600'
                                             }}
                                           >
@@ -1511,19 +1514,19 @@ const Tasks = () => {
                                           </select>
                                         </td>
                                         <td style={{
-                                          padding: '16px 15px',
+                                          padding: '10px 12px',
                                           borderBottom: '1px solid rgba(0,0,0,0.05)',
                                           textAlign: 'center'
                                         }}>
-                                          <div className="d-flex gap-2 justify-content-center">
+                                          <div className="d-flex gap-1 justify-content-center">
                                             <button
                                               onClick={() => taskHandleSubmit(task._id)}
                                               title="Update Task"
                                               style={{
                                                 backgroundColor: 'rgba(82, 180, 71, 0.1)',
                                                 color: '#36a2eb',
-                                                width: '32px',
-                                                height: '32px',
+                                                width: '28px',
+                                                height: '28px',
                                                 borderRadius: '50%',
                                                 padding: '0',
                                                 display: 'flex',
@@ -1539,7 +1542,7 @@ const Tasks = () => {
                                                 e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
                                               }}
                                             >
-                                              <i className="bi-check2"></i>
+                                              <i className="bi-check2" style={{ fontSize: '14px' }}></i>
                                             </button>
                                             <button
                                               data-bs-toggle="modal"
@@ -1549,8 +1552,8 @@ const Tasks = () => {
                                               style={{
                                                 backgroundColor: 'rgba(255, 94, 0, 0.1)',
                                                 color: '#1e40af',
-                                                width: '32px',
-                                                height: '32px',
+                                                width: '28px',
+                                                height: '28px',
                                                 borderRadius: '50%',
                                                 padding: '0',
                                                 display: 'flex',
@@ -1566,22 +1569,22 @@ const Tasks = () => {
                                                 e.currentTarget.style.backgroundColor = 'rgba(255, 94, 0, 0.1)';
                                               }}
                                             >
-                                              <i className="bi-trash"></i>
+                                              <i className="bi-trash" style={{ fontSize: '14px' }}></i>
                                             </button>
                                           </div>
                                         </td>
                                         <td style={{
-                                          padding: '16px 15px',
+                                          padding: '10px 12px',
                                           borderBottom: '1px solid rgba(0,0,0,0.05)'
                                         }}>
-                                          <div className="d-flex align-items-center gap-2">
+                                          <div className="d-flex align-items-center gap-1">
                                             {task.taskStatus === 'Not Started' && (
                                               <div style={{
                                                 backgroundColor: 'rgba(255, 193, 7, 0.1)',
                                                 color: '#ffc107',
-                                                padding: '5px 10px',
-                                                borderRadius: '6px',
-                                                fontSize: '12px',
+                                                padding: '3px 6px',
+                                                borderRadius: '4px',
+                                                fontSize: '10px',
                                                 fontWeight: '600'
                                               }}>Not Started</div>
                                             )}
@@ -1589,9 +1592,9 @@ const Tasks = () => {
                                               <div style={{
                                                 backgroundColor: 'rgba(13, 202, 240, 0.1)',
                                                 color: '#0dcaf0',
-                                                padding: '5px 10px',
-                                                borderRadius: '6px',
-                                                fontSize: '12px',
+                                                padding: '3px 6px',
+                                                borderRadius: '4px',
+                                                fontSize: '10px',
                                                 fontWeight: '600'
                                               }}>In Progress</div>
                                             )}
@@ -1599,9 +1602,9 @@ const Tasks = () => {
                                               <div style={{
                                                 backgroundColor: 'rgba(82, 180, 71, 0.1)',
                                                 color: '#36a2eb',
-                                                padding: '5px 10px',
-                                                borderRadius: '6px',
-                                                fontSize: '12px',
+                                                padding: '3px 6px',
+                                                borderRadius: '4px',
+                                                fontSize: '10px',
                                                 fontWeight: '600'
                                               }}>Completed</div>
                                             )}
@@ -1614,8 +1617,8 @@ const Tasks = () => {
                                               style={{
                                                 backgroundColor: 'rgba(82, 180, 71, 0.1)',
                                                 color: '#36a2eb',
-                                                width: '32px',
-                                                height: '32px',
+                                                width: '28px',
+                                                height: '28px',
                                                 borderRadius: '50%',
                                                 padding: '0',
                                                 display: 'flex',
@@ -1631,7 +1634,7 @@ const Tasks = () => {
                                                 e.currentTarget.style.backgroundColor = 'rgba(82, 180, 71, 0.1)';
                                               }}
                                             >
-                                              <i className="bi-chat-left-dots"></i>
+                                              <i className="bi-chat-left-dots" style={{ fontSize: '14px' }}></i>
                                               {notifications[task._id] > 0 && (
                                                 <span style={{
                                                   position: 'absolute',
@@ -1640,9 +1643,9 @@ const Tasks = () => {
                                                   backgroundColor: '#1e40af',
                                                   color: 'white',
                                                   borderRadius: '50%',
-                                                  width: '18px',
-                                                  height: '18px',
-                                                  fontSize: '10px',
+                                                  width: '16px',
+                                                  height: '16px',
+                                                  fontSize: '9px',
                                                   display: 'flex',
                                                   alignItems: 'center',
                                                   justifyContent: 'center',

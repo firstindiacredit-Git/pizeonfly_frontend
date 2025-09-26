@@ -14,10 +14,30 @@ const SaasManager = () => {
                     <Header />
 
                     <div className="body d-flex py-lg-3 py-md-2 flex-column">
-                        <h4 className="mb-0 fw-bold">Saas Manager</h4>
-                        
+                        <div className="border-bottom" style={{ marginLeft: "20px" }}>
+                            <h3 className="flex-fill mb-3" style={{
+                                fontWeight: '700',
+                                color: '#333',
+                                fontSize: '24px',
+                                position: 'relative',
+                                paddingLeft: '15px'
+                            }}>
+                                <span style={{
+                                    position: 'absolute',
+                                    left: '0',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    width: '5px',
+                                    height: '24px',
+                                    background: 'linear-gradient(to bottom, #4169e1, #1e40af)',
+                                    borderRadius: '3px'
+                                }}></span>
+                                Saas Manager
+                            </h3>
+                        </div>
+
                         <div className="flex-grow-1 mt-3" style={{ minHeight: "80vh", overflow: "hidden" }}>
-                            <iframe 
+                            <iframe
                                 src="https://pizeonflytools.vercel.app/"
                                 style={{
                                     width: "100%",

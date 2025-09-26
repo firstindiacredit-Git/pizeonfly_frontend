@@ -831,7 +831,7 @@ const Project = () => {
   const getProjectColor = (name) => {
     if (!name) return '#1e40af';
     const colors = [
-      '#1e40af', '#ff8a00', '#36a2eb', '#007bff', '#6f42c1', 
+      '#1e40af', '#ff8a00', '#36a2eb', '#007bff', '#6f42c1',
       '#e83e8c', '#fd7e14', '#20c997', '#17a2b8', '#6c757d'
     ];
     const hash = name.split('').reduce((a, b) => {
@@ -1018,7 +1018,7 @@ const Project = () => {
                                 display: 'inline-block'
                               }}
                             >
-                              <i className={`icofont-spinner-alt-3 me-1 ${activeTab === "In Progress" ? 'text-white' : 'text-warning'}`} 
+                              <i className={`icofont-spinner-alt-3 me-1 ${activeTab === "In Progress" ? 'text-white' : 'text-warning'}`}
                                 style={{ fontSize: '14px' }}></i>
                               In Progress
                             </a>
@@ -1051,74 +1051,6 @@ const Project = () => {
                       </div>
                     </div>
                     <div className="d-flex justify-content-between mt-3 mb-3">
-                      <div>
-                        <div className="d-flex">
-                          {viewMode === 'row' ? (
-                            <button
-                              className="btn btn-outline-primary"
-                              onClick={() => setViewMode('list')}
-                              title="Switch to List View"
-                            >
-                              <i className="bi bi-list-task"></i>
-                            </button>
-                          ) : (
-                            <button
-                              className="btn btn-outline-primary"
-                              onClick={() => setViewMode('row')}
-                              title="Switch to Grid View"
-                            >
-                              <i className="bi bi-grid-3x3-gap-fill"></i>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      {filteredEmployeeName && (
-                        <div className="d-flex align-items-center mb-3 mb-md-0 mx-auto">
-                          <div style={{
-                            backgroundColor: 'rgba(65, 105, 225, 0.1)',
-                            padding: '8px 15px',
-                            borderRadius: '8px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px'
-                          }}>
-                            <i className="icofont-filter" style={{ color: '#4169e1', fontSize: '16px' }}></i>
-                            <span style={{ 
-                              fontWeight: '600', 
-                              color: '#333',
-                              fontSize: '14px'
-                            }}>Projects for: <span style={{ color: '#4169e1' }}>{filteredEmployeeName}</span></span>
-                          <button
-                            type="button"
-                              className="btn"
-                            onClick={clearFilter}
-                              style={{
-                                backgroundColor: '#4169e1',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                padding: '4px 12px',
-                                fontSize: '12px',
-                                fontWeight: '600',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '5px',
-                                transition: 'all 0.2s ease'
-                              }}
-                              onMouseOver={(e) => {
-                                e.currentTarget.style.backgroundColor = '#1e40af';
-                              }}
-                              onMouseOut={(e) => {
-                                e.currentTarget.style.backgroundColor = '#4169e1';
-                              }}
-                            >
-                              <i className="icofont-close-line"></i>
-                              Clear
-                          </button>
-                          </div>
-                        </div>
-                      )}
 
                       <div className="order-0 mb-3 mb-md-0">
                         <div className="input-group" style={{
@@ -1159,6 +1091,78 @@ const Project = () => {
                           </button>
                         </div>
                       </div>
+
+
+
+                      {filteredEmployeeName && (
+                        <div className="d-flex align-items-center mb-3 mb-md-0 mx-auto">
+                          <div style={{
+                            backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                            padding: '8px 15px',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px'
+                          }}>
+                            <i className="icofont-filter" style={{ color: '#4169e1', fontSize: '16px' }}></i>
+                            <span style={{
+                              fontWeight: '600',
+                              color: '#333',
+                              fontSize: '14px'
+                            }}>Projects for: <span style={{ color: '#4169e1' }}>{filteredEmployeeName}</span></span>
+                            <button
+                              type="button"
+                              className="btn"
+                              onClick={clearFilter}
+                              style={{
+                                backgroundColor: '#4169e1',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '4px 12px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                transition: 'all 0.2s ease'
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.backgroundColor = '#1e40af';
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.backgroundColor = '#4169e1';
+                              }}
+                            >
+                              <i className="icofont-close-line"></i>
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div>
+                        <div className="d-flex">
+                          {viewMode === 'row' ? (
+                            <button
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewMode('list')}
+                              title="Switch to List View"
+                            >
+                              <i className="bi bi-list-task"></i>
+                            </button>
+                          ) : (
+                            <button
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewMode('row')}
+                              title="Switch to Grid View"
+                            >
+                              <i className="bi bi-grid-3x3-gap-fill"></i>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 </div>{" "}
@@ -1181,7 +1185,7 @@ const Project = () => {
                         }}>
                           <div className="card-body" style={{ padding: '0' }}>
                             {/* Desktop view - with blue and pink theme */}
-                            <table className="table align-middle mb-0 d-none d-md-table" style={{ 
+                            <table className="table align-middle mb-0 d-none d-md-table" style={{
                               width: "100%",
                               borderCollapse: 'separate',
                               borderSpacing: '0'
@@ -1304,9 +1308,9 @@ const Project = () => {
                                         borderBottom: '1px solid rgba(0,0,0,0.05)',
                                         textAlign: 'center'
                                       }}>
-                                        <span style={{ 
+                                        <span style={{
                                           background: 'linear-gradient(135deg, #4169e1, #1e40af)',
-                                          color: 'white', 
+                                          color: 'white',
                                           borderRadius: '50%',
                                           width: '30px',
                                           height: '30px',
@@ -1377,13 +1381,13 @@ const Project = () => {
                                                 textDecoration: 'none',
                                                 transition: 'color 0.2s ease',
                                                 fontSize: '15px'
-                                              }} 
-                                              state={{ projectName: project.projectName }}
-                                              onMouseOver={(e) => e.currentTarget.style.color = '#4169e1'}
-                                              onMouseOut={(e) => e.currentTarget.style.color = '#333'}>
-                                              {project.projectName}
-                                            </Link>
-                                              <div className="mt-1" style={{ 
+                                              }}
+                                                state={{ projectName: project.projectName }}
+                                                onMouseOver={(e) => e.currentTarget.style.color = '#4169e1'}
+                                                onMouseOut={(e) => e.currentTarget.style.color = '#333'}>
+                                                {project.projectName}
+                                              </Link>
+                                              <div className="mt-1" style={{
                                                 fontSize: '12px',
                                                 color: '#777'
                                               }}>
@@ -1420,7 +1424,7 @@ const Project = () => {
                                               <i className="icofont-attachment" style={{ fontSize: '14px' }} />
                                             </button>
                                           )}
-                                          </div>
+                                        </div>
                                       </td>
                                       <td style={{
                                         padding: '16px 15px',
@@ -1428,10 +1432,10 @@ const Project = () => {
                                       }}>
                                         {project.clientAssignPerson?.length > 0 ? (
                                           <div className="dropdown">
-                                            <button 
-                                              className="btn dropdown-toggle" 
-                                              type="button" 
-                                              data-bs-toggle="dropdown" 
+                                            <button
+                                              className="btn dropdown-toggle"
+                                              type="button"
+                                              data-bs-toggle="dropdown"
                                               aria-expanded="false"
                                               style={{
                                                 backgroundColor: 'rgba(255, 105, 180, 0.1)',
@@ -1447,7 +1451,7 @@ const Project = () => {
                                               }}
                                             >
                                               <i className="icofont-Client me-1"></i>
-                                               ({project.clientAssignPerson.length})
+                                              ({project.clientAssignPerson.length})
                                             </button>
                                             <ul className="dropdown-menu" style={{
                                               padding: '10px',
@@ -1470,21 +1474,21 @@ const Project = () => {
                                                 }}>
                                                   <i className="icofont-people me-2"></i>
                                                   Client Members
-                                        </div>
+                                                </div>
                                               </li>
                                               {project.clientAssignPerson?.map((client, idx) => (
                                                 <li key={idx} style={{ marginBottom: '8px' }}>
                                                   <div className="d-flex align-items-center">
-                                                    <i className="icofont-business-man" style={{ 
-                                                      color: '#36a2eb', 
+                                                    <i className="icofont-business-man" style={{
+                                                      color: '#36a2eb',
                                                       fontSize: '14px',
                                                       marginRight: '8px'
                                                     }}></i>
-                                                    <span style={{ 
+                                                    <span style={{
                                                       fontSize: '13px',
                                                       color: '#444'
                                                     }}>{client.clientName}</span>
-                                        </div>
+                                                  </div>
                                                 </li>
                                               ))}
                                             </ul>
@@ -1511,7 +1515,7 @@ const Project = () => {
                                           display: 'inline-block'
                                         }}>
                                           <i className="icofont-calendar me-1"></i>
-                                        {getFormattedDate(project.projectStartDate)}
+                                          {getFormattedDate(project.projectStartDate)}
                                         </div>
                                       </td>
                                       <td style={{
@@ -1528,7 +1532,7 @@ const Project = () => {
                                           display: 'inline-block'
                                         }}>
                                           <i className="icofont-calendar me-1"></i>
-                                        {getFormattedDate(project.projectEndDate)}
+                                          {getFormattedDate(project.projectEndDate)}
                                         </div>
                                       </td>
                                       <td style={{
@@ -1537,10 +1541,10 @@ const Project = () => {
                                       }}>
                                         {project.taskAssignPerson.length > 0 ? (
                                           <div className="dropdown">
-                                            <button 
-                                              className="btn dropdown-toggle" 
-                                              type="button" 
-                                              data-bs-toggle="dropdown" 
+                                            <button
+                                              className="btn dropdown-toggle"
+                                              type="button"
+                                              data-bs-toggle="dropdown"
                                               aria-expanded="false"
                                               style={{
                                                 backgroundColor: 'rgba(65, 105, 225, 0.1)',
@@ -1584,12 +1588,12 @@ const Project = () => {
                                               {project.taskAssignPerson.map((member, idx) => (
                                                 <li key={idx} style={{ marginBottom: '8px' }}>
                                                   <div className="d-flex align-items-center">
-                                                    <i className="icofont-user-alt-5" style={{ 
-                                                      color: '#4169e1', 
+                                                    <i className="icofont-user-alt-5" style={{
+                                                      color: '#4169e1',
                                                       fontSize: '14px',
                                                       marginRight: '8px'
                                                     }}></i>
-                                                    <span style={{ 
+                                                    <span style={{
                                                       fontSize: '13px',
                                                       color: '#444'
                                                     }}>{member.employeeName}</span>
@@ -1612,15 +1616,15 @@ const Project = () => {
                                       }}>
                                         <div className="d-flex justify-content-center" style={{
                                           fontWeight: '600',
-                                          color: project.progress > 75 ? '#1e40af' : 
-                                                 project.progress > 50 ? '#4169e1' : 
-                                                 project.progress > 25 ? '#36a2eb' : '#dc3545',
+                                          color: project.progress > 75 ? '#1e40af' :
+                                            project.progress > 50 ? '#4169e1' :
+                                              project.progress > 25 ? '#36a2eb' : '#dc3545',
                                           marginBottom: '5px',
                                           fontSize: '14px'
                                         }}>
                                           {project.progress}%
                                         </div>
-                                        <div className="progress" style={{ 
+                                        <div className="progress" style={{
                                           height: "8px",
                                           backgroundColor: 'rgba(0,0,0,0.05)',
                                           borderRadius: '4px'
@@ -1628,7 +1632,7 @@ const Project = () => {
                                           <div
                                             className="progress-bar"
                                             role="progressbar"
-                                            style={{ 
+                                            style={{
                                               width: `${project.progress}%`,
                                               background: `linear-gradient(to right, 
                                                 ${project.progress > 75 ? '#1e40af' : '#4169e1'}, 
@@ -1649,12 +1653,12 @@ const Project = () => {
                                         textAlign: 'center'
                                       }}>
                                         <div className="d-flex gap-2 justify-content-center">
-                                        <button
+                                          <button
                                             type="button"
-                                          onClick={() => setToEdit(project._id)}
+                                            onClick={() => setToEdit(project._id)}
                                             className="btn"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#editproject"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editproject"
                                             title="Edit Project"
                                             style={{
                                               backgroundColor: 'rgba(65, 105, 225, 0.1)',
@@ -1678,11 +1682,11 @@ const Project = () => {
                                           >
                                             <i className="icofont-edit"></i>
                                           </button>
-                                        <button
+                                          <button
                                             type="button"
                                             className="btn"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#deleteproject"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteproject"
                                             title="Delete Project"
                                             style={{
                                               backgroundColor: 'rgba(255, 105, 180, 0.1)',
@@ -1697,9 +1701,9 @@ const Project = () => {
                                               border: 'none',
                                               transition: 'all 0.2s ease'
                                             }}
-                                          onClick={() => {
-                                            setDeletableId(project._id);
-                                          }}
+                                            onClick={() => {
+                                              setDeletableId(project._id);
+                                            }}
                                             onMouseOver={(e) => {
                                               e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.2)';
                                             }}
@@ -1709,11 +1713,11 @@ const Project = () => {
                                           >
                                             <i className="icofont-ui-delete"></i>
                                           </button>
-                                        <button
+                                          <button
                                             className="btn position-relative"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#addUser"
-                                          type="button"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#addUser"
+                                            type="button"
                                             title="Messages"
                                             style={{
                                               backgroundColor: 'rgba(65, 105, 225, 0.1)',
@@ -1728,7 +1732,7 @@ const Project = () => {
                                               border: 'none',
                                               transition: 'all 0.2s ease'
                                             }}
-                                          onClick={() => handleOpenMessages(project)}
+                                            onClick={() => handleOpenMessages(project)}
                                             onMouseOver={(e) => {
                                               e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)';
                                             }}
@@ -1737,7 +1741,7 @@ const Project = () => {
                                             }}
                                           >
                                             <i className="icofont-ui-message"></i>
-                                          {notifications[project._id] > 0 && (
+                                            {notifications[project._id] > 0 && (
                                               <span style={{
                                                 position: 'absolute',
                                                 top: '-5px',
@@ -1754,10 +1758,10 @@ const Project = () => {
                                                 fontWeight: 'bold',
                                                 boxShadow: '0 2px 5px rgba(255, 105, 180, 0.3)'
                                               }}>
-                                              {notifications[project._id]}
-                                            </span>
-                                          )}
-                                        </button>
+                                                {notifications[project._id]}
+                                              </span>
+                                            )}
+                                          </button>
                                         </div>
                                       </td>
                                     </tr>
@@ -1943,7 +1947,7 @@ const Project = () => {
                                     display: 'flex',
                                     flexDirection: 'column',
                                     borderRadius: '15px',
-                                    boxShadow: '0 8px 20px rgba(0,0,0,0.05)',
+                                    boxShadow: '20px 20px 20px 20px rgba(0, 0, 0, 0.06)',
                                     border: 'none',
                                     overflow: 'hidden',
                                     position: 'relative',
@@ -1951,11 +1955,11 @@ const Project = () => {
                                   }}
                                   onMouseOver={(e) => {
                                     e.currentTarget.style.transform = 'translateY(-10px)';
-                                    e.currentTarget.style.boxShadow = '0 20px 35px rgba(0,0,0,0.1)';
+                                    e.currentTarget.style.boxShadow = '20px 20px 20px 20px rgba(0, 0, 0, 0.06)';
                                   }}
                                   onMouseOut={(e) => {
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.05)';
+                                    e.currentTarget.style.boxShadow = '20px 20px 20px 20px rgba(0, 0, 0, 0.06)';
                                   }}
                                 >
                                   {/* Gradient Border Effect */}
@@ -1968,11 +1972,11 @@ const Project = () => {
                                     background: 'linear-gradient(90deg, #4169e1, #1e40af, #36a2eb)',
                                     opacity: 0.9
                                   }}></div> */}
-                                  <div className="card-body d-flex flex-column" style={{ padding: '18px' }}>
+                                  <div className="card-body d-flex flex-column" style={{ padding: '10px' }}>
                                     <div className="d-flex justify-content-between align-items-center">
-                                      <span style={{ 
+                                      <span style={{
                                         background: 'linear-gradient(135deg, #4169e1, #1e40af)',
-                                        color: 'white', 
+                                        color: 'white',
                                         borderRadius: '20px',
                                         width: '25px',
                                         height: '25px',
@@ -1981,7 +1985,7 @@ const Project = () => {
                                         justifyContent: 'center',
                                         fontWeight: '600',
                                         fontSize: '10px',
-                                        boxShadow: '0 4px 15px rgba(65, 105, 225, 0.3)',
+                                        boxShadow: '0 4px 15px rgba(68, 65, 225, 0.25)',
                                         border: '2px solid rgba(255, 255, 255, 0.8)'
                                       }}>
                                         {index + 1}
@@ -2091,14 +2095,14 @@ const Project = () => {
                                           border: '1px solid rgba(65, 105, 225, 0.15)',
                                           transition: 'all 0.3s ease'
                                         }}
-                                        onMouseOver={(e) => {
-                                          e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
-                                          e.currentTarget.style.transform = 'translateY(-2px)';
-                                        }}
-                                        onMouseOut={(e) => {
-                                          e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.04)';
-                                          e.currentTarget.style.transform = 'translateY(0)';
-                                        }}>
+                                          onMouseOver={(e) => {
+                                            e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.08)';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                          }}
+                                          onMouseOut={(e) => {
+                                            e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.04)';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                          }}>
                                           <div className="d-flex align-items-center">
                                             <div style={{
                                               width: '16px',
@@ -2138,14 +2142,14 @@ const Project = () => {
                                           border: '1px solid rgba(255, 105, 180, 0.15)',
                                           transition: 'all 0.3s ease'
                                         }}
-                                        onMouseOver={(e) => {
-                                          e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.08)';
-                                          e.currentTarget.style.transform = 'translateY(-2px)';
-                                        }}
-                                        onMouseOut={(e) => {
-                                          e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.04)';
-                                          e.currentTarget.style.transform = 'translateY(0)';
-                                        }}>
+                                          onMouseOver={(e) => {
+                                            e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.08)';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                          }}
+                                          onMouseOut={(e) => {
+                                            e.currentTarget.style.backgroundColor = 'rgba(255, 105, 180, 0.04)';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                          }}>
                                           <div className="d-flex align-items-center">
                                             <div style={{
                                               width: '16px',
@@ -2181,100 +2185,136 @@ const Project = () => {
                                       <div className="d-flex mt-2 justify-content-between">
                                         {/* Employees column */}
                                         <div style={{ flex: 1, marginRight: '30px' }}>
-                                        <div style={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          marginBottom: '6px'
-                                        }}>
-                                          <span style={{
-                                            backgroundColor: 'rgba(65, 105, 225, 0.04)',
-                                            color: '#4169e1',
-                                            padding: '2px 6px',
-                                            borderRadius: '3px',
-                                            fontWeight: '600',
-                                            fontSize: '9px',
+                                          <div style={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            border: '1px solid rgba(65, 105, 225, 0.15)'
+                                            marginBottom: '6px'
                                           }}>
-                                            <i className="icofont-users-alt-2 me-1"></i>
-                                            Employees
-                                          </span>
-                                        </div>
-                                        <div
+                                            <span style={{
+                                              backgroundColor: 'rgba(65, 105, 225, 0.04)',
+                                              color: '#4169e1',
+                                              padding: '2px 6px',
+                                              borderRadius: '3px',
+                                              fontWeight: '600',
+                                              fontSize: '9px',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              border: '1px solid rgba(65, 105, 225, 0.15)'
+                                            }}>
+                                              <i className="icofont-users-alt-2 me-1"></i>
+                                              Employees
+                                            </span>
+                                          </div>
+                                          <div
                                             className="members-list"
-                                          style={{
-                                            height: '45px',
-                                            overflowY: 'auto',
-                                            scrollbarWidth: 'thin',
-                                            scrollbarColor: '#4169e1 #f0f0f0',
-                                            padding: '2px 6px'
-                                          }}
-                                        >
-                                          {project.taskAssignPerson.map((member, idx) => (
-                                            <div key={idx} className="mb-0" style={{ color: '#444' }}>
-                                              <div className="d-flex gap-1 align-items-center">
-                                                <i className="icofont-user-alt-5" style={{ color: '#4169e1', fontSize: '10px' }}></i>
+                                            style={{
+                                              height: '45px',
+                                              overflowY: 'auto',
+                                              scrollbarWidth: 'thin',
+                                              scrollbarColor: '#4169e1 #f0f0f0',
+                                              padding: '2px 6px'
+                                            }}
+                                          >
+                                            {project.taskAssignPerson.map((member, idx) => (
+                                              <div key={idx} className="mb-0" style={{ color: '#444' }}>
+                                                <div className="d-flex gap-1 align-items-center">
+                                                  <i className="icofont-user-alt-5" style={{ color: '#4169e1', fontSize: '10px' }}></i>
                                                   <span className="text-truncate" style={{ maxWidth: '100px', fontSize: '9px' }} title={member.employeeName}>
-                                                  {member.employeeName}
-                                                </span>
+                                                    {member.employeeName}
+                                                  </span>
+                                                </div>
                                               </div>
-                                            </div>
-                                          ))}
+                                            ))}
+                                          </div>
                                         </div>
-                                      </div>
 
                                         {/* Client column */}
                                         <div style={{ flex: 1, marginLeft: '8px' }}>
-                                        <div style={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          marginBottom: '6px'
-                                        }}>
-                                          <span style={{
-                                            backgroundColor: 'rgba(255, 105, 180, 0.04)',
-                                            color: '#36a2eb',
-                                            padding: '2px 6px',
-                                            borderRadius: '3px',
-                                            fontWeight: '600',
-                                            fontSize: '9px',
+                                          <div style={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            border: '1px solid rgba(255, 105, 180, 0.15)'
+                                            marginBottom: '6px'
                                           }}>
-                                            <i className="icofont-people me-1"></i>
-                                            Client
-                                          </span>
-                                        </div>
-                                        <div
-                                          className="clients-list"
-                                          style={{
+                                            <span style={{
+                                              backgroundColor: 'rgba(255, 105, 180, 0.04)',
+                                              color: '#36a2eb',
+                                              padding: '2px 6px',
+                                              borderRadius: '3px',
+                                              fontWeight: '600',
+                                              fontSize: '9px',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              border: '1px solid rgba(255, 105, 180, 0.15)'
+                                            }}>
+                                              <i className="icofont-people me-1"></i>
+                                              Client
+                                            </span>
+                                          </div>
+                                          <div
+                                            className="clients-list"
+                                            style={{
                                               height: '45px',
-                                            overflowY: 'auto',
-                                            scrollbarWidth: 'thin',
-                                            scrollbarColor: '#36a2eb #f0f0f0',
-                                            padding: '2px 6px'
-                                          }}
-                                        >
-                                          {project.clientAssignPerson?.map((client, idx) => (
-                                            <div key={idx} className="d-flex gap-1 align-items-center" title={client.clientName}>
-                                              <i className="icofont-business-man" style={{ color: '#36a2eb', fontSize: '10px' }}></i>
-                                              <span style={{ 
+                                              overflowY: 'auto',
+                                              scrollbarWidth: 'thin',
+                                              scrollbarColor: '#36a2eb #f0f0f0',
+                                              padding: '2px 6px'
+                                            }}
+                                          >
+                                            {project.clientAssignPerson?.map((client, idx) => (
+                                              <div key={idx} className="d-flex gap-1 align-items-center" title={client.clientName}>
+                                                <i className="icofont-business-man" style={{ color: '#36a2eb', fontSize: '10px' }}></i>
+                                                <span style={{
                                                   maxWidth: '100px',
-                                                color: '#444',
-                                                fontSize: '9px'
-                                              }} className="text-truncate">
-                                              {client.clientName}
-                                              </span>
-                                            </div>
-                                          ))}
+                                                  color: '#444',
+                                                  fontSize: '9px'
+                                                }} className="text-truncate">
+                                                  {client.clientName}
+                                                </span>
+                                              </div>
+                                            ))}
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
+
+                                      {/* Progress Indicator */}
+                                      <div className="mt-3">
+                                        <div className="d-flex justify-content-center" style={{
+                                          fontWeight: '600',
+                                          color: project.progress > 75 ? '#1e40af' :
+                                            project.progress > 50 ? '#4169e1' :
+                                              project.progress > 25 ? '#36a2eb' : '#dc3545',
+                                          marginBottom: '5px',
+                                          fontSize: '12px'
+                                        }}>
+                                          Progress: {project.progress}%
+                                        </div>
+                                        <div className="progress" style={{
+                                          height: "6px",
+                                          backgroundColor: 'rgba(0,0,0,0.05)',
+                                          borderRadius: '3px'
+                                        }}>
+                                          <div
+                                            className="progress-bar"
+                                            role="progressbar"
+                                            style={{
+                                              width: `${project.progress}%`,
+                                              background: `linear-gradient(to right, 
+                                              ${project.progress > 75 ? '#1e40af' : '#4169e1'}, 
+                                              ${project.progress > 50 ? '#1e40af' : '#36a2eb'}
+                                            )`,
+                                              borderRadius: '3px',
+                                              transition: 'width 0.5s ease'
+                                            }}
+                                            aria-valuenow={project.progress}
+                                            aria-valuemin="0"
+                                            aria-valuemax="100"
+                                          ></div>
+                                        </div>
+                                      </div>
 
                                     </div>
 
-                                    <div className="d-flex justify-content-between align-items-center mt-auto pt-2" style={{ 
+                                    <div className="d-flex justify-content-between align-items-center mt-auto pt-2" style={{
                                       borderTop: '1px solid rgba(65, 105, 225, 0.1)',
                                       marginTop: '8px'
                                     }}>
@@ -2500,7 +2540,7 @@ const Project = () => {
                       />
                     </div>
                     <div className="mb-4">
-                      <label 
+                      <label
                         className="form-label"
                         style={{
                           fontWeight: '600',
@@ -2534,9 +2574,9 @@ const Project = () => {
 
                     <div className="row g-3 mb-4">
                       <div className="col-md-6">
-                      <label
-                        htmlFor="formFileMultipleone"
-                        className="form-label"
+                        <label
+                          htmlFor="formFileMultipleone"
+                          className="form-label"
                           style={{
                             fontWeight: '600',
                             color: '#444',
@@ -2549,14 +2589,14 @@ const Project = () => {
                         >
                           <i className="icofont-file-image" style={{ color: '#36a2eb' }}></i>
                           Project Images
-                      </label>
-                      <input
-                        className="form-control"
-                        type="file"
-                        id="formFileMultipleone"
-                        multiple
-                        name="projectImage"
-                        onChange={handleFileChange}
+                        </label>
+                        <input
+                          className="form-control"
+                          type="file"
+                          id="formFileMultipleone"
+                          multiple
+                          name="projectImage"
+                          onChange={handleFileChange}
                           style={{
                             borderRadius: '8px',
                             border: '1px solid rgba(255, 94, 0, 0.3)',
@@ -2565,11 +2605,11 @@ const Project = () => {
                             boxShadow: 'none',
                             backgroundColor: 'rgba(255, 94, 0, 0.03)'
                           }}
-                      />
-                    </div>
+                        />
+                      </div>
                       <div className="col-md-6">
-                        <label 
-                          htmlFor="projectIcon" 
+                        <label
+                          htmlFor="projectIcon"
                           className="form-label"
                           style={{
                             fontWeight: '600',
@@ -2582,15 +2622,15 @@ const Project = () => {
                           }}
                         >
                           <i className="icofont-image" style={{ color: '#36a2eb' }}></i>
-                        Project Icon
-                      </label>
-                      <input
-                        type="file"
-                        className="form-control"
-                        id="projectIcon"
-                        name="projectIcon"
-                        accept="image/*"
-                        onChange={handleFileChange}
+                          Project Icon
+                        </label>
+                        <input
+                          type="file"
+                          className="form-control"
+                          id="projectIcon"
+                          name="projectIcon"
+                          accept="image/*"
+                          onChange={handleFileChange}
                           style={{
                             borderRadius: '8px',
                             border: '1px solid rgba(255, 94, 0, 0.3)',
@@ -2603,9 +2643,9 @@ const Project = () => {
                         <small style={{ color: '#777', fontSize: '12px', marginTop: '5px', display: 'block' }}>
                           Upload an icon for your project (optional)
                         </small>
+                      </div>
                     </div>
-                    </div>
-                    
+
                     <div className="deadline-form">
                       <form>
                         <div className="row g-3 mb-4">
@@ -2714,7 +2754,7 @@ const Project = () => {
                         </div>
                         <div className="row g-3 mb-4">
                           <div className="col-sm-12">
-                            <label 
+                            <label
                               className="form-label"
                               style={{
                                 fontWeight: '600',
@@ -2784,8 +2824,8 @@ const Project = () => {
                       />
                     </div>
                     <div className="mb-4">
-                      <label 
-                        htmlFor="backgroundColor" 
+                      <label
+                        htmlFor="backgroundColor"
                         className="form-label"
                         style={{
                           fontWeight: '600',
@@ -2910,7 +2950,7 @@ const Project = () => {
                   </div>
                   {error && (
                     <div className="m-3 p-3" style={{
-                      backgroundColor: 'rgba(255, 94, 0, 0.1)', 
+                      backgroundColor: 'rgba(255, 94, 0, 0.1)',
                       color: '#dc3545',
                       borderRadius: '8px',
                       border: '1px solid rgba(255, 94, 0, 0.2)',
@@ -2944,10 +2984,10 @@ const Project = () => {
                     padding: '20px 25px',
                     position: 'relative'
                   }}>
-                    <h5 
-                      className="modal-title fw-bold" 
+                    <h5
+                      className="modal-title fw-bold"
                       id="editprojectLabel"
-                            style={{
+                      style={{
                         color: 'white',
                         fontSize: '18px',
                         display: 'flex',
@@ -2963,7 +3003,7 @@ const Project = () => {
                       className="btn-close"
                       data-bs-dismiss="modal"
                       aria-label="Close"
-                              style={{
+                      style={{
                         backgroundColor: 'rgba(255, 255, 255, 0.8)',
                         borderRadius: '50%',
                         padding: '8px',
@@ -2985,7 +3025,7 @@ const Project = () => {
                       <label
                         htmlFor="exampleFormControlInput78"
                         className="form-label"
-                        style={{ 
+                        style={{
                           fontWeight: '600',
                           color: '#444',
                           fontSize: '14px',
@@ -3016,7 +3056,7 @@ const Project = () => {
                       />
                     </div>
                     <div className="mb-4">
-                      <label 
+                      <label
                         className="form-label"
                         style={{
                           fontWeight: '600',
@@ -3062,9 +3102,9 @@ const Project = () => {
 
                     <div className="row g-3 mb-4">
                       <div className="col-md-6">
-                      <label
-                        htmlFor="formFileMultiple456"
-                        className="form-label"
+                        <label
+                          htmlFor="formFileMultiple456"
+                          className="form-label"
                           style={{
                             fontWeight: '600',
                             color: '#444',
@@ -3077,14 +3117,14 @@ const Project = () => {
                         >
                           <i className="icofont-file-image" style={{ color: '#36a2eb' }}></i>
                           Project Images
-                      </label>
-                      <input
-                        className="form-control"
-                        type="file"
-                        id="formFileMultiple456"
-                        name="projectImage"
-                        onChange={projectHandleChange}
-                        multiple
+                        </label>
+                        <input
+                          className="form-control"
+                          type="file"
+                          id="formFileMultiple456"
+                          name="projectImage"
+                          onChange={projectHandleChange}
+                          multiple
                           style={{
                             borderRadius: '8px',
                             border: '1px solid rgba(255, 94, 0, 0.3)',
@@ -3093,12 +3133,12 @@ const Project = () => {
                             boxShadow: 'none',
                             backgroundColor: 'rgba(255, 94, 0, 0.03)'
                           }}
-                      />
-                    </div>
+                        />
+                      </div>
 
                       <div className="col-md-6">
-                        <label 
-                          htmlFor="editProjectIcon" 
+                        <label
+                          htmlFor="editProjectIcon"
                           className="form-label"
                           style={{
                             fontWeight: '600',
@@ -3118,12 +3158,12 @@ const Project = () => {
                             <img
                               src={`${import.meta.env.VITE_BASE_URL}${projectFormData.projectIcon}`}
                               alt="Current Icon"
-                                            style={{
-                                              width: '36px',
-                                              height: '36px',
-                                              objectFit: 'cover',
+                              style={{
+                                width: '36px',
+                                height: '36px',
+                                objectFit: 'cover',
                                 borderRadius: '8px',
-                                              border: '2px solid #1e40af',
+                                border: '2px solid #1e40af',
                                 padding: '2px'
                               }}
                             />
@@ -3151,7 +3191,7 @@ const Project = () => {
                         </small>
                       </div>
                     </div>
-                    
+
                     <div className="deadline-form">
                       <form>
                         <div className="row g-3 mb-4">
@@ -3259,7 +3299,7 @@ const Project = () => {
                         </div>
                         <div className="row g-3 mb-4">
                           <div className="col-sm-12">
-                            <label 
+                            <label
                               className="form-label"
                               style={{
                                 fontWeight: '600',
@@ -3326,8 +3366,8 @@ const Project = () => {
                       />
                     </div>
                     <div className="mb-4">
-                      <label 
-                        htmlFor="editBackgroundColor" 
+                      <label
+                        htmlFor="editBackgroundColor"
                         className="form-label"
                         style={{
                           fontWeight: '600',
@@ -3383,7 +3423,7 @@ const Project = () => {
                         </button>
                       </div>
                     </div>
-                        </div>
+                  </div>
                   <div className="modal-footer" style={{
                     borderTop: '1px solid rgba(82, 180, 71, 0.1)',
                     padding: '16px 25px'
@@ -3513,11 +3553,11 @@ const Project = () => {
                     position: 'relative',
                     zIndex: 1
                   }}>
-                    <div 
+                    <div
                       className="d-flex align-items-center"
                       style={{ width: '100%' }}
                     >
-                      <div 
+                      <div
                         style={{
                           width: '40px',
                           height: '40px',
@@ -3532,50 +3572,50 @@ const Project = () => {
                         <i className="icofont-ui-message" style={{ fontSize: '20px', color: 'white' }}></i>
                       </div>
                       <div style={{ flex: 1 }}>
-                    <h5 
-                      className="modal-title" 
-                      id="addUserLabel"
-                      style={{
-                        color: 'white',
-                        fontSize: '18px',
+                        <h5
+                          className="modal-title"
+                          id="addUserLabel"
+                          style={{
+                            color: 'white',
+                            fontSize: '18px',
                             fontWeight: '600',
                             margin: 0
                           }}
                         >
-                      {selectProject.projectName}
-                    </h5>
+                          {selectProject.projectName}
+                        </h5>
                         <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
                           <i className="icofont-ui-user me-1"></i> Project Chat
                         </span>
-                  </div>
-                    <button 
-                      type="button" 
-                      className="btn-close" 
-                      data-bs-dismiss="modal" 
-                      aria-label="Close" 
-                      onClick={() => setIsChatModalOpen(false)}
-                      style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                        borderRadius: '50%',
-                        padding: '8px',
-                        opacity: '1',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
-                        e.currentTarget.style.transform = 'rotate(90deg)';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-                        e.currentTarget.style.transform = 'rotate(0deg)';
-                      }}
-                    ></button>
-                  </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                        onClick={() => setIsChatModalOpen(false)}
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                          borderRadius: '50%',
+                          padding: '8px',
+                          opacity: '1',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                          e.currentTarget.style.transform = 'rotate(90deg)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                          e.currentTarget.style.transform = 'rotate(0deg)';
+                        }}
+                      ></button>
+                    </div>
                   </div>
 
                   {/* Chat Body */}
-                  <div className="modal-body p-0" style={{ 
-                    flex: 1, 
+                  <div className="modal-body p-0" style={{
+                    flex: 1,
                     overflowY: 'auto',
                     backgroundColor: '#f5f5f5',
                     backgroundImage: 'url("data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23000000" fill-opacity="0.03" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E")',
@@ -3612,7 +3652,7 @@ const Project = () => {
                       <div className="chat-messages">
                         {messages.map((message, index) => {
                           const isCurrentUser = message.senderId === "currentUser"; // Replace with your actual logic
-                          const prevSender = index > 0 ? messages[index-1].senderId : null;
+                          const prevSender = index > 0 ? messages[index - 1].senderId : null;
                           const showSender = prevSender !== message.senderId;
                           return (
                             <div key={message._id} className={`message-group ${isCurrentUser ? 'own-messages' : ''}`} style={{ marginBottom: showSender ? '20px' : '2px', marginTop: showSender ? '20px' : '2px' }}>
@@ -3633,50 +3673,50 @@ const Project = () => {
                                   <div style={{
                                     width: '35px',
                                     height: '35px',
-                                borderRadius: '50%',
+                                    borderRadius: '50%',
                                     backgroundColor: 'rgba(255, 138, 0, 0.2)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
                                     marginRight: '10px',
                                     flexShrink: 0
-                              }}>
+                                  }}>
                                     <i className="icofont-user-alt-7" style={{ color: '#ff8a00', fontSize: '18px' }}></i>
-                              </div>
+                                  </div>
                                 )}
-                                
+
                                 {!isCurrentUser && !showSender && (
                                   <div style={{ width: '45px', flexShrink: 0 }}></div>
                                 )}
-                                
+
                                 <div style={{
                                   maxWidth: '75%',
                                   wordBreak: 'break-word',
                                   backgroundColor: isCurrentUser ? 'rgba(82, 180, 71, 0.2)' : 'white',
                                   color: '#333',
                                   padding: '10px 14px',
-                                  borderRadius: isCurrentUser 
-                                    ? '15px 15px 2px 15px' 
+                                  borderRadius: isCurrentUser
+                                    ? '15px 15px 2px 15px'
                                     : '15px 15px 15px 2px',
                                   boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
                                   position: 'relative'
                                 }}>
                                   <div style={{ fontSize: '14px' }}>{message.content}</div>
-                                  <div style={{ 
+                                  <div style={{
                                     fontSize: '11px',
                                     color: '#999',
                                     textAlign: 'right',
-                                    marginTop: '4px' 
+                                    marginTop: '4px'
                                   }}>
-                                    {new Date(message.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                    {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     {isCurrentUser && (
                                       <i className="icofont-check-circled ms-1" style={{ color: '#1e40af' }}></i>
                                     )}
-                              </div>
-                            </div>
+                                  </div>
+                                </div>
 
                                 {isCurrentUser && showSender && (
-                            <div style={{ 
+                                  <div style={{
                                     width: '35px',
                                     height: '35px',
                                     borderRadius: '50%',
@@ -3688,17 +3728,17 @@ const Project = () => {
                                     flexShrink: 0
                                   }}>
                                     <i className="icofont-user-alt-7" style={{ color: '#1e40af', fontSize: '18px' }}></i>
-                            </div>
+                                  </div>
                                 )}
-                                
+
                                 {isCurrentUser && !showSender && (
                                   <div style={{ width: '45px', flexShrink: 0 }}></div>
                                 )}
                               </div>
-                              
+
                               {/* Attachments */}
-                            {message.fileUrls && message.fileUrls.length > 0 && message.fileUrls.some(url => url) && (
-                              <div style={{ 
+                              {message.fileUrls && message.fileUrls.length > 0 && message.fileUrls.some(url => url) && (
+                                <div style={{
                                   display: 'flex',
                                   justifyContent: isCurrentUser ? 'flex-end' : 'flex-start',
                                   marginTop: '5px'
@@ -3706,7 +3746,7 @@ const Project = () => {
                                   {!isCurrentUser && (
                                     <div style={{ width: '45px', flexShrink: 0 }}></div>
                                   )}
-                                  
+
                                   <div style={{
                                     maxWidth: '75%',
                                     display: 'flex',
@@ -3714,44 +3754,44 @@ const Project = () => {
                                     gap: '8px',
                                     justifyContent: isCurrentUser ? 'flex-end' : 'flex-start'
                                   }}>
-                                  {message.fileUrls.map((fileUrl, index) => {
-                                if (fileUrl) {
-                                  const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}${fileUrl.replace('uploads/', '')}`;
-                                  const fileExtension = cleanFileUrl.split('.').pop().toLowerCase();
-                                      const fileName = cleanFileUrl.split('/').pop();
+                                    {message.fileUrls.map((fileUrl, index) => {
+                                      if (fileUrl) {
+                                        const cleanFileUrl = `${import.meta.env.VITE_BASE_URL}${fileUrl.replace('uploads/', '')}`;
+                                        const fileExtension = cleanFileUrl.split('.').pop().toLowerCase();
+                                        const fileName = cleanFileUrl.split('/').pop();
 
-                                  if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                                    return (
-                                          <div key={index} style={{
+                                        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                          return (
+                                            <div key={index} style={{
                                               borderRadius: '10px',
-                                            overflow: 'hidden',
+                                              overflow: 'hidden',
                                               border: `2px solid ${isCurrentUser ? 'rgba(82, 180, 71, 0.3)' : 'rgba(255, 138, 0, 0.3)'}`,
                                               width: '120px',
                                               height: '120px',
                                               position: 'relative'
-                                          }}>
-                                        <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer">
-                                              <img 
-                                                src={cleanFileUrl} 
-                                                alt={`Attachment ${index + 1}`} 
-                                          style={{ 
-                                                  width: '100%', 
-                                                  height: '100%', 
-                                                  objectFit: 'cover', 
-                                                  cursor: 'pointer'
-                                                }} 
-                                              />
-                                        </a>
-                                      </div>
-                                    );
-                                  } else {
+                                            }}>
+                                              <a href={cleanFileUrl} target="_blank" rel="noopener noreferrer">
+                                                <img
+                                                  src={cleanFileUrl}
+                                                  alt={`Attachment ${index + 1}`}
+                                                  style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'cover',
+                                                    cursor: 'pointer'
+                                                  }}
+                                                />
+                                              </a>
+                                            </div>
+                                          );
+                                        } else {
                                           const isDoc = fileExtension === 'pdf' || fileExtension === 'doc' || fileExtension === 'docx';
-                                    return (
-                                            <a 
+                                          return (
+                                            <a
                                               key={index}
-                                              href={cleanFileUrl} 
-                                              target="_blank" 
-                                              rel="noopener noreferrer" 
+                                              href={cleanFileUrl}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
                                               style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
@@ -3774,29 +3814,29 @@ const Project = () => {
                                                 {fileName}
                                               </span>
                                             </a>
-                                    );
-                                  }
-                                }
-                                return null;
-                              })}
-                            </div>
-                                  
+                                          );
+                                        }
+                                      }
+                                      return null;
+                                    })}
+                                  </div>
+
                                   {isCurrentUser && (
                                     <div style={{ width: '45px', flexShrink: 0 }}></div>
                                   )}
-                          </div>
-                            )}
-                          </div>
+                                </div>
+                              )}
+                            </div>
                           );
                         })}
                       </div>
                     )}
-                          </div>
+                  </div>
 
                   {/* Message Input Area */}
                   <div className="chat-input-area" style={{
                     padding: '15px',
-                      backgroundColor: 'white',
+                    backgroundColor: 'white',
                     borderTop: '1px solid rgba(0,0,0,0.05)',
                     boxShadow: '0 -2px 10px rgba(0,0,0,0.03)',
                     zIndex: 1
@@ -3811,20 +3851,20 @@ const Project = () => {
                           position: 'relative',
                           flex: 1
                         }}>
-                        <textarea
-                          className="form-control"
-                          id="currentMessage"
-                          name="message"
+                          <textarea
+                            className="form-control"
+                            id="currentMessage"
+                            name="message"
                             rows="1"
-                          value={content}
+                            value={content}
                             onChange={(e) => {
                               setContent(e.target.value);
                               // Auto resize textarea
                               e.target.style.height = 'auto';
                               e.target.style.height = Math.min(120, e.target.scrollHeight) + 'px';
                             }}
-                          required
-                          ref={messageInputRef}
+                            required
+                            ref={messageInputRef}
                             style={{
                               borderRadius: '20px',
                               border: '1px solid rgba(0,0,0,0.1)',
@@ -3839,8 +3879,8 @@ const Project = () => {
                             }}
                             placeholder="Type a message here..."
                           />
-                          <label 
-                            htmlFor="fileUpload" 
+                          <label
+                            htmlFor="fileUpload"
                             style={{
                               position: 'absolute',
                               right: '15px',
@@ -3852,44 +3892,44 @@ const Project = () => {
                           >
                             <i className="icofont-attachment" style={{ fontSize: '20px' }}></i>
                           </label>
-                        <input
-                          type="file"
+                          <input
+                            type="file"
                             className="form-control d-none"
-                          id="fileUpload"
-                          onChange={messageFileChange}
-                          multiple
-                        />
-                      </div>
-                          <button 
-                            type="submit" 
-                            style={{
+                            id="fileUpload"
+                            onChange={messageFileChange}
+                            multiple
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          style={{
                             width: '45px',
                             height: '45px',
                             borderRadius: '50%',
                             backgroundColor: '#1e40af',
-                              color: 'white',
-                              border: 'none',
+                            color: 'white',
+                            border: 'none',
                             display: 'flex',
-                              alignItems: 'center',
+                            alignItems: 'center',
                             justifyContent: 'center',
                             boxShadow: '0 2px 8px rgba(82,180,71,0.3)',
                             transition: 'all 0.2s ease'
-                            }}
-                            onMouseOver={(e) => {
+                          }}
+                          onMouseOver={(e) => {
                             e.currentTarget.style.transform = 'scale(1.05)';
                             e.currentTarget.style.backgroundColor = '#1e40af';
-                            }}
-                            onMouseOut={(e) => {
+                          }}
+                          onMouseOut={(e) => {
                             e.currentTarget.style.transform = 'scale(1)';
                             e.currentTarget.style.backgroundColor = '#1e40af';
-                            }}
-                          >
+                          }}
+                        >
                           <i className="icofont-paper-plane" style={{ fontSize: '18px' }}></i>
-                          </button>
-                        </div>
-                      
+                        </button>
+                      </div>
+
                       {/* File preview area - shows when files are selected */}
-                      <div id="filePreviewArea" style={{ 
+                      <div id="filePreviewArea" style={{
                         display: 'none', /* Change this dynamically with JS when files are selected */
                         marginTop: '10px',
                         padding: '10px',
@@ -3907,8 +3947,8 @@ const Project = () => {
                             <i className="icofont-attachment me-1"></i>
                             <span id="fileCount">0</span> files selected
                           </span>
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             id="clearFiles"
                             style={{
                               backgroundColor: 'transparent',
@@ -3920,7 +3960,7 @@ const Project = () => {
                           >
                             Clear all
                           </button>
-                    </div>
+                        </div>
                         <div id="previewContainer" style={{
                           display: 'flex',
                           flexWrap: 'wrap',
@@ -3950,12 +3990,12 @@ const Project = () => {
                     padding: '16px 25px',
                     position: 'relative'
                   }}>
-                    <h5 
+                    <h5
                       className="modal-title"
-                        style={{ 
+                      style={{
                         color: 'white',
                         fontSize: '18px',
-                          fontWeight: '600',
+                        fontWeight: '600',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '10px'
@@ -3969,13 +4009,13 @@ const Project = () => {
                       className="btn-close"
                       data-bs-dismiss="modal"
                       aria-label="Close"
-                          style={{ 
+                      style={{
                         backgroundColor: 'rgba(255, 255, 255, 0.8)',
                         borderRadius: '50%',
                         padding: '8px',
                         opacity: '1',
-                            transition: 'all 0.2s ease'
-                          }}
+                        transition: 'all 0.2s ease'
+                      }}
                       onMouseOver={(e) => {
                         e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 1)';
                         e.currentTarget.style.transform = 'rotate(90deg)';
@@ -3986,7 +4026,7 @@ const Project = () => {
                       }}
                     />
                   </div>
-                  <div className="modal-body" style={{ 
+                  <div className="modal-body" style={{
                     padding: '25px',
                     backgroundColor: '#f9fcf7'
                   }}>
@@ -4002,7 +4042,7 @@ const Project = () => {
                             src={`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads/', '/')}`}
                             alt={`Preview ${index + 1}`}
                             className="img-fluid"
-                            style={{ 
+                            style={{
                               cursor: 'pointer',
                               width: '100%',
                               display: 'block'
@@ -4012,7 +4052,7 @@ const Project = () => {
                           <div style={{
                             position: 'absolute',
                             bottom: '0',
-                            left: '0', 
+                            left: '0',
                             right: '0',
                             background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)',
                             padding: '20px 15px 10px 15px',
@@ -4020,14 +4060,14 @@ const Project = () => {
                             justifyContent: 'space-between',
                             alignItems: 'center'
                           }}>
-                            <span style={{ 
+                            <span style={{
                               color: 'white',
                               fontSize: '14px',
                               fontWeight: '500'
                             }}>
                               Image {index + 1}
                             </span>
-                            <button 
+                            <button
                               onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads/', '/')}`, '_blank')}
                               style={{
                                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -4063,8 +4103,8 @@ const Project = () => {
                     display: 'flex',
                     justifyContent: 'center'
                   }}>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="btn"
                       data-bs-dismiss="modal"
                       style={{
@@ -4113,7 +4153,7 @@ const Project = () => {
                     padding: '20px 25px',
                     position: 'relative'
                   }}>
-                    <h5 
+                    <h5
                       className="modal-title"
                       style={{
                         color: 'white',
@@ -4149,14 +4189,14 @@ const Project = () => {
                       }}
                     />
                   </div>
-                  <div className="modal-body" style={{ 
+                  <div className="modal-body" style={{
                     padding: '25px',
                     backgroundColor: '#f9fcf7'
                   }}>
                     <div className="row g-4">
                       {selectedProjectImages.length > 0 ? (
                         selectedProjectImages.map((image, index) => (
-                        <div key={index} className="col-md-4">
+                          <div key={index} className="col-md-4">
                             <div style={{
                               borderRadius: '10px',
                               overflow: 'hidden',
@@ -4168,30 +4208,30 @@ const Project = () => {
                               display: 'flex',
                               flexDirection: 'column'
                             }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.transform = 'translateY(-5px)';
-                              e.currentTarget.style.boxShadow = '0 15px 30px rgba(0,0,0,0.15)';
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.transform = 'translateY(0)';
-                              e.currentTarget.style.boxShadow = '0 5px 15px rgba(0,0,0,0.08)';
-                            }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-5px)';
+                                e.currentTarget.style.boxShadow = '0 15px 30px rgba(0,0,0,0.15)';
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 5px 15px rgba(0,0,0,0.08)';
+                              }}
                             >
                               <div style={{
                                 position: 'relative',
                                 overflow: 'hidden'
                               }}>
-                            <img
-                              src={`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads/', '/')}`}
-                              alt={`Project Image ${index + 1}`}
-                              style={{
+                                <img
+                                  src={`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads/', '/')}`}
+                                  alt={`Project Image ${index + 1}`}
+                                  style={{
                                     height: '180px',
                                     width: '100%',
-                                objectFit: 'cover',
+                                    objectFit: 'cover',
                                     cursor: 'pointer',
                                     transition: 'transform 0.5s ease'
-                              }}
-                              onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads', '/')}`, '_blank')}
+                                  }}
+                                  onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads', '/')}`, '_blank')}
                                   onMouseOver={(e) => {
                                     e.currentTarget.style.transform = 'scale(1.05)';
                                   }}
@@ -4211,8 +4251,8 @@ const Project = () => {
                                   fontWeight: '500'
                                 }}>
                                   Image {index + 1}
-                            </div>
-                          </div>
+                                </div>
+                              </div>
                               <div style={{
                                 padding: '15px',
                                 display: 'flex',
@@ -4221,7 +4261,7 @@ const Project = () => {
                                 borderTop: '1px solid rgba(0,0,0,0.05)',
                                 flexGrow: 1
                               }}>
-                                <button 
+                                <button
                                   onClick={() => window.open(`${import.meta.env.VITE_BASE_URL}${image.replace('/uploads', '/')}`, '_blank')}
                                   style={{
                                     backgroundColor: index % 2 === 0 ? 'rgba(82, 180, 71, 0.1)' : 'rgba(255, 94, 0, 0.1)',
@@ -4249,9 +4289,9 @@ const Project = () => {
                                   <i className="icofont-eye"></i>
                                   View Full Size
                                 </button>
-                        </div>
-                    </div>
-                  </div>
+                              </div>
+                            </div>
+                          </div>
                         ))
                       ) : (
                         <div className="col-12 text-center py-5">
@@ -4261,18 +4301,18 @@ const Project = () => {
                             borderRadius: '10px',
                             border: '1px dashed rgba(82, 180, 71, 0.3)'
                           }}>
-                            <i className="icofont-image" style={{ 
-                              fontSize: '48px', 
+                            <i className="icofont-image" style={{
+                              fontSize: '48px',
                               color: '#1e40af',
                               opacity: '0.5',
                               marginBottom: '15px',
                               display: 'block'
                             }}></i>
-                            <p style={{ 
-                              margin: 0, 
-                              fontSize: '16px', 
+                            <p style={{
+                              margin: 0,
+                              fontSize: '16px',
                               fontWeight: '500',
-                              color: '#666' 
+                              color: '#666'
                             }}>
                               No images available for this project
                             </p>
@@ -4285,8 +4325,8 @@ const Project = () => {
                     borderTop: '1px solid rgba(82, 180, 71, 0.1)',
                     padding: '16px 25px'
                   }}>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="btn"
                       data-bs-dismiss="modal"
                       style={{
@@ -4323,13 +4363,13 @@ const Project = () => {
             {/* Pagination controls  */}
             <div className="row mt-4" style={{ marginBottom: '20px' }}>
               <div className="col-12 col-md-6 mb-3">
-                <div className="d-flex align-items-center" style={{ 
+                <div className="d-flex align-items-center" style={{
                   background: '#f9fcf7',
                   padding: '12px 15px',
                   borderRadius: '8px',
                   border: '1px solid rgba(82, 180, 71, 0.15)'
                 }}>
-                  <label htmlFor="projectsPerPage" className="form-label me-3 mb-0" style={{ 
+                  <label htmlFor="projectsPerPage" className="form-label me-3 mb-0" style={{
                     fontWeight: '600',
                     color: '#444',
                     fontSize: '14px'
@@ -4337,7 +4377,7 @@ const Project = () => {
                   <select
                     id="projectsPerPage"
                     className="form-select"
-                    style={{ 
+                    style={{
                       width: 'auto',
                       border: '1px solid rgba(82, 180, 71, 0.3)',
                       borderRadius: '6px',
@@ -4360,7 +4400,7 @@ const Project = () => {
                     <option value="100">100</option>
                     <option value="all">Show All</option>
                   </select>
-                  <div style={{ 
+                  <div style={{
                     marginLeft: '15px',
                     padding: '6px 12px',
                     backgroundColor: 'rgba(82, 180, 71, 0.1)',
@@ -4377,7 +4417,7 @@ const Project = () => {
                 </div>
               </div>
               <div className="col-12 col-md-6">
-                <nav aria-label="Page navigation" style={{ 
+                <nav aria-label="Page navigation" style={{
                   background: '#f9fcf7',
                   padding: '12px 15px',
                   borderRadius: '8px',
@@ -4385,10 +4425,10 @@ const Project = () => {
                 }}>
                   <ul className="pagination justify-content-md-end mb-0">
                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                      <button 
-                        onClick={prevPage} 
+                      <button
+                        onClick={prevPage}
                         className="page-link"
-                        style={{ 
+                        style={{
                           border: '1px solid rgba(82, 180, 71, 0.3)',
                           borderRadius: '6px 0 0 6px',
                           color: currentPage === 1 ? '#999' : '#1e40af',
@@ -4404,19 +4444,19 @@ const Project = () => {
                     </li>
                     {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
                       <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                        <button 
-                          onClick={() => paginate(page)} 
-                          className="page-link" 
-                          style={{ 
+                        <button
+                          onClick={() => paginate(page)}
+                          className="page-link"
+                          style={{
                             border: '1px solid rgba(82, 180, 71, 0.3)',
                             borderLeft: 'none',
                             borderRight: 'none',
                             color: currentPage === page ? 'white' : '#555',
                             padding: '8px 14px',
                             fontWeight: '600',
-                            background: currentPage === page ? 
+                            background: currentPage === page ?
                               'linear-gradient(135deg, #36a2eb)' : 'white',
-                            boxShadow: currentPage === page ? 
+                            boxShadow: currentPage === page ?
                               '0 2px 5px rgba(255, 94, 0, 0.3)' : 'none',
                             transition: 'all 0.2s ease',
                             minWidth: '40px',
@@ -4429,10 +4469,10 @@ const Project = () => {
                     ))}
                     {endPage < totalPages && (
                       <li className="page-item">
-                        <button 
-                          onClick={() => paginate(endPage + 1)} 
-                          className="page-link" 
-                          style={{ 
+                        <button
+                          onClick={() => paginate(endPage + 1)}
+                          className="page-link"
+                          style={{
                             border: '1px solid rgba(82, 180, 71, 0.3)',
                             borderRadius: '0 6px 6px 0',
                             color: '#1e40af',

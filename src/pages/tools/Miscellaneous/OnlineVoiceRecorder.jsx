@@ -265,89 +265,374 @@ const OnlineVoiceRecorder = () => {
     return (
         <>
             <div id="mytask-layout">
+                <style>
+                    {`
+                    .professional-card {
+                        background: linear-gradient(135deg, #ffffff, #f8f9fa);
+                        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+                        transition: all 0.3s ease;
+                    }
+                    .professional-card:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+                    }
+                    .recording-indicator {
+                        animation: pulse 1s ease-in-out infinite;
+                    }
+                    @keyframes pulse {
+                        0% { opacity: 1; }
+                        50% { opacity: 0.5; }
+                        100% { opacity: 1; }
+                    }
+                    .soundwave-canvas {
+                        border: 2px solid rgba(65, 105, 225, 0.3) !important;
+                        border-radius: 15px !important;
+                        background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+                    }
+                    `}
+                </style>
                 <Sidebar />
                 <div className="main">
                     <Header />
                     <div className="body d-flex py-lg-3 py-md-2 flex-column">
-                        <div className="d-flex align-items-center gap-3">
-                            <Link to="/miscellaneous" >
-                                <i className="bi bi-arrow-left fs-4" />
-                            </Link>
-                            <h4 className="mb-0 fw-bold">Online Voice Recorder</h4>
-                        </div>
-                        
-                        <div className="recorder-container mt-4">
-                            <div className="mb-3 d-flex align-items-center gap-3">
-                                <button 
-                                    className="btn btn-info" 
-                                    onClick={testMicrophone}
-                                    disabled={isTesting || isRecording}
-                                >
-                                    {isTesting ? 'Testing...' : 'Test Microphone'}
-                                </button>
-                                {testMessage && (
-                                    <span className={`text-${testMessage.includes('working') ? 'success' : 'danger'}`}>
-                                        {testMessage}
-                                    </span>
-                                )}
-                            </div>
-                            {micPermission === false && (
-                                <div className="text-danger mt-2">
-                                    Microphone access denied. Please check your browser permissions.
-                                </div>
-                            )}
-                            
-                            <canvas ref={canvasRef} width="600" height="100" style={{ border: '1px solid #000' }} />
-                            
-                            <div className="controls mt-3 d-flex gap-3">
-                                {!isRecording ? (
-                                    <button 
-                                        className="btn btn-primary" 
-                                        onClick={startRecording}
-                                        disabled={micPermission === false}
-                                    >
-                                        Record
-                                    </button>
-                                ) : (
-                                    <>
-                                        <button className="btn btn-warning" onClick={pauseRecording}>
-                                            {isPaused ? 'Resume' : 'Pause'}
-                                        </button>
-                                        <button className="btn btn-danger" onClick={stopRecording}>
-                                            Stop
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                            
-                            {audioURL && (
-                                <div className="mt-3">
-                                    <audio src={audioURL} controls className="mb-3 w-100" />
-                                    <div className="d-flex gap-2">
-                                        <button 
-                                            className="btn btn-success" 
-                                            onClick={() => downloadAudio('webm')}
-                                        >
-                                            <i className="bi bi-download me-2"></i>
-                                            Save as WebM
-                                        </button>
-                                        <button 
-                                            className="btn btn-success" 
-                                            onClick={() => downloadAudio('wav')}
-                                        >
-                                            <i className="bi bi-download me-2"></i>
-                                            Save as WAV
-                                        </button>
-                                        <button 
-                                            className="btn btn-primary" 
-                                            onClick={shareAudio}
-                                        >
-                                            <i className="bi bi-share me-2"></i>
-                                            Share
-                                        </button>
+                        <div className="container-xxl">
+                            {/* Header */}
+                            <div className="row align-items-center mb-4">
+                                <div className="col-12">
+                                    <div className="card-header py-4 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between" style={{
+                                        borderBottom: '2px solid rgba(82, 180, 71, 0.2)',
+                                        backgroundColor: 'transparent',
+                                        padding: '0 0 20px 0'
+                                    }}>
+                                        <div className="d-flex align-items-center gap-3 mb-3 mb-sm-0">
+                                            <Link to="/miscellaneous" className="text-decoration-none">
+                                                <div style={{
+                                                    width: '40px',
+                                                    height: '40px',
+                                                    backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                                                    borderRadius: '50%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    color: '#4169e1',
+                                                    transition: 'all 0.3s ease'
+                                                }}
+                                                onMouseOver={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.2)';
+                                                    e.currentTarget.style.transform = 'translateX(-3px)';
+                                                }}
+                                                onMouseOut={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'rgba(65, 105, 225, 0.1)';
+                                                    e.currentTarget.style.transform = 'translateX(0)';
+                                                }}
+                                                >
+                                                    <i className="bi bi-arrow-left fs-5"></i>
+                                                </div>
+                                            </Link>
+                                            <h4 className="mb-0 fw-bold" style={{color: '#333'}}>Online Voice Recorder</h4>
+                                        </div>
+                                        {isRecording && (
+                                            <div className="d-flex align-items-center gap-2" style={{
+                                                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                                padding: '8px 15px',
+                                                borderRadius: '25px',
+                                                color: '#dc3545',
+                                                fontSize: '14px',
+                                                fontWeight: '600'
+                                            }}>
+                                                <div className="recording-indicator" style={{
+                                                    width: '8px',
+                                                    height: '8px',
+                                                    backgroundColor: '#dc3545',
+                                                    borderRadius: '50%',
+                                                    marginRight: '8px'
+                                                }}></div>
+                                                Recording Audio...
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            )}
+                            </div>
+
+                            {/* Main Content */}
+                            <div className="row justify-content-center">
+                                <div className="col-12 col-lg-10">
+                                    <div className="card professional-card" style={{
+                                        borderRadius: '20px',
+                                        border: 'none',
+                                        overflow: 'hidden'
+                                    }}>
+                                        <div className="card-body p-4">
+                                            {/* Microphone Test Section */}
+                                            <div className="mb-4">
+                                                <div className="d-flex flex-wrap align-items-center gap-3 mb-3">
+                                                    <button 
+                                                        className="btn btn-info" 
+                                                        onClick={testMicrophone}
+                                                        disabled={isTesting || isRecording}
+                                                        style={{
+                                                            borderRadius: '25px',
+                                                            padding: '10px 25px',
+                                                            fontWeight: '600',
+                                                            transition: 'all 0.3s ease'
+                                                        }}
+                                                        onMouseOver={(e) => {
+                                                            if (!isTesting && !isRecording) {
+                                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                e.currentTarget.style.boxShadow = '0 5px 15px rgba(23, 162, 184, 0.3)';
+                                                            }
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            if (!isTesting && !isRecording) {
+                                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                                e.currentTarget.style.boxShadow = 'none';
+                                                            }
+                                                        }}
+                                                    >
+                                                        <i className="bi bi-mic me-2"></i>
+                                                        {isTesting ? 'Testing...' : 'Test Microphone'}
+                                                    </button>
+                                                    {testMessage && (
+                                                        <span className={`badge ${testMessage.includes('working') ? 'bg-success' : 'bg-danger'} px-3 py-2`} style={{
+                                                            fontSize: '14px',
+                                                            borderRadius: '20px'
+                                                        }}>
+                                                            <i className={`bi ${testMessage.includes('working') ? 'bi-check-circle' : 'bi-exclamation-triangle'} me-1`}></i>
+                                                            {testMessage}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {micPermission === false && (
+                                                    <div className="alert alert-danger d-flex align-items-center" style={{
+                                                        borderRadius: '15px',
+                                                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                                        borderLeft: '4px solid #dc3545'
+                                                    }}>
+                                                        <i className="bi bi-exclamation-circle-fill me-2"></i>
+                                                        Microphone access denied. Please check your browser permissions.
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Visualizer Section */}
+                                            <div className="text-center mb-4">
+                                                <div style={{
+                                                    backgroundColor: 'rgba(65, 105, 225, 0.05)',
+                                                    borderRadius: '15px',
+                                                    padding: '20px',
+                                                    border: '2px dashed rgba(65, 105, 225, 0.2)'
+                                                }}>
+                                                    <h6 className="mb-3 text-muted">
+                                                        <i className="bi bi-soundwave me-2"></i>
+                                                        Audio Visualizer
+                                                    </h6>
+                                                    <canvas 
+                                                        ref={canvasRef} 
+                                                        width="600" 
+                                                        height="100" 
+                                                        className="soundwave-canvas"
+                                                        style={{ 
+                                                            maxWidth: '100%',
+                                                            height: 'auto'
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Recording Controls */}
+                                            <div className="text-center mb-4">
+                                                <div className="d-flex gap-3 justify-content-center flex-wrap">
+                                                    {!isRecording ? (
+                                                        <button 
+                                                            className="btn btn-primary btn-lg" 
+                                                            onClick={startRecording}
+                                                            disabled={micPermission === false}
+                                                            style={{
+                                                                borderRadius: '50px',
+                                                                padding: '12px 30px',
+                                                                fontWeight: '600',
+                                                                fontSize: '16px',
+                                                                background: 'linear-gradient(135deg, #0d6efd, #4169e1)',
+                                                                border: 'none',
+                                                                boxShadow: '0 4px 15px rgba(13, 110, 253, 0.3)',
+                                                                transition: 'all 0.3s ease'
+                                                            }}
+                                                            onMouseOver={(e) => {
+                                                                if (micPermission !== false) {
+                                                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(13, 110, 253, 0.4)';
+                                                                }
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                if (micPermission !== false) {
+                                                                    e.currentTarget.style.transform = 'translateY(0)';
+                                                                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(13, 110, 253, 0.3)';
+                                                                }
+                                                            }}
+                                                        >
+                                                            <i className="bi bi-record-circle me-2"></i>
+                                                            Start Recording
+                                                        </button>
+                                                    ) : (
+                                                        <>
+                                                            <button 
+                                                                className="btn btn-warning btn-lg" 
+                                                                onClick={pauseRecording}
+                                                                style={{
+                                                                    borderRadius: '50px',
+                                                                    padding: '12px 30px',
+                                                                    fontWeight: '600',
+                                                                    fontSize: '16px',
+                                                                    background: 'linear-gradient(135deg, #ffc107, #fd7e14)',
+                                                                    border: 'none',
+                                                                    boxShadow: '0 4px 15px rgba(255, 193, 7, 0.3)',
+                                                                    transition: 'all 0.3s ease'
+                                                                }}
+                                                                onMouseOver={(e) => {
+                                                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 193, 7, 0.4)';
+                                                                }}
+                                                                onMouseOut={(e) => {
+                                                                    e.currentTarget.style.transform = 'translateY(0)';
+                                                                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 193, 7, 0.3)';
+                                                                }}
+                                                            >
+                                                                <i className={`bi ${isPaused ? 'bi-play-fill' : 'bi-pause-fill'} me-2`}></i>
+                                                                {isPaused ? 'Resume' : 'Pause'}
+                                                            </button>
+                                                            <button 
+                                                                className="btn btn-danger btn-lg" 
+                                                                onClick={stopRecording}
+                                                                style={{
+                                                                    borderRadius: '50px',
+                                                                    padding: '12px 30px',
+                                                                    fontWeight: '600',
+                                                                    fontSize: '16px',
+                                                                    background: 'linear-gradient(135deg, #dc3545, #c82333)',
+                                                                    border: 'none',
+                                                                    boxShadow: '0 4px 15px rgba(220, 53, 69, 0.3)',
+                                                                    transition: 'all 0.3s ease'
+                                                                }}
+                                                                onMouseOver={(e) => {
+                                                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 53, 69, 0.4)';
+                                                                }}
+                                                                onMouseOut={(e) => {
+                                                                    e.currentTarget.style.transform = 'translateY(0)';
+                                                                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 53, 69, 0.3)';
+                                                                }}
+                                                            >
+                                                                <i className="bi bi-stop-fill me-2"></i>
+                                                                Stop Recording
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Audio Playback Section */}
+                                            {audioURL && (
+                                                <div className="mt-4 p-4" style={{
+                                                    backgroundColor: 'rgba(65, 105, 225, 0.05)',
+                                                    borderRadius: '15px',
+                                                    border: '1px solid rgba(65, 105, 225, 0.1)'
+                                                }}>
+                                                    <h5 className="mb-3 fw-bold" style={{color: '#333'}}>
+                                                        <i className="bi bi-play-circle me-2"></i>
+                                                        Audio Playback
+                                                    </h5>
+                                                    <audio 
+                                                        src={audioURL} 
+                                                        controls 
+                                                        className="mb-4 w-100" 
+                                                        style={{
+                                                            borderRadius: '10px',
+                                                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                                                        }}
+                                                    />
+                                                    <div className="d-flex gap-3 justify-content-center flex-wrap">
+                                                        <button 
+                                                            className="btn btn-success btn-lg"
+                                                            onClick={() => downloadAudio('webm')}
+                                                            style={{
+                                                                borderRadius: '50px',
+                                                                padding: '10px 25px',
+                                                                fontWeight: '600',
+                                                                fontSize: '14px',
+                                                                background: 'linear-gradient(135deg, #28a745, #20c997)',
+                                                                border: 'none',
+                                                                boxShadow: '0 4px 15px rgba(40, 167, 69, 0.3)',
+                                                                transition: 'all 0.3s ease'
+                                                            }}
+                                                            onMouseOver={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(40, 167, 69, 0.4)';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(40, 167, 69, 0.3)';
+                                                            }}
+                                                        >
+                                                            <i className="bi bi-download me-2"></i>
+                                                            Save as WebM
+                                                        </button>
+                                                        <button 
+                                                            className="btn btn-success btn-lg"
+                                                            onClick={() => downloadAudio('wav')}
+                                                            style={{
+                                                                borderRadius: '50px',
+                                                                padding: '10px 25px',
+                                                                fontWeight: '600',
+                                                                fontSize: '14px',
+                                                                background: 'linear-gradient(135deg, #28a745, #20c997)',
+                                                                border: 'none',
+                                                                boxShadow: '0 4px 15px rgba(40, 167, 69, 0.3)',
+                                                                transition: 'all 0.3s ease'
+                                                            }}
+                                                            onMouseOver={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(40, 167, 69, 0.4)';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(40, 167, 69, 0.3)';
+                                                            }}
+                                                        >
+                                                            <i className="bi bi-download me-2"></i>
+                                                            Save as WAV
+                                                        </button>
+                                                        <button 
+                                                            className="btn btn-info btn-lg"
+                                                            onClick={shareAudio}
+                                                            style={{
+                                                                borderRadius: '50px',
+                                                                padding: '10px 25px',
+                                                                fontWeight: '600',
+                                                                fontSize: '14px',
+                                                                background: 'linear-gradient(135deg, #17a2b8, #6f42c1)',
+                                                                border: 'none',
+                                                                boxShadow: '0 4px 15px rgba(23, 162, 184, 0.3)',
+                                                                transition: 'all 0.3s ease'
+                                                            }}
+                                                            onMouseOver={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(23, 162, 184, 0.4)';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(23, 162, 184, 0.3)';
+                                                            }}
+                                                        >
+                                                            <i className="bi bi-share me-2"></i>
+                                                            Share Audio
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
